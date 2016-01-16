@@ -1,0 +1,19 @@
+{
+  "name": "skypager-central",
+  "private": true,
+  "version": "1.0.0",
+  "description": "skypager central management repository",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "rm -rf node_modules/* && npm run link:packages",
+    "link:packages": "ln -s ./packages/skypager-presets/node_modules/* ./node_modules"
+  },
+  "author": "Jonathan Soeder <jon@chicago.com>",
+  "license": "UNLICENSED",
+  "skypager": {
+       "main": "skypager.js"
+  },
+  "devDependencies": {
+       "skypager": "latest"
+  }
+}

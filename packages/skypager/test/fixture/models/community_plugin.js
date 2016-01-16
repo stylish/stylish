@@ -1,0 +1,3 @@
+describe("CommunityPlugin", function(model){
+
+})

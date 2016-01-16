@@ -1,0 +1,6 @@
+{
+  "name": "Application Portfolio Manager",
+  "skypager": {
+    "main": "index.js"
+  }
+}

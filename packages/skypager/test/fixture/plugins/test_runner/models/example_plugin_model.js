@@ -1,0 +1,3 @@
+describe("ExamplePluginModel", function(){
+
+})

@@ -1,0 +1,6 @@
+{
+  "name": "skypager-redux",
+  "description": "a redux based flux interface for a skypager project.",
+  "version": "1.0.0",
+  "main": "index.js"
+}

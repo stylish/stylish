@@ -1,0 +1,12 @@
+data_sources:
+  events:
+    attributes:
+      eventName: 
+        type: string
+        required: true
+      regularScheduled:
+        type: boolean
+        default: false
+      startDate:
+        type: datetime
+        required: true

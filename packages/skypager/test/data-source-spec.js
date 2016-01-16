@@ -1,0 +1,25 @@
+import Skypager from './index'
+
+describe("DataSources", ()=>{
+  const project = require('./fixture')
+
+  it("can be accessed through the project content collections", ()=>{
+    typeof(project.content.data_sources.at('inspiration')).should.not.equal('undefined')
+  })
+
+  it("parses YAML", ()=>{
+    let datasource = project.content.data_sources.at('inspiration')
+    datasource.data.should.have.property('note', 'This exists to show how YAML can be used to power an entity.')
+  })
+
+  it("parses JSON", ()=>{
+    let datasource = project.content.data_sources.at('example')
+    datasource.data.should.have.property('name','Example')
+  })
+
+  xit("parses CSV", ()=>{
+    let datasource = project.content.data_sources.at('tabular')
+    datasource.data.should.have.property('length', 1)
+  })
+
+})

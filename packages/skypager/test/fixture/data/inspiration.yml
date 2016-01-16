@@ -1,0 +1,4 @@
+note: This exists to show how YAML can be used to power an entity.
+projects:
+- 'mdast by @woormer for providing an awesome markdown parser / renderer'
+- 'brief by @datapimp for an early example of using markdown to power an ORM'

@@ -1,0 +1,6 @@
+{
+  "name": "skypager-plugin-project-documentation",
+  "description": "a skypager plugin for our internal project documentation projects",
+  "version": "1.0.0",
+  "main": "index.js"
+}

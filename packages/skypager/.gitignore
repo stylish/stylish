@@ -1,0 +1,8 @@
+node_modules/
+bower_components/
+support/*
+plugins/*
+npm-debug.log
+.env
+.DS_Store
+test/fixture/dist/snapshot.*

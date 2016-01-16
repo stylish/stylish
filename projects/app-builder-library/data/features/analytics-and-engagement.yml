@@ -1,0 +1,4 @@
+suggested_integrations:
+  - mixpanel
+  - google-analytics
+  - flurry

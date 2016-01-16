@@ -1,0 +1,24 @@
+.manager {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.overlay {
+  position: absolute;
+  z-index: 10000;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  background: rgba(0,0,0,0.5);
+}
+
+.manager :global(.slide-drawer) {
+  z-index: 11000;
+  position: absolute;
+}
+
