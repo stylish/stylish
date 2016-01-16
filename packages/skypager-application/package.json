@@ -1,5 +1,8 @@
 {
   "name": "skypager-application",
   "version": "1.0.4",
-  "main": "index.js"
+  "main": "index.js",
+  "skypager": {
+    "main": "skypager.js"
+  }
 }
