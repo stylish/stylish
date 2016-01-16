@@ -1,5 +1,5 @@
-describe('Clone')
+describe('Clone', function(){  })
 
-export function create (document) {
+exports.create = function create (document) {
   return document.data
 }

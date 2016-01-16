@@ -1,3 +1,5 @@
-import Application from './application'
+import Application from './web_application'
 
-module.exports = Application
+module.exports = {
+  Application
+}

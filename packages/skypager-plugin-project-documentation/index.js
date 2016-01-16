@@ -1,1 +1,1 @@
-import redux from 'redux'
+module.exports = require('./src')

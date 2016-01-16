@@ -4,6 +4,6 @@ const actions = ['assets/load','assets/update','documents/create','documents/det
 
 module.exports = function loadActions (skypager) {
   actions.forEach(action => {
-    console.log(registry.load(require.resolve('./' + action)))
+    registry.load(require.resolve('./' + action))
   })
 }

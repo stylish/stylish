@@ -1,5 +1,5 @@
-describe("Backlog")
+describe("Backlog", function() {})
 
-export function create(document) {
+exports.create =  function create(document) {
   return document.data
 }

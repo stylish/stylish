@@ -9,6 +9,8 @@ const config = new Config()
 const directory = process.cwd()
 const isDev = (env === 'development')
 
+const argv = require('yargs')
+
 const modulesDirectories = [
   `${directory}/node_modules`,
   `${__dirname}/node_modules`,
@@ -19,14 +21,14 @@ const hasModules = fs.existsSync(path.join(__dirname, 'node_modules'))
 
 const resolveBabelPackages = packages => {
   const modulePath = hasModules ? 'node_modules' : '../../node_modules'
-  return packages.map(package => {
-    return path.resolve(__dirname, modulePath, package)
-  })
+  return packages.map(p => { return path.resolve(__dirname, modulePath, p) })
 }
+
+const entry = argv.entry || './src'
 
 config
   .merge({
-    entry: ['webpack-hot-middleware/client', './src'],
+    entry: ['webpack-hot-middleware/client', entry],
     output: {
       path: path.join(directory, 'public'),
       filename: '[name].js',
@@ -111,6 +113,26 @@ if (env == 'production') {
 const userConfig = path.resolve(directory, './webpack.config.js')
 if (fs.existsSync(userConfig)) {
   config.merge(require(userConfig))
+}
+
+if (argv.project) {
+  config.merge({
+    resolve: {
+      alias: {
+        'skypager-project-src': path.resolve(argv.project)
+      }
+    }
+  })
+}
+
+if (argv.projectSnapshot) {
+  config.merge({
+    resolve: {
+      alias: {
+        'skypager-project-dist': path.resolve(argv.projectSnapshot)
+      }
+    }
+  })
 }
 
 module.exports = config

@@ -2,5 +2,11 @@
   "name": "skypager-plugin-project-documentation",
   "description": "a skypager plugin for our internal project documentation projects",
   "version": "1.0.0",
-  "main": "index.js"
+  "main": "index.js",
+  "skypager": {
+    "main": "skypager.js",
+    "paths": {
+      "models": "src/models"
+    }
+  }
 }

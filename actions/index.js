@@ -1,9 +1,10 @@
 var actions = [
-  'packages/generate',
   'packages/publish',
   'packages/sync_versions',
   'packages/test',
   'packages/initialize',
+  'packages/clone',
+  'projects/initialize',
   'projects/clone',
   'projects/preview',
   'projects/publish',

@@ -1,0 +1,8 @@
+{
+  "name": "portfolio-manager-product-site",
+  "version": "1.0.0",
+  "skypager": {
+    "main": "skypager.js",
+    "theme": "marketing-site"
+  }
+}
