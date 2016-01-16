@@ -6,6 +6,13 @@ and packages.  Packages refer to the reusable components and
 boilerplate modules that are shared across the projects in
 the portfolio.
 
+## Usage
+
+Clone this repo and run npm install. This will install the
+`skypager-presets` libraries, and symlink a local
+`node_modules` folder.  This will allow all projects and
+packages to share the same set of dependencies.
+
 ## Dependency Management
 
 This Monorepo automatically links to the `node_modules` of

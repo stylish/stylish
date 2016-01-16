@@ -121,10 +121,19 @@ function run () {
       if (!helper) { abort(`could not find an action helper using ${ helperId }`) }
 
       if (helper) {
-        log(`Running ${ details.join(' ') }`.green)
+        info(`Running ${ details.join(' ') }`)
+
+        helper.run({
+          ...argv,
+          project
+        })
       }
     }
   })
+}
+
+function info(msg) {
+  console.log(msg.green)
 }
 
 function abort (msg) {

@@ -3,6 +3,7 @@ const HELPERS = [
   'collection_bundle',
   'html',
   'json',
+  'entities',
   'snapshot',
   'disk'
 ]

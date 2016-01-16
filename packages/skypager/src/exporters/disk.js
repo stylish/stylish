@@ -9,7 +9,7 @@ module.exports = function run_disk_exporter (options = {}) {
   var project = options.project = options.project || this,
       type = options.type || 'snapshot',
       filename = options.filename || type,
-      format = options.format || 'js',
+      format = options.format || 'json',
       path = options.path || project.path('build', filename + '.' + format),
       payload = options.payload ? options.payload : project.run.exporter(type, options),
       serialized = '';
@@ -18,7 +18,7 @@ module.exports = function run_disk_exporter (options = {}) {
         serialized = JSON.stringify(payload)
 
         if (format === 'js') {
-          serialized = 'module.exports = JSON.parse(' + serialized + ')'
+          serialized = `module.exports = JSON.parse(${ JSON.stringify(payload) })`
         }
       }
 

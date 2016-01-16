@@ -5,7 +5,9 @@
   "description": "skypager central management repository",
   "main": "index.js",
   "scripts": {
-    "postinstall": "rm -rf node_modules/* && npm run link:packages",
+    "postinstall": "rm -rf node_modules/* && npm run presets",
+    "presets": "cd ./packages/skypager-presets && npm install && cd ../..",
+    "postpresets": "npm run link:packages",
     "link:packages": "ln -s ./packages/skypager-presets/node_modules/* ./node_modules"
   },
   "author": "Jonathan Soeder <jon@chicago.com>",
