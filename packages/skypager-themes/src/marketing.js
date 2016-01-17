@@ -1,4 +1,4 @@
-require('./marketing/less/toolkit-startup.less')
+require('!!style!less!./marketing/less/toolkit-startup.less')
 require('./bootstrap-javascript.js')
 require('./marketing/js/custom/image-grid.js')
 require('./marketing/js/custom/zoom.js')

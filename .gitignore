@@ -3,3 +3,4 @@ node_modules/
 .git
 legacy/
 .DS_Store
+core/

@@ -59,7 +59,7 @@ config
   })
 
   .loader('less', {
-    test: /\.css\.less$/,
+    test: /\.less$/,
     loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
                     : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')
 

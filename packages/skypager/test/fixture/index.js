@@ -11,5 +11,10 @@ module.exports = require('../index').load(__filename, {
     modelPatterns: {
       testcase: /-spec/
     }
+  },
+  hooks: {
+    registriesDidLoad: function() {
+      this.registryHookRan = true
+    }
   }
 })

@@ -17,6 +17,16 @@ const debug = _debug('skypager:project')
 const hide = util.hide.getter
 const lazy = util.lazy
 
+const HOOKS = [
+  'contentWillInitialize',
+  'contentDidInitialize',
+  'projectWillAutoImport',
+  'projectDidAutoImport',
+  'willBuildEntities',
+  'didBuildEntities',
+  'registriesDidLoad'
+]
+
 class Project {
   constructor (uri, options = {}) {
     debug('project created at: ' + uri)
@@ -38,6 +48,9 @@ class Project {
       value: options.manifest || {}
     })
 
+    // autobind hooks functions passed in as options
+    project.hidden('hooks', setupHooks.call(project, options.hooks))
+
     project.hidden('paths', paths.bind(project))
 
     const plugins = [ ]
@@ -47,20 +60,28 @@ class Project {
 
     project.name = options.name || basename(project.root)
 
+    project.runHook('contentWillInitialize')
     // wrap the content interface in a getter but make sure
     // the documents collection is loaded and available right away
     project.hidden('content', content.call(project))
 
+    project.runHook('contentDidInitialize')
+
     if (options.autoImport !== false) {
       debug('running autoimport', options.autoLoad)
 
+      project.runHook('projectWillAutoImport')
+
       runImporter.call(project, {
+        type: (options.importerType || 'disk'),
         autoLoad: options.autoLoad || {
           documents: true,
           assets: true,
           vectors: true
         }
       })
+
+      project.runHook('projectDidAutoImport')
     }
 
     util.hide.getter(project, 'supportedAssetExtensions', () => Assets.Asset.SupportedExtensions )
@@ -70,11 +91,22 @@ class Project {
       get: function () {
         delete project.entities
         debug('building entities')
-        return project.entities = entities.call(project)
+
+        project.runHook('willBuildEntities')
+        project.entities = entities.call(project)
+        project.runHook('didBuildEntities', project, project.entities)
+
+        return project.entities
       }
     })
+
   }
 
+  runHook(name, ...args) {
+    let project = this
+    let fn = project.hooks[name] || project[name]
+    if (fn) { fn.call(project, ...args) }
+  }
   /**
    * A proxy object that lets you run one of the project helpers.
    *
@@ -317,7 +349,11 @@ function registries () {
   let project = this
   let root = project.root
 
-  return Registry.buildAll(project, Helpers, {root})
+  let registries = Registry.buildAll(project, Helpers, {root})
+
+  project.runHook('registriesDidLoad')
+
+  return registries
 }
 
 function entities() {
@@ -332,6 +368,20 @@ function entities() {
         return entities
       }
     })
+
+    return memo
+  }, {})
+}
+
+function setupHooks(hooks = {}) {
+  let project = this
+
+  return Object.keys(hooks).reduce((memo, hook) => {
+    let fn = hooks[hook]
+
+    if (typeof fn === 'function') {
+      memo[hook] = fn.bind(project)
+    }
 
     return memo
   }, {})

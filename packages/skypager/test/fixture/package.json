@@ -1,5 +1,6 @@
 {
   "name":"skypager-documentation",
   "version": "0.0.1",
-  "skypager":{ "plugins":["test_runner"] }
+  "main": "index.js",
+  "skypager":{ "main": "index.js", "plugins":["test_runner"] }
 }

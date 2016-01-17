@@ -1,25 +1,76 @@
 {
   "name": "skypager-central",
-  "private": true,
-  "version": "1.0.0",
-  "description": "skypager central management repository",
-  "main": "index.js",
-  "scripts": {
-      "postinstall": "npm run install:presets && npm run link:packages",
-      "install:presets": "cd packages/skypager-presets && npm install",
-      "link:packages": "rm -rf node_modules && mkdir -p node_modules && npm run link:presets:packages && npm run link:skypager:packages",
-      "link:skypager:packages": "mkdir -p node_modules && cd node_modules && ln -sf ../packages/skypager-* . && cd ..",
-      "link:presets:packages": "mkdir -p node_modules && cd node_modules && ln -sf ../packages/skypager-presets/node_modules/* . && cd .."
-  },
-  "author": "Jonathan Soeder <jon@chicago.com>",
-  "license": "UNLICENSED",
+  "version": "1.1.0",
+  "description": "development base for the skypager portfolio",
+  "main": "skypager.js",
   "skypager": {
-       "main": "skypager.js",
-       "plugins":[
-           "project-documentation"
-       ]
+    "main": "skypager.js"
   },
-  "devDependencies": {
-       "skypager": "latest"
-  }
+  "scripts": {
+    "postinstall": "npm link skypager-application skypager-devpack skypager-electron skypager-plugin-project-documentation skypager-services skypager-themes skypager-ui skypager",
+    "docs": "skypager serve --entry ./src/docs"
+  },
+  "skypager": {
+    "main": "skypager.js"
+  },
+  "dependencies": {
+    "babel-core": "^6.4.0",
+    "babel-loader": "^6.2.1",
+    "babel-plugin-add-module-exports": "^0.1.2",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-react-hmre": "^1.0.1",
+    "babel-preset-stage-0": "^6.3.13",
+    "bootstrap": "^3.3.6",
+    "commander": "^2.9.0",
+    "css-loader": "^0.23.1",
+    "exports-loader": "^0.6.2",
+    "expose-loader": "^0.7.1",
+    "express": "^4.13.3",
+    "file-loader": "^0.8.5",
+    "history": "^1.17.0",
+    "html-webpack-plugin": "^1.7.0",
+    "imports-loader": "^0.6.5",
+    "jquery": "^2.2.0",
+    "less-loader": "latest",
+    "postcss-cssnext": "2.4.0",
+    "postcss-import": "7.1.3",
+    "postcss-loader": "0.8.0",
+    "react": "^0.14.6",
+    "react-body-classname": "latest",
+    "react-bootstrap": "^0.28.2",
+    "react-dom": "^0.14.6",
+    "react-redux": "^4.0.6",
+    "react-router": "^1.0.3",
+    "redbox-react": "^1.2.0",
+    "redux": "^3.0.5",
+    "redux-actions": "^0.9.0",
+    "redux-simple-router": "^2.0.2",
+    "redux-thunk": "^1.0.3",
+    "style-loader": "^0.13.0",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.12.11",
+    "webpack-configurator": "^0.3.1",
+    "webpack-dev-middleware": "^1.4.0",
+    "webpack-hot-middleware": "^2.6.0",
+    "skypager-application": "file:./packages/skypager-application",
+    "skypager-devpack": "file:./packages/skypager-devpack",
+    "skypager-electron": "file:./packages/skypager-electron",
+    "skypager-plugin-blueprints": "file:./packages/skypager-plugin-blueprints",
+    "skypager-services": "file:./packages/skypager-services",
+    "skypager-themes": "file:./packages/skypager-themes",
+    "skypager-ui": "file:./packages/skypager-ui",
+    "skypager": "file:./packages/skypager"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/datapimp/soederpop-presets.git"
+  },
+  "author": "soederpop",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/datapimp/soederpop-presets/issues"
+  },
+  "homepage": "https://github.com/datapimp/soederpop-presets#readme"
 }
