@@ -1,1 +1,0 @@
-module.exports = JSON.parse({"entities":{"outlines":{},"pages":{},"backlogs":{},"clones":{},"concepts":{},"epics":{},"packages":{},"personas":{},"projects":{},"repositories":{}}})

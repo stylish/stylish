@@ -4,6 +4,7 @@ import os from 'os'
 import url from 'url'
 import address from 'url-parse-as-address'
 import isDomain from 'is-domain'
+import { spawn } from 'child_process'
 
 import { argv } from 'yargs'
 import { existsSync as exists, readFileSync } from 'fs'
@@ -54,6 +55,7 @@ let commands = {
   export: runExporter,
   console: runConsole,
   author,
+  compile,
   serve,
   publish,
   devmode,
@@ -164,7 +166,31 @@ function browse () {
   })
 }
 
-function serve () {}
+function serve () {
+  notice('Running skypager project server...')
+
+  pipeline('pkg','project','plugins', (request, next) => {
+    if (request.project) {
+      notice('Found project at: ' + request.project.uri)
+      args.push('--project-uri', request.project.uri)
+      args.push('--project-root', request.project.root)
+      args.push('--project-snapshot-dir', request.project.paths.build)
+    }
+
+    var child = spawn('skypager-devpack', ['start'].concat(args), {})
+
+    child.stdout.on('data', (data) => { console.log(data.toString()) })
+  })
+}
+
+function compile () {
+   pipeline('pkg','project','plugins', (request, next) => {
+    var child = spawn('skypager-devpack', ['build'].concat(args), {})
+    child.stdout.on('data', (data) => { console.log(data.toString()) })
+    child.stderr.on('data', (data) => { console.log(data.toString()) })
+  })
+}
+
 function publish () {}
 function devmode () {}
 function login () {}
@@ -191,6 +217,13 @@ function repl (additionalContext = {}) {
   Object.keys(additionalContext).forEach(key => {
     replServer.context[key] = additionalContext[key]
   })
+}
+
+function notice(...i) {
+  i.unshift(brand.green + '> ')
+  i = i.filter(function(n){ return n != undefined });
+  console.log.apply(console, i)
+  return this
 }
 
 function warn(...i) {

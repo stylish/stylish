@@ -5,15 +5,19 @@
   "description": "skypager central management repository",
   "main": "index.js",
   "scripts": {
-    "postinstall": "rm -rf node_modules/* && npm run presets",
-    "presets": "cd ./packages/skypager-presets && npm install && cd ../..",
-    "postpresets": "npm run link:packages",
-    "link:packages": "ln -s ./packages/skypager-presets/node_modules/* ./node_modules"
+      "postinstall": "npm run install:presets && npm run link:packages",
+      "install:presets": "cd packages/skypager-presets && npm install",
+      "link:packages": "rm -rf node_modules && mkdir -p node_modules && npm run link:presets:packages && npm run link:skypager:packages",
+      "link:skypager:packages": "mkdir -p node_modules && cd node_modules && ln -sf ../packages/skypager-* . && cd ..",
+      "link:presets:packages": "mkdir -p node_modules && cd node_modules && ln -sf ../packages/skypager-presets/node_modules/* . && cd .."
   },
   "author": "Jonathan Soeder <jon@chicago.com>",
   "license": "UNLICENSED",
   "skypager": {
-       "main": "skypager.js"
+       "main": "skypager.js",
+       "plugins":[
+           "project-documentation"
+       ]
   },
   "devDependencies": {
        "skypager": "latest"

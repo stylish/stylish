@@ -39,6 +39,10 @@ class Project {
     })
 
     project.hidden('paths', paths.bind(project))
+
+    const plugins = [ ]
+    util.hide.getter(project, 'enabledPlugins', () => plugins)
+
     project.lazy('registries', registries.bind(project), false)
 
     project.name = options.name || basename(project.root)
@@ -59,9 +63,6 @@ class Project {
       })
     }
 
-    const plugins = [ ]
-
-    util.hide.getter(project, 'enabledPlugins', () => plugins)
     util.hide.getter(project, 'supportedAssetExtensions', () => Assets.Asset.SupportedExtensions )
 
     Object.defineProperty(project, 'entities', {

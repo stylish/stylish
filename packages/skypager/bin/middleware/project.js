@@ -23,7 +23,7 @@ export function currentProject(request = {}, next) {
   } else if (pkg.skypager && pkg.skypager.main && exists(pwd(pkg.skypager.main))) {
     options = Object.assign(options, pkg.skypager)
     foundProject = pwd(pkg.skypager.main)
-    request.project = skypager.load(foundProject, options)
+    request.project = require(foundProject)
   }
 
   next()

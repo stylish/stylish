@@ -3,6 +3,7 @@ const fs = require('fs')
 const Config = require('webpack-configurator')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const env = process.env.NODE_ENV || 'development'
 const config = new Config()
@@ -28,7 +29,7 @@ const entry = argv.entry || './src'
 
 config
   .merge({
-    entry: ['webpack-hot-middleware/client', entry],
+    entry: ['webpack-hot-middleware/client', 'skypager-themes/src/dashboard', entry],
     output: {
       path: path.join(directory, 'public'),
       filename: '[name].js',

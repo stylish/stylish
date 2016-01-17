@@ -76,6 +76,10 @@ class Framework {
     // allow for skypager.json files
     try { Object.assign(options.manifest.skypager, require(root + '/skypager.json')) } catch (error) { }
 
+    if (process.env.SKYPAGER_DEBUG) {
+      console.log('Loading skypager project file', projectFile, options)
+    }
+
     let project = (new this.Project(projectFile, options))
 
     return ProjectCache.projects[projectFile] = project
