@@ -1,5 +1,5 @@
-import Application from './web_application'
+import WebApplication from './web_application'
 
 module.exports = {
-  Application
+  WebApplication
 }

@@ -11,7 +11,7 @@ program
   .parse(process.argv)
 
 const directory = path.resolve('.')
-const config = require('../').resolve()
+const config = require('../compile').resolve()
 
 const compiler = webpack(config)
 
@@ -19,7 +19,8 @@ const compiler = webpack(config)
 compiler.run((err, stats) => {
   if (err) {
     console.log(err)
+    process.exit(1)
   } else {
-    console.log('Build successful')
+    process.exit(0)
   }
 })

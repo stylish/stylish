@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "skypager": {
     "main": "skypager.js",
-    "theme": "marketing-site"
+    "theme": "marketing-site",
+    "domain": "portfolio-manager-test"
   }
 }

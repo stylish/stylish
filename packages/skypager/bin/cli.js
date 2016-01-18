@@ -15,14 +15,13 @@ import * as middleware from './middleware'
 
 let skypager
 
-if (process.env.NODE_ENV === 'development') {
-  throw('tantri')
-  skypager = require('../src/index')
-} else {
+if (process.env.NODE_ENV === 'production') {
   skypager = require('../lib/index')
+} else {
+  skypager = require('../src/index')
 }
 
-const brand = 'Skypager'
+const brand = 'skypager'
 const args = argv._
 const command = args[0] || 'help'
 const details = args.slice(1, args.length)
@@ -184,14 +183,33 @@ function serve () {
 }
 
 function compile () {
-   pipeline('pkg','project','plugins', (request, next) => {
-    var child = spawn('skypager-devpack', ['build'].concat(args), {})
-    child.stdout.on('data', (data) => { console.log(data.toString()) })
-    child.stderr.on('data', (data) => { console.log(data.toString()) })
+	var newEnv = process.env
+	newEnv.NODE_ENV = 'production'
+
+  pipeline('pkg','project','plugins', (request, next) => {
+		spawnCommand('skypager-devpack', ['build', '--env', 'production'].concat(args), {
+			env: newEnv,
+		}).then(()=> {
+			notice('Built project')
+		})
   })
 }
 
-function publish () {}
+function publish () {
+  pipeline('pkg','project','plugins', (request, next) => {
+		let pkg = request.pkg
+		let domain = argv.domain || (pkg.skypager && pkg.skypager.domain) || pkg.name
+
+		if (!domain) {
+			abort('Specify a domain in package.json skypager')
+		}
+
+		spawnCommand('surge', ['publish', '--endpoint', 'surge.skypager.io', '--project', './public', '--domain', domain]).then(()=> {
+			notice('Finished publishing')
+		})
+  })
+}
+
 function devmode () {}
 function login () {}
 function whoami () {}
@@ -220,21 +238,25 @@ function repl (additionalContext = {}) {
 }
 
 function notice(...i) {
-  i.unshift(brand.green + '> ')
+  i.unshift(brand.green + ': ')
   i = i.filter(function(n){ return n != undefined });
   console.log.apply(console, i)
   return this
 }
 
+function handleOutput(i) {
+	console.log(i.toString())
+}
+
 function warn(...i) {
-  i.unshift(brand.yellow + '> ')
+  i.unshift(brand.yellow + ': ')
   i = i.filter(function(n){ return n != undefined });
   console.log.apply(console, i)
   return this
 }
 
 function debug(...i){
-  i.unshift(brand.magenta + '> ')
+  i.unshift(brand.magenta + ': ')
   i = i.filter(function(n){ return n != undefined });
   console.log.apply(console, i)
   return this
@@ -258,6 +280,25 @@ function test () {
 
     next()
   })
+}
+
+function spawnCommand (command, args, options) {
+	return new Promise((resolve,reject) => {
+		let child = spawn(command, args, options)
+
+		if (!argv.quiet) {
+			child.stdout.on('data', handleOutput)
+			child.stderr.on('data', handleOutput)
+		}
+
+		child.on('close', exitCode => {
+			if (exitCode === 0 || options.ignoreExitCode) {
+				resolve(0)
+			} else {
+				reject(exitCode)
+			}
+		})
+	})
 }
 
 if (commands[command]) {

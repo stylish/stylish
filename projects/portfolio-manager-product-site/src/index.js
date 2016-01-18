@@ -1,6 +1,7 @@
-import Application from 'skypager-application'
+import { WebApplication as Application } from 'skypager-application'
+
 import Main from './entries/Main'
 
-module.exports = window.App = Application.render({
-  mainComponent: Main
+Application.render({
+  defaultEntry: Main
 })

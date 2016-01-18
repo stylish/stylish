@@ -63,6 +63,7 @@
     "read": "^1.0.7",
     "request": "^2.67.0",
     "should": "^7.1.1",
+    "surge": "^0.17.5",
     "underscore.string": "^3.2.2",
     "unist-util-visit": "^1.0.0",
     "url": "^0.11.0",

@@ -17,7 +17,7 @@ import memoryHistory from 'history/lib/createMemoryHistory'
  * Application.render({
  *   state: [ {...}, {...} ],
  *   reducers: [{...}, {...}],
- *   mainComponent,
+ *   defaultEntry,
  *   routes
  * })
  *
@@ -27,7 +27,7 @@ import memoryHistory from 'history/lib/createMemoryHistory'
  * @param reducers array an array of reducer objects which will be merged into
  *  a single rootReducer
  *
- * @param mainComponent React.Component a reference to the component which will be the IndexRoute
+ * @param defaultEntry React.Component a reference to the component which will be the IndexRoute
 */
 export class Application {
   static render (options = {}) {
@@ -101,19 +101,13 @@ export class Application {
   get router () {
     return (
        <Route path='/'>
-         <IndexRoute component={ this.mainComponent } />
-
-         <Route path='other'>
-            <IndexRoute component={ Page } />
-            <Route path="section" component={ Page } />
-         </Route>
-
+         <IndexRoute component={ this.defaultEntry } />
        </Route>
     )
   }
 
-  get mainComponent () {
-    return this.options.mainComponent || HelpPage
+  get defaultEntry () {
+    return this.options.defaultEntry || HelpPage
   }
 }
 

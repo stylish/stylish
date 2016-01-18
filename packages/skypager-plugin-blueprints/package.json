@@ -1,6 +1,6 @@
 {
-  "name": "skypager-plugin-project-documentation",
-  "description": "a skypager plugin for our internal project documentation projects",
+  "name": "skypager-plugin-blueprints",
+  "description": "skypager blueprint plugin",
   "version": "1.0.0",
   "main": "index.js",
   "skypager": {

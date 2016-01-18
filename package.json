@@ -7,11 +7,8 @@
     "main": "skypager.js"
   },
   "scripts": {
-    "postinstall": "npm link skypager-application skypager-devpack skypager-electron skypager-plugin-project-documentation skypager-services skypager-themes skypager-ui skypager",
+    "postinstall": "./scripts/link-skypager-packages.js",
     "docs": "skypager serve --entry ./src/docs"
-  },
-  "skypager": {
-    "main": "skypager.js"
   },
   "dependencies": {
     "babel-core": "^6.4.0",
@@ -27,11 +24,13 @@
     "exports-loader": "^0.6.2",
     "expose-loader": "^0.7.1",
     "express": "^4.13.3",
+    "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
     "history": "^1.17.0",
     "html-webpack-plugin": "^1.7.0",
     "imports-loader": "^0.6.5",
     "jquery": "^2.2.0",
+    "less": "^2.5.3",
     "less-loader": "latest",
     "postcss-cssnext": "2.4.0",
     "postcss-import": "7.1.3",
@@ -47,12 +46,7 @@
     "redux-actions": "^0.9.0",
     "redux-simple-router": "^2.0.2",
     "redux-thunk": "^1.0.3",
-    "style-loader": "^0.13.0",
-    "url-loader": "^0.5.7",
-    "webpack": "^1.12.11",
-    "webpack-configurator": "^0.3.1",
-    "webpack-dev-middleware": "^1.4.0",
-    "webpack-hot-middleware": "^2.6.0",
+    "skypager": "file:./packages/skypager",
     "skypager-application": "file:./packages/skypager-application",
     "skypager-devpack": "file:./packages/skypager-devpack",
     "skypager-electron": "file:./packages/skypager-electron",
@@ -60,7 +54,13 @@
     "skypager-services": "file:./packages/skypager-services",
     "skypager-themes": "file:./packages/skypager-themes",
     "skypager-ui": "file:./packages/skypager-ui",
-    "skypager": "file:./packages/skypager"
+    "style-loader": "^0.13.0",
+    "surge": "^0.17.5",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.12.11",
+    "webpack-configurator": "^0.3.1",
+    "webpack-dev-middleware": "^1.4.0",
+    "webpack-hot-middleware": "^2.6.0"
   },
   "devDependencies": {},
   "repository": {
