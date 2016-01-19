@@ -29,6 +29,7 @@ const resolveBabelPackages = packages => {
 
 const entry = {
   app: [ argv.entry || './src' ],
+  theme: `skypager-themes!${directory}/package.json`,
   vendor: [
     'history',
     'jquery',
@@ -54,7 +55,9 @@ config
       filename: (isDev ? '[name].js' : '[name]-[hash].js'),
       publicPath: '/'
     },
-    resolveLoader: {modulesDirectories},
+    resolveLoader: {
+      modulesDirectories: modulesDirectories.concat([ require.resolve('skypager-themes') ])
+    },
     resolve: {
       modulesDirectories
     },

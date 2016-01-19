@@ -5,6 +5,6 @@ module: skypager-application
 
 # Skypager Application
 
-The Skypager Application acts as the main entry point to a React or React Native Application.
+The Application Runtime provides a wrapper around `react-router` and `redux` which combined manage most elements of application runtime state
 
-It encapsulates the best practices for setting up an application, and allows us to bootstrap completely different applications on top of a single module by supplying the parts of the application that are unique and harder to componetize.
+- [ ] Cross-platform Application Runtime
