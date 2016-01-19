@@ -17,9 +17,14 @@ module.exports = function () {};
 module.exports.pitch = function (configPath) {
   this.cacheable(true);
 
+  /*
+  // TODO: Implement some version of this but for now make the full themed version work
+  var config = { scripts: {}, styles: {} }
+
   var enabledScripts = scripts.filter(function (script) {
     return config.scripts[script];
   })
+  */
 
   return scripts.map(function (script) {
     return "require(" + JSON.stringify("bootstrap/js/" + script) + ");";

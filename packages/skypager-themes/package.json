@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "loader": "index.loader.js",
   "skypager": {
     "main": "skypager.js"
   },

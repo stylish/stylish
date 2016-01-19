@@ -46,19 +46,10 @@ var styles = [
 module.exports = function (content) {
   this.cacheable(true);
 
-  var config = this.exec(content, this.resourcePath);
-  var start =
-      "@import          \"~bootstrap/less/variables.less\";\n"
-    + "@icon-font-path: \"~bootstrap/fonts/\";\n"
-    //+ "@import          \"./bootstrap.config.less\";\n";
+  var config = JSON.parse(content);
 
-  styles.filter(function (style) {
-    return config.styles[style];
-  })
-
-  var bootstrap = styles.map(function (style) {
-    return "@import \"~bootstrap/less/" + style + ".less\";";
-  }).join("\n");
-
-  return start + bootstrap
+  return `
+    @import '~skypager-themes/dashboard/variables-inverse.less';
+    @import '~skypager-themes/dashboard/components.less';
+  `
 }
