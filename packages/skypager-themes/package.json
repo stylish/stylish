@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "bin": {
-    "skypager-themes": "./bin/cli.js"
-  },
   "skypager": {
     "main": "skypager.js"
   },
