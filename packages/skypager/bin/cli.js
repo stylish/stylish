@@ -178,6 +178,10 @@ function serve () {
 
     var child = spawn('skypager-devpack', ['start'].concat(args), {})
 
+		if (process.env.DEBUG_SERVER) {
+    	child.stderr.on('data', (data) => { console.log(data.toString()) })
+		}
+
     child.stdout.on('data', (data) => { console.log(data.toString()) })
   })
 }
