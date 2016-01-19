@@ -16,10 +16,12 @@ var scripts = [
 module.exports = function () {};
 module.exports.pitch = function (configPath) {
   this.cacheable(true);
-  var config = require(configPath);
-  return scripts.filter(function (script) {
+
+  var enabledScripts = scripts.filter(function (script) {
     return config.scripts[script];
-  }).map(function (script) {
+  })
+
+  return scripts.map(function (script) {
     return "require(" + JSON.stringify("bootstrap/js/" + script) + ");";
   }).join("\n");
 }
