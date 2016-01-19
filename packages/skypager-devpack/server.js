@@ -26,9 +26,21 @@ const resolveBabelPackages = packages => {
   return packages.map(p => { return path.resolve(__dirname, modulePath, p) })
 }
 
-//   entry: ['webpack-hot-middleware/client', entry],
+const provideModules = {
+  '$': 'jquery',
+  'jquery': 'jquery',
+  'react': 'react',
+  'react-dom': 'react-dom',
+  'react-redux': 'react-redux',
+  'react-router': 'react-router',
+  'redux-simple-router': 'redux-simple-router',
+  'redux-thunk': 'redux-thunk',
+  'react-bootstrap': 'react-bootstrap',
+  'history': 'history/lib/createBrowserHistory',
+  'redux-actions': 'redux-actions'
+}
+
 const entry = [
-  (__dirname + '/../skypager-themes/src/' + (argv.theme || 'dashboard') + '/less/toolkit-light.less'),
   argv.entry || './src'
 ]
 
@@ -89,21 +101,7 @@ config
   .plugin('webpack-order', webpack.optimize.OccurenceOrderPlugin)
   .plugin('webpack-noerrors', webpack.NoErrorsPlugin)
 
-
-
-	.plugin('webpack-provide', webpack.ProvidePlugin, [{
-		'$': 'jquery',
-		'jquery': 'jquery',
-		'react': 'react',
-		'react-dom': 'react-dom',
-		'react-redux': 'react-redux',
-		'react-router': 'react-router',
-		'redux-simple-router': 'redux-simple-router',
-		'redux-thunk': 'redux-thunk',
-		'react-bootstrap': 'react-bootstrap',
-		'history': 'history/lib/createBrowserHistory',
-		'redux-actions': 'redux-actions'
-	}])
+  .plugin('webpack-provide', webpack.ProvidePlugin, [ provideModules ])
 
   .plugin('webpack-html', HtmlWebpackPlugin, [{
     template: `${__dirname}/index.html`,

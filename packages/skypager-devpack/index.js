@@ -1,3 +1,4 @@
+const argv = require('yargs').argv
 const path = require('path')
 const fs = require('fs')
 const Config = require('webpack-configurator')
@@ -5,13 +6,13 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
-const argv = require('yargs')
-
 const env = process.env.NODE_ENV || 'development'
 const config = new Config()
 const directory = process.cwd()
 const isDev = (!argv.production && env === 'development')
 const fontsPrefix = 'fonts'
+
+const myPackage = require(directory + '/package.json')
 
 const modulesDirectories = [
   `${directory}/node_modules`,
@@ -26,30 +27,38 @@ const resolveBabelPackages = packages => {
   return packages.map(p => { return path.resolve(__dirname, modulePath, p) })
 }
 
-//   entry: ['webpack-hot-middleware/client', entry],
-const entry = [
-  ('!!style!less!' + __dirname + '/../skypager-themes/src/' + argv.theme || 'dashboard'),
-  argv.entry || './src'
-]
+const entry = {
+  app: [ argv.entry || './src' ],
+  vendor: [
+    'history',
+    'jquery',
+    'react',
+    'react-dom',
+    'react-redux',
+    'react-router',
+    'react-bootstrap',
+    'redux',
+    'redux-thunk',
+    'redux-actions',
+    'redux-simple-router'
+  ]
+}
 
-const myPackage = require(directory + '/package.json')
-
-if (isDev) { entry.unshift('webpack-hot-middleware/client') }
+if (isDev) { entry.app.unshift('webpack-hot-middleware/client') }
 
 config
   .merge({
     entry: entry,
     output: {
       path: path.join(directory, 'public'),
-      filename: '[name]-[hash].js',
+      filename: (isDev ? '[name].js' : '[name]-[hash].js'),
       publicPath: '/'
     },
     resolveLoader: {modulesDirectories},
     resolve: {
       modulesDirectories
     },
-    devtool: 'eval',
-    // devtool: 'cheap-module-eval-source-map'
+    devtool: 'eval'
   })
 
   .loader('js', {
@@ -74,43 +83,30 @@ config
 
   })
 
-  .loader('url', { test: /\.woff(\?.*)?$/,  loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff' })
-  .loader('url', { test: /\.woff2(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff2' })
-  .loader('url', { test: /\.ttf(\?.*)?$/,   loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream' })
+  .loader('url-1', { test: /\.woff(\?.*)?$/,  loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff' })
+  .loader('url-2', { test: /\.woff2(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff2' })
+  .loader('url-3', { test: /\.ttf(\?.*)?$/,   loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream' })
   .loader('file', { test: /\.eot(\?.*)?$/,   loader: 'file?prefix=' + fontsPrefix + '/&name=[path][name].[ext]' })
-  .loader('url', { test: /\.svg(\?.*)?$/,   loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml' })
-  .loader('url', { test: /\.(png|jpg)$/,    loader: 'url?limit=8192' })
+  .loader('url-4', { test: /\.svg(\?.*)?$/,   loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml' })
+  .loader('url-5', { test: /\.(png|jpg)$/,    loader: 'url?limit=8192' })
 
 
   .plugin('webpack-define', webpack.DefinePlugin, [{
     'process.env': {
       NODE_ENV: JSON.stringify(env)
-    },
-    '__SOEDERPOP__': 'YESYESYALL'
+    }
   }])
 
   .plugin('webpack-order', webpack.optimize.OccurenceOrderPlugin)
   .plugin('webpack-noerrors', webpack.NoErrorsPlugin)
 
-	.plugin('webpack-provide', webpack.ProvidePlugin, [{
-		'$': 'jquery',
-		'jquery': 'jquery',
-		'react': 'react',
-		'react-dom': 'react-dom',
-		'react-redux': 'react-redux',
-		'react-router': 'react-router',
-		'redux-simple-router': 'redux-simple-router',
-		'redux-thunk': 'redux-thunk',
-		'react-bootstrap': 'react-bootstrap',
-		'history': 'history/lib/createBrowserHistory',
-		'redux-actions': 'redux-actions'
-	}])
+  .plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
 
   .plugin('webpack-html', HtmlWebpackPlugin, [{
     template: `${__dirname}/index.html`,
     hash: true,
     inject: 'body',
-    filename: '200.html'
+    filename: 'index.html'
   }])
 
 // development
@@ -122,7 +118,16 @@ if (env == 'development') {
 if (env == 'production') {
   config
     .merge({devtool: 'source-map'})
+
+    .plugin('extract-text', ExtractTextPlugin, ['[name].[contenthash].css',{
+      allChunks: true
+    }])
+
     .plugin('webpack-uglify', webpack.optimize.UglifyJsPlugin, [{
+      compress: {
+        unused: true,
+        dead_code: true
+      },
       compressor: { warnings: false }
     }])
 }

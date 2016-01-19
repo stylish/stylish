@@ -12,10 +12,10 @@ program
   .parse(process.argv)
 
 const directory = path.resolve('.')
-const config = require('../server').resolve()
+const config = require('../index').resolve()
 
 const app = express()
-console.log('config', config.module.loaders)
+
 const compiler = webpack(config)
 
 const devMiddleware = require('webpack-dev-middleware')(compiler, {
@@ -40,6 +40,5 @@ app.listen(program.port, 'localhost', function(err) {
     console.log(err)
     return
   }
-
   console.log('Listening at http://localhost:' + program.port)
 })

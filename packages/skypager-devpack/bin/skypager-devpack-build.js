@@ -11,7 +11,7 @@ program
   .parse(process.argv)
 
 const directory = path.resolve('.')
-const config = require('../compile').resolve()
+const config = require('../index').resolve()
 
 const compiler = webpack(config)
 
