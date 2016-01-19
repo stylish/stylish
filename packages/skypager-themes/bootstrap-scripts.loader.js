@@ -26,7 +26,10 @@ module.exports.pitch = function (configPath) {
   })
   */
 
-  return scripts.map(function (script) {
+  return [
+    "require('!expose?jQuery!jquery');"
+  ].concat(scripts.map(function (script) {
     return "require(" + JSON.stringify("bootstrap/js/" + script) + ");";
-  }).join("\n");
+  }))
+  .join("\n");
 }

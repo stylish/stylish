@@ -47,13 +47,15 @@ const entry = {
 
 if (isDev) { entry.app.unshift('webpack-hot-middleware/client') }
 
+const platform = argv.platform || 'web'
+
 config
   .merge({
     entry: entry,
     output: {
       path: path.join(directory, 'public'),
       filename: (isDev ? '[name].js' : '[name]-[hash].js'),
-      publicPath: '/'
+      publicPath: ''
     },
     resolveLoader: {
       modulesDirectories: modulesDirectories.concat([ require.resolve('skypager-themes') ])
@@ -109,7 +111,7 @@ config
     template: `${__dirname}/index.html`,
     hash: true,
     inject: 'body',
-    filename: 'index.html'
+    filename: argv.outputFile || 'index.html'
   }])
 
 // development
