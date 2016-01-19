@@ -53,9 +53,9 @@ config
   .merge({
     entry: entry,
     output: {
-      path: path.join(directory, 'public'),
-      filename: (isDev ? '[name].js' : '[name]-[hash].js'),
-      publicPath: ''
+      path: path.join(directory, argv.outputPath || 'public'),
+      filename: (argv.contentHash === false || isDev ? '[name].js' : '[name]-[hash].js'),
+      publicPath: argv.publicPath === false ? '' : '/'
     },
     resolveLoader: {
       modulesDirectories: modulesDirectories.concat([ require.resolve('skypager-themes') ])
@@ -108,7 +108,7 @@ config
   .plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
 
   .plugin('webpack-html', HtmlWebpackPlugin, [{
-    template: `${__dirname}/index.html`,
+    template: `${__dirname}/templates/index.html`,
     hash: true,
     inject: 'body',
     filename: argv.outputFile || 'index.html'
@@ -121,6 +121,8 @@ if (env == 'development') {
 
 // production
 if (env == 'production') {
+  console.log('Were in production')
+
   config
     .merge({devtool: 'source-map'})
 

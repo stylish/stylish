@@ -176,7 +176,7 @@ function serve () {
       args.push('--project-snapshot-dir', request.project.paths.build)
     }
 
-    var child = spawn('skypager-devpack', ['start'].concat(args), {})
+    var child = spawn('skypager-devpack', ['start'].concat(process.argv.slice(2)), {})
 
 		if (process.env.DEBUG_SERVER) {
     	child.stderr.on('data', (data) => { console.log(data.toString()) })
@@ -191,7 +191,7 @@ function compile () {
 	newEnv.NODE_ENV = 'production'
 
   pipeline('pkg','project','plugins', (request, next) => {
-		spawnCommand('skypager-devpack', ['build', '--env', 'production'].concat(args), {
+		spawnCommand('skypager-devpack', ['build', '--env', 'production'].concat(process.argv.slice(2)), {
 			env: newEnv,
 		}).then(()=> {
 			notice('Built project')
