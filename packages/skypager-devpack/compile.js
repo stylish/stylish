@@ -10,7 +10,7 @@ const argv = require('yargs')
 const env = process.env.NODE_ENV || 'development'
 const config = new Config()
 const directory = process.cwd()
-const isDev = (!argv.production && env === 'development')
+const isDev = false
 
 const modulesDirectories = [
   `${directory}/node_modules`,
@@ -27,7 +27,7 @@ const resolveBabelPackages = packages => {
 
 //   entry: ['webpack-hot-middleware/client', entry],
 const entry = [
-  ('!!style!less!' + __dirname + '/../skypager-themes/src/' + argv.theme || 'dashboard'),
+  ( __dirname + '/../skypager-themes/src/' + (argv.theme || 'dashboard')),
   argv.entry || './src'
 ]
 

@@ -12,9 +12,10 @@ program
   .parse(process.argv)
 
 const directory = path.resolve('.')
-const config = require('../').resolve()
+const config = require('../server').resolve()
 
 const app = express()
+console.log('config', config.module.loaders)
 const compiler = webpack(config)
 
 const devMiddleware = require('webpack-dev-middleware')(compiler, {
@@ -27,7 +28,7 @@ app.use(require('webpack-hot-middleware')(compiler))
 app.use(express.static(config.output.path))
 app.get('*', function(req, res) {
   if (req.accepts('html')) {
-    const indexPath = path.join(config.output.path, 'index.html')
+    const indexPath = path.join(config.output.path, '200.html')
     const index = devMiddleware.fileSystem.readFileSync(indexPath)
     res.set('Content-Type', 'text/html')
     res.send(index)

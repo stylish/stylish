@@ -11,6 +11,7 @@ const env = process.env.NODE_ENV || 'development'
 const config = new Config()
 const directory = process.cwd()
 const isDev = (!argv.production && env === 'development')
+const fontsPrefix = 'fonts'
 
 const modulesDirectories = [
   `${directory}/node_modules`,
@@ -73,6 +74,14 @@ config
 
   })
 
+  .loader('url', { test: /\.woff(\?.*)?$/,  loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff' })
+  .loader('url', { test: /\.woff2(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff2' })
+  .loader('url', { test: /\.ttf(\?.*)?$/,   loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream' })
+  .loader('file', { test: /\.eot(\?.*)?$/,   loader: 'file?prefix=' + fontsPrefix + '/&name=[path][name].[ext]' })
+  .loader('url', { test: /\.svg(\?.*)?$/,   loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml' })
+  .loader('url', { test: /\.(png|jpg)$/,    loader: 'url?limit=8192' })
+
+
   .plugin('webpack-define', webpack.DefinePlugin, [{
     'process.env': {
       NODE_ENV: JSON.stringify(env)
@@ -118,8 +127,6 @@ if (env == 'production') {
     }])
 }
 
-// merge in user-configs
-// accepts {} or function(config)
 const userConfig = path.resolve(directory, './webpack.config.js')
 if (fs.existsSync(userConfig)) {
   config.merge(require(userConfig))

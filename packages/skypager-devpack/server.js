@@ -10,7 +10,8 @@ const argv = require('yargs')
 const env = process.env.NODE_ENV || 'development'
 const config = new Config()
 const directory = process.cwd()
-const isDev = (!argv.production && env === 'development')
+const isDev = true
+const fontsPrefix = 'fonts'
 
 const modulesDirectories = [
   `${directory}/node_modules`,
@@ -27,7 +28,7 @@ const resolveBabelPackages = packages => {
 
 //   entry: ['webpack-hot-middleware/client', entry],
 const entry = [
-  ('!!style!less!' + __dirname + '/../skypager-themes/src/' + argv.theme || 'dashboard'),
+  (__dirname + '/../skypager-themes/src/' + (argv.theme || 'dashboard') + '/less/toolkit-light.less'),
   argv.entry || './src'
 ]
 
@@ -68,10 +69,15 @@ config
 
   .loader('less', {
     test: /\.less$/,
-    loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
-                    : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')
-
+    loader: isDev ? 'style!less' : ExtractTextPlugin.extract('style-loader', 'less-loader')
   })
+
+  .loader('url1', { test: /\.woff(\?.*)?$/,  loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff' })
+  .loader('url2', { test: /\.woff2(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff2' })
+  .loader('url3', { test: /\.ttf(\?.*)?$/,   loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream' })
+  .loader('file', { test: /\.eot(\?.*)?$/,   loader: 'file?prefix=' + fontsPrefix + '/&name=[path][name].[ext]' })
+  .loader('url5', { test: /\.svg(\?.*)?$/,   loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml' })
+  .loader('url6', { test: /\.(png|jpg)$/,    loader: 'url?limit=8192' })
 
   .plugin('webpack-define', webpack.DefinePlugin, [{
     'process.env': {
@@ -82,6 +88,8 @@ config
 
   .plugin('webpack-order', webpack.optimize.OccurenceOrderPlugin)
   .plugin('webpack-noerrors', webpack.NoErrorsPlugin)
+
+
 
 	.plugin('webpack-provide', webpack.ProvidePlugin, [{
 		'$': 'jquery',
