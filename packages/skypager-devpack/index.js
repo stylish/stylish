@@ -1,6 +1,8 @@
 const argv = require('yargs').argv
 const path = require('path')
 const fs = require('fs')
+
+const assign = Object.assign
 const Config = require('webpack-configurator')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -29,20 +31,7 @@ const resolveBabelPackages = packages => {
 
 const entry = {
   app: [ argv.entry || './src' ],
-  theme: `skypager-themes!${directory}/package.json`,
-  vendor: [
-    'history',
-    'jquery',
-    'react',
-    'react-dom',
-    'react-redux',
-    'react-router',
-    'react-bootstrap',
-    'redux',
-    'redux-thunk',
-    'redux-actions',
-    'redux-simple-router'
-  ]
+  theme: `skypager-themes!${directory}/package.json`
 }
 
 if (isDev) { entry.app.unshift('webpack-hot-middleware/client') }
@@ -53,9 +42,9 @@ config
   .merge({
     entry: entry,
     output: {
-      path: path.join(directory, argv.outputPath || 'public'),
+      path: path.join(directory, argv.outputFolder || 'public'),
       filename: (argv.contentHash === false || isDev ? '[name].js' : '[name]-[hash].js'),
-      publicPath: argv.publicPath === false ? '' : '/'
+      publicPath: platform === 'electron' ? '' : '/'
     },
     resolveLoader: {
       modulesDirectories: modulesDirectories.concat([ require.resolve('skypager-themes') ])
@@ -105,13 +94,11 @@ config
   .plugin('webpack-order', webpack.optimize.OccurenceOrderPlugin)
   .plugin('webpack-noerrors', webpack.NoErrorsPlugin)
 
-  .plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
-
   .plugin('webpack-html', HtmlWebpackPlugin, [{
-    template: `${__dirname}/templates/index.html`,
-    hash: true,
+    template: argv.htmlTemplatePath || `${__dirname}/templates/index.html`,
+    hash: false,
     inject: 'body',
-    filename: argv.outputFile || 'index.html'
+    filename: argv.htmlFilename || (platform === 'web' ? '200.html' : 'index.html')
   }])
 
 // development
@@ -121,22 +108,59 @@ if (env == 'development') {
 
 // production
 if (env == 'production') {
-  console.log('Were in production')
-
   config
-    .merge({devtool: 'source-map'})
+    .merge({
+      devtool: 'source-map'
+    })
 
-    .plugin('extract-text', ExtractTextPlugin, ['[name].[contenthash].css',{
+    .plugin('extract-text', ExtractTextPlugin, [{
       allChunks: true
     }])
 
     .plugin('webpack-uglify', webpack.optimize.UglifyJsPlugin, [{
+      compressor: { warnings: false },
       compress: {
         unused: true,
         dead_code: true
-      },
-      compressor: { warnings: false }
+      }
     }])
+}
+
+if (argv.vendorLibraries !== false && !argv.useExternalVendorLibraries) {
+  config.merge({
+    entry: assign(entry, {
+      vendor: [
+        'history',
+        'jquery',
+        'react',
+        'react-dom',
+        'react-redux',
+        'react-router',
+        'react-bootstrap',
+        'redux',
+        'redux-thunk',
+        'redux-actions',
+        'redux-simple-router'
+      ]
+    })
+  }).plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
+}
+
+if (argv.useExternalVendorLibraries) {
+  config.merge({
+    externals: {
+      'jquery': 'jQuery',
+      'react': 'React',
+      'react-dom': 'ReactDOM',
+      'react-bootstrap': 'ReactBootstrap',
+      'redux': 'Redux',
+      'react-router': 'Router',
+      'redux-actions': 'ReduxActions',
+      'redux-thunk': 'ReduxThunk',
+      'redux-simple-router': 'ReduxSimpleRouter',
+      'history': 'History'
+    }
+  })
 }
 
 const userConfig = path.resolve(directory, './webpack.config.js')
