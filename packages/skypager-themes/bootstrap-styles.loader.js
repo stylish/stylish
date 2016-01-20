@@ -1,4 +1,8 @@
+var querystring = require('querystring')
+
 var styles = [
+  "variables",
+
   "mixins",
 
   "normalize",
@@ -13,7 +17,7 @@ var styles = [
   "buttons",
 
   "component-animations",
-  "glyphicons",
+  //"glyphicons",
   "dropdowns",
   "button-groups",
   "input-groups",
@@ -46,10 +50,30 @@ var styles = [
 module.exports = function (content) {
   this.cacheable(true);
 
-  var config = JSON.parse(content);
+  var query = {};
+  var config = {};
 
-  return `
-    @import '~skypager-themes/dashboard/variables-inverse.less';
-    @import '~skypager-themes/dashboard/components.less';
-  `
+  try {
+    config = JSON.parse(content)
+
+    if (config.skypager) {
+      config = config.skypager
+    }
+  } catch(error) {
+
+  }
+
+  if (this.query) {
+    query = Object.assign(query, querystring.parse(this.query.replace(/^\?/,'')))
+  }
+
+  var theme = query.theme || config.theme;
+
+  if (theme) {
+    return `@import '~skypager-themes/${ theme.replace(/-\w+$/,'') }/${ theme }.less';`
+  } else {
+    return styles.map(function(style) {
+      return `@import '~skypager-themes/bootstrap/${style}.less';`
+    }).join("\n")
+  }
 }

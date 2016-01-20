@@ -29,14 +29,21 @@ const resolveBabelPackages = packages => {
   return packages.map(p => { return path.resolve(__dirname, modulePath, p) })
 }
 
+const platform = argv.platform || 'web'
+
 const entry = {
   app: [ argv.entry || './src' ],
-  theme: `skypager-themes!${directory}/package.json`
 }
 
 if (isDev) { entry.app.unshift('webpack-hot-middleware/client') }
 
-const platform = argv.platform || 'web'
+if (argv.theme) {
+  entry.theme = `skypager-themes?theme=${ argv.theme }!${directory}/package.json`
+} else if (myPackage && myPackage.skypager && myPackage.skypager.theme) {
+  entry.theme = `skypager-themes?theme=${ myPackage.skypager.theme }!${directory}/package.json`
+} else if (argv.theme !== false && argv.theme !== 'none') {
+  entry.theme = `skypager-themes?theme=dashboard!${directory}/package.json`
+}
 
 config
   .merge({

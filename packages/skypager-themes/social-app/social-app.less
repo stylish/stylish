@@ -1,6 +1,6 @@
-// Bootstrap mixins
+// applicaiton toolkit
+@import "./variables.less";
 @import "../bootstrap/mixins.less";
-@import "./custom/mixins.less";
 
 // Reset and dependencies
 @import "../bootstrap/normalize.less";
@@ -10,10 +10,10 @@
 @import "../bootstrap/scaffolding.less";
 @import "../bootstrap/type.less";
 @import "../bootstrap/code.less";
-@import "../bootstrap/grid.less";
 @import "../bootstrap/tables.less";
 @import "../bootstrap/forms.less";
 @import "../bootstrap/buttons.less";
+@import "../bootstrap/grid.less";
 
 // Components
 @import "../bootstrap/component-animations.less";
@@ -36,13 +36,7 @@
 @import "../bootstrap/panels.less";
 @import "../bootstrap/responsive-embed.less";
 @import "../bootstrap/wells.less";
-
-// Extended Bootstrap components
-@import "./custom/type-custom.less";
-@import "./custom/alerts-custom.less";
-@import "./custom/buttons-custom.less";
-@import "./custom/nav-heading.less";
-@import "./custom/navbar-utilities.less";
+@import "../bootstrap/close.less";
 
 // Components w/ JavaScript
 @import "../bootstrap/modals.less";
@@ -55,45 +49,31 @@
 @import "../bootstrap/responsive-utilities.less";
 
 // Custom theme components
-@import "./custom/icons.less";
-@import "./custom/utilities-spacer.less";
-@import "./custom/text-inherit.less";
-@import "./custom/nav-bordered.less";
+@import "./custom/mixins.less";
+
+// Extended Bootstrap components
+@import "./custom/type-custom.less";
+@import "./custom/alerts-custom.less";
 @import "./custom/buttons-outline.less";
+@import "./custom/buttons-custom.less";
 @import "./custom/buttons-radius.less";
 @import "./custom/forms-custom.less";
+@import "./custom/modals-custom.less";
 @import "./custom/container-custom.less";
-@import "./custom/block.less";
-@import "./custom/navbar-transparent.less";
-@import "./custom/carousel-light.less";
-@import "./custom/callouts.less";
-@import "./custom/featured-list.less";
+@import "./custom/dropdowns-custom.less";
+
+// Custom theme components
+@import "./custom/icons.less";
+@import "./custom/text-inherit.less";
+@import "./custom/utilities-spacer.less";
+@import "./custom/navbar-utilities.less";
+@import "./custom/nav-bordered.less";
 @import "./custom/zoom.less";
-@import "./custom/text-ribbon.less";
-@import "./custom/iconlist.less";
-@import "./custom/panels-bold.less";
-@import "./custom/statcard.less";
-@import "./custom/pull-quote.less";
-@import "./custom/stage.less";
-//
-// Custom styles
-//
-
-h1, h2, h3, h4, h5, h6,
-.h1, .h2, .h3, .h4, .h5, .h6 {
-
-  &.text-uppercase {
-    letter-spacing: .15em;
-  }
-
-  small,
-  .small {
-    font-weight: inherit;
-  }
-}
-
-h6, .h6 {
-  margin-bottom: (@spacer-y * .25);
-  color: lighten(@gray, 40%);
-  text-transform: uppercase;
-}
+@import "./custom/avatar-list.less";
+@import "./custom/growl.less";
+@import "./custom/profile-header.less";
+@import "./custom/media-list-stream.less";
+@import "./custom/media-list-conversation.less";
+@import "./custom/media-list-users.less";
+@import "./custom/panels-profile.less";
+@import "./custom/panels-link-list.less";
