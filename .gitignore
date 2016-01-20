@@ -4,3 +4,4 @@ node_modules/
 legacy/
 .DS_Store
 core/
+projects/**/public/**/*
