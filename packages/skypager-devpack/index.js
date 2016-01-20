@@ -35,21 +35,41 @@ const entry = {
   app: [ argv.entry || './src' ],
 }
 
-if (isDev) { entry.app.unshift('webpack-hot-middleware/client') }
+if (isDev) {
+  entry.app.unshift('webpack-hot-middleware/client')
+}
 
-if (argv.theme) {
-  entry.theme = `skypager-themes?theme=${ argv.theme }!${directory}/package.json`
-} else if (myPackage && myPackage.skypager && myPackage.skypager.theme) {
-  entry.theme = `skypager-themes?theme=${ myPackage.skypager.theme }!${directory}/package.json`
-} else if (argv.theme !== false && argv.theme !== 'none') {
-  entry.theme = `skypager-themes?theme=dashboard!${directory}/package.json`
+if (!argv.usePrecompiledTemplate) {
+  if (argv.theme) {
+    entry.theme = `skypager-themes?theme=${ argv.theme }!${directory}/package.json`
+  } else if (myPackage && myPackage.skypager && myPackage.skypager.theme) {
+    entry.theme = `skypager-themes?theme=${ myPackage.skypager.theme }!${directory}/package.json`
+  } else if (argv.theme !== false && argv.theme !== 'none') {
+    entry.theme = `skypager-themes?theme=dashboard!${directory}/package.json`
+  }
+}
+
+var outputPath = path.join(directory, argv.outputFolder || 'public');
+
+if (isDev && argv.usePrecompiledTemplate) {
+  outputPath = path.join(__dirname, 'templates', platform, argv.usePrecompiledTemplate)
+}
+
+var templatePath = `${__dirname}/templates/index.html`
+
+if (argv.htmlTemplatePath) {
+  templatePath = path.resolve(argv.htmlTemplatePath)
+}
+
+if (isDev && argv.usePrecompiledTemplate) {
+  templatePath = path.join(__dirname, 'templates', platform, argv.usePrecompiledTemplate, 'index.html')
 }
 
 config
   .merge({
     entry: entry,
     output: {
-      path: path.join(directory, argv.outputFolder || 'public'),
+      path: outputPath,
       filename: (argv.contentHash === false || isDev ? '[name].js' : '[name]-[hash].js'),
       publicPath: platform === 'electron' ? '' : '/'
     },
@@ -102,10 +122,10 @@ config
   .plugin('webpack-noerrors', webpack.NoErrorsPlugin)
 
   .plugin('webpack-html', HtmlWebpackPlugin, [{
-    template: argv.htmlTemplatePath || `${__dirname}/templates/index.html`,
+    template: templatePath,
     hash: false,
     inject: 'body',
-    filename: argv.htmlFilename || (platform === 'web' ? '200.html' : 'index.html')
+    filename: argv.pushState ? '200.html' : 'index.html'
   }])
 
 // development
@@ -133,7 +153,7 @@ if (env == 'production') {
     }])
 }
 
-if (argv.vendorLibraries !== false && !argv.useExternalVendorLibraries) {
+if (argv.vendorLibraries !== false && !argv.useExternalVendorLibraries && !argv.usePrecompiledTemplate) {
   config.merge({
     entry: assign(entry, {
       vendor: [
@@ -153,7 +173,7 @@ if (argv.vendorLibraries !== false && !argv.useExternalVendorLibraries) {
   }).plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
 }
 
-if (argv.useExternalVendorLibraries) {
+if (argv.useExternalVendorLibraries || argv.usePrecompiledTemplate) {
   config.merge({
     externals: {
       'jquery': 'jQuery',

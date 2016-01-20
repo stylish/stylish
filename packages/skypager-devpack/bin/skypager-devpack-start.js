@@ -26,9 +26,10 @@ app.use(devMiddleware)
 app.use(require('webpack-hot-middleware')(compiler))
 
 app.use(express.static(config.output.path))
+
 app.get('*', function(req, res) {
   if (req.accepts('html')) {
-    const indexPath = path.join(config.output.path, '200.html')
+    const indexPath = path.join(config.output.path, 'index.html')
     const index = devMiddleware.fileSystem.readFileSync(indexPath)
     res.set('Content-Type', 'text/html')
     res.send(index)
