@@ -14,5 +14,8 @@ window.Router=require('react-router')
 window.ReduxActions=require('redux-actions')
 window.ReduxThunk=require('redux-thunk')
 window.ReduxSimpleRouter=require('redux-simple-router')
-window.browserHistory=require('history/lib/createBrowserHistory')
-window.memoryHistory=require('history/lib/createMemoryHistory')
+
+window.History = {
+  browser: require('history/lib/createBrowserHistory'),
+  memory: require('history/lib/createMemoryHistory')
+}
