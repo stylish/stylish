@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropTypes as types } from 'react'
 import classnames from 'classnames'
 
 import IconNav from '../components/IconNav'
@@ -8,10 +8,12 @@ export class IconNavLayout extends React.Component {
   static displayName = 'IconNavLayout';
 
   static propTypes = {
-    children: React.PropTypes.node.isRequired,
-    links: React.PropTypes.array.isRequired,
-    brandIcon: React.PropTypes.string,
-    brandStyle: React.PropTypes.string
+    children: types.node.isRequired,
+    wide: types.bool,
+    containerClassName: types.string,
+    links: types.array.isRequired,
+    brandIcon: types.string,
+    brandStyle: types.string
   };
 
   render () {

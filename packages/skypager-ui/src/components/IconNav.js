@@ -5,14 +5,28 @@ import classnames from 'classnames'
 
 import Icon from './Icon'
 
+import styles from './IconNav.css.less'
+
 export class IconNav extends React.Component {
+  static displayName = 'IconNav';
+
+  static propTypes = {
+    brandIcon: types.string.isRequired,
+    brandStyle: types.string,
+    links: types.arrayOf(types.shape({
+      link: types.string.isRequired,
+      icon: types.string,
+      label: types.string
+    })).isRequired
+  };
+
   render () {
-    const props = this.props
-    const brandIcon = props.brandIcon
-    const styles = require('./IconNav.css.less')
-    const links = props.links.map((link,index) => {
-    const active = !!(AppStore.getState().router.path === link.link)
-      console.log('Settings', this.props.settings)
+    const { brandIcon, brandStyle } = this.props
+
+    const links = (this.props.links || []).map((link,index) => {
+      let active = false
+
+
       return (
         <li key={index} className={active ? 'active' : undefined}>
           <Link to={link.link} title={link.label}>
@@ -23,16 +37,13 @@ export class IconNav extends React.Component {
       )
     })
 
-    let classes = classnames({
-      iconav: true,
-      wtf: true,
-      [styles.iconav]: true
-    })
+    let classes = classnames({ iconav: true, [styles.iconav]: true })
 
     return (
       <nav className={classes}>
         <Link to='/' className='iconav-brand' >
-          <Icon className={'iconav-brand-icon ' + this.props.brandStyle} icon={brandIcon} />
+          <Icon className={'iconav-brand-icon ' + brandStyle}
+                icon={brandIcon} />
         </Link>
 
         <div className='iconav-slider'>
@@ -42,18 +53,11 @@ export class IconNav extends React.Component {
         </div>
       </nav>
     )
-
   }
 }
 
-IconNav.propTypes = {
-  brandIcon: types.string.isRequired,
-  brandStyle: types.string,
-  links: types.arrayOf(types.shape({
-    link: types.string.isRequired,
-    icon: types.string,
-    label: types.string
-  }))
+function flatten (array) {
+   return array.reduce((memo,item) => memo.concat(item) )
 }
 
 export default IconNav

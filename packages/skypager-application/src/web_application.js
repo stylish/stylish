@@ -6,7 +6,11 @@
  * The Skypager.Application class is the global, centralized State Machine for
  * our React Applications.  It conveniently wraps the React, React-Router, and Redux
  * libraries and enables us to spawn up new React applications while only passing in the
- * Application Specific parts of our Codebase.
+ * Application Specific parts of our Codebase, which is usually confined to:
+ *
+ * - Entry Points
+ * - Redux Stores w/ Standard Flux Actions
+ * - Custom UI Components
  *
  * The Application also provides automatic bindings to the Skypager Project local to the project folder,
  * which makes all of the content and data from that project available to the application.
@@ -103,6 +107,9 @@ export class Application {
     )
   }
 
+  /**
+   * Automatically build a Redux store by combining any reducers you pass in to the Application constructor.
+   */
   buildStore () {
     const { initialState, reducers, history } = this
     const appState = Object.assign({}, ...initialState)
@@ -114,6 +121,67 @@ export class Application {
     ))(createStore)
 
     return build(rootReducer, appState)
+  }
+
+  /**
+   * @param routes array[Router.Route]
+   * @param entries object map a route path to a React.Component
+   *
+   * Build this Applications routes dynamically based on the options
+   * passed to the Application constructor. Routes can be explicitly defined,
+   * or we can build a router according to convention based on the Entry Point
+   * components passed in.
+   *
+   * @example pass in entries as an object keyed by path
+   *
+   *  Application.render({
+   *    entries:{
+   *      "/" : Home,
+   *      "/books" : BrowseBooks
+   *    }
+   *  })
+   *
+   * @example pass in routes directly
+   *
+   *  const routes = (
+   *    <Route path="books" component={BrowseBooks} />
+   *    <Route path="authors" component={BrowseAuthors} />
+   *  )
+   *
+   *  Application.render({
+   *    routes
+   *  })
+   *
+   * @example pass in an array of entry points
+   *
+   *  BrowseBooks.path = "/books"
+   *
+   *  Application.render({
+   *    entries:[
+   *      BrowseBooks,
+   *      BrowseAuthors
+   *    ]
+   *  })
+   */
+  buildRoutes (options = {}) {
+    let { routes, entries } = options
+
+    if (routes) {
+      return routes
+
+    } else if (entries && typeof(entries.length) === 'undefined') {
+      return Object.keys(entries).map((path,index) => {
+        let component = entries[path]
+
+        return <Route key={index} path={path} component={component} />
+      })
+
+    } else if (entries && entries.length >= 1) {
+      return entries.map((entry,index) => {
+        let path = entry.path ? entry.path : entry.displayName.toLowerCase()
+        return <Route key={index} path={path} component={entry} />
+      })
+    }
   }
 
   get container () {

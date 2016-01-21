@@ -14,6 +14,8 @@ window.Router=require('react-router')
 window.ReduxActions=require('redux-actions')
 window.ReduxThunk=require('redux-thunk')
 window.ReduxSimpleRouter=require('redux-simple-router')
+window.SkypagerUI = require('skypager-ui')
+window.SkypagerApplication = require('skypager-application')
 
 window.History = {
   browser: require('history/lib/createBrowserHistory'),

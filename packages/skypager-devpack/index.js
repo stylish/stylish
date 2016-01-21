@@ -170,6 +170,8 @@ if (argv.vendorLibraries !== false && !argv.useExternalVendorLibraries && !argv.
         'redux-thunk',
         'redux-actions',
         'redux-simple-router'
+        //'skypager-ui',
+        //'skypager-application'
       ]
     })
   }).plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
@@ -188,6 +190,8 @@ if (argv.useExternalVendorLibraries || argv.usePrecompiledTemplate) {
       'redux-thunk': 'ReduxThunk',
       'redux-simple-router': 'ReduxSimpleRouter',
       'history': 'History'
+      //'skypager-ui': 'SkypagerUI',
+      //'skypager-application': 'SkypagerApplication'
     }
   })
 }
