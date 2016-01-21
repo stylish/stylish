@@ -1,18 +1,23 @@
 {
   "name": "skypager-electron",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "skypager electron stack",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "author": "Jonathan Soeder <jon@chicago.com>",
+  "license": "UNLICENSED",
+  "bin": {
+    "skypager-electron": "./bin/cli.js"
   },
-  "author": "",
-  "license": "ISC",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skypager/skypager-electron"
+  },
   "dependencies": {
-    "electron-prebuilt": "latest",
-    "electronify-server": "latest",
-    "electronify": "latest",
-    "electron-packager": "latest",
-    "electron-rebuild": "latest"
+    "electron-compile": "^2.0.5",
+    "electron-compilers": "^2.0.4",
+    "electron-packager": "^5.2.1",
+    "electron-prebuilt-compile": "^0.36.1",
+    "electron-rebuild": "^1.1.1",
+    "electronify-server": "^0.1.3"
   }
 }
