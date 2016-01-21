@@ -1,3 +1,17 @@
+/**
+ * Skypager.Application
+ *
+ * @description
+ *
+ * The Skypager.Application class is the global, centralized State Machine for
+ * our React Applications.  It conveniently wraps the React, React-Router, and Redux
+ * libraries and enables us to spawn up new React applications while only passing in the
+ * Application Specific parts of our Codebase.
+ *
+ * The Application also provides automatic bindings to the Skypager Project local to the project folder,
+ * which makes all of the content and data from that project available to the application.
+ *
+ */
 import React, { Component } from 'react'
 import { render } from 'react-dom'
 import { Router, Route, IndexRoute, Link } from 'react-router'
@@ -9,27 +23,20 @@ import thunk from 'redux-thunk'
 import browserHistory from 'history/lib/createBrowserHistory'
 import memoryHistory from 'history/lib/createMemoryHistory'
 
-/**
- * Creates a new Application and renders it.
- *
- * @example
- *
- * Application.render({
- *   state: [ {...}, {...} ],
- *   reducers: [{...}, {...}],
- *   defaultEntry,
- *   routes
- * })
- *
- * @param state array an array of state objects which will be merged into redux
- *  store's initialState via an object assign
- *
- * @param reducers array an array of reducer objects which will be merged into
- *  a single rootReducer
- *
- * @param defaultEntry React.Component a reference to the component which will be the IndexRoute
-*/
 export class Application {
+  /**
+   * Creates a new Application and renders it.
+   *
+   * @example
+   *
+   * Application.render({
+   *   state: [ {...}, {...} ],
+   *   reducers: [{...}, {...}],
+   *   defaultEntry,
+   *   routes
+   * })
+   *
+  */
   static render (options = {}) {
     let App = new Application(options)
 
@@ -38,6 +45,25 @@ export class Application {
     return App
   }
 
+  /**
+   * Create a new Application Shell.
+   *
+   * @param state array an array of state objects which will be merged into redux
+   *  store's initialState via an object assign
+   *
+   * @param reducers array an array of reducer objects which will be merged into
+   *  a single rootReducer
+   *
+   * @param defaultEntry React.Component a reference to the component which will be the IndexRoute
+   *
+   * @param routes array[React.Router.Route] an array of React.Router Route components for each
+   *  of the various Entry Point components in the application.
+   *
+   * @param entries array[React.Component] an array of React.Component classes for each Screen in the
+   *  application.  This can be used in place of the routes option, and will automatically build the routes
+   *  for you.  If the Component has a static `routePath` property, this will be used as the URI Path.
+
+   */
   constructor (options = {}) {
     this.options = options
 
@@ -51,6 +77,14 @@ export class Application {
       get: function() {
         delete this.store
         return this.store = this.buildStore()
+      }
+    })
+
+    Object.defineProperty(this, 'routes', {
+      configurable: true,
+      get: function() {
+        delete this.routes
+        return this.store = this.buildRoutes(options)
       }
     })
   }
@@ -94,14 +128,11 @@ export class Application {
     )
   }
 
-  get routes () {
-    return this.options.routes
-  }
-
   get router () {
     return (
        <Route path='/'>
          <IndexRoute component={ this.defaultEntry } />
+         { this.routes }
        </Route>
     )
   }
@@ -113,21 +144,11 @@ export class Application {
 
 export default Application
 
-export class Page extends Component  {
-  render() {
-    return (
-      <div className='page'>
-        <h1>page</h1>
-      </div>
-    )
-  }
-}
-
 export function HelpPage (props, context) {
   return (
     <div className='help-page'>
-      <h1>Help</h1>
-      <Link to="/other/section">Move</Link>
+      <h1>TODO: HELP</h1>
+      <p>This page will be visible whenever the application doesn't have a main component, or can't build a dynamic routing table</p>
     </div>
   )
 }

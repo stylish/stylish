@@ -39,7 +39,7 @@ if (isDev) {
   entry.app.unshift('webpack-hot-middleware/client')
 }
 
-if (!argv.usePrecompiledTemplate) {
+if (!argv.usePrecompiledTemplate && argv.theme !== false) {
   if (argv.theme) {
     entry.theme = `skypager-themes?theme=${ argv.theme }!${directory}/package.json`
   } else if (myPackage && myPackage.skypager && myPackage.skypager.theme) {
@@ -51,18 +51,18 @@ if (!argv.usePrecompiledTemplate) {
 
 var outputPath = path.join(directory, argv.outputFolder || 'public');
 
-if (isDev && argv.usePrecompiledTemplate) {
+if (argv.usePrecompiledTemplate) {
   outputPath = path.join(__dirname, 'templates', platform, argv.usePrecompiledTemplate)
 }
 
 var templatePath = `${__dirname}/templates/index.html`
 
-if (argv.htmlTemplatePath) {
-  templatePath = path.resolve(argv.htmlTemplatePath)
-}
-
 if (isDev && argv.usePrecompiledTemplate) {
   templatePath = path.join(__dirname, 'templates', platform, argv.usePrecompiledTemplate, 'index.html')
+}
+
+if (argv.htmlTemplatePath) {
+  templatePath = path.resolve(argv.htmlTemplatePath)
 }
 
 config
@@ -71,7 +71,7 @@ config
     output: {
       path: outputPath,
       filename: (argv.contentHash === false || isDev ? '[name].js' : '[name]-[hash].js'),
-      publicPath: platform === 'electron' ? '' : '/'
+      publicPath: (!isDev && platform === 'electron') ? '' : '/'
     },
     resolveLoader: {
       modulesDirectories: modulesDirectories.concat([ require.resolve('skypager-themes') ])
@@ -113,6 +113,8 @@ config
 
 
   .plugin('webpack-define', webpack.DefinePlugin, [{
+    '__PLATFORM__': platform,
+    '__ARGV__': argv,
     'process.env': {
       NODE_ENV: JSON.stringify(env)
     }
