@@ -142,7 +142,7 @@ if (env == 'production') {
       devtool: 'source-map'
     })
 
-    .plugin('extract-text', ExtractTextPlugin, [{
+    .plugin('extract-text', ExtractTextPlugin, ['[name]-[contenthash].css', {
       allChunks: true
     }])
 

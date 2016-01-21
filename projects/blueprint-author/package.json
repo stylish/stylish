@@ -1,0 +1,10 @@
+{
+  "name": "@architects/blueprint-author",
+  "version": "0.0.1",
+  "skypager": {
+    "theme": "dashboard"
+  },
+  "dependencies": {
+    "skypager-electron": "latest"
+  }
+}

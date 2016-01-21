@@ -209,7 +209,7 @@ function publish () {
 		}
 
 		spawnCommand('surge', ['publish', '--endpoint', 'surge.skypager.io', '--project', './public', '--domain', domain]).then(()=> {
-			notice('Finished publishing')
+			notice('Finished publishing to ' + domain)
 		})
   })
 }

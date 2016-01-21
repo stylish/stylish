@@ -7,6 +7,12 @@
   },
   "skypager":{
     "plugins":[ "blueprints" ],
-    "theme": "social-app"
+    "theme": "dashboard-dark",
+    "domain": "webapp-boilerplate.skypager.io"
+  },
+  "scripts": {
+    "dev": "DEBUG_SERVER=true skypager serve --use-precompiled-template dashboard-dark",
+    "build": "skypager compile --push-state",
+    "deploy": "skypager publish"
   }
 }
