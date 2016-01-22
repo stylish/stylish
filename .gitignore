@@ -5,3 +5,4 @@ legacy/
 .DS_Store
 core/
 projects/**/public/**/*
+npm-debug.log

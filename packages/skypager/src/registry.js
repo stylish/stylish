@@ -11,7 +11,7 @@ import Skypager from './index'
 import * as util from './util'
 import carve from 'object-path'
 
-import { join, resolve, dirname, relative } from 'path'
+import { basename, join, resolve, dirname, relative } from 'path'
 
 
 import _debug from 'debug'
@@ -128,6 +128,11 @@ class Registry {
 
   buildId (helperURL, keepExtension = false) {
     let reg = new RegExp('^' + this.root + '/', 'i')
+
+    if (!helperURL.match(reg)) {
+      helperURL = basename(helperURL)
+    }
+
     let base = helperURL.replace(reg, '')
 
     if (base.match(/\/index$/i)) {
@@ -202,7 +207,13 @@ class Registry {
   }
 
   get available () {
-    return Object.keys(this.registry)
+    let keys = Object.keys(this.registry)
+
+    if (this.fallback) {
+      return keys.concat(this.fallback.available)
+    }
+
+    return keys
   }
 }
 

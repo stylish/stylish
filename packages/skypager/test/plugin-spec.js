@@ -4,7 +4,11 @@ describe("The Plugin System", ()=>{
   let project = require('./fixture')
 
   it("knows which plugins are available",()=>{
-    Skypager.plugins.available.length.should.equal(2)
+    Skypager.plugins.available.length.should.not.equal(0)
+  })
+
+  it("makes framework plugins available to a project", () => {
+    project.plugins.available.should.containEql('example')
   })
 
   it("shows available project plugins", ()=>{

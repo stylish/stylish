@@ -194,12 +194,17 @@ class Project {
   * Use a plugin from the plugins registry
   *
   */
-  use (...plugins) {
-    plugins.map(plugin => {
+  use (plugins, options = {}) {
+    if (typeof plugins === 'string') {
+      plugins = [plugins]
+    }
+
+    plugins.forEach(plugin => {
       let pluginConfig = this.plugins.lookup(plugin)
 
       if (pluginConfig && pluginConfig.api && pluginConfig.api.modify) {
-        pluginConfig.api.modify(this)
+        options.project = options.project || this
+        pluginConfig.api.modify(options)
       } else {
         if (typeof pluginConfig.api === 'function') {
           pluginConfig.api.call(this, this, pluginConfig)

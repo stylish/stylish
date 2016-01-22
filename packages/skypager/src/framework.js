@@ -85,15 +85,28 @@ class Framework {
     return ProjectCache.projects[projectFile] = project
   }
 
-  use (...plugins) {
-    this.enabledPlugins.concat(plugins.map(plugin => {
+  use (plugins, options = {}) {
+    if (typeof plugins === 'string') {
+      plugins = [plugins]
+    }
+
+    plugins.forEach(plugin => {
       let pluginConfig = this.plugins.lookup(plugin)
-      pluginConfig.modify(this, pluginConfig)
-    }))
+
+      if (pluginConfig && pluginConfig.api && pluginConfig.api.modify) {
+        pluginConfig.api.modify(this)
+      } else {
+        if (typeof pluginConfig.api === 'function') {
+          pluginConfig.api.call(this, this, pluginConfig)
+        }
+      }
+
+      this.enabledPlugins.push(plugin)
+    })
   }
 
-  get additionalPluginConfig () {
-
+  loadPlugin(requirePath) {
+    this.plugins.runLoader(require(requirePath))
   }
 
   get actions () {
