@@ -67,18 +67,11 @@ class Framework {
 
     let root = projectFile.match(/.js/i) ? dirname(projectFile) : projectFile
 
+    // get the project manifest, which should include a skypager key
+    try { options.manifest = options.manifest || Object.assign(options.manifest, require(root + '/package.json')) } catch (error) { }
+
     options.manifest = options.manifest || {}
     options.manifest.skypager = options.manifest.skypager || {}
-
-    // get the project manifest, which should include a skypager key
-    try { Object.assign(options.manifest, require(root + '/package.json')) } catch (error) { }
-
-    // allow for skypager.json files
-    try { Object.assign(options.manifest.skypager, require(root + '/skypager.json')) } catch (error) { }
-
-    if (process.env.SKYPAGER_DEBUG) {
-      console.log('Loading skypager project file', projectFile, options)
-    }
 
     let project = (new this.Project(projectFile, options))
 
