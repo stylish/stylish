@@ -35,6 +35,8 @@ class Project {
     uri.should.be.a.String()
     uri.should.not.be.empty()
 
+    normalizeOptions(options)
+
     let project = this
 
     project.uri = uri
@@ -53,12 +55,22 @@ class Project {
 
     project.hidden('paths', paths.bind(project))
 
+    project.hidden('registries', registries.call(project), false)
+
+    project.name = options.name || basename(project.root)
+
     const plugins = [ ]
     util.hide.getter(project, 'enabledPlugins', () => plugins)
 
-    project.lazy('registries', registries.bind(project), false)
-
-    project.name = options.name || basename(project.root)
+    if (options.plugins) {
+      options.plugins.forEach(plugin => {
+        if (typeof(plugin) === 'function') {
+          plugin.call(this, this)
+        } else {
+          this.use(plugin)
+        }
+      })
+    }
 
     project.runHook('contentWillInitialize')
     // wrap the content interface in a getter but make sure
@@ -183,7 +195,7 @@ class Project {
   *
   */
   use (...plugins) {
-    this.enabledPlugins.concat(plugins.map(plugin => {
+    plugins.map(plugin => {
       let pluginConfig = this.plugins.lookup(plugin)
 
       if (pluginConfig && pluginConfig.api && pluginConfig.api.modify) {
@@ -194,8 +206,8 @@ class Project {
         }
       }
 
-      return plugin
-    }))
+      this.enabledPlugins.push(plugin)
+    })
   }
 
   /*
@@ -385,4 +397,12 @@ function setupHooks(hooks = {}) {
 
     return memo
   }, {})
+}
+
+function normalizeOptions (options = {}) {
+  if (options.manifest && options.manifest.skypager) {
+    options = Object.assign(options, options.manifest.skypager)
+  }
+
+  return options
 }
