@@ -9,10 +9,10 @@ const spawn = require('child_process').spawnSync
 skypagers.forEach(p => {
   console.log('Linking ' + p)
 
+  spawn('npm', ['install'], { cwd: path.join(__dirname, '../packages/skypager') })
+
   // go into the project and make sure it is setup to be linkable
-  spawn('npm', ['link'], {
-    cwd: path.join(__dirname, '../packages/' + p)
-  })
+  spawn('npm', ['link'], { cwd: path.join(__dirname, '../packages/' + p) })
 
   // link to the above
   spawn('npm', ['link', p], {
