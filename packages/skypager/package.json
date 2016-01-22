@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "1.9.7",
+  "version": "1.9.8",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
   "bin": {
@@ -72,7 +72,7 @@
     "yargs": "^3.31.0"
   },
   "devDependencies": {
-    "babel-core": "6.4.0",
+    "babel-core": "^6.4.0",
     "babel-eslint": "^5.0.0-beta4",
     "babel-plugin-add-module-exports": "^0.1.1",
     "babel-plugin-object-assign": "^1.2.1",

@@ -157,7 +157,7 @@ class Asset {
     return relationshipProxy(this)
   }
 
-  load () {
+  _load () {
     this.project.actions.run('assets/load', {
       collection: this.collection,
       id: this.id,
