@@ -11,7 +11,7 @@
     "docs": "skypager serve --entry ./src/docs"
   },
   "dependencies": {
-    "babel-core": "^6.4.0",
+    "babel-core": "6.4.0",
     "babel-loader": "^6.2.1",
     "babel-plugin-add-module-exports": "^0.1.2",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
