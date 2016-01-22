@@ -351,7 +351,7 @@ function registries () {
 
   let registries = Registry.buildAll(project, Helpers, {root})
 
-  project.runHook('registriesDidLoad')
+  project.runHook('registriesDidLoad', registries)
 
   return registries
 }
