@@ -1,3 +1,3 @@
-describe("ExamplePluginModel", function(){
+describe("TestRunner", function(){
 
 })

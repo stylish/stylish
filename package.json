@@ -54,7 +54,6 @@
     "skypager-devpack": "file:./packages/skypager-devpack",
     "skypager-electron": "file:./packages/skypager-electron",
     "skypager-plugin-blueprints": "file:./packages/skypager-plugin-blueprints",
-    "skypager-services": "file:./packages/skypager-services",
     "skypager-themes": "file:./packages/skypager-themes",
     "skypager-ui": "file:./packages/skypager-ui",
     "style-loader": "^0.13.0",
