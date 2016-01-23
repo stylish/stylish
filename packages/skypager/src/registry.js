@@ -64,6 +64,11 @@ class Registry {
     this.loaded = true
   }
 
+  /**
+   * Remove a helper from this registry
+   *
+   * @param {Helper.id} helperId - the id the helper was registered with
+  */
   remove (helperId) {
     let instance = this.lookup(helperId, false)
     if (instance) {
@@ -80,15 +85,30 @@ class Registry {
     }
   }
 
+  /**
+   * run a helper's main function
+   *
+   * @param {Helper.id} helperId
+   * @param {Whatever} ...args
+  */
   run (helperId, ...args) {
     let fn = this.lookup(helperId).runner
     return fn(...args)
   }
 
+  /**
+   * The Fallback registry for now will always be Skypager
+   *
+   * @private
+  */
   get fallback () {
     if (this.host.type !== 'framework') {
       return Fallbacks[this.name]
     }
+  }
+
+  query (params) {
+    return util.filterQuery(this.all, params)
   }
 
   lookup (needle, strict = true, fromProject) {
@@ -204,6 +224,10 @@ class Registry {
 
   get all () {
     return util.values(this.registry)
+  }
+
+  filter (...args) {
+     return this.all.filter(...args)
   }
 
   get available () {

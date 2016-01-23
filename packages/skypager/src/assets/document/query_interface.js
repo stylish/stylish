@@ -1,5 +1,10 @@
-import { assign, hide, lazy, slugify, underscore, flatten } from '../../util'
-
+import { assign, hide, lazy, slugify, underscore, flatten, filterQuery } from '../../util'
+/**
+ * The Document Query Interface decorates the nodes in our Markdown AST with
+ * helper methods which can be used to inspect the content, and query the document
+ * to find child nodes, sibling nodes, and other information such as nested code blocks
+ * with the language javascript, or anything else.
+ */
 module.exports = {
   nodes (document, type, params = {}) {
     return buildFilterInterface(document)
@@ -175,24 +180,7 @@ function queryNodes (params = {}) {
 }
 
 function query (nodeList, params = {}) {
-  return nodeList.filter(node => {
-    return Object.keys(params).every(key => {
-      let param = params[key]
-      let value = node[key]
-
-      if (isRegex(param) && param.test(value)) {
-        return true
-      }
-
-      if (typeof (param)==='string' && value === param) {
-        return true
-      }
-
-      if (typeof (param)==='number' && value === param) {
-        return true
-      }
-    })
-  })
+  return filterQuery(nodeList, params)
 }
 
 function extractText (node) {

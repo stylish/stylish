@@ -5,7 +5,7 @@ import parser from './document/parser'
 import indexer from './document/indexer'
 import transformer from './document/transformer'
 import content_interface from './document/content_interface'
-import query_interface from './document/query_interface'
+import * as query_interface from './document/query_interface'
 
 import { DomWrapper } from './parsers/html'
 

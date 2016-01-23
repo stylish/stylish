@@ -142,6 +142,30 @@ class Project {
     }
   }
 
+  query (source, params) {
+    source = `${ source }`.toLowerCase()
+
+    if (source === 'docs' || source === 'documents') {
+      return this.docs.query(params)
+    }
+
+    if (source === 'data' || source === 'datasources' || source === 'data_sources') {
+      return this.content.data_sources.query(params)
+    }
+
+    if (['assets','scripts','stylesheets','images','vectors'].indexOf(source) >= 0) {
+      return this.content[source].query(params)
+    }
+
+    if (this.modelNames.indexOf(source) > 0) {
+      return util.filterQuery(this.entities[source], params)
+    }
+  }
+
+  queryHelpers(source, params) {
+     return this.registries[source].query(params)
+  }
+
   get assetManifest () {
     return this.exporters.run('asset_manifest', {
       project: this
@@ -289,6 +313,12 @@ class Project {
   get views () {
     return this.registries.views
   }
+
+  get modelNames () {
+    return this.models.available.map(id => {
+      return util.tabelize(util.underscore(model.name))
+    })
+  }
 }
 
 module.exports = Project
@@ -374,9 +404,7 @@ function registries () {
 }
 
 function entities() {
-  let modelNames = ['outline','page'].concat(this.models.available)
-
-  return modelNames.reduce((memo,id) => {
+  return this.models.available.reduce((memo,id) => {
     let model = this.models.lookup(id)
     let entities = model.entities = model.entities || {}
 

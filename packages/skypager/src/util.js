@@ -237,3 +237,80 @@ export function carve (dataPath, resultValue, initialValue = {}) {
   dotpath.set(initialValue, dataPath, resultValue)
   return initialValue
 }
+
+export function loadManifestFromDirectory (directory) {
+	var manifest = require(path.join(directory,'package.json')) || {}
+	return manifest
+}
+
+export function isDomain(value) { return value.match(DOMAIN_REGEX) }
+
+export function loadProjectFromDirectory (directory) {
+	var manifest = loadManifestFromDirectory(directory)
+
+	if (manifest.skypager && manifest.skypager.main) {
+		return require(
+			path.join(
+				directory,
+				manifest.skypager.main.replace(/^\.\//, '')
+			)
+		)
+	}
+
+	if (exists(path.join(directory, 'skypager.js'))) {
+		return require(
+			path.join(directory, 'skypager.js')
+		)
+	}
+
+	if (exists(path.join(directory, 'index.js'))) {
+		var p = require(
+			 path.join(directory, 'index.js')
+		)
+
+		if (!p.registries && !p.docs) {
+			abort('This project does not seem to have a skypager project')
+		}
+
+		return p
+	}
+}
+
+export function isArray(arg) {
+  return Object.prototype.toString.call(arg) === '[object Array]'
+}
+
+export function isRegex(val) {
+  if ((typeof val === 'undefined' ? 'undefined' : typeof(val)) === 'object' && Object.getPrototypeOf(val).toString() === '/(?:)/') {
+    return true;
+  }
+
+  return false;
+}
+
+export function filterQuery (nodeList = [], params) {
+  if ( typeof params === 'function' ) {
+    return nodeList.filter(params)
+  }
+
+  return nodeList.filter(node => {
+    return Object.keys(params).every(key => {
+      let param = params[key]
+      let value = node[key]
+
+      if (isRegex(param) && param.test(value)) {
+        return true
+      }
+
+      if (typeof (param)==='string' && value === param) {
+        return true
+      }
+
+      if (typeof (param)==='number' && value === param) {
+        return true
+      }
+    })
+  })
+}
+
+

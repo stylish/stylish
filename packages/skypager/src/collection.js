@@ -85,6 +85,10 @@ class Collection {
     return Object.keys(this.assets)
   }
 
+  query(params) {
+    return util.filterQuery(this.all, params)
+  }
+
   reduce(...args){
     return this.all.reduce(...args)
   }
