@@ -107,10 +107,27 @@ class Registry {
     }
   }
 
+  /**
+   * Query this helper registry and return only helpers which match
+   *
+   * @example return actions that expose a CLI interface
+   *
+   *  skypager.actions.query((helper) => {
+   *    return ('cli' in helper.definition.interfaces)
+   *  })
+  */
   query (params) {
     return util.filterQuery(this.all, params)
   }
 
+  /**
+   * Lookup a helper by id
+   *
+   * @param {Helper.id} needle the id of the helper you want
+   * @param {Boolean} strict throw an error when it is not found
+   * @param {Project} fromProject only return helpers that were registered by a particular project
+   *
+   */
   lookup (needle, strict = true, fromProject) {
     let helperId = this.aliases[needle]
 
@@ -126,6 +143,12 @@ class Registry {
     return result
   }
 
+  /**
+   * Register a helper instance
+   *
+   * @param {Helper.id} helperId the id to reference this helper by
+   * @param {Helper} helperInstance a helper object that wraps this helper file with metadata
+  */
   register (helperId, helperInstance) {
     if (!helperInstance) {
       throw ('Error registering ' + helperId)
@@ -146,6 +169,12 @@ class Registry {
     return helperInstance
   }
 
+  /**
+   * build a Helper.id for a given helper path
+   *
+   * @param {Path} helperURL the absolute path to this helper
+   * @param {Boolean} keepExtension - keep the file extension as part of the Helper.id
+  */
   buildId (helperURL, keepExtension = false) {
     let reg = new RegExp('^' + this.root + '/', 'i')
 
@@ -162,8 +191,24 @@ class Registry {
     return keepExtension ? base : base.replace(/\.\w+$/i, '')
   }
 
-  runLoader (fn) {
-    let locals = Object.assign({}, (this.helper.DSL ? this.helper.DSL : { }))
+  /**
+   * Run a helper loader function for this registry.
+   *
+   * @param {Function} fn a function which is about to load helpers for us
+   * @param {Object} locals an object containing variables to inject into scope
+   *
+   * This will run the required function in a special context
+   * where certain sugar is injected into the global scope.
+   *
+   * These loader functions can expect to have the following in scope:
+   *
+   * - registry - this
+   * - [helperType] - a variable named action, model, exporter, plugin, or whatever
+   * - load - a function to load in a uri. this.load.bind(registry)
+   *
+  */
+  runLoader (fn, locals = {}) {
+    locals = Object.assign(locals, (this.helper.DSL ? this.helper.DSL : {}))
 
     locals.util = util
 
@@ -181,6 +226,21 @@ class Registry {
     util.noConflict(fn, locals)()
   }
 
+  /**
+   * Load a helper by its URI or Path.
+   *
+   * @description
+   *
+   * This will require the helper in a special context where certain
+   * objects are injected in the global scope. This makes it easier to
+   * write helpers by providing them with a specific DSL based on the
+   * helper type.
+   *
+   * @param {URI} uri an absolute path to the helper js file
+   * @param {Helper.id} id what id to register this helper under?
+   *
+   * @see helpers/definitions/model.js for example
+   */
   load (uri, id) {
     const HelperClass = this.helper
 
@@ -212,6 +272,7 @@ class Registry {
 
       this.register(id, helperInstance)
 
+      // todo: should just be a method on definition
       if (this.helper.Definition && this.helper.Definition.clearDefinition) {
          this.helper.Definition.clearDefinition()
       }

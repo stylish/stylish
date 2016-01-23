@@ -2,7 +2,7 @@ describe("Log", (log) => {
   log.documents.have.a.section('Entries', (section) => {
     section.builder = _buildSection
 
-    section.has.many('entries', (entry) => {
+    section.has.many.articles('entries', (entry) => {
       entry.builder = _buildEntry
     })
   })

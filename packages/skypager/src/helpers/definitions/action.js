@@ -16,11 +16,21 @@ function clearDefinition () { _curr = null; delete tracker[_curr] }
 export class ActionDefinition {
   constructor (actionName) {
     this.name = actionName
-    this.config = { }
+    this.description = ''
+    this.config = {}
+    this.interfaces = {}
     this.parameters = { }
     this.aliases = {}
     this.validator = function () { return true }
     this.executor = function () { throw ('Define your own executor function') }
+  }
+
+  describe(value) {
+    this.description = value
+  }
+
+  expose (platform, configurator) {
+    this.interfaces[platform] = configurator
   }
 
   get api () {
@@ -89,11 +99,16 @@ assign(DSL, {
   action: function (actionName) {
     tracker[(_curr = tabelize(parameterize(actionName)))] = new ActionDefinition(actionName)
   },
+  describe: function (...args) { tracker[_curr].describe(...args) },
   aliases: function (...args) { tracker[_curr].aliases(...args) },
   aka: function (...args) { tracker[_curr].aka(...args) },
   validate: function (...args) { tracker[_curr].validate(...args) },
   execute: function (...args) { tracker[_curr].execute(...args) },
   required: function (...args) { tracker[_curr].required(...args) },
   optional: function (...args) { tracker[_curr].optional(...args) },
-  params: function (...args) { tracker[_curr].params(...args) }
+  params: function (...args) { tracker[_curr].params(...args) },
+  expose: function(...args) { tracker[_curr].expose(...args) },
+  cli: function(...args) { tracker[_curr].expose('cli', ...args) },
+  ipc: function(...args) { tracker[_curr].expose('ipc', ...args) },
+  web: function(...args) { tracker[_curr].expose('web', ...args) }
 })
