@@ -1,15 +1,10 @@
 #!/usr/bin/env node
 
-const program = require('commander')
 const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
 const express = require('express')
-
-program
-  //.version()
-  .option('-p, --port <port>', 'Set port. Defaults to 3000', '3000')
-  .parse(process.argv)
+const argv = require('yargs').argv
 
 const directory = path.resolve('.')
 const config = require('../index').resolve()
@@ -22,6 +17,7 @@ const devMiddleware = require('webpack-dev-middleware')(compiler, {
   publicPath: config.output.publicPath,
   stats: true
 })
+
 app.use(devMiddleware)
 app.use(require('webpack-hot-middleware')(compiler))
 
@@ -36,10 +32,10 @@ app.get('*', function(req, res) {
   }
 })
 
-app.listen(program.port, 'localhost', function(err) {
+app.listen(argv.port || 3000, (argv.hostname || 'localhost'), function(err) {
   if (err) {
     console.log(err)
     return
   }
-  console.log('Listening at http://localhost:' + program.port)
+  console.log('Listening at http://localhost:' + (argv.port || 3000))
 })

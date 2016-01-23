@@ -26,8 +26,7 @@ export default build
 
 export function handle(entry, options = {}, context = {}) {
   entry = entry || options.entry
-  let binPath = join(pathToDevpack(), 'bin', 'cli.js')
-  let cmd = `${ binPath } build ${ process.argv.slice(3).join(' ') }`
+  let cmd = `skypager-devpack build ${ process.argv.slice(3).join(' ') }`
   shell.exec(cmd)
 }
 

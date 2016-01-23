@@ -56,7 +56,7 @@ if (argv.htmlTemplatePath) {
   templatePath = path.resolve(argv.htmlTemplatePath)
 }
 
-let htmlFilename = argv.htmlFilename || 'index.html'
+var htmlFilename = argv.htmlFilename || 'index.html'
 
 if (env === 'production' && platform === 'web' && !argv.htmlFilename && argv.pushState) {
   htmlFilename = '200.html'
