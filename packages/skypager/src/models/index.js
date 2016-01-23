@@ -1,4 +1,4 @@
-const HELPERS = [ 'outline', 'page' ]
+const HELPERS = [ 'outline', 'page', 'log', 'spec' ]
 
 function resolve (p) { return require.resolve('./' + p) }
 

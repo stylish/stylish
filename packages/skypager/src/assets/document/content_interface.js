@@ -1,10 +1,24 @@
 import { assign, lazy, hide, underscore } from '../../util'
 
+/**
+ * In the Model Definition DSL it is possible to define the structure
+ * of the document and supply functions which can be used to shape
+ * the document into a JSON object.
+ *
+ */
 module.exports = function (document) {
 	  let Interface = { }
 	  let definition = document.modelClass && document.modelClass.definition
 
     let ast = document.indexed
+
+    ast.children.forEach(node => {
+      if (node.type === 'heading') {
+        assign(node, {
+          extract: ((...args) => extractContent(node, ...args))
+        })
+      }
+    })
 
 	  Object.keys(definition.sectionsConfig).forEach(sectionId => {
 		  let sectionConfig = definition.sectionsConfig[sectionId]
@@ -56,6 +70,12 @@ module.exports = function (document) {
   }
 
   return Interface
+}
+
+function extractContent (node, extractionType, options ={}) {
+  if (extractionType === 'paragraphs') {
+    return 'TODO!'
+  }
 }
 
 function isEmpty (obj) {
