@@ -124,6 +124,10 @@ export default class Helper {
   get paths () {
     let asset = this
     return {
+      get summary () {
+        let parts = asset.uri.split(/\/|\\/)
+        return parts.reverse().slice(0,3).reverse().join('/')
+      },
       get relative () {
         return asset.uri.replace(asset.owner.root + '/', '')
       },

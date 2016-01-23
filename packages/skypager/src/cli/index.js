@@ -1,3 +1,4 @@
+export available from './available'
 export build from './build'
 export develop from './develop'
 export init from './init'

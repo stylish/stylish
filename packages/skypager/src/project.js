@@ -315,9 +315,9 @@ class Project {
   }
 
   get modelNames () {
-    return this.models.available.map(id => {
-      return util.tabelize(util.underscore(model.name))
-    })
+    return this.models.all.map(model =>
+      util.tabelize(util.underscore(model.name))
+    )
   }
 }
 
