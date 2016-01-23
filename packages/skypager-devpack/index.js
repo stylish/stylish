@@ -14,8 +14,6 @@ const directory = process.cwd()
 const isDev = (!argv.production && env === 'development')
 const fontsPrefix = 'fonts'
 
-const myPackage = require(directory + '/package.json')
-
 const modulesDirectories = [
   `${directory}/node_modules`,
   `${__dirname}/node_modules`,
@@ -32,37 +30,36 @@ const resolveBabelPackages = packages => {
 const platform = argv.platform || 'web'
 
 const entry = {
-  app: [ argv.entry || './src' ],
+  [argv.entryName || 'app']: [ argv.entry || './src' ],
 }
 
-if (isDev) {
+const precompiled = argv.precompiled || argv.usePrecompiledTemplate
+
+if (isDev && argv.hot !== false) {
   entry.app.unshift('webpack-hot-middleware/client')
 }
 
-if (!argv.usePrecompiledTemplate && argv.theme !== false) {
-  if (argv.theme) {
-    entry.theme = `skypager-themes?theme=${ argv.theme }!${directory}/package.json`
-  } else if (myPackage && myPackage.skypager && myPackage.skypager.theme) {
-    entry.theme = `skypager-themes?theme=${ myPackage.skypager.theme }!${directory}/package.json`
-  } else if (argv.theme !== false && argv.theme !== 'none') {
-    entry.theme = `skypager-themes?theme=dashboard!${directory}/package.json`
-  }
+if (!precompiled && argv.theme) {
+  entry.theme = `skypager-themes?theme=${ argv.theme }!${directory}/package.json`
 }
 
 var outputPath = path.join(directory, argv.outputFolder || 'public');
 
-if (argv.usePrecompiledTemplate) {
-  outputPath = path.join(__dirname, 'templates', platform, argv.usePrecompiledTemplate)
-}
-
 var templatePath = `${__dirname}/templates/index.html`
 
-if (isDev && argv.usePrecompiledTemplate) {
-  templatePath = path.join(__dirname, 'templates', platform, argv.usePrecompiledTemplate, 'index.html')
+
+if (isDev && precompiled) {
+  templatePath = path.join(__dirname, 'templates', platform, precompiled, 'index.html')
 }
 
 if (argv.htmlTemplatePath) {
   templatePath = path.resolve(argv.htmlTemplatePath)
+}
+
+let htmlFilename = argv.htmlFilename || 'index.html'
+
+if (env === 'production' && platform === 'web' && !argv.htmlFilename && argv.pushState) {
+  htmlFilename = '200.html'
 }
 
 config
@@ -127,7 +124,7 @@ config
     template: templatePath,
     hash: false,
     inject: 'body',
-    filename: argv.pushState ? '200.html' : 'index.html'
+    filename: htmlFilename
   }])
 
 // development
@@ -155,7 +152,7 @@ if (env == 'production') {
     }])
 }
 
-if (argv.vendorLibraries !== false && !argv.useExternalVendorLibraries && !argv.usePrecompiledTemplate) {
+if (argv.vendorLibraries !== false && !argv.externalVendors && !precompiled) {
   config.merge({
     entry: assign(entry, {
       vendor: [
@@ -177,7 +174,7 @@ if (argv.vendorLibraries !== false && !argv.useExternalVendorLibraries && !argv.
   }).plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
 }
 
-if (argv.useExternalVendorLibraries || argv.usePrecompiledTemplate) {
+if (argv.externalVendors || precompiled) {
   config.merge({
     externals: {
       'jquery': 'jQuery',
@@ -196,29 +193,6 @@ if (argv.useExternalVendorLibraries || argv.usePrecompiledTemplate) {
   })
 }
 
-const userConfig = path.resolve(directory, './webpack.config.js')
-if (fs.existsSync(userConfig)) {
-  config.merge(require(userConfig))
-}
-
-if (argv.project) {
-  config.merge({
-    resolve: {
-      alias: {
-        'skypager-project-src': path.resolve(argv.project)
-      }
-    }
-  })
-}
-
-if (argv.projectSnapshot) {
-  config.merge({
-    resolve: {
-      alias: {
-        'skypager-project-dist': path.resolve(argv.projectSnapshot)
-      }
-    }
-  })
-}
+if (argv.webpackConfig) { config.merge(require(argv.webpackConfig)) }
 
 module.exports = config
