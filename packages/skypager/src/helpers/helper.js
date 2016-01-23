@@ -11,6 +11,11 @@ export default class Helper {
 
     let helper = new this(uri, Object.assign(options, {definition}))
 
+    Object.assign(definition, {
+      get _helper() { return helper },
+      get _requirePath() { return uri }
+    })
+
     return helper
   }
 

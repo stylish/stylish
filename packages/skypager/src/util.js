@@ -6,6 +6,7 @@ import _debug from 'debug'
 
 const inflections = utile.inflect
 const debug = _debug('skypager')
+const DOMAIN_REGEX = /^[a-zA-Z0-9_-]+\.[.a-zA-Z0-9_-]+$/
 
 module.exports.visit = visit
 module.exports.assign = assign
@@ -239,6 +240,7 @@ export function carve (dataPath, resultValue, initialValue = {}) {
 }
 
 export function loadManifestFromDirectory (directory) {
+  var path = require('path')
 	var manifest = require(path.join(directory,'package.json')) || {}
 	return manifest
 }
@@ -246,6 +248,9 @@ export function loadManifestFromDirectory (directory) {
 export function isDomain(value) { return value.match(DOMAIN_REGEX) }
 
 export function loadProjectFromDirectory (directory) {
+  var exists = require('fs').existsSync
+  var path = require('path')
+
 	var manifest = loadManifestFromDirectory(directory)
 
 	if (manifest.skypager && manifest.skypager.main) {
@@ -313,4 +318,8 @@ export function filterQuery (nodeList = [], params) {
   })
 }
 
+export function abort(message) {
+   console.log(message.red || message)
+   process.exit(1)
+}
 

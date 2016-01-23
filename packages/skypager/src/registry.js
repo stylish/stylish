@@ -219,6 +219,7 @@ class Registry {
       return helperInstance
     } catch (error) {
       console.log('Error loading: ' + uri, error.message)
+      console.log(error.stack)
     }
   }
 

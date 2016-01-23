@@ -72,17 +72,17 @@ class Project {
       })
     }
 
-    project.runHook('contentWillInitialize')
+    project.__runHook('contentWillInitialize')
     // wrap the content interface in a getter but make sure
     // the documents collection is loaded and available right away
     project.hidden('content', content.call(project))
 
-    project.runHook('contentDidInitialize')
+    project.__runHook('contentDidInitialize')
 
     if (options.autoImport !== false) {
       debug('running autoimport', options.autoLoad)
 
-      project.runHook('projectWillAutoImport')
+      project.__runHook('projectWillAutoImport')
 
       runImporter.call(project, {
         type: (options.importerType || 'disk'),
@@ -93,7 +93,7 @@ class Project {
         }
       })
 
-      project.runHook('projectDidAutoImport')
+      project.__runHook('projectDidAutoImport')
     }
 
     util.hide.getter(project, 'supportedAssetExtensions', () => Assets.Asset.SupportedExtensions )
@@ -104,9 +104,9 @@ class Project {
         delete project.entities
         debug('building entities')
 
-        project.runHook('willBuildEntities')
+        project.__runHook('willBuildEntities')
         project.entities = entities.call(project)
-        project.runHook('didBuildEntities', project, project.entities)
+        project.__runHook('didBuildEntities', project, project.entities)
 
         return project.entities
       }
@@ -114,7 +114,7 @@ class Project {
 
   }
 
-  runHook(name, ...args) {
+  __runHook(name, ...args) {
     let project = this
     let fn = project.hooks[name] || project[name]
     if (fn) { fn.call(project, ...args) }
@@ -344,7 +344,8 @@ function paths () {
     manifest: join(this.root, 'package.json'),
     cache: join(this.root, 'tmp', 'cache'),
     logs: join(this.root, 'log'),
-    build: join(this.root, 'dist')
+    build: join(this.root, 'dist'),
+    public: join(this.root, 'public')
   }
 
   let custom = project.options.paths || project.manifest.paths || {}
@@ -398,7 +399,7 @@ function registries () {
 
   let registries = Registry.buildAll(project, Helpers, {root})
 
-  project.runHook('registriesDidLoad', registries)
+  project.__runHook('registriesDidLoad', registries)
 
   return registries
 }
