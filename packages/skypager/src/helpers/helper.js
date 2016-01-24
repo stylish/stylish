@@ -40,6 +40,7 @@ export default class Helper {
 
     let definition = options.definition
 
+    // before returning the definition make sure to call any configure methods we have
     this.getter('definition', function () {
       let d = options.definition || this.required.definition
 

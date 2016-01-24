@@ -157,8 +157,8 @@ class Project {
       return this.content[source].query(params)
     }
 
-    if (this.modelNames.indexOf(source) > 0) {
-      return util.filterQuery(this.entities[source], params)
+    if (this.modelGroups.indexOf(source) > 0) {
+      return util.filterQuery(util.values(this.entities[source]), params)
     }
   }
 
@@ -270,7 +270,7 @@ class Project {
     return this.content.data_sources
   }
 
-  get data_sources () {
+  get data () {
     return this.content.data_sources
   }
 
@@ -314,7 +314,7 @@ class Project {
     return this.registries.views
   }
 
-  get modelNames () {
+  get modelGroups () {
     return this.models.all.map(model =>
       util.tabelize(util.underscore(model.name))
     )

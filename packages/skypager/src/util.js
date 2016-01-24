@@ -298,7 +298,7 @@ export function filterQuery (nodeList = [], params) {
     return nodeList.filter(params)
   }
 
-  return nodeList.filter(node => {
+  return (nodeList || []).filter(node => {
     return Object.keys(params).every(key => {
       let param = params[key]
       let value = node[key]
@@ -313,6 +313,11 @@ export function filterQuery (nodeList = [], params) {
 
       if (typeof (param)==='number' && value === param) {
         return true
+      }
+
+      // treat normal arrays to search for any exact matches
+      if (isArray(param)) {
+        return param.any(val => val === value)
       }
     })
   })

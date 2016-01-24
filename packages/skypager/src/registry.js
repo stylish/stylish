@@ -117,7 +117,7 @@ class Registry {
    *  })
   */
   query (params) {
-    return util.filterQuery(this.all, params)
+    return util.filterQuery(this.allHelpers(true), params)
   }
 
   /**
@@ -284,12 +284,31 @@ class Registry {
     }
   }
 
-  get all () {
-    return util.values(this.registry)
-  }
 
   filter (...args) {
      return this.all.filter(...args)
+  }
+
+  map(...args) {
+    return this.all.map(...args)
+  }
+
+  forEach(...args){
+    return this.all.forEach(...args)
+  }
+
+  allHelpers (includeFallback = true) {
+    let mine = util.values(this.registry)
+
+    if (this.fallback && includeFallback) {
+      return mine.concat(this.fallback.all)
+    }
+
+    return mine
+  }
+
+  get all () {
+     return this.allHelpers(false)
   }
 
   get available () {
