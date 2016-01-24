@@ -1,12 +1,24 @@
+import colors from 'colors'
+import { argv } from 'yargs'
+
 export function run (program, dispatch) {
   program
-    .command('run <helper> [type]')
-    .option('--type', 'what type of helper is it? app, action, importer, exporter', 'action')
+    .command('run <action> [files...]')
     .action(dispatch(handle))
 }
 
 export default run
 
-export function handle (helper, helperType, options = {}, context = {}) {
-  console.log('todo handle run cli')
+export function handle (actionId, files, options = {}, context = {}) {
+  const { project } = context
+  const action = project.actions.lookup(actionId, false)
+
+  if (!action) {
+    abort(`could not find and action named ${ actionId }`)
+  }
+}
+
+function abort(message) {
+   console.log(message.red)
+   process.exit(0)
 }

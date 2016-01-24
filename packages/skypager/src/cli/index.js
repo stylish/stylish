@@ -1,13 +1,50 @@
-export available from './available'
-export build from './build'
-export develop from './develop'
-export init from './init'
-export listen from './listen'
-export publish from './publish'
-export run from './run'
-export repl from './repl'
+import { join, resolve } from 'path'
+import { existsSync as exists } from 'fs'
+
+import available from './available'
+import build from './build'
+import dashboard from './dashboard'
+import create from './create'
+import develop from './develop'
+import exporter from './exporter'
+import init from './init'
+import importer from './importer'
+import listen from './listen'
+import publish from './publish'
+import run from './run'
+import repl from './repl'
 
 import { loadProjectFromDirectory } from '../util'
+
+export const commands = {
+  available,
+  build,
+  dashboard,
+  console: repl,
+  create,
+  develop,
+  export: exporter,
+  import: importer,
+  listen,
+  publish,
+  run
+}
+
+export function configure (program, localConfig) {
+  let handler = dispatcher.bind(program)
+
+  available(program, handler)
+  build(program, handler)
+  repl(program, handler)
+  create(program, handler)
+  develop(program, handler)
+  exporter(program, handler)
+  init(program, handler)
+  importer(program, handler)
+  listen(program, handler)
+  publish(program, handler)
+  run(program, handler)
+}
 
 export function dispatcher(handlerFn) {
   let program = this

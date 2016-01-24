@@ -16,11 +16,6 @@ class Action extends Helper {
     return true
   }
 
-  static fromDefinition (uri, actionDef, options = {}) {
-    options.api = actionDef.api
-    return new Action(uri, options)
-  }
-
   get definitionClass () {
      return ActionDefinition
   }

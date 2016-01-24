@@ -8,6 +8,7 @@ const pkg = require('../package.json')
 const program = require('commander')
 const commands = require('../lib/cli')
 const util = require('../lib/util')
+const argv = require('yargs').argv
 
 if (exists(path.join(process.env.PWD,'.babelrc'))) {
 	require('babel-register')
@@ -24,24 +25,28 @@ if (exists(path.join(process.env.PWD,'.babelrc'))) {
 	})
 }
 
-program
-	.version(pkg.version)
-	.option('--project <path>', 'specify which folder contains the project you wish to work with')
+var localPackage = {}
 
-	commands.console = commands.repl
+try {
+	localPackage = require(path.join(process.env.PWD, 'package.json'))
+} catch (error) {
 
-	Object.keys(commands).sort().forEach(function(cmdName) {
-		if (cmdName === 'dispatcher' || cmdName === 'repl') {
-			 return
-		}
+}
 
-		var cmd = commands[cmdName]
+program.version(pkg.version).option('--project <path>', 'specify which folder contains the project you wish to work with')
 
-		if (typeof cmd !== 'function') {
-			console.log('Something wrong with the' + cmdName + ' command definition. Does not export a function'.red)
-		} else {
-			cmd(program, commands.dispatcher.bind(program))
-		}
-	})
+commands.configure(program, localPackage.skypager || {})
 
 program.parse(process.argv)
+
+if (!process.argv.slice(2).length) {
+	program.outputHelp()
+}
+
+var commandNames = program.commands.map(function(c){ return c._name })
+
+if (commandNames.indexOf(program.rawArgs.slice(2)[0]) === -1) {
+	console.log()
+	console.log('Invalid command'.red)
+	 program.outputHelp()
+}
