@@ -35,10 +35,18 @@ class Document extends Asset {
 
   loadEntity () {
     let asset = this
+    var entity
 
     this.ensureIndexes()
 
-    return this.modelClass.entities[this.id] = Object.assign({}, this.modelClass.run(this), {
+    try {
+      entity = this.modelClass.run(this)
+    } catch (error) {
+      console.log('Error building entity', this.modelClass, error.message)
+      entity = this.project.models.lookup('page').run(this)
+    }
+
+    return this.modelClass.entities[this.id] = Object.assign({}, entity, {
         get path () {
             return asset.paths.projectRequire
         },

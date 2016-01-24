@@ -1,12 +1,6 @@
 var debug = require('debug')('skypager:exporters')
 
 function CollectionBundle(options = {}){
-  try {
-
-  } catch(e) {
-
-  }
-
   let project = options.project || this
 
   let bundle = { }

@@ -1,5 +1,10 @@
-import colors from 'colors'
+import { join, resolve, dirname, normalize, existsSync as exists } from 'path'
+import { writeFileSync as write, statSync as stat } from 'fs'
+
 import { argv } from 'yargs'
+
+import mkdirp from 'mkdirp'
+import colors from 'colors'
 
 export function exporter (program, dispatch) {
   program
@@ -24,14 +29,22 @@ export function handle (exporterId, options = {}, context = {}) {
   const params = Object.assign({}, argv, {project})
 
   let payload = project.run.exporter(exporterId, params)
+  let output
 
   if (options.format === 'json' && options.pretty) {
-     payload = JSON.stringify(payload, null, 2)
+     output = JSON.stringify(payload, null, 2)
   } else if (options.format === 'json') {
-     payload = JSON.stringify(payload)
+     output = JSON.stringify(payload)
+  } else if (options.format === 'yaml') {
+    output = yaml.dump(payload)
   }
 
-  console.log(payload)
+  if (options.output) {
+    let outputPath = resolve(normalize(options.output))
+    write(outputPath, output.toString(), 'utf8')
+  } else {
+     console.log(output)
+  }
 }
 
 function abort(message) {

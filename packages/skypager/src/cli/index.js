@@ -3,7 +3,6 @@ import { existsSync as exists } from 'fs'
 
 import available from './available'
 import build from './build'
-import dashboard from './dashboard'
 import create from './create'
 import develop from './develop'
 import exporter from './exporter'
@@ -19,7 +18,6 @@ import { loadProjectFromDirectory } from '../util'
 export const commands = {
   available,
   build,
-  dashboard,
   console: repl,
   create,
   develop,

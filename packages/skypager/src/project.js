@@ -98,6 +98,7 @@ class Project {
 
     util.hide.getter(project, 'supportedAssetExtensions', () => Assets.Asset.SupportedExtensions )
 
+    // lazy load / memoize the entity builder
     Object.defineProperty(project, 'entities', {
       configurable: true,
       get: function () {
@@ -112,6 +113,7 @@ class Project {
       }
     })
 
+    util.hide.getter(project, 'modelDefinitions', modelDefinitions.bind(this))
   }
 
   __runHook(name, ...args) {
@@ -402,6 +404,20 @@ function registries () {
   project.__runHook('registriesDidLoad', registries)
 
   return registries
+}
+
+function modelDefinitions() {
+  return this.models.available.reduce((memo,id) => {
+    let model = this.models.lookup(id)
+
+    Object.assign(memo, {
+      get [util.tabelize(util.underscore(model.name))](){
+        return model.definition
+      }
+    })
+
+    return memo
+  }, {})
 }
 
 function entities() {

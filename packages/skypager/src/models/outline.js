@@ -1,3 +1,7 @@
+define('Outline', () => {
+
+})
+
 export function create (document, options = {}) {
   return {
     data: document.data,
@@ -9,5 +13,5 @@ export function create (document, options = {}) {
 }
 
 export function validate (document, spec, utils) {
-
+  return true
 }

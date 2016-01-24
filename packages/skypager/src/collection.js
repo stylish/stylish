@@ -97,6 +97,10 @@ class Collection {
     return this.all.map(...args)
   }
 
+  forEach(...args){
+    return this.all.forEach(...args)
+  }
+
   filter(...args){
     return this.all.filter(...args)
   }

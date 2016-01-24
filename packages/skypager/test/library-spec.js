@@ -10,7 +10,7 @@ describe("Skypager", ()=>{
   })
 
   it( "has an asset manifest", () => {
-    let man = Skypager.fixture.exporters.run('asset_manifest', {project: Skypager.fixture})
+    let man = Skypager.fixture.exporters.run('assets', {project: Skypager.fixture})
 
     man.should.have.property('documents')
     man.documents.should.have.property('docs/index.md')

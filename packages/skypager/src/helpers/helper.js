@@ -6,14 +6,25 @@ import { dirname, extname, resolve, join } from 'path'
 export default class Helper {
   static fromDefinition (uri, definition, options) {
     if(definition && options.required) {
-      definition.helperExport = options.required
+      Object.defineProperty(definition, 'helperExport', {
+        enumerable: false,
+        get: function() {
+          return options.required
+        }
+      })
     }
 
     let helper = new this(uri, Object.assign(options, {definition}))
 
-    Object.assign(definition, {
-      get _helper() { return helper },
-      get _requirePath() { return uri }
+    Object.defineProperties(definition, {
+      _helper: {
+        enumerable: false,
+        get: function(){ return helper }
+      },
+      _requirePath: {
+        enumerable: false,
+        get: function(){ return uri }
+      }
     })
 
     return helper

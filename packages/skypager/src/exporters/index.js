@@ -1,11 +1,12 @@
 const HELPERS = [
-  'asset_manifest',
-  'collection_bundle',
-  'html',
-  'json',
+  'all',
+  'project',
+  'assets',
+  'content',
   'entities',
   'snapshot',
-  'disk'
+  'bundle',
+  'models'
 ]
 
 function resolve (p) { return require.resolve('./' + p) }

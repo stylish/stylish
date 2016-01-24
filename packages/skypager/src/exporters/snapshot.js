@@ -10,16 +10,12 @@ module.exports = function run_snapshot_exporter (options = {}) {
       root: project.root,
       cacheKey: project.cacheKey
     },
-    assets: project.run.exporter('asset_manifest'),
-    content: project.run.exporter('collection_bundle')
+    assets: project.run.exporter('assets'),
+    content: project.run.exporter('content')
   }
 
   snapshot.html = project.documents.all.reduce((memo, doc) => {
-    try {
-      memo[doc.id] = doc.html.content
-    } catch (error) {
-      console.log('HTML Rendering Error', error.message)
-    }
+    memo[doc.id] = doc.html.content
     return memo
   }, {})
 
