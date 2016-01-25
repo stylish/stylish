@@ -2,6 +2,13 @@ import Skypager from './index'
 
 describe("The Plugin System", ()=>{
   let project = require('./fixture')
+  let called = false
+
+  it("has an easy way of loading helpers into a project host", () => {
+    let count = 0
+    project.run.action('loader', () => { count = count + 1 })
+    count.should.not.equal(0)
+  })
 
   it("knows which plugins are available",()=>{
     Skypager.plugins.available.length.should.not.equal(0)
