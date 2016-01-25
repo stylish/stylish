@@ -19,6 +19,7 @@ export function build (program, dispatch) {
     .option('--precompiled <name>', 'use a precompiled html template which includes vendor libs, themes, etc')
     .option('--push-state', 'use a 200.html file to support push state')
     .option('--content-hash', 'fingerprint the names of the files as a cache busting mechanism', true)
+    .option('--dev-tools-path <path>', 'path to the skypager-devpack')
     .action(dispatch(handle))
 }
 
@@ -26,12 +27,13 @@ export default build
 
 export function handle(entry, options = {}, context = {}) {
   entry = entry || options.entry
-  let cmd = `skypager-devpack build ${ process.argv.slice(3).join(' ') }`
-  shell.exec(cmd)
+  options.theme = options.theme || project.options.theme || 'default'
+
+  require(`${ pathToDevpack(options.devToolsPath) }/lib/compiler`)(options)
 }
 
-function pathToDevpack () {
-  return dirname(
+function pathToDevpack (opt) {
+  return resolve(opt) || process.env.SKYPAGER_DEVPACK_PATH || dirname(
     require.resolve('skypager-devpack')
   )
 }

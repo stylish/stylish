@@ -11,21 +11,27 @@ export function BrowserBundle (options = {}) {
 }
 
 export function AssetExporter (options = {}, callback) {
-  let write = require('fs').writeFileSync
-  let mkdir = require('mkdirp').sync
-  let dirname = require('path').dirname
-
+  let fs = require('fs')
+  let exists = fs.existsSync
   let project = this
-  let { asset, inPath, outPath } = options
+  let { asset } = options
 
   if (!asset.raw) {
     asset.runImporter('disk', {sync: true})
   }
 
+  let requirePath = asset.fingerprint ? asset.paths.project.replace(/\.\w+$/,`-${ asset.fingerprint }.js`) : asset.paths.project.replace(/\.\w+$/,'.js')
+  let outPath = project.path('build','bundle', requirePath)
+
+  let write = fs.writeFileSync
+  let mkdir = require('mkdirp').sync
+  let dirname = require('path').dirname
+
   let output = {
     id: asset.id,
     paths: asset.paths,
-    assetGroup: asset.assetGroup
+    assetGroup: asset.assetGroup,
+    fingerprint: asset.fingerprint
   }
 
   if (asset.assetGroup === 'data_sources') {
@@ -46,27 +52,17 @@ export function AssetExporter (options = {}, callback) {
   mkdir(dirname(outPath))
   write(outPath, `var data = module.exports = ${ JSON.stringify(output) };`)
 
-  return outPath
+  return {
+    requirePath
+  }
 }
 
 export function ProjectExporter (options = {}, callback) {
   let project = options.project
 
-  project.allAssets.forEach(asset => {
-    try {
-    } catch (error) {
-      console.log(`error importing asset: ${ asset.id }`)
-      throw(error)
-    }
-  })
-
   let mkdir = require('mkdirp').sync
 
   const keys = Object.keys(project.content)
-
-  keys.forEach(key => {
-    mkdir(project.path('build', 'bundle', key))
-  })
 
   let src = [`exports = module.exports = {}`]
 
@@ -76,15 +72,8 @@ export function ProjectExporter (options = {}, callback) {
     src.push(`var _${ key } = exports.${ key } = {};`)
 
     collection.forEach(asset => {
-      options.asset = asset
-
-      var requirePath = AssetExporter.call(this, {
-        outPath: project.path('build', 'bundle', asset.paths.project.replace(/\.\w+$/,'.js')),
-        inPath: asset.paths.project,
-        asset: asset
-      })
-
-      src.push(`_${ key }['${ asset.id }'] = require('${requirePath}');`)
+      let { requirePath } = AssetExporter.call(project, { asset, options, key })
+      src.push(`_${ key }['${ asset.id }'] = require('./${requirePath}');`)
     })
   })
 

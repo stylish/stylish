@@ -10,9 +10,10 @@ export function exporter (program, dispatch) {
   program
     .command('export <exporter>')
     .description('run one of the project exporters')
-    .option('--output <path>', 'where to save the contents')
-    .option('--pretty', 'where to save the contents')
     .option('--format <format>', 'which format should the output be serialized in', 'json')
+    .option('--output <path>', 'where to save the contents')
+    .option('--pretty', 'pretty print the output')
+    .option('--stdout', 'write output to stdout')
     .action(dispatch(handle))
 }
 
@@ -29,6 +30,13 @@ export function handle (exporterId, options = {}, context = {}) {
   const params = Object.assign({}, argv, {project})
 
   let payload = project.run.exporter(exporterId, params)
+  let extname = options.format
+
+  // declare this on the exporter somehow
+  if (exporterId === 'bundle') {
+    extname = 'js'
+  }
+
   let output
 
   if (options.format === 'json' && options.pretty) {
@@ -42,8 +50,12 @@ export function handle (exporterId, options = {}, context = {}) {
   if (options.output) {
     let outputPath = resolve(normalize(options.output))
     write(outputPath, output.toString(), 'utf8')
-  } else {
+  } else if (options.stdout) {
      console.log(output)
+  } else if (exporterId === 'bundle') {
+    let outputPath = project.path('build', 'bundle.js')
+    write(outputPath,  `module.exports = require('./bundle/index');`, 'utf8')
+    console.log(`Saved exporter to ${ outputPath }`)
   }
 }
 
