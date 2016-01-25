@@ -116,7 +116,6 @@ class Project {
     util.hide.getter(project, 'modelDefinitions', modelDefinitions.bind(this))
   }
 
-
   emit(name, ...args) {
     let project = this
     let fn = project.hooks[name] || project[name]
@@ -190,6 +189,22 @@ class Project {
 
   get assetPaths (){
     return this.allAssets.map(a => a.paths.project)
+  }
+
+  eachAsset (...args) {
+     return this.allAssets.forEach(...args)
+  }
+
+  reduceAssets(...args) {
+     return this.allAssets.reduce(...args)
+  }
+
+  mapAssets(...args) {
+     return this.allAssets.map(...args)
+  }
+
+  filterAssets(...args) {
+     return this.allAssets.filter(...args)
   }
 
   /**

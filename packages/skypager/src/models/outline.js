@@ -7,7 +7,7 @@ export function create (document, options = {}) {
     data: document.data,
     parsed: document.parsed,
     sections: document.headings.sections.pluck('title'),
-    subsections: document.headings.articles('title'),
+    subsections: document.headings.articles.pluck('title'),
     html: document.html.content
   }
 }

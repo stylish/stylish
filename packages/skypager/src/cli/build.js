@@ -20,6 +20,8 @@ export function build (program, dispatch) {
     .option('--push-state', 'use a 200.html file to support push state')
     .option('--content-hash', 'fingerprint the names of the files as a cache busting mechanism', true)
     .option('--dev-tools-path <path>', 'path to the skypager-devpack')
+    .option('--webpack-config <path>', 'path to a javascript function which can mutate the webpack config')
+    .option('--export-library <name>', 'build this as a umd library')
     .action(dispatch(handle))
 }
 
@@ -27,16 +29,13 @@ export default build
 
 export function handle(entry, options = {}, context = {}) {
   entry = entry || options.entry
-  options.theme = options.theme || project.options.theme || 'default'
+  options.theme = options.theme || project.options.theme || 'marketing'
 
-  require(`${ pathToDevpack(options.devToolsPath) }/lib/compiler`)(options)
+  require(`${ pathToDevpack(options.devToolsPath) }/webpack/compiler`)(options)
 }
 
-function pathToDevpack (opt) {
-  return resolve(opt) || process.env.SKYPAGER_DEVPACK_PATH || dirname(
-    require.resolve('skypager-devpack')
-  )
-}
+
+function pathToDevpack (opt) { return (opt && resolve(opt)) || process.env.SKYPAGER_DEVPACK_PATH || dirname( require.resolve('skypager-devpack')) }
 
 function isDepackInstalled () {
   try {

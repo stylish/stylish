@@ -15,11 +15,13 @@ export function develop (program, dispatch) {
     .option('--theme <name>', 'the name of the theme to use')
     .option('--html-template-path <path>', 'path to the html template to use')
     .option('--precompiled <name>', 'use a precompiled html template which includes vendor libs, themes, etc')
-    .option('--expose', 'when enabled, will attempt to use ngrok to expose a public API endpoint for this server')
-    .option('--expose-config <path>', 'path to a configuration file for the expose service')
+    .option('--ngrok', 'when enabled, will attempt to use ngrok to expose a public API endpoint for this server')
+    .option('--ngrok-config <path>', 'path to a configuration file for the ngrok service')
     .option('--silent', 'suppress any server output')
     .option('--debug', 'show error info from the server')
-    .option('--dev-tools-path <path>', 'path to the skypager-devpack')
+    .option('--dev-tools-path <path>', 'path to the skypager-devpack devtools library')
+    .option('--webpack-config <path>', 'path to a javascript function which can mutate the webpack config')
+    .option('--watch-bundle', 'watch for content changes in the project and update the distribution bundle')
     .action(dispatch(handle))
 }
 
@@ -28,18 +30,39 @@ export default develop
 export function handle (entry, options = {}, context = {}) {
   launchServer(entry, options, context)
 
-  if (options.expose) {
+  if (options.watchBundle) {
+    launchWatcher(options, context)
+  }
+
+  if (options.ngrok) {
     launchTunnel(options, context)
   }
+}
+
+export function launchWatcher(options, context) {
+  let project = context.project
+  var proc = shell.exec(`chokidar './{data,docs}/**/*.{md,js,less,css,yml,json,csv,html,svg}' -c 'skypager export bundle'`, {async: true})
+
+  proc.stdout.on('data', (data) => {
+    if(!options.silent) {
+      console.log(data)
+    }
+  })
+
+  proc.stderr.on('data', (data) => {
+    if(options.debug) {
+      console.log(data)
+    }
+  })
 }
 
 export function launchServer (entry, options = {}, context = {}) {
   let project = context.project
 
   options.entry = entry || options.entry || './src'
-  options.theme = options.theme || project.options.theme || 'default'
+  options.theme = options.theme || project.options.theme || 'marketing'
 
-  require(`${ pathToDevpack(options.devToolsPath) }/lib/server`)(options)
+  require(`${ pathToDevpack(options.devToolsPath) }/webpack/server`)(options)
 }
 
 export function launchTunnel(options, context) {
@@ -58,11 +81,7 @@ export function launchTunnel(options, context) {
   })
 }
 
-function pathToDevpack (opt) {
-  return resolve(opt) || process.env.SKYPAGER_DEVPACK_PATH || dirname(
-    require.resolve('skypager-devpack')
-  )
-}
+function pathToDevpack (opt) { return (opt && resolve(opt)) || process.env.SKYPAGER_DEVPACK_PATH || dirname( require.resolve('skypager-devpack')) }
 
 function isDepackInstalled () {
   try {

@@ -3,13 +3,19 @@ const fs = require('fs')
 const webpack = require('webpack')
 const express = require('express')
 
-const directory = path.resolve('.')
-const config = require('../index').resolve()
-
 module.exports = function(argv) {
   if (!argv) { argv = require('yargs').argv }
 
   var app = express()
+
+  var config = require('./index')(argv)
+
+  if (argv.webpackConfig) {
+    var mod = require(path.resolve(argv.webpackConfig))
+    config = config.merge(mod)
+  }
+
+  config = config.resolve()
 
   var compiler = webpack(config)
 

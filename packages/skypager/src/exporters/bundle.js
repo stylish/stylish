@@ -64,12 +64,17 @@ export function ProjectExporter (options = {}, callback) {
 
   const keys = Object.keys(project.content)
 
-  let src = [`exports = module.exports = {}`]
+  let src = [
+    `exports = module.exports = require('./__project.js');`,
+    `exports.entities = require('./__entities.js');`,
+    `exports.assets = require('./__assets.js');`,
+    `exports.content = {}`
+  ]
 
   keys.forEach(key => {
     let collection = project.content[key]
 
-    src.push(`var _${ key } = exports.${ key } = {};`)
+    src.push(`var _${ key } = exports.content.${ key } = {};`)
 
     collection.forEach(asset => {
       let { requirePath } = AssetExporter.call(project, { asset, options, key })
