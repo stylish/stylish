@@ -47,6 +47,10 @@ export class PluginDefinition {
   * - configuration: additions to the configuration schema
   */
   provides (what, value) {
+    if (typeof what === 'object' && !value) {
+      return this.config.provides = Object.assign(this.config.provides, what)
+    }
+
     if (value) {
       this.config.provides[what] = value
     }

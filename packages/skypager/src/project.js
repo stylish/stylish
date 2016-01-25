@@ -72,17 +72,17 @@ class Project {
       })
     }
 
-    project.__runHook('contentWillInitialize')
+    project.emit('contentWillInitialize')
     // wrap the content interface in a getter but make sure
     // the documents collection is loaded and available right away
     project.hidden('content', content.call(project))
 
-    project.__runHook('contentDidInitialize')
+    project.emit('contentDidInitialize')
 
     if (options.autoImport !== false) {
       debug('running autoimport', options.autoLoad)
 
-      project.__runHook('projectWillAutoImport')
+      project.emit('projectWillAutoImport')
 
       runImporter.call(project, {
         type: (options.importerType || 'disk'),
@@ -93,7 +93,7 @@ class Project {
         }
       })
 
-      project.__runHook('projectDidAutoImport')
+      project.emit('projectDidAutoImport')
     }
 
     util.hide.getter(project, 'supportedAssetExtensions', () => Assets.Asset.SupportedExtensions )
@@ -105,9 +105,9 @@ class Project {
         delete project.entities
         debug('building entities')
 
-        project.__runHook('willBuildEntities')
+        project.emit('willBuildEntities')
         project.entities = entities.call(project)
-        project.__runHook('didBuildEntities', project, project.entities)
+        project.emit('didBuildEntities', project, project.entities)
 
         return project.entities
       }
@@ -116,11 +116,13 @@ class Project {
     util.hide.getter(project, 'modelDefinitions', modelDefinitions.bind(this))
   }
 
-  __runHook(name, ...args) {
+
+  emit(name, ...args) {
     let project = this
     let fn = project.hooks[name] || project[name]
     if (fn) { fn.call(project, ...args) }
   }
+
   /**
    * A proxy object that lets you run one of the project helpers.
    *
@@ -401,7 +403,7 @@ function registries () {
 
   let registries = Registry.buildAll(project, Helpers, {root})
 
-  project.__runHook('registriesDidLoad', registries)
+  project.emit('registriesDidLoad', registries)
 
   return registries
 }

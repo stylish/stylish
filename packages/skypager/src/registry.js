@@ -86,12 +86,19 @@ class Registry {
   }
 
   /**
-   * run a helper's main function
+   * run a helper's main function.
+   *
+   * using the helperId 'loader' and passing it a function is a convenient way
+   * of running a special loader function. @see runLoader
    *
    * @param {Helper.id} helperId
    * @param {Whatever} ...args
   */
   run (helperId, ...args) {
+    if ( helperId === 'loader' ) {
+      return this.runLoader(...args)
+    }
+
     let fn = this.lookup(helperId).runner
     return fn(...args)
   }
