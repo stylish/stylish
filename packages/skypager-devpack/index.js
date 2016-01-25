@@ -82,7 +82,10 @@ config
   .loader('js', {
     test: /\.jsx?$/,
     loader: 'babel',
-    exclude: /(node_modules|bower_components)/,
+    exclude: [
+      /(node_modules|bower_components)/,
+      path.join(argv.project || process.env.PWD, 'dist', 'bundle', 'docs')
+    ],
     query: {
       presets: resolveBabelPackages(['babel-preset-react', 'babel-preset-es2015', 'babel-preset-stage-0']),
       plugins: resolveBabelPackages(['babel-plugin-transform-decorators-legacy']),
