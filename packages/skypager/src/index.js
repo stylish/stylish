@@ -22,6 +22,7 @@ class Skypager extends Framework {
   }
 }
 
+// this tries to ensure that only one instance of skypager lj
 let framework = new Skypager(__dirname)
 
 module.exports = framework

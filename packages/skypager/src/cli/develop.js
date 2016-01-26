@@ -5,7 +5,9 @@ import util from '../util'
 
 export function develop (program, dispatch) {
   program
-    .command('develop [entry]')
+    .command('dev [entry]')
+    .alias('dev')
+    .alias('dev-server')
     .description('run a development server for this project')
     .option('--port <port>', 'which port should this server listen on?', 3000)
     .option('--host <hostname>', 'which hostname should this server listen on?', 'localhost')
@@ -59,7 +61,7 @@ export function launchWatcher(options, context) {
 export function launchServer (entry, options = {}, context = {}) {
   let project = context.project
 
-  options.entry = entry || options.entry || './src'
+  options.entry = entry || options.entry || project.options.entry || './src'
   options.theme = options.theme || project.options.theme || 'marketing'
 
   require(`${ pathToDevpack(options.devToolsPath) }/webpack/server`)(options)

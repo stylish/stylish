@@ -1,12 +1,3 @@
-/**
-* Refactoring notes:
-*
-* Currently there is a registry for the skypager framework and then per project rregistries
-*
-* I should make one registry for the framework, and then helpers register themselves with the project they belong to
-* and by default only get framework helpers and project helpers available to them.
-*
-*/
 import Skypager from './index'
 import * as util from './util'
 import carve from 'object-path'

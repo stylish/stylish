@@ -60,16 +60,8 @@ export class ActionDefinition {
     this.aka(...list)
   }
 
-  params (fn) {
-    this.paramBuilder(fn)
-  }
-
-  required (fn) {
-    this.paramBuilder(fn, false)
-  }
-
-  optional (fn) {
-    this.paramBuilder(fn)
+  params (...args) {
+    this.configureParameters(...args)
   }
 
   validate (fn) {
@@ -80,7 +72,8 @@ export class ActionDefinition {
     this.executor = fn
   }
 
-  paramBuilder (fn, required) {
+  configureParameters(inputs) {
+
   }
 }
 

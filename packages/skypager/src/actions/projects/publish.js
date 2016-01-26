@@ -1,8 +1,9 @@
 action('PublishProject')
 
-params(function () {
-  required(function () {
-  })
+params({
+  "domain": {
+    "type": "string"
+  }
 })
 
 execute(function (dispatch, action) {
