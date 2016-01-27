@@ -1,7 +1,12 @@
-const HELPERS = [ 'html' ]
+module.exports = LoadsRenderers
 
-function resolve (p) { return require.resolve('./' + p) }
+const resolve = require.resolve
 
-module.exports = function (skypager) {
-  return HELPERS.map(resolve).map(function (path) { load(path) })
+function LoadsRenderers (renderers) {
+  const load = renderers.load.bind(renderers)
+
+  load(
+     require('./html.js'),
+     {uri: resolve('./html.js'), id: 'html'}
+  )
 }

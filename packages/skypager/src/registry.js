@@ -255,17 +255,16 @@ class Registry {
     id = id || this.buildId(uri)
 
     let owner = this
+    let HelperClass = this.helper
 
     let helperInstance
     let empty = typeof(required) === 'object' && Object.keys(required).length === 0
     let definition = this.helper.Definition && this.helper.Definition.current()
 
-    if (empty && definition) {
-      helperInstance = HelperClass.fromDefinition(uri, definition, {owner, id, required})
-    } else if (definition) {
+    if (definition) {
       helperInstance = HelperClass.fromDefinition(uri, definition, {owner, id, required})
     } else {
-      helperInstance = new HelperClass(uri, {owner, id, definition, required})
+      helperInstance = new HelperClass(uri, {owner, id, required})
     }
 
     this.register(id, helperInstance)
@@ -319,7 +318,6 @@ class Registry {
       console.log(error.stack)
     }
   }
-
 
   filter (...args) {
      return this.all.filter(...args)

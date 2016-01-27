@@ -1,16 +1,16 @@
-const HELPERS = [
-  'all',
-  'project',
-  'assets',
-  'content',
-  'entities',
-  'snapshot',
-  'bundle',
-  'models'
-]
+module.exports = LoadsExporters
 
-function resolve (p) { return require.resolve('./' + p) }
+const resolve = require.resolve
 
-module.exports = function (skypager) {
-  return HELPERS.map(resolve).map(function (path) { load(path) })
+function LoadsExporters (exporters) {
+  let load = exporters.load.bind(exporters)
+
+  load(require('./all'), {uri: resolve('./all')})
+  load(require('./assets'), {uri: resolve('./assets')})
+  load(require('./bundle'), {uri: resolve('./bundle')})
+  load(require('./content'), {uri: resolve('./content')})
+  load(require('./entities'), {uri: resolve('./entities')})
+  load(require('./models'), {uri: resolve('./models')})
+  load(require('./project'), {uri: resolve('./project')})
+  load(require('./snapshot'), {uri: resolve('./snapshot')})
 }

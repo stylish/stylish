@@ -2,15 +2,19 @@ describe("Model Definition DSL", ()=>{
   let project = require('./fixture')
   let model = project.models.lookup('testcase')
   let testcase = project.documents.at('testcases/structure-spec')
-  
-  describe( "Document -> Model Assignment", () => {
+
+  describe( "Document -> Model Relationship", () => {
     it( "should know what kind of model it is", () => {
       testcase.should.have.property('modelClass')
     })
 
+    it( "should get decorated", ()=>  {
+      testcase.should.have.property('decoratedGetter', 'decoratedGetter')
+      testcase.should.have.property('decoratedMethod')
+    })
   })
 
-  describe( "The Definition", () => { 
+  describe( "The Definition", () => {
     let definition = model.definition
 
     it( "lets model authors describe the document", () => {
@@ -39,7 +43,7 @@ describe("Model Definition DSL", ()=>{
       model.should.have.property('api')
     })
   })
-  
+
   describe( "The Content Interface", () => {
     it( "creates section objects for h2 headings", () => {
       let content = testcase.content
@@ -51,7 +55,7 @@ describe("Model Definition DSL", ()=>{
     it( "creates lists of articles for nested h3 headings", () => {
       let content = testcase.content
       let specifications = content.specifications
-      
+
       specifications.should.have.property('examples')
       specifications.examples.should.be.an.Array()
     })

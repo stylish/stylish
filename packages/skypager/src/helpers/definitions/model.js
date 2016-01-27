@@ -8,6 +8,8 @@ function clearDefinition () { _curr = null; delete tracker[_curr] }
 
 export class ModelDefinition {
   constructor (description, options = {}, body) {
+    let currentDefinition = this
+
     this.description = description
     this.name = description
 
@@ -32,10 +34,18 @@ export class ModelDefinition {
       return {
         create: this.config.creator || this.helperExport.create || defaultCreateMethod,
         validate: this.config.validator || this.helperExport.validate || defaultValidateMethod,
-        runner: this.config.creator || this.helperExport.create || defaultCreateMethod,
-        config: Object.assign({}, this.config, this.helperExport.config || {})
+        runner: function(...args) {
+          currentHelper.api.decorate(...args)
+          return currentHelper.api.create(...args)
+        },
+        config: Object.assign({}, this.config, this.helperExport.config || {}),
+        decorate: this.config.decorator || this.helperExport.decorate || defaultDecorateMethod
       }
     })
+  }
+
+  decorator(fn){
+    this.config.decorator = fn
   }
 
   creator(fn){
@@ -215,12 +225,22 @@ assign(DSL, {
   validator(...args){
     tracker[_curr].validator(...args)
   },
+
+  decorator(...args){
+    tracker[_curr].decorator(...args)
+  },
+
+  decorate(...args){
+    tracker[_curr].decorator(...args)
+  },
+
   creator(...args){
     tracker[_curr].creator(...args)
   },
   create(...args){
     tracker[_curr].creator(...args)
   },
+
   attributes(...args){
     tracker[_curr].attributes(...args)
   }
@@ -231,6 +251,10 @@ export function lookup(modelName) {
 }
 
 function describe (modelName, fn) {
+  if(!fn) {
+    throw('model definition started with no configuration function')
+  }
+
   return tracker[(_curr = tabelize(parameterize(modelName)).toLowerCase())] = new ModelDefinition(modelName, fn)
 }
 
@@ -245,7 +269,9 @@ function createChainMethods (target, ...methods) {
 	})
 }
 
-function defaultCreateMethod(asset, options = {}){
+function defaultCreateMethod (options = {}, context = {}){
+  let asset = options.asset || options.document
+
   return {
     id: asset.id,
     uri: asset.uri,
@@ -254,8 +280,13 @@ function defaultCreateMethod(asset, options = {}){
   }
 }
 
-function defaultValidateMethod(asset, options = {}){
+function defaultValidateMethod (options = {}, context = {}){
   return true
+}
+
+function defaultDecorateMethod (options = {}, context = {}){
+  console.log('DECORATINg!!!')
+  return [options, context]
 }
 
 ModelDefinition.current = current

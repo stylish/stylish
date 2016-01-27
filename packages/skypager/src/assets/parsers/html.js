@@ -14,8 +14,8 @@ export function DomWrapper(content, asset) {
         get dom() {
             return dom
         },
-        css(selector) {
-            return select(selector, dom)
+        css(...args) {
+          return dom(...args)
         }
     }
 }

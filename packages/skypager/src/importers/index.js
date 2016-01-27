@@ -1,3 +1,9 @@
-module.exports = function (skypager) {
-  if (!process.env.SKYPAGER_DIST) { load(require.resolve('./disk'), 'disk') }
+module.exports = LoadsImporters
+
+const resolve = require.resolve
+
+function LoadsImporters (importers) {
+  const load = importers.load.bind(importers)
+
+  load(require('./disk'), {uri: resolve('./disk')})
 }
