@@ -95,7 +95,7 @@ class Document extends Asset {
   }
 
   get relatedData () {
-    let me = { }
+    let relData = { }
 
     if (this.relatedDatasources.length > 0) {
       this.relatedDatasources.forEach(dataSource => {
@@ -104,22 +104,22 @@ class Document extends Asset {
 
         if (relativeId === '') {
           if (Array.isArray(dataSource.data)) {
-            me.related = me.related || []
-            me.related = me.related.concat(dataSource.data)
+            relData.related = relData.related || []
+            relData.related = relData.related.concat(dataSource.data)
           } else {
-            me.related = assign(me.related || {}, related)
+            relData.related = assign(relData.related || {}, related)
           }
         } else {
-          carve(relativeId, related, me)
+          carve(relativeId, related, relData)
         }
       })
     }
 
-    return me
+    return relData
   }
 
   get relatedDatasources () {
-    return this.related.data_sources
+    return this.related.data_sources || []
   }
 
   get type () {
@@ -167,6 +167,9 @@ class Document extends Asset {
     return query_interface.code(this)
   }
 
+  get mainCopy () {
+     return this.selector('main > p').text()
+  }
 }
 
 Document.GLOB = GLOB

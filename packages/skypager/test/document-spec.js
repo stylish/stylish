@@ -68,5 +68,13 @@ describe("Skypager.Document", ()=>{
       document.$('main section').length.should.equal(2)
       document.selector('main section article').length.should.equal(4)
     })
+
+    it("provides access to the main section paragraph copy", () => {
+      document.mainCopy.length.should.equal(753)
+    })
+
+    it("provides access to a specific sections html", () => {
+      document.selector('section#specifications').html().length.should.not.equal(0)
+    })
   })
 })

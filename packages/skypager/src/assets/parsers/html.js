@@ -1,6 +1,8 @@
 import cheerio from 'cheerio'
 import select from 'cheerio-select'
 
+import { slugify } from '../../util'
+
 export function DomWrapper(content, asset) {
     let dom = cheerio.load(content)
 
@@ -13,6 +15,9 @@ export function DomWrapper(content, asset) {
         },
         get dom() {
             return dom
+        },
+        section(title, additional) {
+          return dom(`section#${slugify(title)} ${additional}`)
         },
         css(...args) {
           return dom(...args)

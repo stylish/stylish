@@ -1,4 +1,5 @@
 import { tabelize, pluralize, singularize, parameterize, noConflict, assign, hide, lazy, values, slugify, underscore } from '../../util'
+import yaml from 'js-yaml'
 
 let tracker = { }
 let _curr
@@ -39,9 +40,14 @@ export class ModelDefinition {
           return currentHelper.api.create(...args)
         },
         config: Object.assign({}, this.config, this.helperExport.config || {}),
-        decorate: this.config.decorator || this.helperExport.decorate || defaultDecorateMethod
+        decorate: this.config.decorator || this.helperExport.decorate || defaultDecorateMethod,
+        generate: this.config.generator || this.helperExport.generate || defaultGenerateMethod
       }
     })
+  }
+
+  generator(fn) {
+     this.config.generator = fn
   }
 
   decorator(fn){
@@ -241,6 +247,14 @@ assign(DSL, {
     tracker[_curr].creator(...args)
   },
 
+  generator(...args){
+    tracker[_curr].generator(...args)
+  },
+
+  generate(...args){
+    tracker[_curr].generator(...args)
+  },
+
   attributes(...args){
     tracker[_curr].attributes(...args)
   }
@@ -284,8 +298,22 @@ function defaultValidateMethod (options = {}, context = {}){
   return true
 }
 
+function defaultGenerateMethod (options = {}, context = {}){
+  let str = ''
+  let frontmatter = Object.assign({}, options.data || {})
+
+  if (Object.keys(frontmatter).length > 0) {
+    str = `${require('yaml').dump(frontmatter)}\n\n`
+  }
+
+  if (options.title) {
+    str = str + `# ${ options.title }`
+  }
+
+  return str
+}
+
 function defaultDecorateMethod (options = {}, context = {}){
-  console.log('DECORATINg!!!')
   return [options, context]
 }
 
