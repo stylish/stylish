@@ -21,7 +21,9 @@ module.exports = function(argv) {
 
   var devMiddleware = require('webpack-dev-middleware')(compiler, {
     publicPath: config.output.publicPath,
-    stats: true
+    stats: !!!argv.silent,
+    noInfo: !!argv.silent,
+    quiet: !!argv.silent
   })
 
   app.use(devMiddleware)
@@ -50,7 +52,9 @@ module.exports = function(argv) {
       console.log(err)
       return
     }
-    console.log('Listening at http://localhost:' + (argv.port || 3000))
+    if(!argv.silent) {
+      console.log('Listening at http://localhost:' + (argv.port || 3000))
+    }
   })
 }
 

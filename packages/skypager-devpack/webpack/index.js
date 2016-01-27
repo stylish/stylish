@@ -78,8 +78,7 @@ module.exports = function (argv) {
       },
       resolve: {
         modulesDirectories: modulesDirectories.concat([
-          'src',
-          'dist'
+          'src'
         ])
       },
       devtool: 'eval'
@@ -204,6 +203,14 @@ module.exports = function (argv) {
       }
     })
   }
+
+  config.merge({
+    resolve:{
+      alias: {
+        'dist': path.join(directory, 'dist')
+      }
+    }
+  })
 
   return config
 }

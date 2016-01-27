@@ -11,7 +11,13 @@ module.exports = function(argv) {
     config = config.merge(mod)
   }
 
-  var compiler = webpack(config.resolve())
+  config = config.resolve()
+
+  if (argv.platform === 'electron') {
+    config.output.publicPath = ''
+  }
+
+  var compiler = webpack(config)
 
   compiler.run((err, stats) => {
     if (err) {

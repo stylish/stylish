@@ -5,13 +5,24 @@
   "main": "skypager.js",
   "skypager": {
     "main": "skypager.js",
-    "plugins":[
+    "theme": "dashboard",
+    "electron":{
+        "main": "src/electron/main",
+        "defaultUrl": "app/index.html"
+    },
+    "plugins": [
       "blueprints"
     ]
   },
+  "blueprint": {
+      "storage": {
+          "packages": "packages",
+          "projects": "projects"
+      }
+  },
   "scripts": {
     "postinstall": "./scripts/link-skypager-packages.js",
-    "docs": "skypager serve --entry ./src/docs"
+    "docs": "skypager app docs"
   },
   "dependencies": {
     "babel-core": "^6.4.0",
@@ -22,6 +33,7 @@
     "babel-preset-react-hmre": "^1.0.1",
     "babel-preset-stage-0": "^6.3.13",
     "bootstrap": "^3.3.6",
+    "chokidar-cli": "^1.2.0",
     "commander": "^2.9.0",
     "css-loader": "^0.23.1",
     "exports-loader": "^0.6.2",
@@ -67,12 +79,8 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/datapimp/soederpop-presets.git"
+    "url": "git+ssh://git@github.com/architects/skypager-central.git"
   },
-  "author": "soederpop",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/datapimp/soederpop-presets/issues"
-  },
-  "homepage": "https://github.com/datapimp/soederpop-presets#readme"
+  "author": "Jonathan Soeder <jon@architects.io>",
+  "license": "UNLICENSED"
 }

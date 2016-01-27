@@ -7,3 +7,6 @@ core/
 projects/**/public/**/*
 npm-debug.log
 dist/bundle/**/*.js
+packages/skypager-react-components
+packages/skypager-terminal
+packages/skypager-webhook-logger
