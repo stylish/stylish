@@ -6,7 +6,7 @@ import util from '../util'
 export function develop (program, dispatch) {
   program
     .command('dev [entry]')
-    .alias('dev')
+    .alias('develop')
     .alias('dev-server')
     .description('run a development server for this project')
     .option('--port <port>', 'which port should this server listen on?', 3000)
@@ -24,6 +24,7 @@ export function develop (program, dispatch) {
     .option('--dev-tools-path <path>', 'path to the skypager-devpack devtools library')
     .option('--webpack-config <path>', 'path to a javascript function which can mutate the webpack config')
     .option('--watch-bundle', 'watch for content changes in the project and update the distribution bundle')
+    .option('--middleware <path>', 'apply express middleware to the dev-server')
     .action(dispatch(handle))
 }
 

@@ -29,14 +29,29 @@ describe("Testcase", function(model){
   })
 })
 
-function create(document, options){
+function decorate (options = {}, context = {}) {
+  let doc = options.document || options.asset
+
+  Object.assign(doc, {
+    get decoratedGetter () {
+      return 'decoratedGetter'
+    },
+    decoratedMethod () {
+      return 'decoratedMethod'
+    }
+  })
+}
+
+function create(options = {}, context = {}){
+  let { document } = options
+
   return Object.assign({}, document.data, {
     specifications: document.specifications
   })
 }
 
 function validate(document, spec, util){
-
+  return true
 }
 
 var builders = {
@@ -84,6 +99,7 @@ var builders = {
 module.exports = {
   create: create,
   validate: validate,
+  decorate: decorate,
   builders: builders,
   config:{
     attributes:{

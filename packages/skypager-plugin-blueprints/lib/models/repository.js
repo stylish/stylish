@@ -2,12 +2,8 @@
 
 describe('Repository', function () {});
 
-exports.create = function (document) {
-  return document.data;
-};
+exports.create = function (_ref) {
+  var document = _ref.document;
 
-exports.attributes = {
-  host: {
-    type: 'string'
-  }
+  return document.data;
 };

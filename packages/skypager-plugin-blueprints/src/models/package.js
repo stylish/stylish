@@ -1,5 +1,7 @@
 describe("Package", function() {})
 
-exports.create = function create(document) {
-  return document.data
+exports.create = function create({ document }, { project }) {
+  return {
+    data: document.data
+  }
 }

@@ -2,7 +2,7 @@ define('Outline', () => {
 
 })
 
-export function create (document, options = {}) {
+export function create ({document}) {
   return {
     data: document.data,
     parsed: document.parsed,

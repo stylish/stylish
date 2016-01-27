@@ -5,7 +5,7 @@
 * library also work in the browser, but have swappable backends for asset and data source
 * content.
 */
-export function DiskImporter (options = {}) {
+export function DiskImporter (options = {}, context = {}) {
   let project = options.project = this
 
   if (options.asset && options.collection) {
@@ -21,8 +21,14 @@ export function DiskImporter (options = {}) {
 * This assumes an asset is in the collection already.
 
 */
-export function AssetImporter (options = {}, callback) {
+export function AssetImporter (options = {}, context = {}) {
   let { asset } = options
+
+  let callback = options.onComplete
+
+  if (typeof context === 'function') {
+    callback = context
+  }
 
   if (options.sync) {
     asset.raw = require('fs').readFileSync(asset.paths.absolute).toString()
@@ -34,7 +40,7 @@ export function AssetImporter (options = {}, callback) {
   return asset
 }
 
-export function ProjectImporter (options = {}, callback) {
+export function ProjectImporter (options = {}, context = {}) {
   let path = require('path')
   let glob = require('glob')
   let project = this
@@ -63,6 +69,8 @@ export function ProjectImporter (options = {}, callback) {
 
     collection._didLoadAssets(paths, false)
   })
+
+  let callback = options.onComplete
 
   callback && callback(project, options)
 

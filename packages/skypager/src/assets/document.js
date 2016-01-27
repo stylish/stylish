@@ -30,9 +30,18 @@ class Document extends Asset {
   }
 
   assetWasImported () {
-    this.modelClass && this.loadEntity()
+    if (this.modelClass) {
+      this.decorate()
+      this.loadEntity()
+    }
   }
 
+  decorate () {
+
+  }
+  /**
+   * Convert this document into an Entity and load it into the store
+  */
   loadEntity () {
     let asset = this
     var entity
@@ -40,10 +49,9 @@ class Document extends Asset {
     this.ensureIndexes()
 
     try {
-      entity = this.modelClass.run(this)
+      entity = this.modelClass.run({ document: this, asset: this }, {project: this.project})
     } catch (error) {
-      console.log('Error building entity', this.modelClass, error.message)
-      entity = this.project.models.lookup('page').run(this)
+      console.log(`Error building entity from document: ${ this.id }: ${ error.message }`)
     }
 
     return this.modelClass.entities[this.id] = Object.assign({}, entity, {
@@ -62,8 +70,16 @@ class Document extends Asset {
       return DomWrapper(html, this)
   }
 
+  get $() {
+    return this.html.css
+  }
+
+  get selector() {
+    return this.html.css
+  }
+
   get modelClass () {
-    return this.project.resolve.model(this)
+    return this.project.resolve.model(this) || this.project.models.lookup('page')
   }
 
   get modelDefiniton () {

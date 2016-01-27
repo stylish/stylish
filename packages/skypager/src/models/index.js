@@ -1,7 +1,13 @@
-const HELPERS = [ 'outline', 'page', 'log', 'spec' ]
+module.exports = LoadsModels
 
-function resolve (p) { return require.resolve('./' + p) }
+const resolve = require.resolve
 
-module.exports = function (skypager) {
-  return HELPERS.map(resolve).map(function (path) { load(path) })
+function LoadsModels (models) {
+  const load = models.load.bind(models)
+
+  load(require('./log'), {uri: resolve('./log')})
+  load(require('./outline'), {uri: resolve('./outline')})
+  load(require('./page'), {uri: resolve('./page')})
+  load(require('./spec'), {uri: resolve('./spec')})
 }
+

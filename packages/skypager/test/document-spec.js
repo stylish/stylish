@@ -11,12 +11,12 @@ describe("Skypager.Document", ()=>{
     document.should.have.property('indexed')
     document.indexed.children.should.not.be.empty()
   })
-  
+
   it("provides access to mdast nodes by id", ()=>{
     document.nodes.at('specifications').should.have.property('id','specifications')
     document.nodes.at.id('specifications').should.have.property('id','specifications')
   })
-  
+
   describe("Node Query Interface", ()=>{
     it("gives me the descendants of heading nodes", ()=>{
       document.nodes.at.id('specifications').should.have.property('descendants')
@@ -58,6 +58,15 @@ describe("Skypager.Document", ()=>{
       heading.query({type:'none'}).should.have.property('length', 0)
       heading.query({type:'heading'}).pluck('type').should.not.containEql('code')
       heading.query({type:'heading',depth:3}).should.have.property('length', 4)
+    })
+
+    it("renders and wraps it appropriately HTML", () => {
+      document.html.content.should.containEql('main id="index" class="skypager-document')
+    })
+
+    it("wraps the rendered html in a css selctor engine", () => {
+      document.$('main section').length.should.equal(2)
+      document.selector('main section article').length.should.equal(4)
     })
   })
 })
