@@ -1,9 +1,0 @@
-{
-  "name": "skypager-services",
-  "version": "1.0.0",
-  "description": "provides a common interface on top of service integration endpoints",
-  "main": "index.js",
-  "skypager": {
-    "main": "skypager.js"
-  }
-}

@@ -1,4 +1,8 @@
-# Skypager Portfolio Manager
+---
+type: page
+---
+
+# Skypager Central
 
 This project contains the documentation and source code for the Skypager family of products.  
 
