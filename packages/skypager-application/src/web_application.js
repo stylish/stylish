@@ -113,14 +113,15 @@ export class Application {
   buildStore () {
     const { initialState, reducers, history } = this
     const appState = Object.assign({}, ...initialState)
-    const rootReducer = combineReducers(Object.assign({router: routeReducer}, ...reducers))
+    const combined = Object.assign({router: routeReducer}, ...reducers)
+    const rootReducer = combineReducers(combined)
 
     const build = compose(applyMiddleware(
       thunk,
       syncHistory(this.history)
     ))(createStore)
 
-    return build(rootReducer, appState)
+    return build(rootReducer, pick(appState, Object.keys(combined)))
   }
 
   /**
@@ -219,4 +220,11 @@ export function HelpPage (props, context) {
       <p>This page will be visible whenever the application doesn't have a main component, or can't build a dynamic routing table</p>
     </div>
   )
+}
+
+function pick(object = {}, keys) {
+  return keys.reduce((memo,key)=> {
+    memo[key] = object[key]
+    return memo
+  }, {})
 }
