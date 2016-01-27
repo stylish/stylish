@@ -29,7 +29,7 @@ describe("Spec", function(model){
   })
 })
 
-function create(document, options){
+function create({ document }, context = {}){
   return Object.assign({}, document.data, {
     specifications: document.specifications
   })

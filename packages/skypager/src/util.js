@@ -220,7 +220,7 @@ export function noConflict (fn, provider = {}, scope) {
     } catch (e) {
       result = 'error'
       console.log(e.message)
-      console.error('Error in no conflict fn', e)
+      console.error('Error in no conflict fn', e.message, e.stack)
     }
 
     Object.keys(provider).forEach(remove => delete (global[remove]))

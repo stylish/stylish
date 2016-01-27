@@ -207,10 +207,10 @@ function wrapQueryResponse (results, params) {
       return wrapQueryResponse(response, params)
     },
     get markdown () {
-      return flatten(response.map(node => node.lines.raw)).join('\n')
+      return flatten(response.map(node => node.lines && node.lines.raw)).join('\n')
     },
     get raw () {
-      return flatten(response.map(node => node.lines.raw))
+      return flatten(response.map(node => node.lines && node.lines.raw))
     },
     get text () {
       return response.map(node => extractText(node))

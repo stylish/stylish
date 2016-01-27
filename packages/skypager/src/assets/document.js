@@ -40,10 +40,9 @@ class Document extends Asset {
     this.ensureIndexes()
 
     try {
-      entity = this.modelClass.run(this)
+      entity = this.modelClass.run({ document: this }, {project: this.project})
     } catch (error) {
-      console.log('Error building entity', this.modelClass, error.message)
-      entity = this.project.models.lookup('page').run(this)
+      entity = this.project.models.lookup('page').run({ document: this }, {project: this.project})
     }
 
     return this.modelClass.entities[this.id] = Object.assign({}, entity, {

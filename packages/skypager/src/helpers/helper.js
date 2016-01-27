@@ -1,9 +1,23 @@
+/**
+ * Skypager.Helper
+ *
+ * The Skypager.Helper is a way of specifying the interface and behavior of
+ * different categories of javascript modules used by the project.  The different
+ * categories of modules such as Actions or Models can provide their own DSLs through
+ * the helper system.
+*/
+import skypager from '../index'
 import * as util from '../util'
 import path from 'path'
 
 import { dirname, extname, resolve, join } from 'path'
 
 export default class Helper {
+  /*
+  * Creates a Helper from a Definition object that was
+  * created by a required' script file from one of the dedicated
+  * locations for the type of helper.
+  */
   static fromDefinition (uri, definition, options) {
     if(definition && options.required) {
       Object.defineProperty(definition, 'helperExport', {
@@ -80,8 +94,18 @@ export default class Helper {
   * for handling calls to the run function that get dispatched to the helper.
   *
   */
-  run (...args) {
-    return this.project ? this.runner.call(this.project, ...args) : this.runner(...args)
+  run (options = {}, context = {}) {
+    let project = options.project || context.project || this.project
+    let fn = project ? this.runner.bind(project) : this.runner
+
+    return util.noConflict(function() {
+      return fn(options, context)
+    }, {
+      project,
+      skypager,
+      util,
+      currentHelper: this
+    })()
   }
 
   get idPath () {
@@ -93,12 +117,13 @@ export default class Helper {
   lazy (...args) { return util.lazy(this, ...args) }
 
   buildAPI (api) {
-    let mod = this.required
-
     if (api) { return api }
+
+    let mod = this.required
 
     let runner
 
+    // if this helper module exported a function
     if ( typeof mod === 'function' ) {
       runner = this.project ? mod.bind(this.project) : mod
 

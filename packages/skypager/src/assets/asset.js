@@ -157,14 +157,6 @@ class Asset {
     return relationshipProxy(this)
   }
 
-  _load () {
-    this.project.actions.run('assets/load', {
-      collection: this.collection,
-      id: this.id,
-      uri: this.uri
-    })
-  }
-
   require () {
     if (this.requireable) { return require(this.uri) }
   }

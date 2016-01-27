@@ -2,8 +2,8 @@ describe( 'Project Query Interface', () => {
   const project = require('./fixture')
 
   it ('Lets you query registries to find helpers', () => {
-    let results = project.actions.query(action => action.id.match(/ass/))
-    results.length.should.equal(2)
+    let results = project.models.query(action => action.id === 'log')
+    results.length.should.equal(1)
   })
 
   it ('Lets you query collections to find documents', () => {

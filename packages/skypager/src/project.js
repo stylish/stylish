@@ -131,17 +131,45 @@ class Project {
    * project.run.action('snapshots/save', '/path/to/snapshot.json')
    *
    */
-  get run(){
+  get run() {
     let project = this
 
     return {
-      action: function action(...args) { return project.actions.run(...args) },
-      context: function context(...args) { return project.contexts.run(...args) },
-      importer: function importer(type, ...args) { return project.importers.run((type || project.options.importer || 'disk'), ...args) },
-      exporter: function exporter(type, ...args) { return project.exporters.run((type || project.options.exporter || 'snapshot'), ...args) },
-      model: function model(...args) { return project.models.run(...args) },
-      renderer: function renderer(...args) { return project.renderers.run(...args) },
-      view: function view(...args) { return project.views.run(...args) }
+      action (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.actions.run(helperId, options, context)
+      },
+
+      importer (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.importers.run(helperId, options, context)
+      },
+
+      exporter (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.exporters.run(helperId, options, context)
+      },
+
+      plugin (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.plugins.run(helperId, options, context)
+      },
+
+      model (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.models.run(helperId, options, context)
+      },
+
+      renderer (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.renderers.run(helperId, options, context)
+      },
+
+      view (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.views.run(helperId, options, context)
+      }
+
     }
   }
 

@@ -250,7 +250,7 @@ function defaultCreateMethod(asset, options = {}){
     id: asset.id,
     uri: asset.uri,
     metadata: asset.data,
-    content: asset.content.toJSON()
+    content: asset.content
   }
 }
 

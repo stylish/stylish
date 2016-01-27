@@ -29,7 +29,9 @@ describe("Testcase", function(model){
   })
 })
 
-function create(document, options){
+function create(options = {}, context = {}){
+  let { document } = options
+
   return Object.assign({}, document.data, {
     specifications: document.specifications
   })

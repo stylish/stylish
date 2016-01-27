@@ -1,6 +1,6 @@
 define('Page', (page) => { })
 
-export function create (document, options = {}) {
+export function create ({ document }, context = {}) {
   return {
     data: document.data,
     parsed: document.parsed,

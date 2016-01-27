@@ -85,13 +85,16 @@ class Registry {
    * @param {Helper.id} helperId
    * @param {Whatever} ...args
   */
-  run (helperId, ...args) {
+  run (helperId, options = {}, context = {}) {
     if ( helperId === 'loader' ) {
-      return this.runLoader(...args)
+      return this.runLoader(options, context)
     }
 
-    let fn = this.lookup(helperId).runner
-    return fn(...args)
+    if (this.host.type === 'project') {
+      context.project = context.project || this.host
+    }
+
+    return this.lookup(helperId).run(options, context)
   }
 
   /**
@@ -206,22 +209,15 @@ class Registry {
    *
   */
   runLoader (fn, locals = {}) {
+    let registry = this
+    let host = this.host
+
     locals = Object.assign(locals, (this.helper.DSL ? this.helper.DSL : {}))
+    locals.load = registry.load.bind(registry)
 
-    locals.util = util
-
-    if (this.host && this.host.type && !locals[this.host.type]) {
-      locals[this.host.type] = this.host
-    }
-
-    if (this.helper && this.helper.name) {
-      locals[this.helper.name] = this.helper
-    }
-
-    locals.registry = this
-    locals.load = this.load.bind(this)
-
-    util.noConflict(fn, locals)()
+    util.noConflict(function() {
+      fn.call(host, registry, host.type)
+    }, locals)()
   }
 
   /**
@@ -230,16 +226,59 @@ class Registry {
    * @description
    *
    * This will require the helper in a special context where certain
-   * objects are injected in the global scope. This makes it easier to
-   * write helpers by providing them with a specific DSL based on the
-   * helper type.
+   * objects and functions are injected in the global scope. This makes it easier to
+   * write helpers by providing them with a specific DSL based on the helper type.
    *
-   * @param {URI} uri an absolute path to the helper js file
+   * @param {String} uri the absolute path to the helper
    * @param {Helper.id} id what id to register this helper under?
    *
    * @see helpers/definitions/model.js for example
-   */
+   *
+   * NOTE: Need to refactor this if im going to use webpack as a build
+   * since it doesnt like dynamic require.
+  */
   load (uri, id) {
+    if (typeof uri !== 'string') {
+      return this.loadModule.apply(this, arguments)
+    }
+
+    return this.loadPath.apply(this, arguments)
+  }
+
+  loadModule (required, options = {}) {
+    if(typeof required === 'string') {
+      return this.loadPath.apply(this, arguments)
+    }
+
+    let { id, uri } = options
+
+    id = id || this.buildId(uri)
+
+    let owner = this
+
+    let helperInstance
+    let empty = typeof(required) === 'object' && Object.keys(required).length === 0
+    let definition = this.helper.Definition && this.helper.Definition.current()
+
+    if (empty && definition) {
+      helperInstance = HelperClass.fromDefinition(uri, definition, {owner, id, required})
+    } else if (definition) {
+      helperInstance = HelperClass.fromDefinition(uri, definition, {owner, id, required})
+    } else {
+      helperInstance = new HelperClass(uri, {owner, id, definition, required})
+    }
+
+    this.register(id, helperInstance)
+
+    // todo: should just be a method on definition
+    if (this.helper.Definition && this.helper.Definition.clearDefinition) {
+       this.helper.Definition.clearDefinition()
+    }
+
+    return helperInstance
+  }
+
+  loadPath (uri, id) {
     const HelperClass = this.helper
 
     let owner = this
@@ -250,8 +289,7 @@ class Registry {
 
     try {
       let required = require(uri)
-      let cached = require.cache[uri]
-      let empty = Object.keys(cached.exports).length === 0
+      let empty = typeof(required) === 'object' && Object.keys(required).length === 0
       let definition = this.helper.Definition && this.helper.Definition.current()
 
       if (empty && definition) {
