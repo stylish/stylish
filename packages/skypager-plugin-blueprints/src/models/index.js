@@ -1,18 +1,26 @@
-module.exports = function loader () {
-  load(require.resolve('./backlog'), 'backlog')
-  load(require.resolve('./concept'), 'concept')
-  load(require.resolve('./epic'), 'epic')
-  load(require.resolve('./environment'), 'environment')
-  load(require.resolve('./feature'), 'feature')
-  load(require.resolve('./metric'), 'metric')
-  load(require.resolve('./package'), 'package')
-  load(require.resolve('./platform'), 'platform')
-  load(require.resolve('./project'), 'project')
-  load(require.resolve('./release'), 'release')
-  load(require.resolve('./repository'), 'repository')
-  load(require.resolve('./service'), 'service')
-  load(require.resolve('./ui_component'), 'ui_component')
-  load(require.resolve('./ui_layout'), 'ui_layout')
-  load(require.resolve('./ui_screen'), 'ui_screen')
-  load(require.resolve('./ui_theme'), 'ui_theme')
+module.exports = LoadsModels
+
+const resolve = require.resolve
+
+function LoadsModels (models) {
+  const load = models.load.bind(models)
+
+  load(require('./backlog'), {uri: resolve('./backlog'), id: 'backlog'})
+  load(require('./concept'), {uri: resolve('./concept'), id: 'concept'})
+  load(require('./environment'), {uri: resolve('./environment'), id: 'environment'})
+  load(require('./epic'), {uri: resolve('./epic'), id: 'epic'})
+  load(require('./feature'), {uri: resolve('./feature'), id: 'feature'})
+  load(require('./metric'), {uri: resolve('./metric'), id: 'metric'})
+  load(require('./package'), {uri: resolve('./package'), id: 'package'})
+  load(require('./persona'), {uri: resolve('./persona'), id: 'persona'})
+  load(require('./platform'), {uri: resolve('./platform'), id: 'platform'})
+  load(require('./project'), {uri: resolve('./project'), id: 'project'})
+  load(require('./release'), {uri: resolve('./release'), id: 'release'})
+  load(require('./repository'), {uri: resolve('./repository'), id: 'repository'})
+  load(require('./service'), {uri: resolve('./service'), id: 'service'})
+  load(require('./ui_component'), {uri: resolve('./ui_component'), id: 'ui_component'})
+  load(require('./ui_layout'), {uri: resolve('./ui_layout'), id: 'ui_layout'})
+  load(require('./ui_theme'), {uri: resolve('./ui_theme'), id: 'ui_theme'})
+  load(require('./ui_screen'), {uri: resolve('./ui_screen'), id: 'ui_screen'})
+  load(require('./wizard'), {uri: resolve('./wizard'), id: 'wizard'})
 }

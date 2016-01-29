@@ -1,7 +1,20 @@
-describe("Package", function() {})
+describe('Package', (Package) => { })
 
-exports.create = function create({ document }, { project }) {
+exports.decorate = function decorate(options = {}, context = {}) {
+  return require('./utils/source-paths')(options, context)
+}
+
+exports.create = function create (options = {}, context = {}) {
+  let { document } = options
+  let { project } = context
+  let { id, data, documentTitle, sourcePath, mainCopy } = document
+
   return {
-    data: document.data
+    id,
+    data,
+    title: documentTitle,
+    sourcePath,
+    mainCopy,
+    manifest: document.readManifest()
   }
 }
