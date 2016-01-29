@@ -24,6 +24,14 @@ class Model extends Helper {
     return (this.definition && this.definition.name) || this.id
   }
 
+  get generate () {
+     return this.definition && this.definition.api.generate
+  }
+
+  get actions () {
+    return (this.definition && this.definition.config.actions)
+  }
+
   static validate (instance) {
     return true
   }

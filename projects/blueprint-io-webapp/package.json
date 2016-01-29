@@ -1,5 +1,5 @@
 {
-  "name": "@architects/webapp-boilerplate",
+  "name": "@architects/blueprint-io-webapp",
   "version": "1.0.0",
   "repository": {
     "type": "git",
@@ -7,11 +7,21 @@
   },
 
   "skypager":{
-    "plugins":[ "blueprints" ],
+    "plugins":[ 
+      "blueprints" 
+    ],
     "main": "skypager.js",
     "theme": "dashboard-dark",
-    "domain": "webapp-boilerplate.skypager.io",
-    "platform": "web"
+    "domain": "architects.blueprint.io",
+    "platform": "web",
+    "featureFlags":{
+      "API_BASE_URL": "http://localhost:3000"
+    },
+    "staticAssets": {
+      "headerScripts":[
+        "://cdn.auth0.com/js/lock-8.x.y.min.js"
+      ]
+    }
   },
 
   "scripts": {

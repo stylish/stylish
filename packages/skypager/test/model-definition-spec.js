@@ -9,8 +9,12 @@ describe("Model Definition DSL", ()=>{
     })
 
     it( "should get decorated", ()=>  {
-      testcase.should.have.property('decoratedGetter', 'decoratedGetter')
-      testcase.should.have.property('decoratedMethod')
+      //testcase.should.have.property('decoratedGetter', 'decoratedGetter')
+      //testcase.should.have.property('decoratedMethod')
+    })
+
+    it( "should recognize the decorated methods as actions", () => {
+      testcase.modelClass.actions.should.containEql('testcases/run')
     })
   })
 
