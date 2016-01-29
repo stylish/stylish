@@ -23,6 +23,7 @@ import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
 import { routeReducer, syncHistory } from 'redux-simple-router'
 
+import invariant from 'invariant'
 import thunk from 'redux-thunk'
 import browserHistory from 'history/lib/createBrowserHistory'
 import memoryHistory from 'history/lib/createMemoryHistory'
@@ -69,32 +70,30 @@ export class Application {
 
    */
   constructor (options = {}) {
+		options.state = options.state || [{}]
+		options.reducers = options.reducers || [{}]
+		options.middlewares = options.middlewares || []
+		options.routes = options.routes || []
+		options.entries = options.entries || []
+
     this.options = options
 
     this.history = browserHistory()
 
-    this.initialState = options.state || [{}]
-    this.reducers = options.reducers || [{}]
+    let hide = (prop, value) => _hide(this, prop, value)
+    let lazy = (prop, fn) => _lazy(this, prop, fn)
 
-    Object.defineProperty(this, 'store', {
-      configurable: true,
-      get: function() {
-        delete this.store
-        return this.store = this.buildStore()
-      }
-    })
+    hide('reducers', options.reducers)
+    hide('middlewares', options.middlewares || [])
 
-    Object.defineProperty(this, 'routes', {
-      configurable: true,
-      get: function() {
-        delete this.routes
-        return this.store = this.buildRoutes(options)
-      }
-    })
-  }
+    lazy('entryPoints', () => buildEntryPoints(options.entries || []))
+    lazy('initialState', ()=> this.buildInitialState(options))
+    lazy('store', () => this.buildStore(options))
+    lazy('routes', () => this.buildRoutes(options))
 
-  get state () {
-    return this.store.getState()
+    if (options.extensions) {
+      this.loadExtensions(options)
+    }
   }
 
   dispatch (...args) {
@@ -107,6 +106,27 @@ export class Application {
     )
   }
 
+  loadExtensions () {
+    let extensions = this.options.extensions || {}
+
+    Object.keys(extensions).forEach(name => {
+      let extension = extensions[name] || {}
+			let middlewares = extension.middlewares || []
+			let reducers = extension.reducers || []
+			let state = extension.state || []
+			let routes = extension.routes || []
+			let entries = extension.entries || []
+
+      if (middlewares) { this.options.middlewares.push(...middlewares) }
+      if (reducers) { this.options.reducers.push(...reducers) }
+      if (state) { this.options.state.push(...state) }
+			if (routes) { this.options.routes.push(...routes) }
+
+      if (entries) {
+        this.entryPoints.push(...(buildEntryPoints(entries)))
+      }
+    })
+  }
   /**
    * Automatically build a Redux store by combining any reducers you pass in to the Application constructor.
    */
@@ -116,10 +136,9 @@ export class Application {
     const combined = Object.assign({router: routeReducer}, ...reducers)
     const rootReducer = combineReducers(combined)
 
-    const build = compose(applyMiddleware(
-      thunk,
-      syncHistory(this.history)
-    ))(createStore)
+    const middlewares = [ thunk, syncHistory(this.history) ].concat(this.middlewares || [])
+
+    const build = compose(applyMiddleware(...middlewares))(createStore)
 
     return build(rootReducer, pick(appState, Object.keys(combined)))
   }
@@ -165,25 +184,18 @@ export class Application {
    *  })
    */
   buildRoutes (options = {}) {
-    let { routes, entries } = options
-
-    if (routes) {
-      return routes
-
-    } else if (entries && typeof(entries.length) === 'undefined') {
-      return Object.keys(entries).map((path,index) => {
-        let component = entries[path]
-
-        return <Route key={index} path={path} component={component} />
-      })
-
-    } else if (entries && entries.length >= 1) {
-      return entries.map((entry,index) => {
-        let path = entry.path ? entry.path : entry.displayName.toLowerCase()
-        return <Route key={index} path={path} component={entry} />
-      })
-    }
+    const routes = options.routes || []
+    return routes.concat(this.entryPoints)
   }
+
+  addEntries(entries){
+    let entryPoints = buildEntryPoints(entries)
+    this.entryPoints.push(...entryPoints)
+  }
+
+	buildInitialState (options = {}) {
+		return options.state || [{}]
+	}
 
   get container () {
     let { store, router, history } = this
@@ -207,7 +219,19 @@ export class Application {
   }
 
   get defaultEntry () {
-    return this.options.defaultEntry || HelpPage
+    if (this.options.defaultEntry || this.options.defaultEntryPoint) {
+      return this.options.defaultEntry || this.defaultEntryPoint
+    }
+
+    if (this.options.entries && this.options.entries.default) {
+      return this.options.entries.default
+    }
+
+    return this.entryPoints[0] || HelpPage
+  }
+
+  get middlewares () {
+    return this.options.middlewares || []
   }
 }
 
@@ -222,9 +246,45 @@ export function HelpPage (props, context) {
   )
 }
 
+function _hide(obj, property, value) {
+  Object.defineProperty(obj, property, {
+    enumerable: false,
+    value
+  })
+
+  return value
+}
+
+function _lazy(obj, property, fn, ...args) {
+  Object.defineProperty(obj, property, {
+    configurable: true,
+    get: function() {
+      delete obj[property]
+      return obj[property] = fn.call(obj, ...args)
+    }
+  })
+}
+
 function pick(object = {}, keys) {
   return keys.reduce((memo,key)=> {
     memo[key] = object[key]
     return memo
   }, {})
+}
+
+function buildEntryPoints(entries) {
+  if (entries && typeof(entries.length) === 'undefined') {
+    return (Object.keys(entries).map((path,index) => {
+      let component = entries[path]
+
+      return <Route key={index} path={path} component={component} />
+    }))
+  } else if (entries && entries.length >= 1) {
+    return (entries.map((entry,index) => {
+      let path = entry.path ? entry.path : (entry.displayName || 'whatever').toLowerCase()
+      return <Route key={index} path={path} component={entry} />
+    }))
+  } else {
+    return []
+  }
 }

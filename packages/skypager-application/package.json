@@ -4,5 +4,11 @@
   "main": "index.js",
   "skypager": {
     "main": "skypager.js"
+  },
+  "dependencies": {
+    "invariant": "^2.2.0"
+  },
+  "optionalDependencies": {
+    "auth0-lock": "latest"
   }
 }
