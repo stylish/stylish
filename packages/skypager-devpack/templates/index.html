@@ -4,9 +4,21 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic" rel="stylesheet" />
+		<title><%= htmlWebpackPlugin.options.title %></title>
+
+		<% for(var i = htmlWebpackPlugin.options.headerScripts.length; i-->0;) { %>
+			<script src="<%= htmlWebpackPlugin.options.headerScripts[i] %>"></script>
+		<% } %>
+
+		<% for(var i = htmlWebpackPlugin.options.staticStyles.length; i-->0;) { %>
+			<link href="<%= htmlWebpackPlugin.options.staticStyles[i] %>" rel='stylesheet' />
+		<% } %>
   </head>
 <body>
   <div id="app"></div>
+	<% for(var i = htmlWebpackPlugin.options.bodyScripts.length; i-->0;) { %>
+		<script src="<%= htmlWebpackPlugin.options.bodyScripts[i] %>"></script>
+	<% } %>
 </body>
 </html>

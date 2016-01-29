@@ -50,7 +50,6 @@ module.exports = function (argv) {
 
   var templatePath = `${__dirname}/../templates/index.html`
 
-
   if (isDev && precompiled) {
     templatePath = path.join(__dirname, 'templates', platform, precompiled, 'index.html')
   }
@@ -115,24 +114,41 @@ module.exports = function (argv) {
     .loader('file', { test: /\.eot(\?.*)?$/,   loader: 'file?prefix=' + fontsPrefix + '/&name=[path][name].[ext]' })
     .loader('url-4', { test: /\.svg(\?.*)?$/,   loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml' })
     .loader('url-5', { test: /\.(png|jpg)$/,    loader: 'url?limit=8192' })
-
-
-    .plugin('webpack-define', webpack.DefinePlugin, [{
-      '__PLATFORM__': platform,
-      'process.env': {
-        NODE_ENV: JSON.stringify(env)
-      }
-    }])
+		.loader('ejs', {test:/\.ejs/, loader: 'ejs'})
 
     .plugin('webpack-order', webpack.optimize.OccurenceOrderPlugin)
     .plugin('webpack-noerrors', webpack.NoErrorsPlugin)
 
-    .plugin('webpack-html', HtmlWebpackPlugin, [{
-      template: templatePath,
-      hash: false,
-      inject: 'body',
-      filename: htmlFilename
-    }])
+
+	let featureFlags = {
+		'__PLATFORM__': platform,
+		'process.env': {
+			NODE_ENV: JSON.stringify(env)
+		}
+	}
+
+	if (argv.featureFlags) {
+		featureFlags = Object.assign(featureFlags, argv.featureFlags)
+	}
+
+	config.plugin('webpack-define', webpack.DefinePlugin, [featureFlags])
+
+	let staticAssets = argv.staticAssets || {}
+
+	let bodyScripts = staticAssets.bodyScripts || []
+	let staticStyles = staticAssets.staticStyles || []
+	let headerScripts = staticAssets.headerScripts || []
+	let googleFont = staticAssets.googleFont || `http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic`
+
+	config.plugin('webpack-html', HtmlWebpackPlugin, [{
+		template: `${ templatePath }`,
+		hash: false,
+		inject: 'body',
+		filename: htmlFilename,
+		bodyScripts,
+		headerScripts,
+		staticStyles: [googleFont].concat(staticStyles),
+	}])
 
   // development
   if (env == 'development') {
@@ -207,7 +223,7 @@ module.exports = function (argv) {
   config.merge({
     resolve:{
       alias: {
-        'dist': path.join(directory, 'dist')
+        'dist': argv.distributionPath || path.join(directory, 'dist')
       }
     }
   })

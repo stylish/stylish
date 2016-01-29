@@ -19,7 +19,7 @@
     },
     "staticAssets": {
       "headerScripts":[
-        "://cdn.auth0.com/js/lock-8.x.y.min.js"
+        "https://cdn.auth0.com/js/lock-8.2.js"
       ]
     }
   },
