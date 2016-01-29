@@ -1,6 +1,6 @@
 import Asset from './asset'
 
-import { carve, assign, singularize, pluralize, isArray } from '../util'
+import { carve, assign, singularize, pluralize, isArray, humanize, titleize  } from '../util'
 import parser from './document/parser'
 import indexer from './document/indexer'
 import transformer from './document/transformer'
@@ -168,7 +168,22 @@ class Document extends Asset {
   }
 
   get mainCopy () {
-     return this.selector('main > p').text()
+     return this.selector('main > p').eq(0).text()
+  }
+
+  get documentTitle () {
+    let val = (this.headings.titles.first && this.headings.titles.first.value)
+
+    if (val) { return val }
+
+    let heading = this.selector('main > h1').eq(0)
+
+    return heading && heading.length > 0 ? heading.text() : this.humanizedId
+  }
+
+  get humanizedId() {
+    let parts = this.id.split(/\/|\\/)
+    return titleize(humanize(parts[parts.length - 1]))
   }
 }
 

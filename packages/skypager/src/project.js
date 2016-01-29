@@ -300,6 +300,10 @@ class Project {
     return join(this.paths[base], ...rest)
   }
 
+  join(...args) {
+    return this.paths.join(...args)
+  }
+
   /**
   * Collection Accessor Methods
   *
@@ -392,7 +396,10 @@ function paths () {
     cache: join(this.root, 'tmp', 'cache'),
     logs: join(this.root, 'log'),
     build: join(this.root, 'dist'),
-    public: join(this.root, 'public')
+    public: join(this.root, 'public'),
+    join: function (...args) {
+      return join(project.root, ...args)
+    }
   }
 
   let custom = project.options.paths || project.manifest.paths || {}

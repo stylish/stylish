@@ -41,9 +41,15 @@ export class ModelDefinition {
         },
         config: Object.assign({}, this.config, this.helperExport.config || {}),
         decorate: this.config.decorator || this.helperExport.decorate || defaultDecorateMethod,
-        generate: this.config.generator || this.helperExport.generate || defaultGenerateMethod
+        generate: this.config.generator || this.helperExport.generate || defaultGenerateMethod,
+        actions: this.config.actions || []
       }
     })
+  }
+
+  actions(...actionIds) {
+    this.config.actions = this.config.actions || []
+    this.config.actions.push(...actionIds)
   }
 
   generator(fn) {
@@ -257,6 +263,10 @@ assign(DSL, {
 
   attributes(...args){
     tracker[_curr].attributes(...args)
+  },
+
+  actions(...args){
+    tracker[_curr].actions(...args)
   }
 })
 
@@ -301,13 +311,18 @@ function defaultValidateMethod (options = {}, context = {}){
 function defaultGenerateMethod (options = {}, context = {}){
   let str = ''
   let frontmatter = Object.assign({}, options.data || {})
+  let attrs = options.attributes || options.attrs || {}
 
   if (Object.keys(frontmatter).length > 0) {
-    str = `${require('yaml').dump(frontmatter)}\n\n`
+    str = `---\n${yaml.dump(frontmatter)}---\n\n`
   }
 
-  if (options.title) {
-    str = str + `# ${ options.title }`
+  if (options.content) {
+    return str = str + `${ options.content }\n`
+  }
+
+  if (attrs.title) {
+    str = str + `# ${ attrs.title }`
   }
 
   return str

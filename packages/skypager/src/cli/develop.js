@@ -23,7 +23,8 @@ export function develop (program, dispatch) {
     .option('--debug', 'show error info from the server')
     .option('--dev-tools-path <path>', 'path to the skypager-devpack devtools library')
     .option('--webpack-config <path>', 'path to a javascript function which can mutate the webpack config')
-    .option('--watch-bundle', 'watch for content changes in the project and update the distribution bundle')
+    .option('--bundle', 'watch for content changes in the project and update the distribution bundle')
+    .option('--bundle-command', 'the command to run to generate the bundle default: skypager export bundle', 'skypager export bundle')
     .option('--middleware <path>', 'apply express middleware to the dev-server')
     .action(dispatch(handle))
 }
@@ -33,18 +34,23 @@ export default develop
 export function handle (entry, options = {}, context = {}) {
   launchServer(entry, options, context)
 
-  if (options.watchBundle) {
+  if (options.bundle) {
+    console.log('watching assets for changes'.green)
     launchWatcher(options, context)
   }
 
   if (options.ngrok) {
+    console.log('launching ngrok tunnel'.green)
     launchTunnel(options, context)
   }
 }
 
 export function launchWatcher(options, context) {
   let project = context.project
-  var proc = shell.exec(`chokidar './{data,docs}/**/*.{md,js,less,css,yml,json,csv,html,svg}' -c 'skypager export bundle'`, {async: true})
+
+  let bundleCommand = options.bundleCommand || 'skypager export bundle'
+
+  var proc = shell.exec(`chokidar './{data,docs}/**/*.*' --silent --debounce 1200 -c '${ bundleCommand }'`, {async: true})
 
   proc.stdout.on('data', (data) => {
     if(!options.silent) {
@@ -65,22 +71,24 @@ export function launchServer (entry, options = {}, context = {}) {
   options.entry = entry || options.entry || project.options.entry || './src'
   options.theme = options.theme || project.options.theme || 'marketing'
 
+  options.staticAssets = options.staticAssets || project.options.staticAssets || {}
+
   require(`${ pathToDevpack(options.devToolsPath) }/webpack/server`)(options)
 }
 
 export function launchTunnel(options, context) {
-  var server = shell.exec(`ngrok http ${ options.port }`, {async: true})
+  var server = shell.exec(`ngrok http ${ options.port || 3000 }`, {async: true})
 
   server.stdout.on('data', (data) => {
-    if(!options.silent) {
-      console.log(data)
-    }
+    console.log(data)
   })
 
   server.stderr.on('data', (data) => {
-    if(options.debug) {
-      console.log(data)
-    }
+    console.log(data)
+  })
+
+  server.on('end', () => {
+     console.log('Ngrok tunnel ended')
   })
 }
 
