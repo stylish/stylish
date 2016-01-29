@@ -1,6 +1,24 @@
 {
-  "name": "Application Portfolio Manager",
+  "name": "@architects/app-builder-library",
+
+  "version": "1.0.0",
+
   "skypager": {
-    "main": "index.js"
+    "theme": "dashboard",
+    "main": "skypager.js",
+    "platform": "electron",
+    "plugins":[
+      "blueprints"
+    ]
+  },
+
+  "dependencies": {
+    "skypager-electron": "latest",
+    "skypager": "latest",
+    "skypager-application": "latest",
+    "skypager-ui": "latest",
+    "skypager-themes": "latest",
+    "skypager-devpack": "latest",
+    "skypager-plugin-blueprints": "latest"
   }
 }

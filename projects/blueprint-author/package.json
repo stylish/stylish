@@ -1,10 +1,22 @@
 {
-  "name": "@architects/blueprint-author",
-  "version": "0.0.1",
+  "name": "@architects/blueprint-author-desktop",
+
+  "version": "1.0.0",
+
   "skypager": {
-    "theme": "dashboard"
+    "theme": "dashboard",
+    "main": "skypager.js",
+    "platform": "electron",
+    "plugins":[ "blueprints" ]
   },
+
   "dependencies": {
-    "skypager-electron": "latest"
+    "skypager-electron": "latest",
+    "skypager": "latest",
+    "skypager-application": "latest",
+    "skypager-ui": "latest",
+    "skypager-themes": "latest",
+    "skypager-devpack": "latest",
+    "skypager-plugin-blueprints": "latest"
   }
 }
