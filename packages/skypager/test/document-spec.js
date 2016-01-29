@@ -70,11 +70,21 @@ describe("Skypager.Document", ()=>{
     })
 
     it("provides access to the main section paragraph copy", () => {
-      document.mainCopy.length.should.equal(753)
+      document.mainCopy.length.should.equal(281)
     })
 
     it("provides access to a specific sections html", () => {
       document.selector('section#specifications').html().length.should.not.equal(0)
+    })
+
+    it("can generate new documents from the model generator", () => {
+      let content = project.models.lookup('page').generate({attrs:{title:'hi'}, data:{type:'skypager'}})
+      content.should.equal('---\ntype: skypager\n---\n\n# hi')
+    })
+
+    it("can generate new documents with arbitrary content", () => {
+      let content = project.models.lookup('page').generate({data:{type:'skypager'}, content: '# sup baby'})
+      content.should.containEql('---\ntype: skypager\n---\n\n# sup baby')
     })
   })
 })

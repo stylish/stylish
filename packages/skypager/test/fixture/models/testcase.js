@@ -29,6 +29,8 @@ describe("Testcase", function(model){
   })
 })
 
+actions('testcases/run')
+
 function decorate (options = {}, context = {}) {
   let doc = options.document || options.asset
 
