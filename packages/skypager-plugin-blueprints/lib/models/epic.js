@@ -2,8 +2,17 @@
 
 describe("Epic", function () {});
 
-exports.create = function create(_ref) {
-  var document = _ref.document;
+create(function (options, context) {});
 
-  return document.data;
+module.exports = {
+  decorate: function decorate(options, context) {},
+  create: function create(options, context) {
+    var document = options.document;
+
+    return {
+      id: document.id,
+      title: document.headings.titles.first && document.headings.titles.first.value,
+      description: document.mainCopy
+    };
+  }
 };
