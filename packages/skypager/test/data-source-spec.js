@@ -17,9 +17,15 @@ describe("DataSources", ()=>{
     datasource.data.should.have.property('name','Example')
   })
 
-  xit("parses CSV", ()=>{
-    let datasource = project.content.data_sources.at('tabular')
-    datasource.data.should.have.property('length', 1)
-  })
+  describe('Script Datasources', () => {
+    it("gets run in the scope of the data source asset", () => {
+      let datasource = project.content.data_sources.at('scripts/simple-exports')
+      datasource.data.id.should.equal('scripts/simple-exports')
+    })
 
+    it("gets run with certain values in the global scope", () => {
+      let datasource = project.content.data_sources.at('scripts/global-scope-helpers')
+      datasource.data.should.containEql('util', 'project', 'datasource')
+    })
+  })
 })

@@ -6,7 +6,7 @@ const exists = fs.existsSync
 const colors = require('colors')
 const pkg = require('../package.json')
 const program = require('commander')
-const commands = require('../lib/cli')
+const commands = require('../lib/commands')
 const util = require('../lib/util')
 const argv = require('yargs').argv
 
