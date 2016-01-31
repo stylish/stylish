@@ -1,7 +1,14 @@
-import WebApplication from './web_application'
-import authentication from './extensions/authzero'
+import Application from './containers/Application'
+import LockedApplication from './containers/LockedApplication.js'
+import ProjectBundle from './ProjectBundle'
 
-module.exports = {
-  WebApplication,
-  authentication
+import { stateful } from './util/stateful'
+
+const containers = {
+  Application,
+  LockedApplication,
+  ProjectBundle,
+  stateful
 }
+
+module.exports = containers

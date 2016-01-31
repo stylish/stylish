@@ -1,4 +1,0 @@
----
-personas:
-  - skypager-developer
----
