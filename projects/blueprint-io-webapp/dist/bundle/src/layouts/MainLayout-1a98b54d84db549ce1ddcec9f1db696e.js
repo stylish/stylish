@@ -1,0 +1,1 @@
+var data = module.exports = {"id":"layouts/MainLayout","paths":{"relative":"layouts/MainLayout.js","project":"src/layouts/MainLayout.js","projectRequire":"src/layouts/MainLayout.js","absolute":"/Users/jonathan/Skypager/projects/blueprint-io-webapp/src/layouts/MainLayout.js"},"assetGroup":"stylesheets","fingerprint":"1a98b54d84db549ce1ddcec9f1db696e"};
