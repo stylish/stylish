@@ -6,7 +6,7 @@
 * content.
 */
 export function DiskImporter (options = {}, context = {}) {
-  let project = options.project = this
+  let project = options.project = options.project || this
 
   if (options.asset && options.collection) {
     return AssetImporter.apply(project, arguments)
@@ -50,6 +50,7 @@ export function ProjectImporter (options = {}, context = {}) {
   Object.keys(collections).forEach(name => {
     let collection = collections[name]
     let pattern = collection.AssetClass.GLOB
+
     let paths = glob.sync(pattern, {
       cwd: collection.root
     })

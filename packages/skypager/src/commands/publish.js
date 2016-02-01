@@ -4,6 +4,7 @@
 export function publish (program, dispatch) {
   program
     .command('publish [domain]')
+    .description('publish a website for this project to cloud hosting platforms')
     .option('--domain <domain>', 'which domain to publish this to?')
     .option('--public', 'which folder should we publish? defaults to the projects public path')
     .option('--build', 'run the build process first')

@@ -1,6 +1,7 @@
 export function repl (program, dispatch) {
   program
     .command('console')
+    .description('Run an interactive REPL within the project')
     .option('--es6', 'require babel-register and polyfill')
     .action(dispatch(handle))
 }

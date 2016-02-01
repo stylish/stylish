@@ -14,6 +14,7 @@ export function exporter (program, dispatch) {
     .option('--output <path>', 'where to save the contents')
     .option('--pretty', 'pretty print the output')
     .option('--stdout', 'write output to stdout')
+    .option('--benchmark', 'include benchmarking information')
     .action(dispatch(handle))
 }
 
@@ -28,6 +29,8 @@ export function handle (exporterId, options = {}, context = {}) {
   }
 
   const params = Object.assign({}, argv, {project})
+
+  if (options.benchmark) { console.time('exporter') }
 
   let payload = project.run.exporter(exporterId, params)
 
@@ -46,19 +49,9 @@ export function handle (exporterId, options = {}, context = {}) {
     write(outputPath, output.toString(), 'utf8')
   } else if (options.stdout) {
      console.log(output)
-  } else if (exporterId === 'bundle') {
-    let outputPath = project.path('build', 'bundle.js')
-    let assets = project.run.exporter('assets', params)
-    let entities = project.run.exporter('entities', params)
-    let _project = project.run.exporter('project', params)
-
-    write(project.path('build', 'bundle/__assets.js'), 'module.exports = ' + JSON.stringify(assets))
-    write(project.path('build', 'bundle/__entities.js'), 'module.exports = ' + JSON.stringify(entities))
-    write(project.path('build', 'bundle/__project.js'), 'module.exports = ' + JSON.stringify(_project))
-
-    write(outputPath,  `module.exports = require('./bundle/index');`, 'utf8')
-    console.log(`Saved exporter to ${ outputPath }`)
   }
+
+  if (options.benchmark) { console.timeEnd('exporter') }
 }
 
 function abort(message) {

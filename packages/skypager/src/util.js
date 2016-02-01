@@ -101,7 +101,7 @@ export function pluralize (word) {
   return inflections.pluralize(word)
 }
 
-export function lazy (target, attribute, fn, enumerable = true) {
+export function lazy (target, attribute, fn, enumerable = false) {
   Object.defineProperty(target, attribute, {
     configurable: true,
     enumerable: enumerable,
@@ -115,8 +115,8 @@ export function lazy (target, attribute, fn, enumerable = true) {
 
         Object.defineProperty(target, attribute, {
           enumerable: false,
-          configurable: false,
-          get: function () { return value }
+          configurable: true,
+          value
         })
 
         return value
@@ -279,6 +279,10 @@ export function loadProjectFromDirectory (directory) {
 
 		return p
 	}
+}
+
+export function isPromise (obj) {
+  return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
 }
 
 export function isArray(arg) {

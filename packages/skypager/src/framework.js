@@ -43,7 +43,6 @@ class Framework {
       } catch(e2) {  }
 
       if (projectManifest && projectManifest.skypager && projectManifest.skypager.plugins) {
-        console.log('Eager loading project plugins')
         eagerLoadProjectPlugins(this, projectManifest.skypager.plugins)
       }
     } catch(e) {
@@ -170,12 +169,10 @@ class Framework {
 }
 
 function eagerLoadProjectPlugins(skypager, list) {
-  console.log('list', list)
   list
   .filter(item => item && (typeof item === 'string'))
   .filter(item => !item.match(/skypager-plugin-/))
   .forEach(plugin => {
-    console.log('plugin', plugin)
     try {
       skypager.loadPlugin(require(`skypager-plugin-${ plugin }`))
     } catch (error) {

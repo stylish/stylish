@@ -1,33 +1,35 @@
 import Skypager from './index'
-import * as util from './util'
+import {filterQuery as query, hide, hidden, lazy, tabelize, values} from './util'
 import {relative, basename, dirname, extname, resolve, join} from 'path'
 import minimatch from 'minimatch'
 import carve from 'object-path'
 
 class Collection {
   constructor (root, project, assetClass) {
-    this.root = root
+    let collection = this
 
-    this.name = basename(root)
+    collection.root = root
 
-    this.hidden('project', project)
-    this.hidden('AssetClass', () => assetClass)
+    collection.name = basename(root)
+
+    collection.hidden('project', project)
+    collection.hidden('AssetClass', () => assetClass)
 
     const assets = { }
     const index = { }
 
     let loaded = false
 
-    this.hidden('assets', () => assets )
-    this.hidden('index', () => index )
-    util.hide.property(this, 'expandDotPaths', () => buildAtInterface(this, true))
+    collection.hidden('assets', () => assets )
+    collection.hidden('index', () => index )
+    hide.property(collection, 'expandDotPaths', () => buildAtInterface(collection, true))
 
     // provides access to document
-    if (assetClass.groupName && !this[assetClass.groupName]) {
-      this.hidden(util.tabelize(assetClass.groupName), () => this.assets )
+    if (assetClass.groupName && !collection[assetClass.groupName]) {
+      collection.hidden(tabelize(assetClass.groupName), () => collection.assets )
     }
 
-    buildAtInterface(this, false)
+    buildAtInterface(collection, false)
   }
 
   get paths() {
@@ -74,19 +76,19 @@ class Collection {
   }
 
   get all () {
-    return util.values(this.assets)
+    return values(this.assets)
   }
 
   get indexes () {
-    return Object.keys(this.index)
+    return keys(this.index)
   }
 
   get available () {
-    return Object.keys(this.assets)
+    return keys(this.assets)
   }
 
-  query(params) {
-    return util.filterQuery(this.all, params)
+  query(params = {}, options = {}) {
+    return wrapCollection(this, query(this.all, params))
   }
 
   reduce(...args){
@@ -94,7 +96,7 @@ class Collection {
   }
 
   map(...args){
-    return this.all.map(...args)
+    return wrapCollection(this, this.all.map(...args))
   }
 
   forEach(...args){
@@ -102,7 +104,7 @@ class Collection {
   }
 
   filter(...args){
-    return this.all.filter(...args)
+    return wrapCollection(this, this.all.filter(...args))
   }
 
   add (asset, autoLoad = false, expandDotPath = false) {
@@ -119,9 +121,9 @@ class Collection {
     }
   }
 
-  hidden (...args) { return util.hidden.getter(this, ...args) }
+  hidden (...args) { return hidden.getter(this, ...args) }
 
-  lazy (...args) { return util.lazy(this, ...args) }
+  lazy (...args) { return lazy(this, ...args) }
 
   _didLoadAssets (paths, expand) {
     if (expand) {
@@ -144,7 +146,7 @@ function buildAtInterface (collection, expand = true) {
     return this.assets[pointer]
   }.bind(collection)
 
-  Object.defineProperty(collection, 'at', {
+  defineProperty(collection, 'at', {
     configurable: true,
     enumerable: false,
     value: chain
@@ -161,3 +163,34 @@ function buildAtInterface (collection, expand = true) {
 }
 
 module.exports = Collection
+
+function wrapCollection(collection, array) {
+  Object.defineProperty(array, 'condense', {
+    enumerable: false,
+    value: function condense(options = {}) {
+      let {prop,key} = options
+
+      if (typeof key === 'undefined') {
+        key = 'id'
+      }
+
+      return array.reduce((memo,a) => {
+        let asset = prop ? a[prop] : a
+        let payload = key ? { [a[key]]: asset } : asset
+
+        return assign(memo, payload)
+      }, {})
+    }
+  })
+
+  Object.defineProperty(array, 'merge', {
+    enumerable: false,
+    value: function merge(options = {}) {
+      return array.condense({key: false, prop: options.prop || 'data'})
+    }
+  })
+
+  return array
+}
+
+const { assign, keys, defineProperty } = Object

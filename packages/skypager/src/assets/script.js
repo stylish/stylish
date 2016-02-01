@@ -1,11 +1,11 @@
 import Asset from './asset'
 import babel from 'babel-core'
 
-const EXTENSIONS = ['js', 'jsx', 'cjsx', 'coffee', 'es6']
-const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
+export const EXTENSIONS = ['js', 'jsx', 'cjsx', 'coffee', 'es6']
+export const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
 
 // can parse, index, transform js with babel
-class Script extends Asset {
+export class Script extends Asset {
   parse () {
     let options = this.project.manifest && this.project.manifest.babel
 
@@ -21,7 +21,4 @@ class Script extends Asset {
   }
 }
 
-Script.EXTENSIONS = EXTENSIONS
-Script.GLOB = GLOB
-
-exports = module.exports = Script
+export default Script

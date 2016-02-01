@@ -325,6 +325,26 @@ class Project {
     return this.content.data_sources
   }
 
+  get images () {
+    return this.content.images
+  }
+
+  get scripts () {
+    return this.content.scripts
+  }
+
+  get stylesheets () {
+    return this.content.stylesheets
+  }
+
+  get stylesheets () {
+    return this.content.stylesheets
+  }
+
+  get vectors () {
+    return this.content.vectors
+  }
+
   get collections () {
     return util.values(this.content)
   }

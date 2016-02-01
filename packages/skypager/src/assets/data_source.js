@@ -11,9 +11,17 @@ class DataSource extends Asset {
     this.lazy('parsed', () => this.parse(this.raw))
     this.lazy('indexed', () => this.index(this.parsed, this))
     this.lazy('transformed', () => this.transform(this.indexed, this))
+    this.lazy('data', this.getData, true)
+
+    this.indexer = options.indexer || ((val) => val)
+    this.transformer = options.transformer || ((val) => val)
   }
 
-  get data () {
+  getData () {
+    if (this.extension !== '.js' && (!this.raw || this.raw.length === 0)) {
+      this.runImporter('disk', {asset: this, sync: true})
+    }
+
     return this.indexed
   }
 
@@ -34,14 +42,6 @@ class DataSource extends Asset {
       throw ('Implement parser for ' + this.extension + ' ' + content.length)
     }
   }
-
-  indexer (parsed) {
-    return parsed
-  }
-
-  transformer (indexed) {
-    return indexed
-  }
 }
 
 DataSource.EXTENSIONS = EXTENSIONS
@@ -59,7 +59,6 @@ function handleScript (datasource, load) {
   return util.noConflict(function(){
     let exp = load()
 
-    console.log('No Conflict', exp)
     if (typeof exp === 'function') {
        return exp.call(datasource, datasource, datasource.project)
     } else {

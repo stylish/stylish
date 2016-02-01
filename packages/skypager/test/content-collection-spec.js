@@ -1,9 +1,9 @@
 describe("Content Collections", ()=>{
-  const project = require('./fixture') 
+  const project = require('./fixture')
   const content = project.content
   const documents = project.content.documents
   const collections = Object.keys(content).map(key => content[key])
-  
+
   it("provides simple access via asset id", ()=>{
     documents.at('index').should.be.an.Object
   })
@@ -34,7 +34,26 @@ describe("Content Collections", ()=>{
     documents.glob('**/data-sources-spec*').length.should.equal(0)
   })
 
-  it("gives patterns to be used to match related assets", ()=>{
+  it("exposes patterns to be used to match related assets", ()=>{
     content.data_sources.relatedGlob(documents.at('assets/data-source-spec')).length.should.equal(2)
   })
+
+  it('provides an enumerable like interface', () => {
+    content.data_sources.map(a => a).length.should.not.equal(0)
+    content.data_sources.filter(a => false).length.should.equal(0)
+    content.data_sources.filter((a,i) => i === 0).length.should.equal(1)
+  })
+
+  it('can merge map, filter, or query results into a single object', () => {
+    let merged = content.data_sources.query({id:/merge/}).merge()
+    merged.alpha.should.have.property('my_dog', 'sup')
+    merged.bravo.should.have.property('cool', 'feature')
+  })
+
+  it('can condense map, filter, or query results into a single object', () => {
+    let condensed = content.data_sources.query({id:/merge/}).condense()
+    condensed.should.have.property('merge/alpha')
+    condensed.should.have.property('merge/bravo')
+  })
+
 })
