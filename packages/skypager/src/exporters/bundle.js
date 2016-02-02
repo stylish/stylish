@@ -18,15 +18,16 @@ export function AssetExporter (options = {}, callback) {
     asset.runImporter('disk', {sync: true})
   }
 
-  let requirePath = asset.fingerprint
+  // temp disable
+  let requirePath = asset.fingerprint && false
     ? asset.paths.project.replace(/\.\w+$/,`-${ asset.fingerprint.substr(0,6) }.js`)
     : asset.paths.project.replace(/\.\w+$/,'.js')
 
   let outPath = project.path('build','bundle', requirePath)
 
-  if (exists(outPath)) {
+  /*if (exists(outPath)) {
     return { requirePath }
-  }
+  }*/
 
   let output = {
     id: asset.id,
@@ -62,6 +63,7 @@ const IncludeExporters = ['assets', 'entities', 'project', 'models' ]
 export function ProjectExporter (options = {}, callback) {
   let project = options.project
 
+
   if (options.runIncluded !== false) {
     IncludeExporters.forEach(exporter =>
       runAndSave(project, exporter, options)
@@ -69,11 +71,16 @@ export function ProjectExporter (options = {}, callback) {
   }
 
   let lines = [
-    `exports = module.exports = require('./project-export.json');`,
+    `exports.project = require('./project-export.json');`,
     `exports.entities = require('./entities-export.json');`,
     `exports.assets = require('./assets-export.json');`,
     `exports.models = require('./models-export.json');`,
-    `exports.content = {}`
+    `
+    exports.requireContexts = {
+      scripts: require.context('${ project.scripts.paths.absolute }', true, /\.js$/i),
+      stylesheets: require.context('${ project.stylesheets.paths.absolute }', true, /\..*ss$/i)
+    };
+    exports.content = {}`
   ]
 
   keys(project.content).forEach(key => {
@@ -112,6 +119,10 @@ function write(path, contents) {
 
 function exists(...args) {
    return require('fs').existsSync(...args)
+}
+
+function generateRequireContexts (project) {
+
 }
 
 const { keys } = Object

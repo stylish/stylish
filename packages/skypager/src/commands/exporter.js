@@ -15,6 +15,7 @@ export function exporter (program, dispatch) {
     .option('--pretty', 'pretty print the output')
     .option('--stdout', 'write output to stdout')
     .option('--benchmark', 'include benchmarking information')
+    .option('--clean', 'clean or remove previous versions first')
     .action(dispatch(handle))
 }
 
@@ -29,6 +30,12 @@ export function handle (exporterId, options = {}, context = {}) {
   }
 
   const params = Object.assign({}, argv, {project})
+
+  if (options.clean && exporterId === 'bundle') {
+     require('rimraf').sync(
+       project.path('build','bundle')
+     )
+  }
 
   if (options.benchmark) { console.time('exporter') }
 
@@ -50,6 +57,7 @@ export function handle (exporterId, options = {}, context = {}) {
   } else if (options.stdout) {
      console.log(output)
   }
+
 
   if (options.benchmark) { console.timeEnd('exporter') }
 }

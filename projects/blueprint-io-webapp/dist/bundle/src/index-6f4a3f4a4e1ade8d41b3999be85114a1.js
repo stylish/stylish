@@ -1,1 +1,0 @@
-var data = module.exports = {"id":"index","paths":{"relative":"index.js","project":"src/index.js","projectRequire":"src/index.js","absolute":"/Users/jonathan/Skypager/projects/blueprint-io-webapp/src/index.js"},"assetGroup":"stylesheets","fingerprint":"6f4a3f4a4e1ade8d41b3999be85114a1"};

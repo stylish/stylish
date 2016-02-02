@@ -1,1 +1,0 @@
-var data = module.exports = {"id":"settings/integrations","paths":{"relative":"settings/integrations.yml","project":"data/settings/integrations.yml","projectRequire":"data/settings/integrations.yml","absolute":"/Users/jonathan/Skypager/projects/blueprint-io-webapp/data/settings/integrations.yml"},"assetGroup":"data_sources","fingerprint":""};

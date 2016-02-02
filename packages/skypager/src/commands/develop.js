@@ -32,15 +32,13 @@ export function develop (program, dispatch) {
 export default develop
 
 export function handle (entry, options = {}, context = {}) {
+  let project = context.project
+
+  launchWatcher(options, context)
+
   launchServer(entry, options, context)
 
-  if (options.bundle) {
-    console.log('watching assets for changes'.green)
-    launchWatcher(options, context)
-  }
-
   if (options.ngrok) {
-    console.log('launching ngrok tunnel'.green)
     launchTunnel(options, context)
   }
 }
@@ -50,7 +48,11 @@ export function launchWatcher(options, context) {
 
   let bundleCommand = options.bundleCommand || 'skypager export bundle'
 
-  var proc = shell.exec(`chokidar './{data,docs}/**/*.*' --silent --debounce 1200 -c '${ bundleCommand }'`, {async: true})
+  console.log('Exporting project bundle'.green)
+  shell.exec(`${ bundleCommand } --clean`)
+
+  console.log('Launching project bundler'.yellow)
+  var proc = shell.exec(`chokidar './{data,docs}/**/*.*' --silent --ignore --debounce 1200 -c '${ bundleCommand }'`, {async: true})
 
   proc.stdout.on('data', (data) => {
     if(!options.silent) {
@@ -73,11 +75,14 @@ export function launchServer (entry, options = {}, context = {}) {
 
   options.staticAssets = options.staticAssets || project.options.staticAssets || {}
 
+  console.log('Launching server'.cyan)
   require(`${ pathToDevpack(options.devToolsPath) }/webpack/server`)(options)
 }
 
 export function launchTunnel(options, context) {
   var server = shell.exec(`ngrok http ${ options.port || 3000 }`, {async: true})
+
+  console.log(server)
 
   server.stdout.on('data', (data) => {
     console.log(data)
