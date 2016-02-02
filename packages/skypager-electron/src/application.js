@@ -8,7 +8,9 @@ export class Application {
   static boot (options = {}) {
     let app = new Application(options)
 
-    app.startProcess('main')
+    if (process.env.NODE_ENV !== 'production') {
+      app.devProcess('main')
+    }
 
     return app
   }
@@ -21,12 +23,11 @@ export class Application {
 
   get developmentUrl () {
     let { host, port } = this.options
-    `http://${ host || DEFAULT_HOST }:${ port || DEFAULT_PORT }`
+    return `http://${ host || DEFAULT_HOST }:${ port || DEFAULT_PORT }`
   }
 
-  startProcess (name = this.nextWindowName, options = {}) {
-    console.log('yo yo')
-
+  devProcess (name = this.nextWindowName, options = {}) {
+    console.log('running the dev process')
     electronify({
       url: `file://${  join(process.env.PWD, 'public', 'index.html') }`,
       noServer: true,
@@ -34,9 +35,11 @@ export class Application {
         height: options.height || 960,
         width: options.width || 1440
       },
+
       ready (app) {
         options.ready && options.ready(app)
       },
+
       preLoad (app, win) {
         options.preLoad && options.preLoad(app, win)
 

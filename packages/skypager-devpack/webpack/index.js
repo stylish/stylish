@@ -11,7 +11,7 @@ module.exports = function (argv) {
   const env = process.env.NODE_ENV || 'development'
   const config = new Config()
   const directory = process.cwd()
-  const isDev = (!argv.production && env === 'development')
+  const isDev = (!argv.production)
   const fontsPrefix = 'fonts'
 
   // this assumes the devpack is checked out and in skypager-central/packages/skypager-devpack

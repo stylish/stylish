@@ -1,7 +1,5 @@
-var skypager = require('./packages/skypager')
-
-skypager.loadPlugin('skypager-plugin-blueprints')
+var skypager = require('skypager')
 
 module.exports = skypager.load(__filename, {
   manifest: require('./package.json')
-});
+})

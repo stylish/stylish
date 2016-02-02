@@ -1,6 +1,7 @@
 import { join, resolve } from 'path'
 import { existsSync as exists } from 'fs'
 
+import author from './author'
 import available from './available'
 import build from './build'
 import create from './create'
@@ -16,6 +17,7 @@ import repl from './repl'
 import { loadProjectFromDirectory } from '../util'
 
 export const commands = {
+  author,
   available,
   build,
   console: repl,
@@ -31,6 +33,7 @@ export const commands = {
 export function configure (program, localConfig) {
   let handler = dispatcher.bind(program)
 
+  author(program, handler)
   available(program, handler)
   build(program, handler)
   repl(program, handler)

@@ -39,7 +39,7 @@ export function stores (options = {}) {
      appState.settings = project.settings
   }
 
-  return compose(applyMiddleware(...appMiddlewares), window.devToolsExtension() ? window.devToolsExtension() : f => f)(createStore)(
+  return compose(applyMiddleware(...appMiddlewares), window.devToolsExtension ? window.devToolsExtension() : f => f)(createStore)(
 
     combineReducers(appReducers),
     pick(appState, keys(appReducers))
