@@ -31,6 +31,7 @@ export function handle(entry, options = {}, context = {}) {
   entry = entry || options.entry
   options.theme = options.theme || project.options.theme || 'marketing'
 
+  process.env.NODE_ENV = 'production'
   require(`${ pathToDevpack(options.devToolsPath) }/webpack/compiler`)(options)
 }
 

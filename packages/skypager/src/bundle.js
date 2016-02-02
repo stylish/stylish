@@ -1,5 +1,14 @@
+/**
+ * Consumes a Skypager Bundle Export and provides
+ * a Project like interface.  It also can generate a Skypager.Application
+*/
 module.exports =
-class ProjectBundle {
+
+class Bundle {
+  static create(...args) {
+    return new Bundle(...args)
+  }
+
   constructor (bundle, options = {}) {
     hide(this, {
       bundle
@@ -18,6 +27,10 @@ class ProjectBundle {
     this.project = this.bundle.project
     this.settings = (this.data.settings && this.data.settings.data) || {}
     this.entityNames = keys(this.entities || {})
+  }
+
+  createApp(appClass, options = {}) {
+    return appClass.create(buildApp(options))
   }
 
   buildApp (options = {}) {
@@ -64,7 +77,6 @@ class ProjectBundle {
     let mod = this.bundle.requireContexts[assetType + 's'](`./${ key }`)
 
     if (!mod) {
-       console.log('Failure', assetType, assetId, this.bundle.requireContexts)
        throw('Could not find ' + assetType + ' ' + assetId)
     }
 
@@ -90,7 +102,6 @@ class ProjectBundle {
       settings: project.settings
     })
 
-    console.log('Built State Machine')
     return props
   }
 
@@ -130,7 +141,6 @@ class ProjectBundle {
 
     })
 
-    console.log('Built Entry Points')
     return props
   }
 
@@ -151,7 +161,6 @@ class ProjectBundle {
       }
     }
 
-    console.log('Built Layout')
     return props
   }
 

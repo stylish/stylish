@@ -71,26 +71,29 @@ export function ProjectExporter (options = {}, callback) {
   }
 
   let lines = [
-    `exports.project = require('./project-export.json');`,
-    `exports.entities = require('./entities-export.json');`,
-    `exports.assets = require('./assets-export.json');`,
-    `exports.models = require('./models-export.json');`,
+    `var bundle = module.exports = {};`,
+    `bundle.project = require('./project-export.json');`,
+    `bundle.entities = require('./entities-export.json');`,
+    `bundle.assets = require('./assets-export.json');`,
+    `bundle.models = require('./models-export.json');`,
     `
-    exports.requireContexts = {
+    bundle.requireContexts = {
       scripts: require.context('${ project.scripts.paths.absolute }', true, /\.js$/i),
       stylesheets: require.context('${ project.stylesheets.paths.absolute }', true, /\..*ss$/i)
     };
-    exports.content = {}`
+    bundle.content = {}`
   ]
 
   keys(project.content).forEach(key => {
-    lines.push(`var _${ key } = exports.content.${ key } = {};`)
+    lines.push(`var _${ key } = bundle.content.${ key } = {};`)
 
     project.content[key].forEach(asset => {
       let { requirePath } = AssetExporter.call(project, { asset, options, key })
       lines.push(`_${ key }['${ asset.id }'] = require('./${requirePath}');`)
     })
   })
+
+  lines.push(`module.exports = require('${ require.resolve('../bundle') }').create(bundle)`)
 
   return write(
     project.path('build','bundle','index.js'), lines.join("\n")

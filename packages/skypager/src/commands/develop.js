@@ -76,6 +76,7 @@ export function launchServer (entry, options = {}, context = {}) {
   options.staticAssets = options.staticAssets || project.options.staticAssets || {}
 
   console.log('Launching server'.cyan)
+  process.env.NODE_ENV = 'development'
   require(`${ pathToDevpack(options.devToolsPath) }/webpack/server`)(options)
 }
 

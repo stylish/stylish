@@ -38,7 +38,7 @@ module.exports = function (argv) {
 
   const precompiled = argv.precompiled || argv.usePrecompiledTemplate
 
-  if (isDev && argv.hot !== false) {
+  if (env !== 'production' && argv.hot !== false) {
     entry.app.unshift('webpack-hot-middleware/client')
   }
 
@@ -152,12 +152,12 @@ module.exports = function (argv) {
 	}])
 
   // development
-  if (env == 'development') {
+  if (env !== 'production') {
     config.plugin('webpack-hmr', webpack.HotModuleReplacementPlugin)
   }
 
   // production
-  if (env == 'production') {
+  if (env === 'production') {
     config
       .merge({
         devtool: 'source-map'

@@ -21,6 +21,9 @@ export function handle(domain, options = {}, context = {}) {
   domain = domain || options.domain || project.options.domain
   options.public = options.public || project.paths.public
 
+  if (options.service === 'skypager') { options.service = 'skypager.io' }
+  if (options.service === 'blueprint') { options.service = 'blueprint.io' }
+
   if (options.service === 'blueprint.io' || options.service === 'skypager.io') {
     options.endpoint = `surge.${ options.service }`
     surgePlatformHandler(domain, options, context)

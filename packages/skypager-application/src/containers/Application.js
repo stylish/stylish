@@ -8,8 +8,6 @@ import memoryHistory from 'history/lib/createMemoryHistory'
 import { stores as buildStore } from '../util/stores'
 import { routes as buildRoutes } from '../util/routes'
 
-import ProjectBundle from '../ProjectBundle'
-
 const history = browserHistory()
 
 const defaultInitialState = []
@@ -64,11 +62,7 @@ export class Application extends Component {
   }
 
   static render (options = {}) {
-    let project = options.project
-
-    if (options.bundle && !project) {
-      project = new ProjectBundle(options.bundle)
-    }
+    let project = options.project || options.bundle
 
     let props = project ? project.buildApp(options) : sanitize(options)
 
@@ -81,7 +75,7 @@ export class Application extends Component {
     } = props
 
     if (version >= 1 && project) {
-      console.log('We should be reloading the bundle')
+
     }
 
     app = render(
