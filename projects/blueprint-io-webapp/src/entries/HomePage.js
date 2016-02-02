@@ -1,13 +1,22 @@
 import React from 'react'
-import { stateful as connect } from 'skypager-application'
 import { Button } from 'react-bootstrap'
+import { connect } from 'react-redux'
+
+function mapStateToProps (state) {
+  return {
+    settings: state.settings
+  }
+}
 
 export class HomePage extends React.Component {
+  static displayName = 'HomePage';
+
   render () {
     return (
-      <h1>Hello How are you?.</h1>
+      <div>
+      </div>
     )
   }
 }
 
-export default connect(HomePage, 'auth')
+export default connect(mapStateToProps)(HomePage)

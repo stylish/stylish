@@ -8,7 +8,9 @@ import invariant from 'invariant'
 export default stores
 
 export function stores (options = {}) {
-  let { initialState, reducers, history, middlewares } = options
+  console.log('Building a Store')
+
+  let { initialState, reducers, history, middlewares, project } = options
 
   invariant(isArray(reducers), 'Pass an array of reducers')
   invariant(isArray(initialState) && reducers.length === initialState.length, 'Pass an array of initial state objects for each reducer')
@@ -28,7 +30,17 @@ export function stores (options = {}) {
     ? defaultMiddlewares.concat(middlewares)
     : defaultMiddlewares
 
+  if (project) {
+     appState.assets = project.assets
+     appState.content = project.content
+     appState.entities = project.entities
+     appState.models = project.models
+     appState.project = project.project
+     appState.settings = project.settings
+  }
+
   return compose(applyMiddleware(...appMiddlewares), window.devToolsExtension() ? window.devToolsExtension() : f => f)(createStore)(
+
     combineReducers(appReducers),
     pick(appState, keys(appReducers))
   )

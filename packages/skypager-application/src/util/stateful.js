@@ -1,16 +1,26 @@
+import { PropTypes as types } from 'react'
 import { connect } from 'react-redux'
 import { pick } from 'lodash'
 
 export default stateful
 
 export function stateful (component, ...args) {
-  let { stateProps, dispatchers, fn } = parse(...args)
+  let { stateProps } = parse(...args)
 
-  if (stateProps && !dispatchers && !fn) {
-    return connect((state) => pick(state, ...stateProps))(component)
+  let connected
+
+  component.contextTypes = component.contextTypes || {}
+  component.contextTypes.project = types.object.isRequired
+
+  if (stateProps && stateProps.length > 0) {
+    connected = connect((state) => pick(state, ...stateProps))(component)
+  } else {
+    connected = connect(...args)(component)
   }
 
-  throw('Implement other method signatures')
+  connected.contextTypes.project = types.object.isRequired
+
+  return connected
 }
 
 function parse(...args) {
@@ -23,4 +33,4 @@ function parse(...args) {
   return options
 }
 
-const { keys } = Object
+const { assign, keys } = Object

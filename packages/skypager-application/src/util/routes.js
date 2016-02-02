@@ -12,15 +12,12 @@ export function routes(component, options = {}) {
   const root = { path: "/", component, childRoutes:[] }
 
   if (entryPoints.index) {
-    root.indexRoute = {
-      component: take(entryPoints, 'index')
-    }
+    root.indexRoute = entryPoints.index
   }
 
   let childRoutes = keys(entryPoints)
-                    .map((path, i) =>
-                         buildRoute(path, entryPoints[path], i)
-                        )
+                    .filter(key => key !== 'index')
+                    .map((path, i) => buildRoute(path, entryPoints[path], i))
 
   root.childRoutes.push(...childRoutes)
 
@@ -30,22 +27,15 @@ export function routes(component, options = {}) {
 }
 
 function buildRoute(path, config = {}, index = 0) {
-  let route = {
-     path,
-     component
-  }
+  let component = config.component
+  let route = { path, component }
 
   if (config.index) {
-     route.indexRoute = take(config, 'index')
+    route.indexRoute = {
+      component: config.index.component || config.index
+    }
   }
-
   return route
-}
-
-function take(object, property) {
-   let value = object[property]
-   delete(object[property])
-   return value
 }
 
 const { keys, assign } = Object

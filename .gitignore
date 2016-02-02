@@ -6,7 +6,12 @@ legacy/
 core/
 projects/**/public/**/*
 npm-debug.log
-dist/bundle/**/*.js
+packages/**/dist/bundle
+packages/**/dist/bundle*
+projects/**/dist/bundle
+projects/**/dist/bundle*
+dist/bundle
+dist/bundle/**/*.*
 packages/skypager-react-components
 packages/skypager-terminal
 packages/skypager-webhook-logger

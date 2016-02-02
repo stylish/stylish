@@ -1,121 +1,52 @@
-import React, { Component, PropTypes as types } from 'react'
-import { render } from 'react-dom'
-import { Router } from 'react-router'
-import { Provider } from 'react-redux'
+import Application from './Application'
 
-import browserHistory from 'history/lib/createBrowserHistory'
-import memoryHistory from 'history/lib/createMemoryHistory'
+let lock
 
-import { stores as buildStore } from '../util/stores'
-import { routes as buildRoutes } from '../util/routes'
+class LockedApplication extends Application {
+  static create (options = {}) {
+    options.defer = true
+    let render = Application.create(options)
 
-import auth from '../extensions/auth'
+    if (!lock && options.lock) {
+      lock = new Auth0Lock(options.lock.clientId, options.lock.clientDomain)
+    }
 
-const history = browserHistory()
+    doLogin().then(cacheToken).then(render)
+  }
+}
 
-const defaultInitialState = [{
-  auth: auth.initialState
-}]
+function cacheToken (result) {
+  localStorage.setItem('userToken', result.user_id)
+  localStorage.setItem('userProfile', JSON.stringify(result))
 
-const defaultReducers = [{
-  auth: auth.reducer
-}]
+  return result.user_id
+}
 
-const defaultMiddlewares = []
+export function getProfile (token) {
+  token = token || localStorage.getItem('userToken')
 
-export class LockedApplication extends Component {
-  static displayName = 'LockedApplication';
+  return new Promise((resolve,reject)=> {
+    lock.getProfile(token, (err, result) => {
+      return err ? reject(err) : resolve(result)
+    })
+  })
+}
 
-  static propTypes = {
-    // an array of objects which will get merged into the rootReducer
-    reducers: types.arrayOf(types.object),
-    // an array of objects which will get merged into an initialState
-    state: types.arrayOf(types.object),
-    // the main layout component to wrap the app in
-    main: types.func.isRequired,
-
-    // entry point configuration
-    entryPoints: types.object.isRequired,
-
-    // the auth0 lock object
-    lock: types.object.isRequired,
-
-    // an array of redux middlewares to inject into the store
-    middlewares: types.array
-  };
-
-  static create(options = {}) {
-    const lock = new Auth0Lock(options.lock.clientId, options.lock.domain)
-    const renderer = this.renderer(options)
+export function doLogin() {
+  return new Promise((resolve, reject) => {
+    if (!lock) {
+       console.error('could not get lock. did you configure auth0?')
+       reject('could not get access to auth0 lock; did you configure it?')
+       return
+    }
 
     lock.show((err, result) => {
       if(err) {
-        return err;
+        reject(err)
+        return;
       }
 
-      console.log('Result', result)
-      renderer()
+      resolve(result)
     })
-  }
-
-  static render(options = {}) {
-    return this.renderer(options)()
-  }
-
-  static renderer (options = {}) {
-    let { main, entryPoints, lock, middlewares, reducers, initialState } = options
-
-    initialState = initialState || defaultInitialState
-    middlewares = middlewares || defaultMiddlewares
-    reducers = reducers || defaultReducers
-
-    initialState = isArray(initialState) ? initialState : [initialState]
-    reducers = isArray(reducers) ? reducers : [reducers]
-
-    return () => {
-      render(
-        <LockedApplication entryPoints={entryPoints}
-                           initialState={initialState}
-                           lock={lock}
-                           main={main}
-                           middlewares={middlewares}
-                           reducers={reducers} />
-
-        , document.getElementById(options.root)
-      )
-    }
-  }
-
-  constructor (props = {}, context = {}) {
-    super(props, context)
-
-    const { reducers, middlewares, initialState, main, entryPoints } = props
-
-    this.store = buildStore({
-      reducers,
-      middlewares,
-      initialState,
-      history
-    })
-
-    this.routes = buildRoutes(main, {entryPoints})
-  }
-
-  render () {
-    let { store, routes } = this
-
-    return (
-      <Provider store={store}>
-        <Router history={history}>
-          {routes}
-        </Router>
-      </Provider>
-    )
-  }
+  })
 }
-
-function isArray(arg) {
-  return Object.prototype.toString.call(arg) === '[object Array]'
-}
-
-export default LockedApplication

@@ -83,12 +83,13 @@ module.exports = function (argv) {
       devtool: 'eval'
     })
 
+		.loader('json', {loader: 'json', test:/.json$/})
     .loader('js', {
       test: /\.jsx?$/,
       loader: 'babel',
       exclude: [
         /(node_modules|bower_components)/,
-        path.join(argv.project || process.env.PWD, 'dist', 'bundle', 'docs')
+        path.join(argv.project || process.env.PWD, 'dist', 'bundle')
       ],
       query: {
         presets: resolveBabelPackages(['babel-preset-react', 'babel-preset-es2015', 'babel-preset-stage-0']),
