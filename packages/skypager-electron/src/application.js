@@ -1,58 +1,114 @@
-import { join } from 'path'
-import electronify from 'electronify-server'
+import colors from 'colors'
+import { join, resolve } from 'path'
 
-const DEFAULT_HOST = 'localhost'
-const DEFAULT_PORT = 3000
+import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
+import thunk from 'redux-thunk'
+
+import Workspace, {reducer as workspaceReducer, initialState as workspaceState} from './workspace'
 
 export class Application {
-  static boot (options = {}) {
-    let app = new Application(options)
+  constructor (project, options = {}) {
+		hide(this, 'project', project)
+		hide(this, 'env', options.env || 'development')
 
-    if (process.env.NODE_ENV !== 'production') {
-      app.devProcess('main')
-    }
-
-    return app
+		hide(this, 'store', setupStore({
+			state: {
+				project: {
+					paths: project.paths
+				},
+				process: {
+					env: this.env,
+					pwd: process.env.PWD,
+					options
+				}
+			}
+		}))
   }
 
-  constructor (options = {}) {
-    this.options = options
-    this.windows = {}
-    this.processes = {}
-  }
+	boot () {
+		this.store.subscribe(this.onStateChange)
+		this.mainWorkspace.launch()
+	}
 
-  get developmentUrl () {
-    let { host, port } = this.options
-    return `http://${ host || DEFAULT_HOST }:${ port || DEFAULT_PORT }`
-  }
+	dispatch (...args) {
+		return this.store.dispatch(...args)
+	}
 
-  devProcess (name = this.nextWindowName, options = {}) {
-    console.log('running the dev process')
-    electronify({
-      url: `file://${  join(process.env.PWD, 'public', 'index.html') }`,
-      noServer: true,
-      window: {
-        height: options.height || 960,
-        width: options.width || 1440
-      },
+	onStateChange() {
+		console.log('yo')
+	}
 
-      ready (app) {
-        options.ready && options.ready(app)
-      },
+	get state () {
+		return this.store.getState()
+	}
 
-      preLoad (app, win) {
-        options.preLoad && options.preLoad(app, win)
+	get projectSettings() {
+		return this.project.data.at.settings || {}
+	}
 
-      },
-      postLoad (app, win) {
-        options.postLoad && options.postLoad(app, win)
-      }
-    })
-  }
+	get workspaces() {
+		return this.projectSettings.workspaces || {}
+	}
 
-  get nextWindowName () {
-    return `window-${ Object.keys(this.windows).length }`
-  }
+	get mainWorkspace () {
+		let project = this.project
+		let config = this.workspaces.main || {
+			id: 'default',
+			electronify:{
+				noServer: true,
+				url: `file://${project.path('public','index.html')}`
+			}
+		}
+
+		return Workspace.provision(this, config)
+	}
 }
 
-export default Application
+function hide(obj, prop, value) {
+	defineProperty(obj, prop, {
+		enumerable: false,
+		value
+	})
+}
+
+const { defineProperty, keys, assign } = Object
+
+export function setupStore (options = {}) {
+	let reducers = assign({
+		workspaces: workspaceReducer
+	}, options.reducers || {})
+
+	let rootReducer = combineReducers(reducers)
+
+	let initialState = assign({
+		workspaces: workspaceState
+	}, options.sate || {})
+
+	const buildStore = compose(
+		 applyMiddleware(thunk, createLogger)
+	)(createStore)
+
+	return buildStore(rootReducer, initialState)
+}
+
+function notice (msg) {
+	console.log(msg.green)
+}
+
+function warn (msg) {
+	console.log(msg.yellow)
+}
+
+export default function createLogger({ getState }) {
+  return (next) =>
+    (action) => {
+      const prevState = getState();
+      const returnValue = next(action);
+      const nextState = getState();
+      const actionType = String(action.type);
+      const message = `action ${actionType}`;
+			console.log(message)
+			console.log(nextState)
+      return returnValue;
+    };
+}
