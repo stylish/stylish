@@ -177,7 +177,7 @@ module.exports = function (argv) {
 		config.plugin('webpack-html', HtmlWebpackPlugin, [{
 			template: `${ templatePath }`,
 			hash: false,
-			inject: 'body',
+			inject: argv.templateInject === 'none' ? false : (argv.templateInject || 'body'),
 			filename: htmlFilename,
 			bodyScripts,
 			headerScripts,
@@ -215,9 +215,11 @@ module.exports = function (argv) {
     config.plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
   }
 
-  config.merge({
-    target: argv.target || platform
-  })
+	if (argv.target) {
+		config.merge({
+			target: argv.target
+		})
+	}
 
   if (argv.externalVendors || precompiled ) {
     config.merge({
@@ -240,8 +242,11 @@ module.exports = function (argv) {
   if (!isDev) {
   	config .merge({ devtool: 'cheap-module-source-map' })
 
+
+		let extractFilename = (platform === 'electron' || argv.noContentHash || argv.contentHash === false) ? '[name].js' : '[name]-[hash].js'
+
 		config
-      .plugin('extract-text', ExtractTextPlugin, ['[name]-[contenthash].css', {
+      .plugin('extract-text', ExtractTextPlugin, [extractFilename, {
         allChunks: true
       }])
 
