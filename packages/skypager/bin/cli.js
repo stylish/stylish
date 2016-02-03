@@ -33,7 +33,10 @@ try {
 
 }
 
-program.version(pkg.version).option('--project <path>', 'specify which folder contains the project you wish to work with')
+program
+	.version(pkg.version)
+	.option('--project <path>', 'specify which folder contains the project you wish to work with')
+	.option('--env <env>', 'which environment should we run in? defaults to NODE_ENV', process.env.NODE_ENV || 'development')
 
 commands.configure(program, localPackage.skypager || {})
 

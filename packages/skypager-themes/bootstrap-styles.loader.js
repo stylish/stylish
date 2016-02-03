@@ -69,11 +69,13 @@ module.exports = function (content) {
 
   var theme = query.theme || config.theme;
 
+  var output;
+
   if (theme) {
-    return `@import '~skypager-themes/${ theme.replace(/-\w+$/,'') }/${ theme }.less';`
+    output = `@import '~skypager-themes/${ theme.replace(/-\w+$/,'') }/${ theme }.less';`
   } else {
-    return styles.map(function(style) {
-      return `@import '~skypager-themes/bootstrap/${style}.less';`
-    }).join("\n")
+    output = styles.map(function(style) { return `@import '~skypager-themes/bootstrap/${style}.less';` }).join("\n")
   }
+
+  return output;
 }

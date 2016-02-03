@@ -4,6 +4,9 @@ export function author (program, dispatch) {
   program
     .command('author')
     .description('run the author app')
+    .option('--main <url>', 'the url to open by default')
+    .option('--port <port>', 'which port to launch the dev server', '3000')
+    .option('--server-cmd <command>', 'which command should launch the server?')
     .action(dispatch(handle))
 }
 

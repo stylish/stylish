@@ -1,7 +1,10 @@
 module.exports = function (argv) {
+	const md5 = require('md5')
   const path = require('path')
   const fs = require('fs')
-
+	const exists = fs.existsSync
+	const resolve = path.resolve
+	const join = path.join
   const assign = Object.assign
   const Config = require('webpack-configurator')
   const webpack = require('webpack')
@@ -11,22 +14,23 @@ module.exports = function (argv) {
   const env = process.env.NODE_ENV || 'development'
   const config = new Config()
   const directory = process.cwd()
-  const isDev = (!argv.production)
-  const fontsPrefix = 'fonts'
+
+	const isDev = (env === 'development')
+  const fontsPrefix = argv.fontsPrefix || 'fonts'
 
   // this assumes the devpack is checked out and in skypager-central/packages/skypager-devpack
   const babelModulesPath = argv.modulesPath || process.env.SKYPAGER_MODULES_PATH || '../../../node_modules'
 
   const modulesDirectories = [
     `${directory}/node_modules`,
-    `${__dirname}/node_modules`,
+    `${__dirname}/../node_modules`,
     'node_modules'
   ]
 
-  const hasModules = fs.existsSync(path.join(__dirname, 'node_modules'))
+  const hasModules = fs.existsSync(path.join(__dirname, '../node_modules'))
 
   const resolveBabelPackages = packages => {
-    const modulePath = hasModules ? 'node_modules' : babelModulesPath
+    const modulePath = hasModules ? '../node_modules' : babelModulesPath
     return packages.map(p => { return path.resolve(__dirname, modulePath, p) })
   }
 
@@ -38,21 +42,32 @@ module.exports = function (argv) {
 
   const precompiled = argv.precompiled || argv.usePrecompiledTemplate
 
-  if (env !== 'production' && argv.hot !== false) {
+  if (env === 'development') {
     entry.app.unshift('webpack-hot-middleware/client')
   }
 
-  if (!precompiled && argv.theme) {
-    entry.theme = `skypager-themes?theme=${ argv.theme }!${directory}/package.json`
+  if (!precompiled && !argv.skipTheme && argv.theme) {
+    entry.theme = [`skypager-themes?theme=${ argv.theme }&env=${ env }!${directory}/package.json`]
   }
 
-  var outputPath = path.join(directory, argv.outputFolder || 'public');
+	var outputPath = path.resolve(
+		argv.outputFolder || join(directory, 'public')
+	)
 
   var templatePath = `${__dirname}/../templates/index.html`
 
-  if (isDev && precompiled) {
-    templatePath = path.join(__dirname, 'templates', platform, precompiled, 'index.html')
-  }
+  if (precompiled && precompiled.match(/dashboard|marketing|social/i)) {
+    templatePath = path.join(__dirname, '../templates', platform, precompiled, 'index.html')
+	} else if (precompiled) {
+		try {
+			if (exists(resolve(precompiled))) {
+				templatePath = resolve(precompiled)
+			}
+		} catch(error) {
+			 console.log('Error precompiled path', error.message)
+			 throw(error)
+		}
+	}
 
   if (argv.htmlTemplatePath) {
     templatePath = path.resolve(argv.htmlTemplatePath)
@@ -69,21 +84,26 @@ module.exports = function (argv) {
       entry: entry,
       output: {
         path: outputPath,
-        filename: (argv.contentHash === false || isDev ? '[name].js' : '[name]-[hash].js'),
+        filename: (argv.noContentHash || argv.contentHash === false || isDev ? '[name].js' : '[name]-[hash].js'),
         publicPath: (!isDev && platform === 'electron') ? '' : '/'
       },
       resolveLoader: {
-        modulesDirectories: modulesDirectories.concat([ require.resolve('skypager-themes') ])
+        root: modulesDirectories.concat([ require.resolve('skypager-themes') ])
       },
       resolve: {
-        modulesDirectories: modulesDirectories.concat([
-          'src'
-        ])
+				root: modulesDirectories.concat([
+					require.resolve('skypager-themes')
+				]),
+				modulesDirectories:[
+					'.',
+					'src'
+				]
       },
       devtool: 'eval'
     })
 
 		.loader('json', {loader: 'json', test:/.json$/})
+
     .loader('js', {
       test: /\.jsx?$/,
       loader: 'babel',
@@ -122,14 +142,26 @@ module.exports = function (argv) {
 
 
 	let featureFlags = {
-		'__PLATFORM__': platform,
+		'__PLATFORM__': JSON.stringify(platform),
 		'process.env': {
 			NODE_ENV: JSON.stringify(env)
 		}
 	}
 
 	if (argv.featureFlags) {
-		featureFlags = Object.assign(featureFlags, argv.featureFlags)
+		if (exists(resolve(argv.featureFlags))) {
+			try {
+				var extras = require(argv.featureFlags)
+				if (typeof extras === 'object') {
+					featureFlags = Object.keys(extras).reduce((memo,key)=>{
+						memo[`__${ key.toUpperCase() }__`] = JSON.stringify(extras[key])
+						return memo
+					}, featureFlags)
+				}
+			} catch (error) {
+				console.log('Error setting feature flags', error.message)
+			}
+		}
 	}
 
 	config.plugin('webpack-define', webpack.DefinePlugin, [featureFlags])
@@ -141,44 +173,27 @@ module.exports = function (argv) {
 	let headerScripts = staticAssets.headerScripts || []
 	let googleFont = staticAssets.googleFont || `http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic`
 
-	config.plugin('webpack-html', HtmlWebpackPlugin, [{
-		template: `${ templatePath }`,
-		hash: false,
-		inject: 'body',
-		filename: htmlFilename,
-		bodyScripts,
-		headerScripts,
-		staticStyles: [googleFont].concat(staticStyles),
-	}])
+	if (!argv.entryOnly && !argv.exportLibrary) {
+		config.plugin('webpack-html', HtmlWebpackPlugin, [{
+			template: `${ templatePath }`,
+			hash: false,
+			inject: 'body',
+			filename: htmlFilename,
+			bodyScripts,
+			headerScripts,
+			staticStyles: [googleFont].concat(staticStyles),
+		}])
+	}
 
   // development
-  if (env !== 'production') {
+  if (isDev) {
     config.plugin('webpack-hmr', webpack.HotModuleReplacementPlugin)
   }
 
-  // production
-  if (env === 'production') {
-    config
-      .merge({
-        devtool: 'source-map'
-      })
 
-      .plugin('extract-text', ExtractTextPlugin, ['[name]-[contenthash].css', {
-        allChunks: true
-      }])
-
-      .plugin('webpack-uglify', webpack.optimize.UglifyJsPlugin, [{
-        compressor: { warnings: false },
-        compress: {
-          unused: true,
-          dead_code: true
-        }
-      }])
-  }
-
-  if (argv.vendorLibraries !== false && !argv.externalVendors && !precompiled) {
+  if ((argv.noVendorLibraries || argv.vendorLibraries !== false) && !argv.externalVendors && !precompiled) {
     config.merge({
-      entry: assign(entry, {
+      entry: {
         vendor: [
           'history',
           'jquery',
@@ -194,8 +209,10 @@ module.exports = function (argv) {
           //'skypager-ui',
           //'skypager-application'
         ]
-      })
-    }).plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
+      }
+		})
+
+    config.plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
   }
 
   config.merge({
@@ -215,19 +232,44 @@ module.exports = function (argv) {
         'redux-thunk': 'ReduxThunk',
         'redux-simple-router': 'ReduxSimpleRouter',
         'history': 'History'
-        //'skypager-ui': 'SkypagerUI',
-        //'skypager-application': 'SkypagerApplication'
       }
     })
+  }
+
+  // production
+  if (!isDev) {
+  	config .merge({ devtool: 'cheap-module-source-map' })
+
+		config
+      .plugin('extract-text', ExtractTextPlugin, ['[name]-[contenthash].css', {
+        allChunks: true
+      }])
+
+      .plugin('webpack-uglify', webpack.optimize.UglifyJsPlugin, [{
+        compressor: { warnings: false },
+        compress: {
+          unused: true,
+          dead_code: true
+        }
+      }])
   }
 
   config.merge({
     resolve:{
       alias: {
-        'dist': argv.distributionPath || path.join(directory, 'dist')
+        'dist': (argv.distPath && resolve(argv.distPath)) || path.join(directory, 'dist')
       }
     }
   })
+
+	if (argv.exportLibrary) {
+		config.merge({
+			output: {
+				library: argv.exportLibrary,
+				libraryTarget: 'umd'
+			}
+		})
+	}
 
   return config
 }

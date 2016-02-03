@@ -26,6 +26,14 @@ export function develop (program, dispatch) {
     .option('--bundle', 'watch for content changes in the project and update the distribution bundle')
     .option('--bundle-command', 'the command to run to generate the bundle default: skypager export bundle', 'skypager export bundle')
     .option('--middleware <path>', 'apply express middleware to the dev-server')
+    .option('--modules-path <path>', 'which modules folder to use for webpacks default? defaults to standard node_modules')
+    .option('--feature-flags <path>', 'path to a script which exports an object to be used for feature flags')
+    .option('--skip-theme', 'do not include a theme')
+    .option('--entry-only', 'do not use html template')
+    .option('--dist-path <path>', 'the project exporter or dist path')
+    .option('--external-vendors', "assume vendor libraries will be available to our script")
+    .option('--no-vendor-libraries', "don't include any vendor libraries in the bundle")
+    .option('--export-library <name>', 'build this as a umd library')
     .action(dispatch(handle))
 }
 
