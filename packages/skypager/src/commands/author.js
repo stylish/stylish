@@ -1,37 +1,44 @@
 import colors from 'colors'
+import { resolve } from 'path'
+import { existsSync as exists } from 'fs'
 
 export function author (program, dispatch) {
   program
-    .command('author')
-    .description('run the author app')
-    .option('--main <url>', 'the url to open by default')
-    .option('--port <port>', 'which port to launch the dev server', '3000')
-    .option('--server-cmd <command>', 'which command should launch the server?')
+    .command('author [workspace]')
+    .option('--main <require>', 'require this script in the electron main process')
+    .option('--project <path>', 'the project path')
+    .option('--interactive', 'run an interactive REPL')
+    .option('--dont-boot', 'dont boot the electron app (DEV HELPER)')
+    .description('run an author workspace app')
     .action(dispatch(handle))
 }
 
 export default author
 
-export function handle(options = {}, context = {}) {
+export function handle(workspace, options = {}, context = {}) {
   let { project } = context
 
   let electron = isElectronInstalled()
   let skypagerElectron = isSkypagerElectronInstalled()
 
   if (!electron) {
-    console.log('Please install the electron-prebuilt package'.red)
-    process.exit(1)
+    abort('make sure electron-prebuilt is available.  You can specify a path manually via the ELECTRON_PREBUILT_PATH env var')
   }
 
   if (!skypagerElectron) {
-    console.log('Please install the skypager-electron package'.red)
-    process.exit(1)
+    abort('Make sure the skypager-electron package is available. You can specify a path manually via the SKYPAGER_ELECTRON_PATH env var')
+  }
+
+  let authorArgs = process.argv.slice(2)
+
+  if (project) {
+    authorArgs.push('--project', project.root)
   }
 
   let proc = require('child_process').spawn(
     electron,
-    [ skypagerElectron ].concat(process.argv.slice(2))
-  )
+    [ skypagerElectron ].concat(authorArgs)
+  );
 
   proc.stdout.on('data', (data) => console.log(data.toString()))
   proc.stderr.on('data', (data) => console.log(data.toString()))
@@ -49,7 +56,13 @@ function isElectronInstalled () {
   try {
     return require('electron-prebuilt')
   } catch (error) {
-    console.log('Error!', error.message)
-     return false
+    return false
   }
+}
+
+function abort (msg, ...rest) {
+  console.log()
+  console.log(`${msg}`.red)
+  console.log(...rest)
+  process.exit(1)
 }

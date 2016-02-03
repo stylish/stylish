@@ -34,6 +34,7 @@ export function develop (program, dispatch) {
     .option('--external-vendors', "assume vendor libraries will be available to our script")
     .option('--no-vendor-libraries', "don't include any vendor libraries in the bundle")
     .option('--export-library <name>', 'build this as a umd library')
+    .option('--template-inject [target]', 'where to inject the webpack bundle? none, body, head')
     .action(dispatch(handle))
 }
 

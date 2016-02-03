@@ -32,6 +32,7 @@ export function build (program, dispatch) {
     .option('--bundle-command', 'the command to run to generate the bundle default: skypager export bundle', 'skypager export bundle')
     .option('--silent', 'suppress any server output')
     .option('--debug', 'show error info from the server')
+    .option('--template-inject [target]', 'where to inject the webpack bundle? none, body, head')
     .action(dispatch(handle))
 }
 
