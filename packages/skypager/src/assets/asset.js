@@ -157,7 +157,7 @@ class Asset {
     return relationshipProxy(this)
   }
 
-  require () {
+  __require () {
     if (this.requireable) { return require(this.uri) }
   }
 
