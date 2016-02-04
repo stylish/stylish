@@ -2,3 +2,6 @@ links:
   - label: Home
     icon: Home
     link: '/'
+  - label: What up
+    icon: leaf
+    link: /login

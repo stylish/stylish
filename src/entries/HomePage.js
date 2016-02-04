@@ -1,4 +1,11 @@
 import React from 'react'
+import { connect } from 'react-redux'
+
+const mp = function(state) {
+  return {
+    settings: state.settings
+  }
+}
 
 export class HomePage extends React.Component {
   render () {
@@ -8,4 +15,4 @@ export class HomePage extends React.Component {
   }
 }
 
-export default HomePage
+export default connect(mp)(HomePage)
