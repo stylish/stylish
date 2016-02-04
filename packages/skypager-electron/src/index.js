@@ -10,15 +10,6 @@ export function enter (options = {}) {
 
   let app = new Application(project)
 
-  if (argv.interactive || process.env.SKYPAGER_INTERACTIVE) {
-    var replServer = require('repl').start({
-      prompt: 'skypager app:'.green
-    })
-
-    replServer.context.app = app
-    replServer.context.project = project
-  }
-
   if (!argv.dontBoot) {
     app.boot()
   }

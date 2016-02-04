@@ -28,6 +28,8 @@ module.exports.pitch = function (remainingRequest) {
     ? prodLoader
     : devLoader;
 
+  styleLoader = devLoader
+
   var finalLoader = [
     wrap(styleLoader + '!' + remainingRequest),
     scriptLoader

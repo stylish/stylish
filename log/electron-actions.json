@@ -1,0 +1,18 @@
+dispatch({"type":"APPLICATION_BOOT","payload":{"process":{"pid":25852,"argv":{"_":["author"],"project":"/Users/jonathan/Skypager","$0":"node_modules/electron-prebuilt/dist/Electron.app/Contents/MacOS/Electron packages/skypager-electron"}}}});
+
+dispatch({"type":"WORKSPACE_APP_READY","payload":{"workspaceId":"main"},"meta":{"workspaceId":"main"}});
+
+dispatch({"type":"WORKSPACE_APP_READY","payload":{"workspaceId":"main"},"meta":{"workspaceId":"main"}});
+
+dispatch({"type":"WORKSPACE_WILL_LOAD","payload":{"workspaceId":"main","browserWindowId":1,"panelName":"console"},"meta":{"workspaceId":"main"}});
+
+dispatch({"type":"WORKSPACE_PROCESS_STARTED","payload":{"workspaceId":"main","pid":25854,"panelName":"presentation"},"meta":{"workspaceId":"main"}});
+
+dispatch({"type":"WORKSPACE_WILL_LOAD","payload":{"workspaceId":"main","browserWindowId":2,"panelName":"presentation"},"meta":{"workspaceId":"main"}});
+
+dispatch({"type":"WORKSPACE_DID_LOAD","payload":{"workspaceId":"main","browserWindowId":2,"panelName":"presentation"},"meta":{"workspaceId":"main"}});
+
+dispatch({"type":"WORKSPACE_DID_LOAD","payload":{"workspaceId":"main","browserWindowId":1,"panelName":"console"},"meta":{"workspaceId":"main"}});
+
+dispatch({"type":"WORKSPACE_PROCESS_ERROR","payload":{"workspaceId":"main","err":{"killed":true,"code":null,"signal":"SIGTERM","cmd":"/bin/sh -c skypager dev --bundle --port 3000","stdout":"Exporting project bundle\nLaunching project bundler\nLaunching server\nConfig { path: '/Users/jonathan/Skypager/public',\n  filename: '[name].js',\n  publicPath: '/',\n  libraryTarget: 'var',\n  sourceMapFilename: '[file].map[query]',\n  hotUpdateChunkFilename: '[id].[hash].hot-update.js',\n  hotUpdateMainFilename: '[hash].hot-update.json',\n  crossOriginLoading: false,\n  hashFunction: 'md5',\n  hashDigest: 'hex',\n  hashDigestLength: 20,\n  sourcePrefix: '\\t',\n  devtoolLineToLine: false }\nListening at http://localhost:3000\n","stderr":""},"panelName":"presentation"},"meta":{"workspaceId":"main"}});
+

@@ -1,14 +1,13 @@
 workspaces:
   main:
-    root: project
-    env:
-      development:
-        windows:
-          presentation:
-            command: 'skypager dev --port $port0 --entry ./src/presentation'
-            url: "http://localhost:$port0"
-            layout: 'full-height half-width right-stacked'
-          console:
-            command: 'skypager dev --port $port1 --entry ./src/console --theme dashboard-dark'
-            url: 'http://localhost:$port1'
-            layout: 'half-height half-width left-stacked top-stacked'
+    panels:
+      presentation:
+        command: 'skypager dev --bundle --port 3000'
+        url: "http://localhost:3000"
+        window:
+          height: 300
+          width: 200
+      console:
+        noServer: true
+        url: "http://localhost:3000/console.html"
+

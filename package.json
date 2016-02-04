@@ -21,8 +21,7 @@
     }
   },
   "scripts": {
-    "postinstall": "./scripts/link-skypager-packages.js",
-    "docs": "skypager app docs"
+    "docs": "skypager author docs"
   },
   "dependencies": {
     "babel-core": "^6.4.0",
@@ -60,7 +59,7 @@
     "react-router": "^1.0.3",
     "redbox-react": "^1.2.0",
     "redux": "^3.0.5",
-    "redux-actions": "^0.9.0",
+    "redux-actions": "^0.9.1",
     "redux-simple-router": "^2.0.2",
     "redux-thunk": "^1.0.3",
     "skypager": "file:./packages/skypager",
@@ -68,6 +67,7 @@
     "skypager-devpack": "file:./packages/skypager-devpack",
     "skypager-electron": "file:./packages/skypager-electron",
     "skypager-plugin-blueprints": "file:./packages/skypager-plugin-integrations",
+    "skypager-plugin-blueprints": "file:./packages/skypager-plugin-blueprints",
     "skypager-themes": "file:./packages/skypager-themes",
     "skypager-ui": "file:./packages/skypager-ui",
     "style-loader": "^0.13.0",

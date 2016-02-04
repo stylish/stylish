@@ -1,13 +1,19 @@
 import colors from 'colors'
-import { join, resolve } from 'path'
 
+import { argv } from 'yargs'
+import { join, resolve } from 'path'
+import { writeFileSync as write, createWriteStream as createStream } from 'fs'
 import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
 import thunk from 'redux-thunk'
 
 import Workspace, {reducer as workspaceReducer, initialState as workspaceState} from './workspace'
 
+import { screen, app } from 'electron'
+
 export class Application {
   constructor (project, options = {}) {
+		let hide = this.hide = hideProperties.bind(this)
+
 		hide(this, 'project', project)
 		hide(this, 'env', options.env || 'development')
 
@@ -23,19 +29,55 @@ export class Application {
 				}
 			}
 		}))
+
+		write(actionLogs, '', 'utf8')
+
+		hide(this, 'actionLogger', createStream(actionLogs))
   }
 
-	boot () {
-		this.store.subscribe(this.onStateChange)
-		this.mainWorkspace.launch()
+	get dataPath () {
+		return app.getPath('userData')
 	}
 
-	dispatch (...args) {
-		return this.store.dispatch(...args)
+	get tempPath () {
+		 return app.getPath('temp')
+	}
+
+	boot () {
+		this.store.subscribe(
+			this.onStateChange.bind(this)
+		)
+
+		this.dispatch({
+			type: 'APPLICATION_BOOT',
+			payload: {
+				process: {
+					pid: process.pid,
+					pwd: process.env.pwd,
+					argv
+				}
+			}
+		})
+		this.mainWorkspace.boot()
+	}
+
+	dispatch (action) {
+		this.logAction(action)
+		return this.store.dispatch(action)
+	}
+
+	logAction (action) {
+		this.actionLogger.write(
+			`dispatch(${JSON.stringify(action)});\n\n`
+		)
 	}
 
 	onStateChange() {
-		console.log('yo')
+		write(
+			this.project.path('data_sources', 'electron-state.json'),
+			JSON.stringify(this.state, null, 2),
+			'utf8'
+		)
 	}
 
 	get state () {
@@ -43,7 +85,7 @@ export class Application {
 	}
 
 	get projectSettings() {
-		return this.project.data.at.settings || {}
+		return this.project.data.at('settings').data
 	}
 
 	get workspaces() {
@@ -53,13 +95,10 @@ export class Application {
 	get mainWorkspace () {
 		let project = this.project
 		let config = this.workspaces.main || {
-			id: 'default',
-			electronify:{
-				noServer: true,
-				url: `file://${project.path('public','index.html')}`
-			}
+			id: 'default'
 		}
 
+		config.id = config.id || 'main'
 		return Workspace.provision(this, config)
 	}
 }
@@ -84,11 +123,17 @@ export function setupStore (options = {}) {
 		workspaces: workspaceState
 	}, options.sate || {})
 
-	const buildStore = compose(
-		 applyMiddleware(thunk, createLogger)
-	)(createStore)
+	let middlewares = applyMiddleware(
+		thunk,
+		loggerMiddleware.bind(this)
+	)
 
-	return buildStore(rootReducer, initialState)
+	const buildStore = compose(middlewares)(createStore)
+
+	return buildStore(
+		rootReducer,
+		pick(initialState, keys(reducers))
+	)
 }
 
 function notice (msg) {
@@ -99,7 +144,7 @@ function warn (msg) {
 	console.log(msg.yellow)
 }
 
-export default function createLogger({ getState }) {
+export function loggerMiddleware({ getState }) {
   return (next) =>
     (action) => {
       const prevState = getState();
@@ -107,8 +152,7 @@ export default function createLogger({ getState }) {
       const nextState = getState();
       const actionType = String(action.type);
       const message = `action ${actionType}`;
-			console.log(message)
-			console.log(nextState)
+
       return returnValue;
     };
 }
