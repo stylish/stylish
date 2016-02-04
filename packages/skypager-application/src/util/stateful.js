@@ -12,8 +12,12 @@ export function stateful (component, ...args) {
   component.contextTypes = component.contextTypes || {}
   component.contextTypes.project = types.object.isRequired
 
+  function  mapSelectedProps (state) {
+    return pick(state, ...stateProps)
+  }
+
   if (stateProps && stateProps.length > 0) {
-    connected = connect((state) => pick(state, ...stateProps))(component)
+    connected = connect( mapSelectedProps)(component)
   } else {
     connected = connect(...args)(component)
   }
@@ -32,5 +36,6 @@ function parse(...args) {
 
   return options
 }
+
 
 const { assign, keys } = Object

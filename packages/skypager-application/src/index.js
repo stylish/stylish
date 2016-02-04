@@ -1,5 +1,5 @@
 import Application from './containers/Application'
-import LockedApplication from './containers/LockedApplication.js'
+import LockedApplication from './containers/LockedApplication'
 
 import { stateful } from './util/stateful'
 

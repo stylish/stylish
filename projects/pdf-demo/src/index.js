@@ -12,6 +12,7 @@ Application.create({
   layout: MainLayout,
   project,
   bundle: project,
+  //lock: project.settings.integrations.auth0,
   entryPoints:{
     index: {
       component: HomePage

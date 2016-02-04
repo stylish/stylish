@@ -2,13 +2,13 @@ import Application from './Application'
 
 let lock
 
-class LockedApplication extends Application {
+export class LockedApplication extends Application {
   static create (options = {}) {
     options.defer = true
     let render = Application.create(options)
 
     if (!lock && options.lock) {
-      lock = new Auth0Lock(options.lock.clientId, options.lock.clientDomain)
+      lock = new Auth0Lock(options.lock.clientId, options.lock.domain || options.lock.clientDomain)
     }
 
     doLogin().then(cacheToken).then(render)
@@ -50,3 +50,5 @@ export function doLogin() {
     })
   })
 }
+
+export default LockedApplication
