@@ -6,33 +6,17 @@ import { writeFileSync as write, createWriteStream as createStream } from 'fs'
 import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
 import thunk from 'redux-thunk'
 
-import Workspace, {reducer as workspaceReducer, initialState as workspaceState} from './workspace'
+import * as Workspace from './workspace'
 
 import { screen, app } from 'electron'
 
 export class Application {
   constructor (project, options = {}) {
-		let hide = this.hide = hideProperties.bind(this)
+		let hide = this.hide = (...args) => hideProperties.call(this, ...args)
 
-		hide(this, 'project', project)
-		hide(this, 'env', options.env || 'development')
+		hide({ project, env: options.env || 'development' })
 
-		hide(this, 'store', setupStore({
-			state: {
-				project: {
-					paths: project.paths
-				},
-				process: {
-					env: this.env,
-					pwd: process.env.PWD,
-					options
-				}
-			}
-		}))
-
-		write(actionLogs, '', 'utf8')
-
-		hide(this, 'actionLogger', createStream(actionLogs))
+		hide({ store: setupStore() })
   }
 
 	get dataPath () {
@@ -43,21 +27,15 @@ export class Application {
 		 return app.getPath('temp')
 	}
 
+	get actionLogsPath () {
+		 return join(this.dataPath, 'electron', 'app-actions.log')
+	}
+
 	boot () {
 		this.store.subscribe(
 			this.onStateChange.bind(this)
 		)
 
-		this.dispatch({
-			type: 'APPLICATION_BOOT',
-			payload: {
-				process: {
-					pid: process.pid,
-					pwd: process.env.pwd,
-					argv
-				}
-			}
-		})
 		this.mainWorkspace.boot()
 	}
 
@@ -73,6 +51,10 @@ export class Application {
 	}
 
 	onStateChange() {
+
+	}
+
+	snapshotState () {
 		write(
 			this.project.path('data_sources', 'electron-state.json'),
 			JSON.stringify(this.state, null, 2),
@@ -94,12 +76,20 @@ export class Application {
 
 	get mainWorkspace () {
 		let project = this.project
-		let config = this.workspaces.main || {
-			id: 'default'
+		let config = this.workspaces.main
+
+		if (config) {
+			return config
 		}
 
-		config.id = config.id || 'main'
-		return Workspace.provision(this, config)
+		return {
+			id: 'main',
+			panels: {
+				browser:{
+					url: project.path('public', 'index.html')
+				}
+			}
+		}
 	}
 }
 
@@ -113,9 +103,9 @@ function hide(obj, prop, value) {
 const { defineProperty, keys, assign } = Object
 
 export function setupStore (options = {}) {
-	let reducers = assign({
-		workspaces: workspaceReducer
-	}, options.reducers || {})
+	let reducers = {
+		workspaces: Workspace.store
+	}
 
 	let rootReducer = combineReducers(reducers)
 
