@@ -1,3 +1,5 @@
+const { assign, keys, defineProperty } = Object
+
 export function hideProperties (obj, ...args) {
   let props = args.length === 2 ? {[args[0]]:args[1]} : args[0]
 
@@ -12,5 +14,4 @@ export function hideProperties (obj, ...args) {
     })
   })
 }
-
 

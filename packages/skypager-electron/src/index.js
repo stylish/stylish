@@ -2,15 +2,18 @@ import { Application } from './application'
 
 import { loadProjectFromDirectory as loadProject } from 'skypager/lib/util'
 
-import { argv } from 'yargs'
+import pick from 'lodash/object/pick'
+
+global.pick = pick
+global.assign = Object.assign
+global.keys = Object.keys
 
 export function enter (options = {}) {
-  let projectPath = options.project || process.env.PWD
-  let project = loadProject(projectPath)
+  let { project, argv } = options
 
-  let app = new Application(project)
+  let app = new Application(project, pick(options, 'argv', 'command'))
 
-  if (!argv.dontBoot) {
-    app.boot()
-  }
+  if (!argv.dontBoot) { app.boot() }
+
+  return app
 }

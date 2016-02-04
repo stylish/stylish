@@ -4,10 +4,17 @@
   "description": "skypager electron stack",
   "author": "Jonathan Soeder <jon@chicago.com>",
   "license": "UNLICENSED",
-  "bin": {
-    "skypager-electron": "./bin/cli.js"
-  },
   "main": "app.js",
+  "scripts": {
+    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "test:watch": "NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
+    "lint": "eslint src/**/*",
+    "lint:fix": "npm run lint -- --fix",
+    "build:clean": "rm -rf lib test/fixture/dist/*",
+    "build": "npm run build:clean && npm run test && npm run compile",
+    "compile": "NODE_ENV=production babel -q -d lib src",
+    "compile:watch": "babel -w -d lib src"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/skypager/skypager-electron"

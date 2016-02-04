@@ -1,4 +1,6 @@
-export const WORKSPACE_APP_READY = 'WORKSPACE_APP_READY'
+import { handleActions as reducer, createAction as action } from 'redux-actions'
+
+export const WORKSPACE_READY = 'WORKSPACE_READY'
 export const WORKSPACE_DID_LOAD = 'WORKSPACE_DID_LOAD'
 export const WORKSPACE_PROCESS_ERROR = 'WORKSPACE_PROCESS_ERROR'
 export const WORKSPACE_PROCESS_STARTED = 'WORKSPACE_PROCESS_STARTED'
@@ -11,8 +13,17 @@ export const initialState = {
 }
 
 export const store = reducer({
-  [ WORKSPACE_READY ]: (state, {payload}) => state
+  [ WORKSPACE_READY ]: workspaceStatus,
+  [ WORKSPACE_DID_LOAD ]: workspaceStatus
 }, initialState)
+
+export const actions = {
+  processClosed,
+  processError,
+  processStarted,
+  workspaceReady,
+  panelLoaded
+}
 
 export function processClosed (workspace, panelName, child) {
 	return {
@@ -57,12 +68,32 @@ export function panelLoaded (workspace, panelName, electronApp, browserWindow) {
   }
 }
 
-export function workspaceReady (workspace, electronApp) {
+export function workspaceReady (workspace, payload) {
   return {
-    type: WORKSPACE_APP_READY,
-    payload: {
+    type: WORKSPACE_READY,
+    payload: assign(payload, {
       workspaceId: workspace.id
-    }
+    })
   }
+}
+
+function workspaceStatus (state, {payload, meta}) {
+    let { panelName, browserWindowId } = payload
+    let { workspaceId, applicationId } = meta
+    let workspaces = state.workspaces
+
+    let nextState = assign({}, state, {
+      workspaces: assign({}, workspaces, {
+        [workspaceId]: 'ready'
+      })
+    })
+
+    if( panelName && browserWindowId ) {
+      nextState.windows = nextState.windows || {}
+      nextState.windows[workspaceId] = nextState.windows[workspaceId] || {}
+      nextState.windows[workspaceId][panelName] = browserWindowId
+    }
+
+    return nextState
 }
 
