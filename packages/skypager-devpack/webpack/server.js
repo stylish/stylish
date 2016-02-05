@@ -19,8 +19,6 @@ module.exports = function(argv) {
 
   var compiler = webpack(config)
 
-  console.log('Config', config.output)
-
   var devMiddleware = require('webpack-dev-middleware')(compiler, {
     publicPath: config.output.publicPath,
     stats: !!!argv.silent,

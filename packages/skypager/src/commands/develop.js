@@ -2,6 +2,7 @@ import { join, resolve, dirname } from 'path'
 
 import shell from 'shelljs'
 import util from '../util'
+import pick from 'lodash/object/pick'
 
 export function develop (program, dispatch) {
   program
@@ -35,6 +36,8 @@ export function develop (program, dispatch) {
     .option('--no-vendor-libraries', "don't include any vendor libraries in the bundle")
     .option('--export-library <name>', 'build this as a umd library')
     .option('--template-inject [target]', 'where to inject the webpack bundle? none, body, head')
+    .option('--exclude-chunks [list]', 'chunk names to exclude from the html bundle')
+    .option('--chunks [list]', 'chunk names to exclude from the html bundle')
     .action(dispatch(handle))
 }
 
@@ -43,7 +46,9 @@ export default develop
 export function handle (entry, options = {}, context = {}) {
   let project = context.project
 
-  launchWatcher(options, context)
+  if (options.bundle){
+    launchWatcher(options, context)
+  }
 
   launchServer(entry, options, context)
 
@@ -84,15 +89,18 @@ export function launchServer (entry, options = {}, context = {}) {
 
   options.staticAssets = options.staticAssets || project.options.staticAssets || {}
 
-  console.log('Launching server'.cyan)
+  console.log(`Launching server with entry`.cyan + ` ${ options.entry }`.white)
+
   process.env.NODE_ENV = 'development'
-  require(`${ pathToDevpack(options.devToolsPath) }/webpack/server`)(options)
+
+  //wow
+  let serverOptions = pick(options, 'fontsPrefix','modulesPath','platform','entry','entryName','precompiled', 'theme', 'skipTheme', 'outputFolder', 'htmlTemplatePath', 'htmlFilename', 'pushState', 'contentHash', 'noContentHash', 'project', 'featureFlags', 'staticAssets', 'chunks', 'excludeChunks', 'templateInject', 'entryOnly', 'exportLibrary', 'vendorLibraries', 'noVendorLibraries', 'externalVendors', 'target')
+
+  require(`${ pathToDevpack(options.devToolsPath) }/webpack/server`)(serverOptions)
 }
 
 export function launchTunnel(options, context) {
   var server = shell.exec(`ngrok http ${ options.port || 3000 }`, {async: true})
-
-  console.log(server)
 
   server.stdout.on('data', (data) => {
     console.log(data)

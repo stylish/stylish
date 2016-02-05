@@ -12,9 +12,8 @@ var yargs = require('yargs'),
     pick = require('lodash/object/pick'),
     colors = require('colors'),
     loadProject = require('skypager/lib/util').loadProjectFromDirectory,
-    project = loadProject(yargs.argv.project || process.env.PWD),
-    skypagerMain = require('./src/index').enter({
-      project,
+    skypagerMain = require('./src/boot').enter({
+      project: yargs.argv.project || process.env.PWD,
       argv: yargs.argv,
       command: yargs.argv._
     });
@@ -24,6 +23,6 @@ if (yargs.argv.interactive) {
     prompt: 'skypager-'.magenta + 'electron'.yellow + ' ' + ':'.white + '> '
   })
 
-  server.context.project = project
+  server.context.project = skypagerMain.project
   server.context.app = skypagerMain
 }

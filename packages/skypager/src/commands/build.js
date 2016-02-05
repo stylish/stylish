@@ -33,6 +33,8 @@ export function build (program, dispatch) {
     .option('--silent', 'suppress any server output')
     .option('--debug', 'show error info from the server')
     .option('--template-inject [target]', 'where to inject the webpack bundle? none, body, head')
+    .option('--exclude-chunks [list]', 'chunk names to exclude from the html bundle')
+    .option('--chunks [list]', 'chunk names to exclude from the html bundle')
     .action(dispatch(handle))
 }
 

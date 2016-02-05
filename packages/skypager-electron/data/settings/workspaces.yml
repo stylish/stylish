@@ -1,0 +1,21 @@
+workspaces:
+  main:
+    command: 'npm run dev:workspaces:main'
+    panels:
+      presentation:
+        path: '/'
+        window:
+          width: 800
+          left: 1120
+          top: 0
+          height: 1200
+      console:
+        path: '/console'
+        window:
+          width: 300
+          left: 0
+          top: 0
+          height: 1200
+          frame: false
+          movable: false
+          resizable: false

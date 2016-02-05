@@ -6,18 +6,24 @@
   "license": "UNLICENSED",
   "main": "app.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
-    "test:watch": "NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
+    "test": "npm run test:node && npm run test:electron",
+    "test:node": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/node/**/*-spec.js",
+    "test:electron": "NODE_ENV=test electron-mocha --require 'babel-register' --require should --require ./test/index.js test/electron/**/*-spec.js",
+    "test:watch": "NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/node/**/*-spec.js",
     "lint": "eslint src/**/*",
     "lint:fix": "npm run lint -- --fix",
     "build:clean": "rm -rf lib test/fixture/dist/*",
     "build": "npm run build:clean && npm run test && npm run compile",
     "compile": "NODE_ENV=production babel -q -d lib src",
-    "compile:watch": "babel -w -d lib src"
+    "compile:watch": "babel -w -d lib src",
+    "dev:workspaces:main": "skypager dev --port 9000 --entry ./src/index"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/skypager/skypager-electron"
+  },
+  "skypager": {
+    "entry": "author-app/index.js"
   },
   "dependencies": {
     "electron-compile": "^2.0.5",
@@ -25,6 +31,10 @@
     "electron-packager": "^5.2.1",
     "electron-prebuilt-compile": "^0.36.1",
     "electron-rebuild": "^1.1.1",
-    "electronify-server": "^0.1.3"
+    "electronify-server": "^0.1.3",
+    "openport": "0.0.4"
+  },
+  "devDependencies": {
+    "mocha": "^2.4.5"
   }
 }
