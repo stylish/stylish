@@ -4,18 +4,24 @@ import shell from 'shelljs'
 import util from '../util'
 import pick from 'lodash/object/pick'
 
+/**
+ * This is a low level wrapper around webpack dev server and how we use it to build react / bootstrap / redux
+ * apps for web, electron, and react-native platforms.
+ *
+ * Eventually I would rather have several presets which compose these different options together.
+*/
 export function develop (program, dispatch) {
   program
     .command('dev [entry]')
     .alias('develop')
     .alias('dev-server')
     .description('run a development server for this project')
+    .option('--platform <name>', 'which platform are we building for? electron or web', 'web')
     .option('--port <port>', 'which port should this server listen on?', 3000)
     .option('--host <hostname>', 'which hostname should this server listen on?', 'localhost')
     .option('--entry <path>', 'relative path to the entry point', './src')
     .option('--entry-name <name>', 'what to name the entry point script', 'app')
-    .option('--platform <name>', 'which platform are we building for? electron or web', 'web')
-    .option('--theme <name>', 'the name of the theme to use')
+    .option('--entry-only', 'do not build an html template, only build the webpack entries')
     .option('--html-template-path <path>', 'path to the html template to use')
     .option('--precompiled <name>', 'use a precompiled html template which includes vendor libs, themes, etc')
     .option('--ngrok', 'when enabled, will attempt to use ngrok to expose a public API endpoint for this server')
@@ -26,12 +32,12 @@ export function develop (program, dispatch) {
     .option('--webpack-config <path>', 'path to a javascript function which can mutate the webpack config')
     .option('--bundle', 'watch for content changes in the project and update the distribution bundle')
     .option('--bundle-command', 'the command to run to generate the bundle default: skypager export bundle', 'skypager export bundle')
+    .option('--dist-path <path>', 'the project exporter or dist path, where the bundle will be built')
     .option('--middleware <path>', 'apply express middleware to the dev-server')
     .option('--modules-path <path>', 'which modules folder to use for webpacks default? defaults to standard node_modules')
     .option('--feature-flags <path>', 'path to a script which exports an object to be used for feature flags')
+    .option('--theme <name>', 'the name of the theme to use')
     .option('--skip-theme', 'do not include a theme')
-    .option('--entry-only', 'do not use html template')
-    .option('--dist-path <path>', 'the project exporter or dist path')
     .option('--external-vendors', "assume vendor libraries will be available to our script")
     .option('--no-vendor-libraries', "don't include any vendor libraries in the bundle")
     .option('--export-library <name>', 'build this as a umd library')

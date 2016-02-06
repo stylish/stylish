@@ -1,5 +1,14 @@
+import colors from 'colors'
+
 import { join, resolve } from 'path'
-import { existsSync as exists } from 'fs'
+import { argv } from 'yargs'
+
+import {
+  existsSync as exists,
+  readFileSync as readFile,
+  createWriteStream as writeStream,
+  createReadStream as readStream
+} from 'fs'
 
 import author from './author'
 import available from './available'
@@ -11,10 +20,13 @@ import init from './init'
 import importer from './importer'
 import listen from './listen'
 import publish from './publish'
-import run from './run'
 import repl from './repl'
 
-import { loadProjectFromDirectory } from '../util'
+import { loadProjectFromDirectory, skypagerBabel } from '../util'
+
+import pkg from '../../package.json'
+
+const currentDirectory = process.env.PWD
 
 export const commands = {
   author,
@@ -26,51 +38,80 @@ export const commands = {
   export: exporter,
   import: importer,
   listen,
-  publish,
-  run
+  publish
 }
 
-export function configure (program, localConfig) {
-  let handler = dispatcher.bind(program)
+let requestedCommand = argv._[0]
 
-  author(program, handler)
-  available(program, handler)
-  build(program, handler)
-  repl(program, handler)
-  create(program, handler)
-  develop(program, handler)
-  exporter(program, handler)
-  init(program, handler)
-  importer(program, handler)
-  listen(program, handler)
-  publish(program, handler)
-  run(program, handler)
+export function commander (options = {}) {
+  const program = require('commander')
+
+  program
+    .version(pkg.version)
+    .option('--project <path>', 'specify which folder contains the project you wish to work with')
+    .option('--debug', 'enable debugging')
+    .option('--env <env>', 'which environment should we run in? defaults to NODE_ENV', process.env.NODE_ENV || 'development');
+
+  configure(program)
+
+  if (program.commands.map(c => c._name).indexOf(requestedCommand) < 0) {
+     program.outputHelp()
+  }
+
+  return () => program.parse(process.argv)
 }
 
-export function dispatcher(handlerFn) {
-  let program = this
+export default commander
 
-  return (...args) => {
-    var project
-    var options
+function configure (program, options = {}) {
+  let project = loadProject(argv.project)
+  let config = project && project.manifest && project.manifest.skypager
 
-    options = args[args.length - 1] || {}
+  let context = {
+    program,
+    project,
+    config
+  }
 
-    try {
-      project = loadProjectFromDirectory(options.project || (options.parent && options.parent.project) || process.env.PWD)
-    } catch (error) {
-      console.log('Error loading the skypager project'.red)
-      console.log(error.message)
+  const dispatch = (handlerFn) => {
+    return (...args) => {
+      args.push(context)
+      handlerFn(...args)
     }
+  }
 
-    // create a context argument that is available
-    // in addition to the options arg. this will have things available
-    // that are shared across every cli handler, e.g. the project object
-    args.push({
-      project,
-      program
-    })
+  author(program, dispatch)
+  available(program, dispatch)
+  build(program, dispatch)
+  repl(program, dispatch)
+  create(program, dispatch)
+  develop(program, dispatch)
+  exporter(program, dispatch)
+  init(program, dispatch)
+  importer(program, dispatch)
+  listen(program, dispatch)
+  publish(program, dispatch)
 
-    handlerFn(...args)
+  program.command('*').action((...args) => {
+  })
+
+  return () => program.parse(argv)
+}
+
+function loadProject(fromPath, silent = false) {
+  try {
+    skypagerBabel()
+    return loadProjectFromDirectory(fromPath || process.env.PWD)
+  } catch (error) {
+    if (!silent && requestedCommand !== 'init' && requestedCommand !== 'help') {
+      console.error(
+        `Error loading skypager project. Run this from within a project directory.`.red
+      )
+
+      console.log(error.message)
+      console.log(error.stack)
+    }
   }
 }
+
+

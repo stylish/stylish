@@ -3,6 +3,9 @@ import assign from 'object-assign'
 import dotpath from 'object-path'
 import utile from 'utile'
 import _debug from 'debug'
+import any from 'lodash/collection/some'
+import defaults from 'lodash/object/defaultsDeep'
+import { join } from 'path'
 
 const inflections = utile.inflect
 const debug = _debug('skypager')
@@ -10,6 +13,8 @@ const DOMAIN_REGEX = /^[a-zA-Z0-9_-]+\.[.a-zA-Z0-9_-]+$/
 
 module.exports.visit = visit
 module.exports.assign = assign
+module.exports.defaults = defaults
+module.exports.any = any
 
 let hidden = {
   getter: function (target, name, fn, configurable = false) {
@@ -332,3 +337,10 @@ export function abort(message) {
    process.exit(1)
 }
 
+export function skypagerBabel() {
+  require('babel-register')({
+    presets:[
+      require('babel-preset-skypager')
+    ]
+  })
+}
