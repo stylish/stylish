@@ -173,19 +173,6 @@ module.exports = function (argv) {
 	let headerScripts = staticAssets.headerScripts || []
 	let googleFont = staticAssets.googleFont || `http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic`
 
-	let chunks = Object.keys(entry)
-	let excludeChunks = []
-
-	if (argv.chunks) {
-		if (typeof argv.chunks === 'string') { chunks = argv.chunks.split(',') }
-		if (typeof argv.chunks === 'array') { chunks = argv.chunks }
-	}
-
-	if (argv.excludeChunks) {
-		if (typeof argv.excludeChunks === 'string') { excludeChunks = excludeChunks.concat(argv.excludeChunks.split(',')) }
-		if (typeof argv.excludeChunks === 'array') { excludeChunks = excludeChunks.concat(argv.excludeChunks) }
-	}
-
 	if (!argv.entryOnly && !argv.exportLibrary) {
 		config.plugin('webpack-html', HtmlWebpackPlugin, [{
 			template: `${ templatePath }`,
@@ -195,7 +182,6 @@ module.exports = function (argv) {
 			bodyScripts,
 			headerScripts,
 			staticStyles: [googleFont].concat(staticStyles),
-			chunks: chunks
 		}])
 	}
 
