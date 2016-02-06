@@ -72,7 +72,7 @@ export class Application {
 
 	get browserWindows() {
 		let workspace = this.workspace
-		let windows = this.state.workspaces.windows[workspace.id]
+		let windows = this.state.workspaces.windows.main
 
 		return keys(windows).reduce((memo,panelName)=>{
 			let w = windows[panelName]

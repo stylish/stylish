@@ -106,9 +106,11 @@ function workspaceStatusReducer (state, {payload, meta}) {
     })
 
     if( panelName && browserWindowId ) {
-      nextState.windows[panelName] = {
-        browserWindowId
-      }
+      nextState.windows[workspaceId] = assign(nextState.windows[workspaceId] || {}, {
+        [panelName]: {
+          browserWindowId
+        }
+      })
     }
 
     return nextState

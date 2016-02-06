@@ -38,6 +38,7 @@ export class Workspace {
   }
 
 	boot(options = {}) {
+    buildElectronifyOptions(this)
 		this.launchPanels()
 	}
 
@@ -67,12 +68,8 @@ export class Workspace {
   }
 
 	launchPanels () {
-    let calls = buildElectronifyOptions(this)
-
-    calls.forEach(params => {
-      if (process.env.NODE_ENV !== 'test') {
-        launch.call(this, params.id, params)
-      }
+    this.panels.forEach(panel => {
+      launch.call(this, panel.id, panel.opts)
     })
 	}
 
@@ -88,22 +85,23 @@ function buildElectronifyOptions (workspace) {
   let command = workspace.command
 
   return workspace.panels.map((panel, index) => {
+    let opts = {}
+
     if (command && !panel.command && index === 0) {
-      panel.command = command
+      opts.command = command
     }
 
     if (!panel.command) {
-      panel.noServer = true
+      opts.noServer = true
     }
 
     if (!panel.url && panel.path ) {
-      panel.url = `${ workspace.baseUrl || 'http://localhost:3000' }${ panel.path }`
+      opts.url = `${ workspace.baseUrl || 'http://localhost:3000' }${ panel.path }`
     }
 
-    panel.index = index
-    panel.id = panel.id
+    panel.opts = opts
 
-    return pick(panel, 'index', 'id', 'url', 'noServer', 'command', 'window')
+    return opts
   })
 }
 
@@ -129,7 +127,7 @@ function launch (panelName, params = {}) {
         })
       )
 
-      win.show()
+      win.hide()
 
       win.setBounds({
         x: parseInt(bounds.left),
