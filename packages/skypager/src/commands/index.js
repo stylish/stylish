@@ -22,7 +22,7 @@ import listen from './listen'
 import publish from './publish'
 import repl from './repl'
 
-import { loadProjectFromDirectory, skypagerBabel } from '../util'
+import { loadProjectFromDirectory, skypagerBabel, dotpath } from '../util'
 
 import pkg from '../../package.json'
 
@@ -70,7 +70,8 @@ function configure (program, options = {}) {
   let context = {
     program,
     project,
-    config
+    config,
+    isCLI: true
   }
 
   const dispatch = (handlerFn) => {
@@ -92,8 +93,12 @@ function configure (program, options = {}) {
   listen(program, dispatch)
   publish(program, dispatch)
 
-  program.command('*').action((...args) => {
-  })
+  // the project can dynamically add its own cli commands from certain actions
+  if (project) {
+    project.actions
+    .filter(action => dotpath.get(action, 'definition.interfaces.cli'))
+    .forEach(action => dotpath.get(action, 'definition.interfaces.cli').call(action, program, dispatch))
+  }
 
   return () => program.parse(argv)
 }

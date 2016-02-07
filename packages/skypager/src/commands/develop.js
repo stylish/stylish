@@ -12,10 +12,11 @@ import pick from 'lodash/object/pick'
 */
 export function develop (program, dispatch) {
   program
-    .command('dev [entry]')
+    .command('dev [preset]')
     .alias('develop')
     .alias('dev-server')
     .description('run a development server for this project')
+    .option('--preset <name>', 'use a preset instead of all of this configuration')
     .option('--platform <name>', 'which platform are we building for? electron or web', 'web')
     .option('--port <port>', 'which port should this server listen on?', 3000)
     .option('--host <hostname>', 'which hostname should this server listen on?', 'localhost')
@@ -44,19 +45,20 @@ export function develop (program, dispatch) {
     .option('--template-inject [target]', 'where to inject the webpack bundle? none, body, head')
     .option('--exclude-chunks [list]', 'chunk names to exclude from the html bundle')
     .option('--chunks [list]', 'chunk names to exclude from the html bundle')
+    .option('--save-webpack-stats <path>', 'save the webpack compilation stats output')
     .action(dispatch(handle))
 }
 
 export default develop
 
-export function handle (entry, options = {}, context = {}) {
+export function handle (preset, options = {}, context = {}) {
   let project = context.project
 
   if (options.bundle){
     launchWatcher(options, context)
   }
 
-  launchServer(entry, options, context)
+  launchServer(preset, options, context)
 
   if (options.ngrok) {
     launchTunnel(options, context)
@@ -87,10 +89,10 @@ export function launchWatcher(options, context) {
   })
 }
 
-export function launchServer (entry, options = {}, context = {}) {
+export function launchServer (preset, options = {}, context = {}) {
   let project = context.project
 
-  options.entry = entry || options.entry || project.options.entry || './src'
+  options.entry = options.entry || project.options.entry || './src'
   options.theme = options.theme || project.options.theme || 'marketing'
 
   options.staticAssets = options.staticAssets || project.options.staticAssets || {}
@@ -99,10 +101,7 @@ export function launchServer (entry, options = {}, context = {}) {
 
   process.env.NODE_ENV = 'development'
 
-  //wow
-  let serverOptions = pick(options, 'fontsPrefix','modulesPath','platform','entry','entryName','precompiled', 'theme', 'skipTheme', 'outputFolder', 'htmlTemplatePath', 'htmlFilename', 'pushState', 'contentHash', 'noContentHash', 'project', 'featureFlags', 'staticAssets', 'chunks', 'excludeChunks', 'templateInject', 'entryOnly', 'exportLibrary', 'vendorLibraries', 'noVendorLibraries', 'externalVendors', 'target')
-
-  require(`${ pathToDevpack(options.devToolsPath) }/webpack/server`)(serverOptions)
+  require(`${ pathToDevpack(options.devToolsPath) }/webpack/server`)(options)
 }
 
 export function launchTunnel(options, context) {
