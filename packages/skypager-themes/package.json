@@ -1,6 +1,6 @@
 {
   "name": "skypager-themes",
-  "version": "1.0.0",
+  "version": "1.18.0",
   "description": "",
   "main": "index.js",
   "loader": "index.loader.js",

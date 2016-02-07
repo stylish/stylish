@@ -4,6 +4,7 @@ import { handleActions as reducer, createAction as action } from 'redux-actions'
 import { hideProperties } from '../util'
 import { compact, pick, isNumber, isString } from 'lodash'
 import { constrain } from '../util/constrain'
+import chokidar from 'chokidar'
 
 const defaultPanels = {
   browser: {
@@ -64,6 +65,8 @@ export class Workspace {
       workspaceId: this.id
     }, action.meta || {})
 
+    console.log('Workspace Dispatch', action.type, action.payload)
+
     return this.application.dispatch(action)
   }
 
@@ -110,33 +113,23 @@ function launch (panelName, params = {}) {
 
 	let options = assign({}, params, {
 		ready: function(electronApp) {
+      let bounds = constrain(assign({}, params.window), w.application.screenSize)
+
       w.dispatch(
         workspaceReady(w, {
-          panelName
+          panelName,
+          bounds
         })
       )
 		},
 
 		preLoad: function(electronApp, win) {
-      let bounds = params.window = constrain(assign({}, params.window), w.application.screenSize)
-
       w.dispatch(
         workspaceReady(w, {
           browserWindowId: win.id,
           panelName
         })
       )
-
-      win.hide()
-
-      win.setBounds({
-        x: parseInt(bounds.left),
-        y: parseInt(bounds.top),
-        height: parseInt(bounds.height),
-        width: parseInt(bounds.width)
-      })
-
-      if (params.window.centered) { win.center() }
 		},
 
 		postLoad: function(electronApp, win) {
@@ -146,17 +139,11 @@ function launch (panelName, params = {}) {
 		}
 	})
 
+  options.window = assign({}, options.window, {width: 200, height: 200, show: false})
+
 	if (!options.command) {
-		options.noServer = true
+    options.noServer = true
 	}
-
-
-  options.window = assign({}, options.window, {width: 200, height: 200})
-
-	electronify(options)
-	.on('child-started', (c)=> w.dispatch(processStarted(w, panelName, c)))
-	.on('child-closed', (app, stderr, stdout)=> w.dispatch(processClosed(w, panelName)))
-	.on('child-error', (err, app)=> w.dispatch(processError(w, panelName, err)))
 
   w.dispatch(workspaceDidLaunch(w, {
     electronify: {

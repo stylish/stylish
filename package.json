@@ -1,6 +1,7 @@
 {
   "name": "skypager-central",
-  "version": "1.17.1",
+  "version": "1.18.0",
+  "private": "true",
   "description": "development base for the skypager portfolio",
   "skypager": {
     "main": "skypager.js",
@@ -48,7 +49,7 @@
     "redux-actions": "^0.9.1",
     "redux-simple-router": "^2.0.2",
     "redux-thunk": "^1.0.3",
-    "skypager": "^1.17.1",,
+    "skypager": "^1.17.1",
     "skypager-application": "^1.17.1",
     "skypager-devpack": "^1.17.1",
     "skypager-electron": "^1.17.1",

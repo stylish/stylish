@@ -1,0 +1,14 @@
+{
+  "name": "skypager-docs",
+  "version": "1.0.0",
+  "skypager": {
+    "main": "skypager.js",
+    "plugins": []
+  },
+  "devDependencies": {
+    "skypager": "^1.18.0",
+    "skypager-devpack": "^1.18.0",
+    "babel-preset-skypager": "^1.18.0",
+    "babel-runtime": "^6.4.0"
+  }
+}

@@ -1,12 +1,12 @@
 {
   "name": "skypager-application",
   "description": "unified react and redux appication runtime for skypager projects supporting the browser, electron, and react native",
-  "version": "1.17.1",
+  "version": "1.18.0",
   "main": "index.js",
   "skypager": {
     "main": "skypager.js"
   },
-  "keywords":[
+  "keywords": [
     "react",
     "react-native",
     "redux",
@@ -25,9 +25,9 @@
     "redux-simple-router": "^2.0.2",
     "redux-thunk": "^1.0.3"
   },
-  "devDependencies":{
-     "skypager": "^1.17.1",
-     "skypager-devpack": "^1.17.1",
-     "babel-preset-skypager": "^1.17.1"
+  "devDependencies": {
+    "skypager": "^1.17.1",
+    "skypager-devpack": "^1.17.1",
+    "babel-preset-skypager": "^1.17.1"
   }
 }

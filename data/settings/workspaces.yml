@@ -1,6 +1,6 @@
 workspaces:
   main:
-    command: 'skypager dev --platform electron --html-template-path=public/template.html --skip-theme --external-vendors'
+    command: 'skypager dev --platform electron --html-template-path=public/template.html --skip-theme --external-vendors --save-webpack-stats=webpack-stats.json'
     panels:
       presentation:
         path: '/'
