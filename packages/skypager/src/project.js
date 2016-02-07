@@ -390,6 +390,10 @@ class Project {
       util.tabelize(util.underscore(model.name))
     )
   }
+
+  get mergedSettingsData () {
+    return this.data_sources.query({ id: /^settings\// }).merge()
+  }
 }
 
 module.exports = Project
@@ -406,7 +410,9 @@ function paths () {
     exporters: join(this.root, 'exporters'),
     importers: join(this.root, 'importers'),
     models: join(this.root, 'models'),
+    packages: join(this.root, 'packages'),
     plugins: join(this.root, 'plugins'),
+    projects: join(this.root, 'projects'),
     renderers: join(this.root, 'renderers'),
     vectors: join(this.root, 'assets'),
     images: join(this.root, 'assets'),
@@ -459,7 +465,9 @@ function buildContentCollectionsManually () {
     images: Image.createCollection(this, false),
     scripts: Script.createCollection(this, false),
     stylesheets: Stylesheet.createCollection(this, false),
-    vectors: Vector.createCollection(this, false)
+    vectors: Vector.createCollection(this, false),
+    packages: new Collection({root: this.paths.packages, project: this, assetClass: DataSource, pattern: '*/package.json', exclude: '**/node_modules'}),
+    projects: new Collection({root: this.paths.projects, project: this, assetClass: DataSource, pattern: '*/package.json', exclude: '**/node_modules'})
   }
 }
 

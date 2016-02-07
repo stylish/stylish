@@ -12,7 +12,13 @@ const Fallbacks = {}
 
 class Registry {
   static build (host, helper, options) {
-    return new Registry(host, helper, options)
+    let registry = new Registry(host, helper, options)
+
+    if (helper && helper.decorateRegistry) {
+      helper.decorateRegistry(registry)
+    }
+
+    return registry
   }
 
   constructor (host, helper, options = {}) {
@@ -320,15 +326,15 @@ class Registry {
   }
 
   filter (...args) {
-     return this.all.filter(...args)
+     return this.allHelpers(true).filter(...args)
   }
 
   map(...args) {
-    return this.all.map(...args)
+    return this.allHelpers(true).map(...args)
   }
 
   forEach(...args){
-    return this.all.forEach(...args)
+    return this.allHelpers(true).forEach(...args)
   }
 
   allHelpers (includeFallback = true) {
@@ -375,8 +381,9 @@ class Builder {
     c.should.be.an.Object
     helpers.should.not.be.empty()
 
-    Object.keys(helpers).forEach(type => {
+    Object.keys(helpers).filter(type => type !== 'default').forEach(type => {
       let name = util.tabelize(type)
+
       c[name] = c[name] || Registry.build(host, helpers[type], {name, root: host.root})
     })
 

@@ -29,9 +29,41 @@ describe("Spec", function(model){
   })
 })
 
+function decorate ({ document }, { project }) {
+  let doc = document
+
+  Object.assign(doc, {
+    get specs () {
+      return doc.content.toJSON().specifications
+    },
+    toMochaSuite (options = {}) {
+      let currentSpec = doc
+
+      require('mocha').setup({
+        ui: 'bdd',
+        ...options
+      })
+
+      return function () {
+        describe(doc.title, function() {
+          doc.specs.examples.forEach(function(example){
+            it(example.title, function(){
+              example.runTests()
+            })
+          })
+        })
+      }
+    }
+  })
+}
+
 function create({ document }, context = {}){
+  let specifications = document.content.toJSON()
+
   return Object.assign({}, document.data, {
-    specifications: document.specifications
+    title,
+    mainCopy,
+    specifications
   })
 }
 

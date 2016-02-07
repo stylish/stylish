@@ -8,7 +8,15 @@ import * as util from '../util'
 const EXTENSIONS = ['js', 'css', 'html']
 const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
 
+const { defineProperties } = Object
+
 class Asset {
+  static decorateCollection (collection) {
+    if (this.collectionInterface) {
+      defineProperties(collection, this.collectionInterface(collection))
+    }
+  }
+
   constructor (uri, options = {}) {
     let asset = this
     let raw
@@ -39,6 +47,10 @@ class Asset {
     this.lazy('parsed', () => this.parse(this.raw))
     this.lazy('indexed', () => this.index(this.parsed, this))
     this.lazy('transformed', () => this.transform(this.indexed, this))
+  }
+
+  result(...args) {
+    return util.result(this, ...args)
   }
 
   runImporter(importer = 'disk', options = {}, callback){
@@ -174,13 +186,44 @@ class Asset {
     return require(string)
   }
 
-  static createCollection (project, autoLoad = false) {
+  saveSync (options = {}) {
+    if (this.raw || this.raw.length === 0) {
+      if (!options.allowEmpty) {
+        return false
+      }
+    }
+
+    return require('fs').writeFileSync(
+       this.paths.absolute,
+       this.raw,
+       'utf8'
+    )
+  }
+
+  save (options = {}) {
+    if (this.raw || this.raw.length === 0) {
+      if (!options.allowEmpty) {
+        return false
+      }
+    }
+
+    return require('fs-promise').writeFile(
+       this.paths.absolute,
+       this.raw,
+       'utf8'
+    )
+  }
+
+  static createCollection (project, options = {}) {
     let assetClass = this
     let root = project.paths[util.tabelize(assetClass.name)]
-    let collection = new Collection(root, project, assetClass)
 
-
-    return collection
+    return new Collection({
+      root,
+      project,
+      assetClass,
+      ...options
+    })
   }
 
   static get groupName () {

@@ -5,6 +5,8 @@ import utile from 'utile'
 import _debug from 'debug'
 import any from 'lodash/collection/some'
 import defaults from 'lodash/object/defaultsDeep'
+import result from 'lodash/object/result'
+
 import { join } from 'path'
 
 const inflections = utile.inflect
@@ -15,6 +17,8 @@ module.exports.visit = visit
 module.exports.assign = assign
 module.exports.defaults = defaults
 module.exports.any = any
+module.exports.result = result
+module.exports.dotpath = dotpath
 
 let hidden = {
   getter: function (target, name, fn, configurable = false) {

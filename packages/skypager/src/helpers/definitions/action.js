@@ -70,9 +70,41 @@ export class ActionDefinition {
       execute: this.executor,
       validate: this.validator,
       parameters: this.parameters,
-      runner: function (params, action) {
-        if (def.api.validate(params, action)) {
-          return def.api.execute(params, action)
+      runner: function (...args) {
+        let report = {
+          errors:[],
+          suggestions: [],
+          warnings:[]
+        }
+
+        if (def.api.validate(...args)) {
+          noConflict(function(){
+            try {
+              def.api.execute(...args)
+            } catch(err) {
+              report.errors.push('fatal error:' + err.message)
+            }
+          }, {
+              abort(message, ...r) {
+                report.error(message, ...r)
+                process.exit(1)
+              },
+              error(message, ...r) {
+                console.log(message.red, ...r)
+                report.errors.push(message)
+              },
+              warn(message, ...r) {
+                console.log(message.yellow, ...r)
+                report.warnings.push(message)
+              },
+              suggest(message, ...r) {
+                console.log(message.white, ...r)
+                report.suggestions.push(message)
+              },
+              report
+          })(...args)
+
+          return report
         }
       }
     }

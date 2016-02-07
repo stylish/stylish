@@ -25,6 +25,50 @@ class DataSource extends Asset {
     return this.indexed
   }
 
+  updateData(newData = {}, saveOptions = {}) {
+    this.data = Object.assign({}, data, newData)
+
+    if (this.extension === '.json') {
+      this.raw = saveOptions.minify
+        ? JSON.stringify(this.data, null, 2)
+        : JSON.stringify(this.data)
+    }
+
+    if (this.extension === '.yml') {
+      this.raw = require('yaml').dump(this.data)
+    }
+
+    return saveOptions.sync ? this.saveSync(saveOptions) : this.save(saveOptions)
+  }
+
+  saveSync (options = {}) {
+    if (this.raw || this.raw.length === 0) {
+      if (!options.allowEmpty) {
+        return false
+      }
+    }
+
+    return require('fs').writeFileSync(
+       this.paths.absolute,
+       this.raw,
+       'utf8'
+    )
+  }
+
+  save (options = {}) {
+    if (this.raw || this.raw.length === 0) {
+      if (!options.allowEmpty) {
+        return false
+      }
+    }
+
+    return require('fs-promise').writeFile(
+       this.paths.absolute,
+       this.raw,
+       'utf8'
+    )
+  }
+
   parser (content, asset) {
     content = content || this.raw || ''
 
