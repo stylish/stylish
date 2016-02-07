@@ -317,13 +317,14 @@ function defaultGenerateMethod (options = {}, context = {}){
     str = `---\n${yaml.dump(frontmatter)}---\n\n`
   }
 
-  if (options.content) {
-    return str = str + `${ options.content }\n`
+  if (attrs.title) {
+    str = str + `# ${ attrs.title }\n\n`
   }
 
-  if (attrs.title) {
-    str = str + `# ${ attrs.title }`
+  if (options.content) {
+    str = str + `${ options.content }\n`
   }
+
 
   return str
 }

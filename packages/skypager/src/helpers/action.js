@@ -17,3 +17,4 @@ Action.Definition = ActionDefinition
 Action.apiMethods = ActionDefinition.apiMethods
 
 module.exports = Action
+

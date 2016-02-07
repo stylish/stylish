@@ -3,9 +3,11 @@ import {filterQuery as query, hide, hidden, lazy, tabelize, values} from './util
 import {relative, basename, dirname, extname, resolve, join} from 'path'
 import minimatch from 'minimatch'
 import carve from 'object-path'
+import { invokeMap, mapValues, groupBy, invoke } from 'lodash'
 
 class Collection {
-  constructor (root, project, assetClass) {
+  constructor (options = {}) {
+    let { root, project, assetClass } = options
     let collection = this
 
     collection.root = root
@@ -22,6 +24,9 @@ class Collection {
 
     collection.hidden('assets', () => assets )
     collection.hidden('index', () => index )
+    collection.hidden('assetPattern', () => options.pattern || assetClass.GLOB)
+    collection.hidden('excludePattern', () => options.ignore || '**/node_modules')
+
     hide.property(collection, 'expandDotPaths', () => buildAtInterface(collection, true))
 
     // provides access to document
@@ -30,6 +35,21 @@ class Collection {
     }
 
     buildAtInterface(collection, false)
+  }
+
+  globFiles(pattern, options = {}) {
+    let glob = require('glob')
+
+    return new Promise((resolve, reject) => {
+      glob(pattern, {cwd: this.root, ...options }, (err, files) => {
+        if (err) {
+          reject(err)
+          return
+        } else {
+           resolve(files)
+        }
+      })
+    })
   }
 
   get paths() {
@@ -73,6 +93,22 @@ class Collection {
     return patterns.reduce((m, a) => {
       return m.concat(this.glob(a))
     }, [])
+  }
+
+  mapResult(...args) {
+    return this.map(asset => asset.result(...args))
+  }
+
+  mapValues(...args) {
+    return mapValues(this.assets, ...args)
+  }
+
+  invokeMap(...args) {
+    return invokeMap(this.all, ...args)
+  }
+
+  invoke(...args) {
+    return invoke(this.all, ...args)
   }
 
   get all () {

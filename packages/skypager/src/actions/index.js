@@ -1,5 +1,13 @@
 module.exports = function ActionsLoader (actions) {
   actions.load(
-    require('./projects/create_folders'), {uri: require.resolve('./projects/create_folders') }
+    require('./projects/scaffold'), {uri: require.resolve('./projects/scaffold') }
+  )
+
+  actions.load(
+    require('./specs/run_suite'), {uri: require.resolve('./specs/run_suite') }
+  )
+
+  actions.load(
+    require('./specs/generate'), {uri: require.resolve('./specs/generate') }
   )
 }

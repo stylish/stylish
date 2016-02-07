@@ -49,10 +49,11 @@ export function ProjectImporter (options = {}, context = {}) {
 
   Object.keys(collections).forEach(name => {
     let collection = collections[name]
-    let pattern = collection.AssetClass.GLOB
+    let pattern = collection.assetPattern
 
     let paths = glob.sync(pattern, {
-      cwd: collection.root
+      cwd: collection.root,
+      ignore: [collection.excludePattern]
     })
 
     collection._willLoadAssets(paths)
