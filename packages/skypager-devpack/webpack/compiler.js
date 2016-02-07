@@ -3,9 +3,14 @@ const path = require('path')
 const webpack = require('webpack')
 const md5 = require('md5')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const fs = require('fs')
 
 module.exports = function(argv) {
   if (!argv) { argv = require('yargs').argv }
+
+  if (argv.preset) {
+    // TODO lookup named argv combos
+  }
 
   var config = require('./index')(argv)
 
@@ -60,6 +65,11 @@ module.exports = function(argv) {
         console.log("\n----\n\n")
       }
 
+      if (argv.debug) {
+        console.log(
+          JSON.stringify(compilation, null, 2)
+        )
+      }
 
       process.exit(0)
     }

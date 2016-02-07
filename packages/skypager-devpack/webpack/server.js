@@ -33,6 +33,12 @@ module.exports = function(argv, serverOptions) {
       if (serverOptions.onCompile && isFunction(serverOptions.onCompile)) {
         serverOptions.onCompile(err, stats)
       }
+
+      if (argv.saveWebpackStats) {
+        // trigger a watcher event on purpose
+        fs.removeFileSync(argv.saveWebpackStats)
+        fs.writeFileSync(argv.saveWebpackStats, JSON.stringify(stats), 'utf8')
+      }
     })
   }
 
