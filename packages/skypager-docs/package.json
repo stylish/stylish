@@ -5,6 +5,9 @@
     "main": "skypager.js",
     "plugins": []
   },
+  "scripts": {
+    "test": "exit 0"
+  },
   "devDependencies": {
     "skypager": "^1.18.0",
     "skypager-devpack": "^1.18.0",

@@ -8,7 +8,7 @@
   "scripts": {
     "test": "npm run test:node && npm run test:electron",
     "test:node": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/node/**/*-spec.js",
-    "test:electron": "NODE_ENV=test electron-mocha --require 'babel-register' --require should --require ./test/index.js test/electron/**/*-spec.js",
+    "test:electron": "NODE_ENV=test electron-mocha --require 'babel-register' --timeout 10000 --require should --require ./test/index.js test/electron/**/*-spec.js",
     "test:watch": "NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/node/**/*-spec.js",
     "lint": "eslint src/**/*",
     "lint:fix": "npm run lint -- --fix",

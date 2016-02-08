@@ -6,6 +6,9 @@
   "skypager": {
     "main": "skypager.js"
   },
+  "scripts": {
+    "test": "exit 0"
+  },
   "keywords": [
     "react",
     "react-native",

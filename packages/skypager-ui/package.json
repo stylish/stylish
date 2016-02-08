@@ -6,6 +6,11 @@
   "skypager": {
     "main": "./skypager.js"
   },
+
+  "scripts": {
+    "test": "exit 0"
+  },
+
   "dependencies": {
     "bootstrap": "^3.3.6",
     "classnames": "^2.2.3",
