@@ -126,7 +126,6 @@ function launch (panelName, params = {}) {
 
       w.panelSettings[panelName].constrained = constrained
 
-      console.log('constrainig', constrained, params.window)
       w.dispatch(
         workspaceReady(w, {
           panelName,
@@ -187,6 +186,8 @@ function launch (panelName, params = {}) {
           }
         })
 
+				watcher.close()
+
         w.application.eachBrowserWindow((browserWindow) => {
            browserWindow.show()
            browserWindow.reload()
@@ -201,10 +202,15 @@ function launch (panelName, params = {}) {
     })
   }
 
+  options.window.preload = require.resolve('../client-bootstrap.js')
+
   let proc = electronify(options)
 
   proc.on('child-started', (child) => {
-    w.dispatch(processStarted(w, panelName, child))
+    w.dispatch(
+			processStarted(w, panelName, child)
+		)
+
   }).on('child-closed', (app, stderr, stdout) => {
     w.dispatch(processClosed(w, panelName))
   }).on('child-error', (err) => {

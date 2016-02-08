@@ -87,6 +87,10 @@ export class Application {
 	}
 
 	dispatch (action) {
+		BrowserWindow.getAllWindows().forEach(win => {
+			win.webContents.send('skypager:message', 'application:dispatch', action)
+		})
+
 		return this.store.dispatch(action)
 	}
 
@@ -118,6 +122,11 @@ export class Application {
 
 	onStateChange() {
 		this.snapshotState()
+		global.SkypagerElectronAppState = JSON.stringify(this.state)
+
+		BrowserWindow.getAllWindows().forEach(win => {
+			win.webContents.send('skypager:message', 'state:change')
+		})
 	}
 
 	snapshotState () {

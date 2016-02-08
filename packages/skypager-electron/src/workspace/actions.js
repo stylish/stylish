@@ -4,10 +4,10 @@ const { assign, keys } = Object
 
 export const WORKSPACE_READY = 'WORKSPACE_READY'
 export const WORKSPACE_DID_LOAD = 'WORKSPACE_DID_LOAD'
+export const WORKSPACE_DID_LAUNCH = 'WORKSPACE_DID_LAUNCH'
 export const WORKSPACE_PROCESS_ERROR = 'WORKSPACE_PROCESS_ERROR'
 export const WORKSPACE_PROCESS_STARTED = 'WORKSPACE_PROCESS_STARTED'
 export const WORKSPACE_PROCESS_CLOSED = 'WORKSPACE_PROCESS_CLOSED'
-export const WORKSPACE_DID_LAUNCH = 'WORKSPACE_DID_LAUNCH'
 
 export const initialState = {
   workspaces: {},
@@ -16,9 +16,12 @@ export const initialState = {
 }
 
 export const store = reducer({
-  [ WORKSPACE_READY ]: workspaceStatusReducer,
-  [ WORKSPACE_DID_LOAD ]: workspaceStatusReducer,
-  [ WORKSPACE_DID_LAUNCH ]: workspaceStatusReducer
+  [ WORKSPACE_READY ]: workspaceReducer,
+  [ WORKSPACE_DID_LOAD ]: workspaceReducer,
+  [ WORKSPACE_DID_LAUNCH ]: workspaceReducer,
+  [ WORKSPACE_PROCESS_STARTED ]: processReducer,
+  [ WORKSPACE_PROCESS_ERROR ]: processReducer,
+  [ WORKSPACE_PROCESS_CLOSED ]: processReducer
 }, initialState)
 
 export const actions = {
@@ -28,6 +31,32 @@ export const actions = {
   workspaceDidLaunch,
   workspaceReady,
   panelLoaded
+}
+
+export function workspaceReducer (state, {payload, meta}) {
+    let { panelName, browserWindowId } = payload
+    let { workspaceId, applicationId } = meta
+    let { workspaces, windows, processes } = state
+
+    let nextState = assign({}, state, {
+      workspaces: assign({}, workspaces, {
+        [workspaceId]: 'ready'
+      })
+    })
+
+    if( panelName && browserWindowId ) {
+      nextState.windows[workspaceId] = assign(nextState.windows[workspaceId] || {}, {
+        [panelName]: {
+          browserWindowId
+        }
+      })
+    }
+
+    return nextState
+}
+
+export function processReducer (state, {payload, meta}) {
+  return state
 }
 
 export function processClosed (workspace, panelName) {
@@ -41,7 +70,6 @@ export function processClosed (workspace, panelName) {
 }
 
 export function processError (workspace, panelName, err ) {
-  console.log('process error', err)
 	return {
 		type: WORKSPACE_PROCESS_ERROR,
 		payload: {
@@ -94,24 +122,5 @@ export function workspaceDidLaunch (workspace, payload) {
     }
   }
 }
-function workspaceStatusReducer (state, {payload, meta}) {
-    let { panelName, browserWindowId } = payload
-    let { workspaceId, applicationId } = meta
-    let { workspaces, windows, processes } = state
 
-    let nextState = assign({}, state, {
-      workspaces: assign({}, workspaces, {
-        [workspaceId]: 'ready'
-      })
-    })
 
-    if( panelName && browserWindowId ) {
-      nextState.windows[workspaceId] = assign(nextState.windows[workspaceId] || {}, {
-        [panelName]: {
-          browserWindowId
-        }
-      })
-    }
-
-    return nextState
-}

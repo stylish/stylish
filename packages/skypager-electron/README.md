@@ -29,7 +29,8 @@ window.History = require('history')
 running this will generate an html file 
 
 ```bash
-skypager build --entry ./src/externals.js --entry-name externals --no-content-hash --platform electron --html-filename template.html
+skypager build --entry ./src/externals.js --entry-name externals \
+--no-content-hash --platform electron --html-filename template.html
 ```
 
 now when you run the dev server you can do this.
