@@ -7,7 +7,10 @@
     "main": "skypager.js"
   },
   "scripts": {
-    "test": "exit 0"
+    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "build:clean": "rm -rf lib dist",
+    "build": "npm run build:clean && npm run test && npm run compile",
+    "compile": "NODE_ENV=production babel -q -d lib src"
   },
   "keywords": [
     "react",
@@ -29,8 +32,11 @@
     "redux-thunk": "^1.0.3"
   },
   "devDependencies": {
+    "babel-preset-skypager": "^1.17.1",
+    "mocha": "^2.4.5",
+    "should": "^8.2.1",
+    "sinon": "^1.17.3",
     "skypager": "^1.17.1",
-    "skypager-devpack": "^1.17.1",
-    "babel-preset-skypager": "^1.17.1"
+    "skypager-devpack": "^1.17.1"
   }
 }

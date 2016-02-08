@@ -8,7 +8,10 @@
     "main": "skypager.js"
   },
   "scripts": {
-    "test": "exit 0"
+    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "build:clean": "rm -rf lib dist",
+    "build": "npm run build:clean && npm run test && npm run compile",
+    "compile": "NODE_ENV=production babel -q -d lib src"
   },
   "author": "",
   "license": "ISC"
