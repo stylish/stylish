@@ -286,7 +286,7 @@ export function loadProjectFromDirectory (directory) {
 }
 
 export function isPromise (obj) {
-  return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
+  return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function'
 }
 
 export function isArray(arg) {
@@ -295,10 +295,10 @@ export function isArray(arg) {
 
 export function isRegex(val) {
   if ((typeof val === 'undefined' ? 'undefined' : typeof(val)) === 'object' && Object.getPrototypeOf(val).toString() === '/(?:)/') {
-    return true;
+    return true
   }
 
-  return false;
+  return false
 }
 
 export function filterQuery (nodeList = [], params) {

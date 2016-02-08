@@ -1,5 +1,5 @@
 module.exports = function run_snapshot_exporter (options = {}) {
-  let project = options.project || this;
+  let project = options.project || this
   let entities = project.entities
 
   let snapshot = {

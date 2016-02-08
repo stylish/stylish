@@ -43,7 +43,7 @@ export function handle(workspace, options = {}, context = {}) {
   let proc = require('child_process').spawn(
     electron,
     [ skypagerElectron ].concat(authorArgs)
-  );
+  )
 
   if (options.interactive) {
     proc.stdout.on('data', (data) => process.stdout.write(data))

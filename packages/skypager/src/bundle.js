@@ -231,10 +231,10 @@ function isArray(arg) {
 
 function isRegex(val) {
   if ((typeof val === 'undefined' ? 'undefined' : typeof(val)) === 'object' && Object.getPrototypeOf(val).toString() === '/(?:)/') {
-    return true;
+    return true
   }
 
-  return false;
+  return false
 }
 
 const ProjectReducers = {

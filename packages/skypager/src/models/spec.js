@@ -11,7 +11,7 @@
 */
 
 describe("Spec", function(model){
-  var spec = model, specs = model;
+  var spec = model, specs = model
 
   /*
   specs.have.attributes(function(){
