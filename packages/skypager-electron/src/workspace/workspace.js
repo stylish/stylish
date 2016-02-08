@@ -81,7 +81,9 @@ export class Workspace {
 
 	launchPanels () {
     this.panels.forEach(panel => {
-      launch.call(this, panel.id, assign(panel.opts, {window: (panel.window || DEFAULT_WINDOW)}))
+      if (process.env.NODE_ENV !== 'test') {
+        launch.call(this, panel.id, assign(panel.opts, {window: (panel.window || DEFAULT_WINDOW)}))
+      }
     })
 	}
 
