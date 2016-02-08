@@ -3,7 +3,7 @@ import {filterQuery as query, hide, hidden, lazy, tabelize, values} from './util
 import {relative, basename, dirname, extname, resolve, join} from 'path'
 import minimatch from 'minimatch'
 import carve from 'object-path'
-import { invokeMap, mapValues, groupBy, invoke } from 'lodash'
+import { invokeMap, mapValues, groupBy, invoke, pick } from 'lodash'
 
 class Collection {
   constructor (options = {}) {
@@ -35,6 +35,14 @@ class Collection {
     }
 
     buildAtInterface(collection, false)
+  }
+
+  get assetType () {
+    return this.AssetClass.typeAlias
+  }
+
+  get assetGroupName () {
+    return this.AssetClass.groupName
   }
 
   globFiles(pattern, options = {}) {
@@ -95,12 +103,20 @@ class Collection {
     }, [])
   }
 
+  mapPick(...args) {
+    return this.map(asset => asset.pick(...args))
+  }
+
   mapResult(...args) {
     return this.map(asset => asset.result(...args))
   }
 
   mapValues(...args) {
     return mapValues(this.assets, ...args)
+  }
+
+  groupBy(...args) {
+    return groupBy(this.all, ...args)
   }
 
   invokeMap(...args) {
@@ -201,7 +217,7 @@ function buildAtInterface (collection, expand = true) {
 module.exports = Collection
 
 function wrapCollection(collection, array) {
-  Object.defineProperty(array, 'condense', {
+  defineProperty(array, 'condense', {
     enumerable: false,
     value: function condense(options = {}) {
       let {prop,key} = options
@@ -219,10 +235,17 @@ function wrapCollection(collection, array) {
     }
   })
 
-  Object.defineProperty(array, 'merge', {
+  defineProperty(array, 'merge', {
     enumerable: false,
     value: function merge(options = {}) {
       return array.condense({key: false, prop: options.prop || 'data'})
+    }
+  })
+
+  defineProperty(array, 'mapPick', {
+    enumerable: false,
+    value: function(...args) {
+      return array.map(asset => asset.pick(...args))
     }
   })
 

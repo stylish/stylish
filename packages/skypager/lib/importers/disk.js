@@ -76,10 +76,11 @@ function ProjectImporter() {
 
   (0, _keys2.default)(collections).forEach(function (name) {
     var collection = collections[name];
-    var pattern = collection.AssetClass.GLOB;
+    var pattern = collection.assetPattern;
 
     var paths = glob.sync(pattern, {
-      cwd: collection.root
+      cwd: collection.root,
+      ignore: [collection.excludePattern]
     });
 
     collection._willLoadAssets(paths);

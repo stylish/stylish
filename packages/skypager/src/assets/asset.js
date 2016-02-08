@@ -21,12 +21,11 @@ class Asset {
     let asset = this
     let raw
 
-    util.assign(this, {
-      get raw () { return raw },
-
-      set raw (val) {
-        raw = val
-        asset.contentDidChange(asset)
+    defineProperties(this, {
+      raw: {
+        enumerable: false,
+        get: function() { return raw },
+        set: function(val) { var oldVal = raw; raw = val; asset.contentDidChange(raw, oldVal) }
       }
     })
 
@@ -47,6 +46,10 @@ class Asset {
     this.lazy('parsed', () => this.parse(this.raw))
     this.lazy('indexed', () => this.index(this.parsed, this))
     this.lazy('transformed', () => this.transform(this.indexed, this))
+  }
+
+  pick(...args) {
+    return util.pick(this, ...args)
   }
 
   result(...args) {
@@ -187,7 +190,7 @@ class Asset {
   }
 
   saveSync (options = {}) {
-    if (this.raw || this.raw.length === 0) {
+    if (!this.raw || this.raw.length === 0) {
       if (!options.allowEmpty) {
         return false
       }
@@ -201,7 +204,7 @@ class Asset {
   }
 
   save (options = {}) {
-    if (this.raw || this.raw.length === 0) {
+    if (!this.raw || this.raw.length === 0) {
       if (!options.allowEmpty) {
         return false
       }
@@ -231,7 +234,7 @@ class Asset {
   }
 
   static get typeAlias () {
-    return util.tabelize(this.name)
+    return util.singularize(util.tabelize(this.name))
   }
 }
 

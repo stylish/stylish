@@ -54,7 +54,13 @@ var Registry = (function () {
   (0, _createClass3.default)(Registry, null, [{
     key: 'build',
     value: function build(host, helper, options) {
-      return new Registry(host, helper, options);
+      var registry = new Registry(host, helper, options);
+
+      if (helper && helper.decorateRegistry) {
+        helper.decorateRegistry(registry);
+      }
+
+      return registry;
     }
   }]);
 
@@ -419,23 +425,23 @@ var Registry = (function () {
   }, {
     key: 'filter',
     value: function filter() {
-      var _all;
+      var _allHelpers;
 
-      return (_all = this.all).filter.apply(_all, arguments);
+      return (_allHelpers = this.allHelpers(true)).filter.apply(_allHelpers, arguments);
     }
   }, {
     key: 'map',
     value: function map() {
-      var _all2;
+      var _allHelpers2;
 
-      return (_all2 = this.all).map.apply(_all2, arguments);
+      return (_allHelpers2 = this.allHelpers(true)).map.apply(_allHelpers2, arguments);
     }
   }, {
     key: 'forEach',
     value: function forEach() {
-      var _all3;
+      var _allHelpers3;
 
-      return (_all3 = this.all).forEach.apply(_all3, arguments);
+      return (_allHelpers3 = this.allHelpers(true)).forEach.apply(_allHelpers3, arguments);
     }
   }, {
     key: 'allHelpers',
@@ -503,8 +509,11 @@ var Builder = (function () {
       c.should.be.an.Object;
       helpers.should.not.be.empty();
 
-      (0, _keys2.default)(helpers).forEach(function (type) {
+      (0, _keys2.default)(helpers).filter(function (type) {
+        return type !== 'default';
+      }).forEach(function (type) {
         var name = util.tabelize(type);
+
         c[name] = c[name] || Registry.build(host, helpers[type], { name: name, root: host.root });
       });
 

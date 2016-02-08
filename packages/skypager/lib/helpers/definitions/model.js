@@ -449,12 +449,12 @@ function defaultGenerateMethod() {
     str = '---\n' + _jsYaml2.default.dump(frontmatter) + '---\n\n';
   }
 
-  if (options.content) {
-    return str = str + (options.content + '\n');
+  if (attrs.title) {
+    str = str + ('# ' + attrs.title + '\n\n');
   }
 
-  if (attrs.title) {
-    str = str + ('# ' + attrs.title);
+  if (options.content) {
+    str = str + (options.content + '\n');
   }
 
   return str;

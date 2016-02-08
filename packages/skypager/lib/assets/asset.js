@@ -4,6 +4,10 @@ var _defineEnumerableProperties2 = require('babel-runtime/helpers/defineEnumerab
 
 var _defineEnumerableProperties3 = _interopRequireDefault(_defineEnumerableProperties2);
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -37,7 +41,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var EXTENSIONS = ['js', 'css', 'html'];
 var GLOB = '**/*.{' + EXTENSIONS.join(',') + '}';
 
+var _Object = Object;
+var defineProperties = _Object.defineProperties;
+
 var Asset = (function () {
+  (0, _createClass3.default)(Asset, null, [{
+    key: 'decorateCollection',
+    value: function decorateCollection(collection) {
+      if (this.collectionInterface) {
+        defineProperties(collection, this.collectionInterface(collection));
+      }
+    }
+  }]);
+
   function Asset(uri) {
     var _this = this;
 
@@ -47,14 +63,15 @@ var Asset = (function () {
     var asset = this;
     var raw = undefined;
 
-    util.assign(this, {
-      get raw() {
-        return raw;
-      },
-
-      set raw(val) {
-        raw = val;
-        asset.contentDidChange(asset);
+    defineProperties(this, {
+      raw: {
+        enumerable: false,
+        get: function get() {
+          return raw;
+        },
+        set: function set(val) {
+          var oldVal = raw;raw = val;asset.contentDidChange(raw, oldVal);
+        }
       }
     });
 
@@ -88,6 +105,24 @@ var Asset = (function () {
   }
 
   (0, _createClass3.default)(Asset, [{
+    key: 'pick',
+    value: function pick() {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return util.pick.apply(util, [this].concat(args));
+    }
+  }, {
+    key: 'result',
+    value: function result() {
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      return util.result.apply(util, [this].concat(args));
+    }
+  }, {
     key: 'runImporter',
     value: function runImporter() {
       var importer = arguments.length <= 0 || arguments[0] === undefined ? 'disk' : arguments[0];
@@ -131,8 +166,8 @@ var Asset = (function () {
     value: function hidden() {
       var _util$hidden;
 
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
+      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
       }
 
       return (_util$hidden = util.hidden).getter.apply(_util$hidden, [this].concat(args));
@@ -140,8 +175,8 @@ var Asset = (function () {
   }, {
     key: 'lazy',
     value: function lazy() {
-      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
+      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
       }
 
       return util.lazy.apply(util, [this].concat(args));
@@ -176,6 +211,32 @@ var Asset = (function () {
     value: function loadWithWebpack() {
       var string = [this.loaderString, this.uri].join('!');
       return require(string);
+    }
+  }, {
+    key: 'saveSync',
+    value: function saveSync() {
+      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      if (!this.raw || this.raw.length === 0) {
+        if (!options.allowEmpty) {
+          return false;
+        }
+      }
+
+      return require('fs').writeFileSync(this.paths.absolute, this.raw, 'utf8');
+    }
+  }, {
+    key: 'save',
+    value: function save() {
+      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      if (!this.raw || this.raw.length === 0) {
+        if (!options.allowEmpty) {
+          return false;
+        }
+      }
+
+      return require('fs-promise').writeFile(this.paths.absolute, this.raw, 'utf8');
     }
   }, {
     key: 'fingerprint',
@@ -263,13 +324,16 @@ var Asset = (function () {
   }], [{
     key: 'createCollection',
     value: function createCollection(project) {
-      var autoLoad = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
       var assetClass = this;
       var root = project.paths[util.tabelize(assetClass.name)];
-      var collection = new _collection2.default(root, project, assetClass);
 
-      return collection;
+      return new _collection2.default((0, _extends3.default)({
+        root: root,
+        project: project,
+        assetClass: assetClass
+      }, options));
     }
   }, {
     key: 'groupName',
@@ -279,7 +343,7 @@ var Asset = (function () {
   }, {
     key: 'typeAlias',
     get: function get() {
-      return util.tabelize(this.name);
+      return util.singularize(util.tabelize(this.name));
     }
   }]);
   return Asset;

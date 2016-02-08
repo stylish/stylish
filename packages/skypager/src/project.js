@@ -329,6 +329,14 @@ class Project {
     return this.content.images
   }
 
+  get packages () {
+    return this.content.packages
+  }
+
+  get projects () {
+    return this.content.projects
+  }
+
   get scripts () {
     return this.content.scripts
   }

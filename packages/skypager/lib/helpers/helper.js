@@ -55,13 +55,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var Helper = (function () {
   (0, _createClass3.default)(Helper, null, [{
-    key: 'fromDefinition',
+    key: 'decorateRegistry',
+    value: function decorateRegistry(registry) {
+      if (this.registryInterface) {
+        defineProperties(registry, this.registryInterface(registry));
+      }
+    }
 
     /*
     * Creates a Helper from a Definition object that was
     * created by a required' script file from one of the dedicated
     * locations for the type of helper.
     */
+
+  }, {
+    key: 'fromDefinition',
     value: function fromDefinition(uri, definition, options) {
       if (definition && options.required) {
         Object.defineProperty(definition, 'helperExport', {
@@ -157,13 +165,22 @@ var Helper = (function () {
     });
   }
 
-  /**
-  * Every helper should expose an api with a function which is responsible
-  * for handling calls to the run function that get dispatched to the helper.
-  *
-  */
-
   (0, _createClass3.default)(Helper, [{
+    key: 'result',
+    value: function result() {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return util.result.apply(util, [this].concat(args));
+    }
+    /**
+    * Every helper should expose an api with a function which is responsible
+    * for handling calls to the run function that get dispatched to the helper.
+    *
+    */
+
+  }, {
     key: 'run',
     value: function run() {
       var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -186,8 +203,8 @@ var Helper = (function () {
     value: function hidden() {
       var _util$hidden;
 
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
       }
 
       return (_util$hidden = util.hidden).getter.apply(_util$hidden, [this].concat(args));
@@ -195,8 +212,8 @@ var Helper = (function () {
   }, {
     key: 'lazy',
     value: function lazy() {
-      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
+      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
       }
 
       return util.lazy.apply(util, [this].concat(args));
@@ -293,3 +310,6 @@ var Helper = (function () {
 exports.default = Helper;
 
 Helper.apiMethods = [];
+
+var _Object = Object;
+var defineProperties = _Object.defineProperties;

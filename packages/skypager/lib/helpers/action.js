@@ -30,6 +30,8 @@ var _registry2 = _interopRequireDefault(_registry);
 
 var _action = require('./definitions/action');
 
+var _util = require('../util');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Action = (function (_Helper) {
@@ -49,6 +51,19 @@ var Action = (function (_Helper) {
     key: 'definitionClass',
     get: function get() {
       return _action.ActionDefinition;
+    }
+  }], [{
+    key: 'registryInterface',
+    value: function registryInterface(registry) {
+      return {
+        actionsForCLI: {
+          get: function get() {
+            return registry.query(function (action) {
+              return _util.dotpath.get(action, 'definition.interfaces.cli');
+            });
+          }
+        }
+      };
     }
   }]);
   return Action;

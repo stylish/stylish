@@ -17,6 +17,18 @@ class DataSource extends Asset {
     this.transformer = options.transformer || ((val) => val)
   }
 
+  defaults(...args) {
+    return util.defaults(this.data, ...args)
+  }
+
+  pick(...args) {
+    return util.pick(this.data, ...args)
+  }
+
+  result(...args) {
+    return util.result(this.data, ...args)
+  }
+
   getData () {
     if (this.extension !== '.js' && (!this.raw || this.raw.length === 0)) {
       this.runImporter('disk', {asset: this, sync: true})
@@ -25,27 +37,19 @@ class DataSource extends Asset {
     return this.indexed
   }
 
-  updateData(newData = {}, saveOptions = {}) {
-    this.data = Object.assign({}, data, newData)
-
-    if (this.extension === '.json') {
-      this.raw = saveOptions.minify
-        ? JSON.stringify(this.data, null, 2)
-        : JSON.stringify(this.data)
-    }
-
-    if (this.extension === '.yml') {
-      this.raw = require('yaml').dump(this.data)
-    }
-
-    return saveOptions.sync ? this.saveSync(saveOptions) : this.save(saveOptions)
-  }
-
   saveSync (options = {}) {
     if (this.raw || this.raw.length === 0) {
       if (!options.allowEmpty) {
         return false
       }
+    }
+
+    if (this.extension === '.json') {
+      this.raw = !options.minify
+        ? JSON.stringify(this.data, null, 2)
+        : JSON.stringify(this.data)
+    } else if (this.extension === '.yml') {
+      this.raw = require('yaml').dump(this.data)
     }
 
     return require('fs').writeFileSync(
@@ -60,6 +64,14 @@ class DataSource extends Asset {
       if (!options.allowEmpty) {
         return false
       }
+    }
+
+    if (this.extension === '.json') {
+      this.raw = !options.minify
+        ? JSON.stringify(this.data, null, 2)
+        : JSON.stringify(this.data)
+    } else if (this.extension === '.yml') {
+      this.raw = require('yaml').dump(this.data)
     }
 
     return require('fs-promise').writeFile(

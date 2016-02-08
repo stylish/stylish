@@ -1,5 +1,9 @@
 'use strict';
 
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -65,6 +69,33 @@ var DataSource = (function (_Asset) {
   }
 
   (0, _createClass3.default)(DataSource, [{
+    key: 'defaults',
+    value: function defaults() {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return util.defaults.apply(util, [this.data].concat(args));
+    }
+  }, {
+    key: 'pick',
+    value: function pick() {
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      return util.pick.apply(util, [this.data].concat(args));
+    }
+  }, {
+    key: 'result',
+    value: function result() {
+      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
+      }
+
+      return util.result.apply(util, [this.data].concat(args));
+    }
+  }, {
     key: 'getData',
     value: function getData() {
       if (this.extension !== '.js' && (!this.raw || this.raw.length === 0)) {
@@ -72,6 +103,44 @@ var DataSource = (function (_Asset) {
       }
 
       return this.indexed;
+    }
+  }, {
+    key: 'saveSync',
+    value: function saveSync() {
+      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      if (this.raw || this.raw.length === 0) {
+        if (!options.allowEmpty) {
+          return false;
+        }
+      }
+
+      if (this.extension === '.json') {
+        this.raw = !options.minify ? (0, _stringify2.default)(this.data, null, 2) : (0, _stringify2.default)(this.data);
+      } else if (this.extension === '.yml') {
+        this.raw = require('yaml').dump(this.data);
+      }
+
+      return require('fs').writeFileSync(this.paths.absolute, this.raw, 'utf8');
+    }
+  }, {
+    key: 'save',
+    value: function save() {
+      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      if (this.raw || this.raw.length === 0) {
+        if (!options.allowEmpty) {
+          return false;
+        }
+      }
+
+      if (this.extension === '.json') {
+        this.raw = !options.minify ? (0, _stringify2.default)(this.data, null, 2) : (0, _stringify2.default)(this.data);
+      } else if (this.extension === '.yml') {
+        this.raw = require('yaml').dump(this.data);
+      }
+
+      return require('fs-promise').writeFile(this.paths.absolute, this.raw, 'utf8');
     }
   }, {
     key: 'parser',

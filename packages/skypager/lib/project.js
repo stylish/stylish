@@ -480,6 +480,16 @@ var Project = (function () {
       return this.content.images;
     }
   }, {
+    key: 'packages',
+    get: function get() {
+      return this.content.packages;
+    }
+  }, {
+    key: 'projects',
+    get: function get() {
+      return this.content.projects;
+    }
+  }, {
     key: 'scripts',
     get: function get() {
       return this.content.scripts;
@@ -546,6 +556,11 @@ var Project = (function () {
         return util.tabelize(util.underscore(model.name));
       });
     }
+  }, {
+    key: 'mergedSettingsData',
+    get: function get() {
+      return this.data_sources.query({ id: /^settings\// }).merge();
+    }
   }]);
   return Project;
 })();
@@ -564,7 +579,9 @@ function paths() {
     exporters: (0, _path.join)(this.root, 'exporters'),
     importers: (0, _path.join)(this.root, 'importers'),
     models: (0, _path.join)(this.root, 'models'),
+    packages: (0, _path.join)(this.root, 'packages'),
     plugins: (0, _path.join)(this.root, 'plugins'),
+    projects: (0, _path.join)(this.root, 'projects'),
     renderers: (0, _path.join)(this.root, 'renderers'),
     vectors: (0, _path.join)(this.root, 'assets'),
     images: (0, _path.join)(this.root, 'assets'),
@@ -630,7 +647,9 @@ function buildContentCollectionsManually() {
     images: Image.createCollection(this, false),
     scripts: Script.createCollection(this, false),
     stylesheets: Stylesheet.createCollection(this, false),
-    vectors: Vector.createCollection(this, false)
+    vectors: Vector.createCollection(this, false),
+    packages: new _collection2.default({ root: this.paths.packages, project: this, assetClass: DataSource, pattern: '*/package.json', exclude: '**/node_modules' }),
+    projects: new _collection2.default({ root: this.paths.projects, project: this, assetClass: DataSource, pattern: '*/package.json', exclude: '**/node_modules' })
   };
 }
 

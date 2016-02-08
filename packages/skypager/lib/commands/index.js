@@ -116,7 +116,8 @@ function configure(program) {
   var context = {
     program: program,
     project: project,
-    config: config
+    config: config,
+    isCLI: true
   };
 
   var dispatch = function dispatch(handlerFn) {
@@ -142,15 +143,14 @@ function configure(program) {
   (0, _listen2.default)(program, dispatch);
   (0, _publish2.default)(program, dispatch);
 
-  program.command('*').action(function () {
-    var _console;
-
-    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
-    }
-
-    (_console = console).log.apply(_console, ['catch all action'].concat(args, [project]));
-  });
+  // the project can dynamically add its own cli commands from certain actions
+  if (project) {
+    project.actions.filter(function (action) {
+      return _util.dotpath.get(action, 'definition.interfaces.cli');
+    }).forEach(function (action) {
+      return _util.dotpath.get(action, 'definition.interfaces.cli').call(action, program, dispatch);
+    });
+  }
 
   return function () {
     return program.parse(_yargs.argv);

@@ -1,5 +1,9 @@
 'use strict';
 
+var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -17,7 +21,17 @@ exports.lookup = lookup;
 
 var _util = require('../../util');
 
+var _trim = require('lodash/string/trim');
+
+var _trim2 = _interopRequireDefault(_trim);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var route = require('path-match')({
+  sensitive: false,
+  strict: false,
+  end: false
+});
 
 var tracker = {};
 var _curr = undefined;
@@ -45,6 +59,7 @@ var ActionDefinition = exports.ActionDefinition = (function () {
     this.executor = function () {
       throw 'Define your own executor function';
     };
+    this.config.pathMatchers = [];
   }
 
   (0, _createClass3.default)(ActionDefinition, [{
@@ -56,6 +71,33 @@ var ActionDefinition = exports.ActionDefinition = (function () {
     key: 'expose',
     value: function expose(platform, configurator) {
       this.interfaces[platform] = configurator;
+    }
+  }, {
+    key: 'addCommandPhrase',
+    value: function addCommandPhrase(phrase) {
+      this.config.pathMatchers.push(route((0, _trim2.default)(phrase).replace(/\s/g, '/')));
+    }
+  }, {
+    key: 'addRouteMatcher',
+    value: function addRouteMatcher(rule) {
+      this.config.pathMatchers.push(route(rule));
+    }
+  }, {
+    key: 'testRoute',
+    value: function testRoute(path) {
+      var matching = this.config.pathMatchers.find(function (rule) {
+        return rule(path);
+      });
+      return matching && matching(path);
+    }
+  }, {
+    key: 'testCommand',
+    value: function testCommand(phrase) {
+      var sample = (0, _trim2.default)(phrase).replace(/\s/g, '/');
+      var matching = this.config.pathMatchers.find(function (rule) {
+        return rule(sample);
+      });
+      return matching && matching(sample);
     }
   }, {
     key: 'aka',
@@ -75,6 +117,9 @@ var ActionDefinition = exports.ActionDefinition = (function () {
     value: function aliases() {
       this.aka.apply(this, arguments);
     }
+  }, {
+    key: 'pathMatchers',
+    value: function pathMatchers() {}
   }, {
     key: 'params',
     value: function params() {
@@ -101,12 +146,77 @@ var ActionDefinition = exports.ActionDefinition = (function () {
       return {
         name: this.name,
         aliases: this.aliases,
+        testCommand: this.testCommand.bind(this),
+        testRoute: this.testRoute.bind(this),
         execute: this.executor,
         validate: this.validator,
         parameters: this.parameters,
-        runner: function runner(params, action) {
-          if (def.api.validate(params, action)) {
-            return def.api.execute(params, action);
+        runner: function runner() {
+          var _def$api;
+
+          for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+          }
+
+          var report = {
+            errors: [],
+            suggestions: [],
+            warnings: []
+          };
+
+          if ((_def$api = def.api).validate.apply(_def$api, args)) {
+            (0, _util.noConflict)(function () {
+              try {
+                var _def$api2;
+
+                (_def$api2 = def.api).execute.apply(_def$api2, args);
+              } catch (err) {
+                report.errors.push('fatal error:' + err.message);
+              }
+            }, {
+              abort: function abort(message) {
+                for (var _len3 = arguments.length, r = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+                  r[_key3 - 1] = arguments[_key3];
+                }
+
+                report.error.apply(report, [message].concat((0, _toConsumableArray3.default)(r)));
+                process.exit(1);
+              },
+              error: function error(message) {
+                var _console;
+
+                for (var _len4 = arguments.length, r = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+                  r[_key4 - 1] = arguments[_key4];
+                }
+
+                (_console = console).log.apply(_console, [message.red].concat((0, _toConsumableArray3.default)(r)));
+                report.errors.push(message);
+              },
+              warn: function warn(message) {
+                var _console2;
+
+                for (var _len5 = arguments.length, r = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
+                  r[_key5 - 1] = arguments[_key5];
+                }
+
+                (_console2 = console).log.apply(_console2, [message.yellow].concat((0, _toConsumableArray3.default)(r)));
+                report.warnings.push(message);
+              },
+              suggest: function suggest(message) {
+                var _console3;
+
+                for (var _len6 = arguments.length, r = Array(_len6 > 1 ? _len6 - 1 : 0), _key6 = 1; _key6 < _len6; _key6++) {
+                  r[_key6 - 1] = arguments[_key6];
+                }
+
+                (_console3 = console).log.apply(_console3, [message.white].concat((0, _toConsumableArray3.default)(r)));
+                report.suggestions.push(message);
+              },
+
+              report: report
+            }).apply(undefined, args);
+
+            return report;
           }
         }
       };
@@ -170,36 +280,46 @@ function lookup(actionName) {
 
     (_tracker$_curr8 = tracker[_curr]).params.apply(_tracker$_curr8, arguments);
   },
-  expose: function expose() {
+  commandPhrase: function commandPhrase() {
     var _tracker$_curr9;
 
-    (_tracker$_curr9 = tracker[_curr]).expose.apply(_tracker$_curr9, arguments);
+    (_tracker$_curr9 = tracker[_curr]).addCommandPhrase.apply(_tracker$_curr9, arguments);
   },
-  cli: function cli() {
+  route: function route() {
     var _tracker$_curr10;
 
-    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
-    }
-
-    (_tracker$_curr10 = tracker[_curr]).expose.apply(_tracker$_curr10, ['cli'].concat(args));
+    (_tracker$_curr10 = tracker[_curr]).addRouteMatcher.apply(_tracker$_curr10, arguments);
   },
-  ipc: function ipc() {
+  expose: function expose() {
     var _tracker$_curr11;
 
-    for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-      args[_key3] = arguments[_key3];
-    }
-
-    (_tracker$_curr11 = tracker[_curr]).expose.apply(_tracker$_curr11, ['ipc'].concat(args));
+    (_tracker$_curr11 = tracker[_curr]).expose.apply(_tracker$_curr11, arguments);
   },
-  web: function web() {
+  cli: function cli() {
     var _tracker$_curr12;
 
-    for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-      args[_key4] = arguments[_key4];
+    for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+      args[_key7] = arguments[_key7];
     }
 
-    (_tracker$_curr12 = tracker[_curr]).expose.apply(_tracker$_curr12, ['web'].concat(args));
+    (_tracker$_curr12 = tracker[_curr]).expose.apply(_tracker$_curr12, ['cli'].concat(args));
+  },
+  ipc: function ipc() {
+    var _tracker$_curr13;
+
+    for (var _len8 = arguments.length, args = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
+      args[_key8] = arguments[_key8];
+    }
+
+    (_tracker$_curr13 = tracker[_curr]).expose.apply(_tracker$_curr13, ['ipc'].concat(args));
+  },
+  web: function web() {
+    var _tracker$_curr14;
+
+    for (var _len9 = arguments.length, args = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
+      args[_key9] = arguments[_key9];
+    }
+
+    (_tracker$_curr14 = tracker[_curr]).expose.apply(_tracker$_curr14, ['web'].concat(args));
   }
 });

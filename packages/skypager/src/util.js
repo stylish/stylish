@@ -1,13 +1,12 @@
+import { join } from 'path'
+
 import visit from 'unist-util-visit'
 import assign from 'object-assign'
 import dotpath from 'object-path'
 import utile from 'utile'
 import _debug from 'debug'
-import any from 'lodash/collection/some'
-import defaults from 'lodash/object/defaultsDeep'
-import result from 'lodash/object/result'
 
-import { join } from 'path'
+import { kebabCase, any, defaults, result, pick } from 'lodash'
 
 const inflections = utile.inflect
 const debug = _debug('skypager')
@@ -16,6 +15,7 @@ const DOMAIN_REGEX = /^[a-zA-Z0-9_-]+\.[.a-zA-Z0-9_-]+$/
 module.exports.visit = visit
 module.exports.assign = assign
 module.exports.defaults = defaults
+module.exports.pick = pick
 module.exports.any = any
 module.exports.result = result
 module.exports.dotpath = dotpath
@@ -94,12 +94,7 @@ export function parameterize (s) {
 }
 
 export function slugify (s) {
-  s = s.replace(/\\|\//g, '-', '')
-  s = s.replace(/[^-\w\s]/g, '')  // remove unneeded chars
-  s = s.replace(/^\s+|\s+$/g, '') // trim leading/trailing spaces
-  s = s.replace(/[-\s]+/g, '-')   // convert spaces to hyphens
-  s = s.toLowerCase()             // convert to lowercase
-  return s
+  return parameterize(s)
 }
 
 export function singularize (word) {

@@ -1,5 +1,9 @@
 'use strict';
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
@@ -38,12 +42,48 @@ describe("Spec", function (model) {
   });
 });
 
-function create(_ref) {
+function decorate(_ref, _ref2) {
   var document = _ref.document;
+  var project = _ref2.project;
+
+  var doc = document;
+
+  (0, _assign2.default)(doc, {
+    get specs() {
+      return doc.content.toJSON().specifications;
+    },
+    toMochaSuite: function toMochaSuite() {
+      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      var currentSpec = doc;
+
+      require('mocha').setup((0, _extends3.default)({
+        ui: 'bdd'
+      }, options));
+
+      return function () {
+        describe(doc.title, function () {
+          doc.specs.examples.forEach(function (example) {
+            it(example.title, function () {
+              example.runTests();
+            });
+          });
+        });
+      };
+    }
+  });
+}
+
+function create(_ref3) {
+  var document = _ref3.document;
   var context = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
+  var specifications = document.content.toJSON();
+
   return (0, _assign2.default)({}, document.data, {
-    specifications: document.specifications
+    title: title,
+    mainCopy: mainCopy,
+    specifications: specifications
   });
 }
 

@@ -63,6 +63,8 @@ exports.filterQuery = filterQuery;
 exports.abort = abort;
 exports.skypagerBabel = skypagerBabel;
 
+var _path = require('path');
+
 var _unistUtilVisit = require('unist-util-visit');
 
 var _unistUtilVisit2 = _interopRequireDefault(_unistUtilVisit);
@@ -83,15 +85,7 @@ var _debug2 = require('debug');
 
 var _debug3 = _interopRequireDefault(_debug2);
 
-var _some = require('lodash/collection/some');
-
-var _some2 = _interopRequireDefault(_some);
-
-var _defaultsDeep = require('lodash/object/defaultsDeep');
-
-var _defaultsDeep2 = _interopRequireDefault(_defaultsDeep);
-
-var _path = require('path');
+var _lodash = require('lodash');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -101,8 +95,11 @@ var DOMAIN_REGEX = /^[a-zA-Z0-9_-]+\.[.a-zA-Z0-9_-]+$/;
 
 module.exports.visit = _unistUtilVisit2.default;
 module.exports.assign = _objectAssign2.default;
-module.exports.defaults = _defaultsDeep2.default;
-module.exports.any = _some2.default;
+module.exports.defaults = _lodash.defaults;
+module.exports.pick = _lodash.pick;
+module.exports.any = _lodash.any;
+module.exports.result = _lodash.result;
+module.exports.dotpath = _objectPath2.default;
 
 var hidden = {
   getter: function getter(target, name, fn) {
@@ -181,12 +178,7 @@ function parameterize(s) {
 }
 
 function slugify(s) {
-  s = s.replace(/\\|\//g, '-', '');
-  s = s.replace(/[^-\w\s]/g, ''); // remove unneeded chars
-  s = s.replace(/^\s+|\s+$/g, ''); // trim leading/trailing spaces
-  s = s.replace(/[-\s]+/g, '-'); // convert spaces to hyphens
-  s = s.toLowerCase(); // convert to lowercase
-  return s;
+  return parameterize(s);
 }
 
 function singularize(word) {

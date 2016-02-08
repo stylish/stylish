@@ -65,7 +65,7 @@ var Framework = (function () {
     this.root = __dirname;
 
     util.hide.getter(this, 'manifest', function () {
-      return assign(require(_this.root + '/../package.json'), { root: root });
+      return (0, _assign2.default)(require(_this.root + '/../package.json'), { root: root });
     });
 
     var plugins = [];

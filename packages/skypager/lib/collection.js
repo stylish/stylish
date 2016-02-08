@@ -4,6 +4,14 @@ var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _promise = require('babel-runtime/core-js/promise');
+
+var _promise2 = _interopRequireDefault(_promise);
+
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -28,11 +36,17 @@ var _objectPath = require('object-path');
 
 var _objectPath2 = _interopRequireDefault(_objectPath);
 
+var _lodash = require('lodash');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Collection = (function () {
-  function Collection(root, project, assetClass) {
+  function Collection() {
+    var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
     (0, _classCallCheck3.default)(this, Collection);
+    var root = options.root;
+    var project = options.project;
+    var assetClass = options.assetClass;
 
     var collection = this;
 
@@ -56,6 +70,13 @@ var Collection = (function () {
     collection.hidden('index', function () {
       return index;
     });
+    collection.hidden('assetPattern', function () {
+      return options.pattern || assetClass.GLOB;
+    });
+    collection.hidden('excludePattern', function () {
+      return options.ignore || '**/node_modules';
+    });
+
     _util.hide.property(collection, 'expandDotPaths', function () {
       return buildAtInterface(collection, true);
     });
@@ -71,6 +92,26 @@ var Collection = (function () {
   }
 
   (0, _createClass3.default)(Collection, [{
+    key: 'globFiles',
+    value: function globFiles(pattern) {
+      var _this = this;
+
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+      var glob = require('glob');
+
+      return new _promise2.default(function (resolve, reject) {
+        glob(pattern, (0, _extends3.default)({ cwd: _this.root }, options), function (err, files) {
+          if (err) {
+            reject(err);
+            return;
+          } else {
+            resolve(files);
+          }
+        });
+      });
+    }
+  }, {
     key: 'glob',
     value: function glob(pattern) {
       var regex = _minimatch2.default.makeRe(pattern);
@@ -81,13 +122,71 @@ var Collection = (function () {
   }, {
     key: 'relatedGlob',
     value: function relatedGlob(target) {
-      var _this = this;
+      var _this2 = this;
 
       var patterns = [target.id + '.{' + this.AssetClass.EXTENSIONS.join(',') + '}', target.id + '/**/*.{' + this.AssetClass.EXTENSIONS.join(',') + '}'];
 
       return patterns.reduce(function (m, a) {
-        return m.concat(_this.glob(a));
+        return m.concat(_this2.glob(a));
       }, []);
+    }
+  }, {
+    key: 'mapPick',
+    value: function mapPick() {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return this.map(function (asset) {
+        return asset.pick.apply(asset, args);
+      });
+    }
+  }, {
+    key: 'mapResult',
+    value: function mapResult() {
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      return this.map(function (asset) {
+        return asset.result.apply(asset, args);
+      });
+    }
+  }, {
+    key: 'mapValues',
+    value: function mapValues() {
+      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
+      }
+
+      return _lodash.mapValues.apply(undefined, [this.assets].concat(args));
+    }
+  }, {
+    key: 'groupBy',
+    value: function groupBy() {
+      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
+      }
+
+      return _lodash.groupBy.apply(undefined, [this.all].concat(args));
+    }
+  }, {
+    key: 'invokeMap',
+    value: function invokeMap() {
+      for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+        args[_key5] = arguments[_key5];
+      }
+
+      return _lodash.invokeMap.apply(undefined, [this.all].concat(args));
+    }
+  }, {
+    key: 'invoke',
+    value: function invoke() {
+      for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+        args[_key6] = arguments[_key6];
+      }
+
+      return _lodash.invoke.apply(undefined, [this.all].concat(args));
     }
   }, {
     key: 'query',
@@ -148,8 +247,8 @@ var Collection = (function () {
   }, {
     key: 'hidden',
     value: function hidden() {
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
+      for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+        args[_key7] = arguments[_key7];
       }
 
       return _util.hidden.getter.apply(_util.hidden, [this].concat(args));
@@ -157,8 +256,8 @@ var Collection = (function () {
   }, {
     key: 'lazy',
     value: function lazy() {
-      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
+      for (var _len8 = arguments.length, args = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
+        args[_key8] = arguments[_key8];
       }
 
       return _util.lazy.apply(undefined, [this].concat(args));
@@ -173,6 +272,16 @@ var Collection = (function () {
   }, {
     key: '_willLoadAssets',
     value: function _willLoadAssets(paths) {}
+  }, {
+    key: 'assetType',
+    get: function get() {
+      return this.AssetClass.typeAlias;
+    }
+  }, {
+    key: 'assetGroupName',
+    get: function get() {
+      return this.AssetClass.groupName;
+    }
   }, {
     key: 'paths',
     get: function get() {
@@ -200,10 +309,10 @@ var Collection = (function () {
   }, {
     key: 'subfolderPaths',
     get: function get() {
-      var _this2 = this;
+      var _this3 = this;
 
       return this.assetPaths.map(function (p) {
-        return (0, _path.relative)(_this2.root, (0, _path.dirname)(p));
+        return (0, _path.relative)(_this3.root, (0, _path.dirname)(p));
       }).unique().filter(function (i) {
         return i.length > 0;
       }).sort(function (a, b) {
@@ -266,7 +375,7 @@ function buildAtInterface(collection) {
 module.exports = Collection;
 
 function wrapCollection(collection, array) {
-  Object.defineProperty(array, 'condense', {
+  defineProperty(array, 'condense', {
     enumerable: false,
     value: function condense() {
       var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -286,12 +395,25 @@ function wrapCollection(collection, array) {
     }
   });
 
-  Object.defineProperty(array, 'merge', {
+  defineProperty(array, 'merge', {
     enumerable: false,
     value: function merge() {
       var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
       return array.condense({ key: false, prop: options.prop || 'data' });
+    }
+  });
+
+  defineProperty(array, 'mapPick', {
+    enumerable: false,
+    value: function value() {
+      for (var _len9 = arguments.length, args = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
+        args[_key9] = arguments[_key9];
+      }
+
+      return array.map(function (asset) {
+        return asset.pick.apply(asset, args);
+      });
     }
   });
 
