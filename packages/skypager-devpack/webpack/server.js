@@ -34,7 +34,17 @@ module.exports = function(argv, serverOptions) {
         serverOptions.onCompile(err, stats)
       }
 
-      if (argv.saveWebpackStats) {
+      try {
+        if (argv.saveWebpackStats) {
+          fs.writeFileSync(
+            argv.saveWebpackStats,
+            JSON.stringify(stats.toJson(), null, 2),
+            ''
+          )
+        }
+      } catch(error) {
+        console.error('ERRROR', error.message)
+        fs.writeFileSync('/Users/jonathan/Skypager/error.txt', error.message)
       }
     })
   }

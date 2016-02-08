@@ -13,6 +13,7 @@
   "scripts": {
     "docs": "skypager author docs"
   },
+  "main": "app.js",
   "dependencies": {
     "babel-core": "^6.4.0",
     "babel-loader": "^6.2.1",

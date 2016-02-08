@@ -1,6 +1,6 @@
 workspaces:
   main:
-    command: 'skypager dev --platform electron --html-template-path=public/template.html --skip-theme --external-vendors --save-webpack-stats=webpack-stats.json'
+    command: 'skypager dev --platform electron --html-template-path=public/template.html --skip-theme --external-vendors --save-webpack-stats=./webpack-stats.json'
     panels:
       presentation:
         path: '/'
@@ -8,13 +8,14 @@ workspaces:
           height: 1200 
           width: 1520
           left: 400
+          height: '100%'
       console:
         path: '/console.html'
         window:
-          frame: false
-          movable: false
-          resizable: false
           height: '100%'
           left: 0
           top: 0
           width: 390
+          frame: false
+          movable: false
+          resizable: false

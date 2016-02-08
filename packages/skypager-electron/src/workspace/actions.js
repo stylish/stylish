@@ -30,7 +30,7 @@ export const actions = {
   panelLoaded
 }
 
-export function processClosed (workspace, panelName, child) {
+export function processClosed (workspace, panelName) {
 	return {
     type: WORKSPACE_PROCESS_STARTED,
 		payload: {

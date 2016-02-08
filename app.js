@@ -1,0 +1,1 @@
+require('skypager-electron/app')

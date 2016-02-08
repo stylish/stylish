@@ -1,16 +1,22 @@
-import electronify from 'electronify-server'
 import { join, resolve } from 'path'
 import { handleActions as reducer, createAction as action } from 'redux-actions'
 import { hideProperties } from '../util'
 import { compact, pick, isNumber, isString } from 'lodash'
 import { constrain } from '../util/constrain'
 import chokidar from 'chokidar'
+import electronify from './electronify-server'
 
 const defaultPanels = {
   browser: {
     path: 'index.html',
     layout: 'centered'
   }
+}
+
+const DEFAULT_WINDOW = {
+  height: 768,
+  width: 1024,
+  centered: true
 }
 
 const { keys, assign } = Object
@@ -40,11 +46,16 @@ export class Workspace {
 
 	boot(options = {}) {
     buildElectronifyOptions(this)
+
 		this.launchPanels()
 	}
 
   get id () {
     return this.attributes.id
+  }
+
+  get commandCount () {
+    return compact(this.panels.map(p => p.command)).length
   }
 
   get panels () {
@@ -65,14 +76,12 @@ export class Workspace {
       workspaceId: this.id
     }, action.meta || {})
 
-    console.log('Workspace Dispatch', action.type, action.payload)
-
     return this.application.dispatch(action)
   }
 
 	launchPanels () {
     this.panels.forEach(panel => {
-      launch.call(this, panel.id, panel.opts)
+      launch.call(this, panel.id, assign(panel.opts, {window: (panel.window || DEFAULT_WINDOW)}))
     })
 	}
 
@@ -83,15 +92,13 @@ export function provision (application, options) {
 };
 
 function buildElectronifyOptions (workspace) {
-  let panelCommands = compact(workspace.panels.map(panel => panel.command))
-
   let command = workspace.command
 
   return workspace.panels.map((panel, index) => {
     let opts = {}
 
     if (command && !panel.command && index === 0) {
-      opts.command = command
+      panel.command = opts.command = command
     }
 
     if (!panel.command) {
@@ -113,12 +120,14 @@ function launch (panelName, params = {}) {
 
 	let options = assign({}, params, {
 		ready: function(electronApp) {
-      let bounds = constrain(assign({}, params.window), w.application.screenSize)
+      let constrained = constrain(assign({}, params.window), w.application.screenSize)
+
+      w.panelSettings[panelName].constrained = constrained
 
       w.dispatch(
         workspaceReady(w, {
           panelName,
-          bounds
+          constrained
         })
       )
 		},
@@ -133,19 +142,24 @@ function launch (panelName, params = {}) {
 		},
 
 		postLoad: function(electronApp, win) {
+      if (w.panelSettings[panelName].constrained) {
+        win.setBounds({
+          ...(w.panelSettings[panelName].constrained)
+        })
+      }
+
 			w.dispatch(
 				panelLoaded(w, panelName, electronApp, win)
 			)
 		}
 	})
 
-  options.window = assign({}, options.window, {width: 200, height: 200, show: false})
-
 	if (!options.command) {
     options.noServer = true
 	}
 
   w.dispatch(workspaceDidLaunch(w, {
+    panelName,
     electronify: {
       command: options.command,
       url: options.url,
@@ -154,4 +168,43 @@ function launch (panelName, params = {}) {
     }
   }))
 
+  if (options.command && options.command.match(/skypager dev/)) {
+    let watcher = chokidar.watch(process.env.PWD, {
+      persistent: true,
+      depth: 1
+    })
+
+    watcher.on('raw', (action, path) => {
+      if (path && path.match(/webpack-stats/)){
+        w.dispatch({
+          type: 'WEBPACK_DEV_SERVER_READY',
+          payload: {
+            panelName,
+            workspaceId: w.id
+          }
+        })
+
+        w.application.eachBrowserWindow((browserWindow) => {
+           browserWindow.show()
+           browserWindow.reload()
+        })
+      }
+    })
+
+    process.on('exit', (code) => {
+      if(!watcher && watcher.closed) {
+        watcher.close()
+      }
+    })
+  }
+
+  let proc = electronify(options)
+
+  proc.on('child-started', (child) => {
+    w.dispatch(processStarted(w, panelName, child))
+  }).on('child-closed', (app, stderr, stdout) => {
+    w.dispatch(processClosed(w, panelName))
+  }).on('child-error', (err) => {
+     w.dispatch(processError(w, panelName, err))
+  })
 }

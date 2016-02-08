@@ -15,7 +15,11 @@ export function calculateBounds (inputs = {}, bounds) {
 
   let outputs = assign(inputs, calculatePosition(inputs, bounds))
 
-  return pick(outputs, 'height', 'width', 'top', 'left')
+  return {
+    ...outputs,
+    x: outputs.left,
+    y: outputs.top
+  }
 }
 
 export function calculateSizes (settings, screen) {

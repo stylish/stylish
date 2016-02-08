@@ -67,7 +67,7 @@ module.exports = function(argv) {
 
       if (argv.debug) {
         console.log(
-          JSON.stringify(compilation, null, 2)
+          JSON.stringify(compilation.getStats().toJson(), null, 2)
         )
       }
 

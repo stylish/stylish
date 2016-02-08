@@ -70,6 +70,11 @@ export class Application {
 		return this.primaryDisplay.bounds
 	}
 
+	eachBrowserWindow (...args) {
+		let windows = Object.values(this.browserWindows)
+		windows.forEach(...args)
+	}
+
 	get browserWindows() {
 		let workspace = this.workspace
 		let windows = this.state.workspaces.windows.main
@@ -91,7 +96,6 @@ export class Application {
 		this.workspace = this.createWorkspace(this.argv.workspace)
 
 		if (this.workspace) {
-			console.log('booting the workspace')
 			this.workspace.boot()
 		}
 	}

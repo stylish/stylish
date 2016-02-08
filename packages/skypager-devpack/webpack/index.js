@@ -276,11 +276,5 @@ module.exports = function (argv) {
 		})
 	}
 
-	if (argv.saveWebpackStats) {
-		config.plugin('webpack-stats', require('stats-webpack-plugin'), ['webpack-stats.json', {
-			chunkModules: true,
-			exclude: /node_modules|react|redux|bootstrap|jquery/
-		}])
-	}
   return config
 }

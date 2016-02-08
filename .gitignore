@@ -16,3 +16,5 @@ packages/skypager-react-components
 packages/skypager-terminal
 packages/skypager-webhook-logger
 public/
+webpack-stats.json
+log/electron-actions.json
