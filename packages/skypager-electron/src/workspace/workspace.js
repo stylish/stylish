@@ -126,6 +126,7 @@ function launch (panelName, params = {}) {
 
       w.panelSettings[panelName].constrained = constrained
 
+      console.log('constrainig', constrained, params.window)
       w.dispatch(
         workspaceReady(w, {
           panelName,

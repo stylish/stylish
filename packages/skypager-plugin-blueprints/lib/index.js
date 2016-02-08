@@ -1,3 +1,8 @@
-"use strict";
+'use strict';
 
-module.exports = function () {};
+module.exports = function LoadsPlugin(plugins) {
+  plugins.load(require('./definition'), {
+    uri: require.resolve('./definition'),
+    id: 'blueprints'
+  });
+};
