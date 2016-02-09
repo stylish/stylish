@@ -20,10 +20,6 @@ var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
 
-var _stringify = require('babel-runtime/core-js/json/stringify');
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
 var _defineProperty = require('babel-runtime/core-js/object/define-property');
 
 var _defineProperty2 = _interopRequireDefault(_defineProperty);
@@ -31,7 +27,6 @@ var _defineProperty2 = _interopRequireDefault(_defineProperty);
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.clone = clone;
 exports.humanize = humanize;
 exports.titleize = titleize;
 exports.classify = classify;
@@ -100,6 +95,8 @@ module.exports.pick = _lodash.pick;
 module.exports.any = _lodash.any;
 module.exports.result = _lodash.result;
 module.exports.dotpath = _objectPath2.default;
+module.exports.clone = _lodash.cloneDeep;
+module.exports.template = _lodash.template;
 
 var hidden = {
   getter: function getter(target, name, fn) {
@@ -129,14 +126,6 @@ module.exports.hidden = hidden;
 module.exports.hide = hidden;
 
 hidden.getter(module.exports, 'inflections', inflections);
-
-/**
-* clone an object
-*
-*/
-function clone(base) {
-  return JSON.parse((0, _stringify2.default)(base));
-}
 
 function humanize(s) {
   return inflections.humanize(s).replace(/-|_/g, ' ');

@@ -105,6 +105,24 @@ var Asset = (function () {
   }
 
   (0, _createClass3.default)(Asset, [{
+    key: 'templater',
+    value: function templater(string) {
+      var asset = this;
+      return util.template(string, {
+        imports: {
+          get project() {
+            return asset.project;
+          },
+          get self() {
+            return asset;
+          },
+          get process() {
+            return process;
+          }
+        }
+      });
+    }
+  }, {
     key: 'pick',
     value: function pick() {
       for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {

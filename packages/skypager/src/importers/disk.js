@@ -50,17 +50,24 @@ export function ProjectImporter (options = {}, context = {}) {
   Object.keys(collections).forEach(name => {
     let collection = collections[name]
     let pattern = collection.assetPattern
+    let paths = []
 
-    let paths = glob.sync(pattern, {
-      cwd: collection.root,
-      ignore: [collection.excludePattern]
-    })
+    try {
+      paths = glob.sync(pattern, {
+        cwd: collection.root,
+        ignore: [collection.excludePattern]
+      })
+    } catch(error) {
+      paths = []
+    }
 
     collection._willLoadAssets(paths)
 
     paths.forEach(rel => {
-      let uri = path.join(collection.root, rel)
-      let asset = new collection.AssetClass(rel, {collection: collection, project: project})
+      //let uri = path.join(collection.root, rel)
+      //let asset = new collection.AssetClass(rel, {collection: collection, project: project})
+
+      let asset = collection.createAsset(rel)
 
       collection.add(asset, false, true)
 

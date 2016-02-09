@@ -1,15 +1,15 @@
 import Skypager from './index'
 
-describe("Skypager", ()=>{
-	it("exposes a public class interface", ()=>{
+describe("Skypager", function(){
+	it("exposes a public class interface", function(){
 		Skypager.should.have.property('Project')
 	})
 
-  it( "loads a project", () => {
+  it( "loads a project", function(){
     Skypager.fixture.should.have.property('content')
   })
 
-  it( "has an asset manifest", () => {
+  it( "has an asset manifest", function(){
     let man = Skypager.fixture.exporters.run('assets', {project: Skypager.fixture})
 
     man.should.have.property('documents')

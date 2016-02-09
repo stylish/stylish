@@ -399,8 +399,8 @@ class Project {
     )
   }
 
-  get mergedSettingsData () {
-    return this.data_sources.query({ id: /^settings\// }).merge()
+  get settings () {
+    return this.content.settings.query((s) => true).merge()
   }
 }
 
@@ -431,6 +431,7 @@ function paths () {
     logs: join(this.root, 'log'),
     build: join(this.root, 'dist'),
     public: join(this.root, 'public'),
+    settings: join(this.root, 'settings'),
     join: function (...args) {
       return join(project.root, ...args)
     }
@@ -474,8 +475,28 @@ function buildContentCollectionsManually () {
     scripts: Script.createCollection(this, false),
     stylesheets: Stylesheet.createCollection(this, false),
     vectors: Vector.createCollection(this, false),
-    packages: new Collection({root: this.paths.packages, project: this, assetClass: DataSource, pattern: '*/package.json', exclude: '**/node_modules'}),
-    projects: new Collection({root: this.paths.projects, project: this, assetClass: DataSource, pattern: '*/package.json', exclude: '**/node_modules'})
+
+    packages: new Collection({
+      root: this.paths.packages,
+      project: this,
+      assetClass: DataSource,
+      pattern: '*/package.json',
+      exclude: '**/node_modules'
+    }),
+
+    projects: new Collection({
+      root: this.paths.projects,
+      project: this,
+      assetClass: DataSource,
+      pattern: '*/package.json',
+      exclude: '**/node_modules'
+    }),
+
+    settings: new Collection({
+      root: this.paths.settings,
+      project: this,
+      assetClass: DataSource
+    })
   }
 }
 
