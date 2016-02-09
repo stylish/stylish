@@ -25,8 +25,6 @@ function ReactWebapp() {
   var project = arguments[1];
   var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
-  console.log('YO YOY', arguments);
-
   switch (environment) {
     case development:
       return development(project, options);
@@ -46,11 +44,11 @@ function production(project) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   return (0, _defaults2.default)({
-    pushState: true,
-    env: 'production',
     contentHash: true,
+    env: 'production',
     platform: 'web',
     publicPath: '/',
+    pushState: true,
     theme: project.options.theme || project.get('settings.themes.theme') || project.get('settings.themes.base') || options.theme
   }, project.get('settings.build.production'));
 }
@@ -59,10 +57,10 @@ function development(project) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   return (0, _defaults2.default)({
-    pushState: true,
-    noContentHash: true,
-    platform: 'web',
     env: 'development',
+    contentHash: false,
+    platform: 'web',
+    pushState: true,
     publicPath: '/',
     theme: project.options.theme || project.get('settings.themes.theme') || project.get('settings.themes.base') || options.theme
   }, project.get('settings.build.development'));

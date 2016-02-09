@@ -8,8 +8,8 @@ const fs = require('fs')
 module.exports = function(argv) {
   if (!argv) { argv = require('yargs').argv }
 
-  if (argv.preset) {
-    // TODO lookup named argv combos
+  if (argv.preset && argv.project) {
+    argv = require('../lib').devpack('build', argv.env || process.env.NODE_ENV, argv.project, require('yargs').argv)
   }
 
   var config = require('./index')(argv)

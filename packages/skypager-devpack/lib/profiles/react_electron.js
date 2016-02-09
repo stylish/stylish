@@ -44,8 +44,8 @@ function production(project) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   return (0, _defaults2.default)({
-    pushState: true,
-    noContentHash: true,
+    contentHash: false,
+    env: 'production',
     htmlFileName: 'index.html',
     publicPath: '',
     platform: 'electron',
@@ -57,8 +57,8 @@ function development(project) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   return (0, _defaults2.default)({
-    pushState: true,
-    noContentHash: true,
+    contentHash: false,
+    env: 'development',
     htmlFileName: 'index.html',
     platform: 'electron',
     publicPath: '/',

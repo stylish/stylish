@@ -3,25 +3,47 @@ import pick from 'lodash/object/pick'
 
 import * as profiles from './profiles'
 import * as presets from './presets'
+import * as stages from './stages'
 
-export function availableProfiles (project) {
+module.exports = {
+  availableStages,
+  availablePresets,
+  availableProfiles,
+  devpack
+}
+
+function availableProfiles (project) {
   return (
     mapValues(profiles, (profile) => profile.description)
   )
 }
 
-export function availablePresets (project) {
+function availableStages (project) {
   return (
-    mapValues(presets, (profile) => preset.description)
+    mapValues(stages, (stage) => stage.description)
   )
 }
 
-export function argsFor(action, profile, environment, project, options = {}) {
+function availablePresets (project) {
+  return (
+    mapValues(presets, (preset) => preset.description)
+  )
+}
+
+function argsFor(profile, environment, project, options = {}) {
   return profiles[profile](environment, project, options)
 }
 
-export function devpack(action = 'compile', profile, environment, project, options = {}) {
+function devpack(action, profile, environment, project, options = {}) {
   let argv = argsFor(profile, environment, project, options)
+
+  if (!action) {
+    action = environment === 'production' ? 'build' : 'serve'
+  }
+
+  if (options.test) {
+    return argv
+  }
 
   if ( action === 'build' || action === 'compile' ) {
     return require('../webpack/compiler')(argv)
@@ -29,5 +51,3 @@ export function devpack(action = 'compile', profile, environment, project, optio
     return require('../webpack/server')(argv)
   }
 }
-
-export default devpack

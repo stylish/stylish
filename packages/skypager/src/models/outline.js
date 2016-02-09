@@ -1,13 +1,15 @@
-define('Outline', () => {
-
+define('Outline', ()=> {
+  outline.example(
+    h2("Table Of Contents",
+       h3("sections")
+    )
+  )
 })
 
 export function create ({document}) {
   return {
     data: document.data,
-    parsed: document.parsed,
-    sections: document.headings.sections.pluck('title'),
-    subsections: document.headings.articles.pluck('title'),
+    sections: document.headings.articles.pluck('value'),
     html: document.html.content
   }
 }

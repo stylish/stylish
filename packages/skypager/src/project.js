@@ -177,6 +177,11 @@ class Project {
     }
   }
 
+  findBy(source, params) {
+    params.limit = 1
+    return this.query(source, params)[0]
+  }
+
   query (source, params) {
     source = `${ source }`.toLowerCase()
 

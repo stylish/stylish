@@ -1,13 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.availableProfiles = availableProfiles;
-exports.availablePresets = availablePresets;
-exports.argsFor = argsFor;
-exports.devpack = devpack;
-
 var _mapValues = require('lodash/object/mapValues');
 
 var _mapValues2 = _interopRequireDefault(_mapValues);
@@ -28,6 +20,12 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+module.exports = {
+  availablePresets: availablePresets,
+  availableProfiles: availableProfiles,
+  devpack: devpack
+};
+
 function availableProfiles(project) {
   return (0, _mapValues2.default)(profiles, function (profile) {
     return profile.description;
@@ -40,20 +38,24 @@ function availablePresets(project) {
   });
 }
 
-function argsFor(action, profile, environment, project) {
-  var options = arguments.length <= 4 || arguments[4] === undefined ? {} : arguments[4];
+function argsFor(profile, environment, project) {
+  var options = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
 
   return profiles[profile](environment, project, options);
 }
 
-function devpack() {
-  var action = arguments.length <= 0 || arguments[0] === undefined ? 'compile' : arguments[0];
-  var profile = arguments[1];
-  var environment = arguments[2];
-  var project = arguments[3];
+function devpack(action, profile, environment, project) {
   var options = arguments.length <= 4 || arguments[4] === undefined ? {} : arguments[4];
 
   var argv = argsFor(profile, environment, project, options);
+
+  if (!action) {
+    action = environment === 'production' ? 'build' : 'serve';
+  }
+
+  if (options.test) {
+    return argv;
+  }
 
   if (action === 'build' || action === 'compile') {
     return require('../webpack/compiler')(argv);
@@ -61,5 +63,3 @@ function devpack() {
     return require('../webpack/server')(argv);
   }
 }
-
-exports.default = devpack;
