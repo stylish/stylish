@@ -1,5 +1,19 @@
-import { tabelize, pluralize, singularize, parameterize, noConflict, assign, hide, lazy, values, slugify, underscore } from '../../util'
-import yaml from 'js-yaml'
+import { dump } from 'js-yaml'
+
+import {
+  tabelize,
+  pluralize,
+  singularize,
+  parameterize,
+  noConflict,
+  assign,
+  hide,
+  lazy,
+  values,
+  slugify,
+  underscore
+} from '../../util'
+
 
 let tracker = { }
 let _curr
@@ -25,7 +39,7 @@ export class ModelDefinition {
     this.config = {}
 
     if(options.required && options.required.definition){
-      this.config = Object.assign(this.config, options.required.definition)
+      this.config = assign(this.config, options.required.definition)
     }
 
     hide.getter(this, 'documents', this.configureDocuments.bind(this))
@@ -39,7 +53,7 @@ export class ModelDefinition {
           currentHelper.api.decorate(...args)
           return currentHelper.api.create(...args)
         },
-        config: Object.assign({}, this.config, this.helperExport.config || {}),
+        config: assign({}, this.config, this.helperExport.config || {}),
         decorate: this.config.decorator || this.helperExport.decorate || defaultDecorateMethod,
         generate: this.config.generator || this.helperExport.generate || defaultGenerateMethod,
         actions: this.config.actions || []
@@ -77,7 +91,15 @@ export class ModelDefinition {
 	}
 
   configure () {
-    this.body(this)
+    let helpers = (def) => ({
+      example() {},
+      paragraphs() {},
+      h1() {},
+      h2() {},
+      h3() {}
+    })
+
+    this.body(this, helpers(this))
     this.documents.configure()
   }
 
@@ -310,11 +332,11 @@ function defaultValidateMethod (options = {}, context = {}){
 
 function defaultGenerateMethod (options = {}, context = {}){
   let str = ''
-  let frontmatter = Object.assign({}, options.data || {})
+  let frontmatter = assign({}, options.data || {})
   let attrs = options.attributes || options.attrs || {}
 
   if (Object.keys(frontmatter).length > 0) {
-    str = `---\n${yaml.dump(frontmatter)}---\n\n`
+    str = `---\n${dump(frontmatter)}---\n\n`
   }
 
   if (attrs.title) {

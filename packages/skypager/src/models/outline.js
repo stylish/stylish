@@ -1,9 +1,22 @@
-define('Outline', ()=> {
-  outline.example(
+define('Outline', (outline)=> {
+  /**
+   * This is better than what i have currently
+
+  example(
+    h1('document.title'),
+
+    paragraphs('document.description'),
+
     h2("Table Of Contents",
-       h3("sections")
+       h3("sections", { builder: sectionsBuilder, multi: true })
     )
   )
+  */
+  outline.documents.have.a.section('Table Of Contents', (section) => {
+    section.has.many.articles('sections', (article) => {
+
+    })
+  })
 })
 
 export function create ({document}) {
