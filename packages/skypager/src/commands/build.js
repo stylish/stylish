@@ -5,8 +5,9 @@ import util from '../util'
 
 export function build (program, dispatch) {
   program
-    .command('build [entry]')
+    .command('build [preset]')
     .description('build a website for this project using our preconfigured webpack bundle')
+    .option('--preset <name>', 'use a preset instead of all of this configuration')
     .option('--entry <path>', 'relative path to the entry point', './src')
     .option('--entry-name <name>', 'what to name the entry point script', 'app')
     .option('--entry-only', 'only compiled asssets; do not use html template')
@@ -33,13 +34,16 @@ export function build (program, dispatch) {
     .option('--silent', 'suppress any server output')
     .option('--debug', 'show error info from the server')
     .option('--template-inject [target]', 'where to inject the webpack bundle? none, body, head')
+    .option('--exclude-chunks [list]', 'chunk names to exclude from the html bundle')
+    .option('--chunks [list]', 'chunk names to exclude from the html bundle')
+    .option('--save-webpack-stats <path>', 'save the webpack compilation stats output')
     .action(dispatch(handle))
 }
 
 export default build
 
-export function handle(entry, options = {}, context = {}) {
-  entry = entry || options.entry
+export function handle(preset, options = {}, context = {}) {
+  options.preset = preset || options.preset
   options.theme = options.theme || project.options.theme
 
   if (!options.theme && !options.skipTheme) {
@@ -50,8 +54,9 @@ export function handle(entry, options = {}, context = {}) {
 
   let bundleCommand = options.bundleCommand || 'skypager export bundle'
 
-  console.log('Exporting project bundle'.green)
-  shell.exec(`${ bundleCommand } --clean`)
+  if (options.bundle) {
+    shell.exec(`${ bundleCommand } --clean`)
+  }
 
   require(`${ pathToDevpack(options.devToolsPath) }/webpack/compiler`)(options)
 }

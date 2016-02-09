@@ -13,6 +13,12 @@ import path from 'path'
 import { dirname, extname, resolve, join } from 'path'
 
 export default class Helper {
+  static decorateRegistry (registry) {
+    if (this.registryInterface) {
+      defineProperties(registry, this.registryInterface(registry))
+    }
+  }
+
   /*
   * Creates a Helper from a Definition object that was
   * created by a required' script file from one of the dedicated
@@ -89,6 +95,9 @@ export default class Helper {
     this.hidden('api', () => this.buildAPI(options.api, this.required))
   }
 
+  result(...args) {
+    return util.result(this, ...args)
+  }
   /**
   * Every helper should expose an api with a function which is responsible
   * for handling calls to the run function that get dispatched to the helper.
@@ -192,3 +201,5 @@ export default class Helper {
 }
 
 Helper.apiMethods = [ ]
+
+const { defineProperties } = Object

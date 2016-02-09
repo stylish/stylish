@@ -1,6 +1,36 @@
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _typeof2 = require('babel-runtime/helpers/typeof');
+
+var _typeof3 = _interopRequireDefault(_typeof2);
+
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
+
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = require('babel-runtime/helpers/inherits');
+
+var _inherits3 = _interopRequireDefault(_inherits2);
 
 var _asset = require('./asset');
 
@@ -14,24 +44,23 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+var clone = util.clone;
+var _defaults = util.defaults;
+var _pick = util.pick;
+var _result = util.result;
+var noConflict = util.noConflict;
 
 var EXTENSIONS = ['js', 'json', 'yaml', 'yml', 'csv'];
 var GLOB = '**/*.{' + EXTENSIONS.join(',') + '}';
 
 var DataSource = (function (_Asset) {
-  _inherits(DataSource, _Asset);
+  (0, _inherits3.default)(DataSource, _Asset);
 
   function DataSource(uri) {
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    (0, _classCallCheck3.default)(this, DataSource);
 
-    _classCallCheck(this, DataSource);
-
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DataSource).call(this, uri, options));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(DataSource).call(this, uri, options));
 
     _this.lazy('parsed', function () {
       return _this.parse(_this.raw);
@@ -44,16 +73,48 @@ var DataSource = (function (_Asset) {
     });
     _this.lazy('data', _this.getData, true);
 
-    _this.indexer = options.indexer || function (val) {
-      return val;
-    };
+    if (_this.collection && _this.collection.name === 'settings') {
+      _this.indexer = parseSettings.bind(_this);
+    } else {
+      _this.indexer = options.indexer || function (val) {
+        return val;
+      };
+    }
+
     _this.transformer = options.transformer || function (val) {
       return val;
     };
     return _this;
   }
 
-  _createClass(DataSource, [{
+  (0, _createClass3.default)(DataSource, [{
+    key: 'defaults',
+    value: function defaults() {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return _defaults.apply(undefined, [this.data].concat(args));
+    }
+  }, {
+    key: 'pick',
+    value: function pick() {
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      return _pick.apply(undefined, [this.data].concat(args));
+    }
+  }, {
+    key: 'result',
+    value: function result() {
+      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
+      }
+
+      return _result.apply(undefined, [this.data].concat(args));
+    }
+  }, {
     key: 'getData',
     value: function getData() {
       if (this.extension !== '.js' && (!this.raw || this.raw.length === 0)) {
@@ -61,6 +122,44 @@ var DataSource = (function (_Asset) {
       }
 
       return this.indexed;
+    }
+  }, {
+    key: 'saveSync',
+    value: function saveSync() {
+      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      if (this.raw || this.raw.length === 0) {
+        if (!options.allowEmpty) {
+          return false;
+        }
+      }
+
+      if (this.extension === '.json') {
+        this.raw = !options.minify ? (0, _stringify2.default)(this.data, null, 2) : (0, _stringify2.default)(this.data);
+      } else if (this.extension === '.yml') {
+        this.raw = require('yaml').dump(this.data);
+      }
+
+      return require('fs').writeFileSync(this.paths.absolute, this.raw, 'utf8');
+    }
+  }, {
+    key: 'save',
+    value: function save() {
+      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      if (this.raw || this.raw.length === 0) {
+        if (!options.allowEmpty) {
+          return false;
+        }
+      }
+
+      if (this.extension === '.json') {
+        this.raw = !options.minify ? (0, _stringify2.default)(this.data, null, 2) : (0, _stringify2.default)(this.data);
+      } else if (this.extension === '.yml') {
+        this.raw = require('yaml').dump(this.data);
+      }
+
+      return require('fs-promise').writeFile(this.paths.absolute, this.raw, 'utf8');
     }
   }, {
     key: 'parser',
@@ -85,7 +184,6 @@ var DataSource = (function (_Asset) {
       }
     }
   }]);
-
   return DataSource;
 })(_asset2.default);
 
@@ -101,7 +199,7 @@ function handleScript(datasource, load) {
     project: datasource.project
   };
 
-  return util.noConflict(function () {
+  return noConflict(function () {
     var exp = load();
 
     if (typeof exp === 'function') {
@@ -111,4 +209,25 @@ function handleScript(datasource, load) {
     }
   }, locals)();
 }
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9hc3NldHMvZGF0YV9zb3VyY2UuanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7OztJQUNZLElBQUk7Ozs7Ozs7Ozs7OztBQUVoQixJQUFNLFVBQVUsR0FBRyxDQUFDLElBQUksRUFBRSxNQUFNLEVBQUUsTUFBTSxFQUFFLEtBQUssRUFBRSxLQUFLLENBQUMsQ0FBQTtBQUN2RCxJQUFNLElBQUksR0FBRyxRQUFRLEdBQUcsVUFBVSxDQUFDLElBQUksQ0FBQyxHQUFHLENBQUMsR0FBRyxHQUFHLENBQUE7O0lBRTVDLFVBQVU7WUFBVixVQUFVOztBQUNkLFdBREksVUFBVSxDQUNELEdBQUcsRUFBZ0I7UUFBZCxPQUFPLHlEQUFHLEVBQUU7OzBCQUQxQixVQUFVOzt1RUFBVixVQUFVLGFBRU4sR0FBRyxFQUFFLE9BQU87O0FBRWxCLFVBQUssSUFBSSxDQUFDLFFBQVEsRUFBRTthQUFNLE1BQUssS0FBSyxDQUFDLE1BQUssR0FBRyxDQUFDO0tBQUEsQ0FBQyxDQUFBO0FBQy9DLFVBQUssSUFBSSxDQUFDLFNBQVMsRUFBRTthQUFNLE1BQUssS0FBSyxDQUFDLE1BQUssTUFBTSxRQUFPO0tBQUEsQ0FBQyxDQUFBO0FBQ3pELFVBQUssSUFBSSxDQUFDLGFBQWEsRUFBRTthQUFNLE1BQUssU0FBUyxDQUFDLE1BQUssT0FBTyxRQUFPO0tBQUEsQ0FBQyxDQUFBO0FBQ2xFLFVBQUssSUFBSSxDQUFDLE1BQU0sRUFBRSxNQUFLLE9BQU8sRUFBRSxJQUFJLENBQUMsQ0FBQTs7QUFFckMsVUFBSyxPQUFPLEdBQUcsT0FBTyxDQUFDLE9BQU8sSUFBSyxVQUFDLEdBQUc7YUFBSyxHQUFHO0tBQUEsQUFBQyxDQUFBO0FBQ2hELFVBQUssV0FBVyxHQUFHLE9BQU8sQ0FBQyxXQUFXLElBQUssVUFBQyxHQUFHO2FBQUssR0FBRztLQUFBLEFBQUMsQ0FBQTs7R0FDekQ7O2VBWEcsVUFBVTs7OEJBYUg7QUFDVCxVQUFJLElBQUksQ0FBQyxTQUFTLEtBQUssS0FBSyxLQUFLLENBQUMsSUFBSSxDQUFDLEdBQUcsSUFBSSxJQUFJLENBQUMsR0FBRyxDQUFDLE1BQU0sS0FBSyxDQUFDLENBQUEsQUFBQyxFQUFFO0FBQ3BFLFlBQUksQ0FBQyxXQUFXLENBQUMsTUFBTSxFQUFFLEVBQUMsS0FBSyxFQUFFLElBQUksRUFBRSxJQUFJLEVBQUUsSUFBSSxFQUFDLENBQUMsQ0FBQTtPQUNwRDs7QUFFRCxhQUFPLElBQUksQ0FBQyxPQUFPLENBQUE7S0FDcEI7OzsyQkFFTyxPQUFPLEVBQUUsS0FBSyxFQUFFOzs7QUFDdEIsYUFBTyxHQUFHLE9BQU8sSUFBSSxJQUFJLENBQUMsR0FBRyxJQUFJLEVBQUUsQ0FBQTs7QUFFbkMsVUFBSSxJQUFJLENBQUMsU0FBUyxLQUFLLEtBQUssRUFBRTtBQUM1QixlQUFPLFlBQVksQ0FBQyxJQUFJLENBQUMsSUFBSSxFQUFFLElBQUksRUFBRTtpQkFBTSxPQUFPLENBQUMsT0FBSyxLQUFLLENBQUMsUUFBUSxDQUFDO1NBQUEsQ0FBQyxDQUFBO09BQ3pFLE1BQU0sSUFBRyxJQUFJLENBQUMsU0FBUyxLQUFLLE9BQU8sRUFBRTtBQUNwQyxlQUFPLElBQUksQ0FBQyxLQUFLLENBQUMsT0FBTyxJQUFJLElBQUksQ0FBQyxDQUFBO09BQ25DLE1BQU0sSUFBSSxJQUFJLENBQUMsU0FBUyxLQUFLLE1BQU0sRUFBRTtBQUNwQyxlQUFPLE9BQU8sQ0FBQyxTQUFTLENBQUMsQ0FBQyxRQUFRLENBQUMsT0FBTyxJQUFJLEVBQUUsQ0FBQyxDQUFBO09BRWxELE1BQU0sSUFBSSxJQUFJLENBQUMsU0FBUyxLQUFLLE1BQU0sRUFBRTtBQUNwQyxlQUFPLEVBQUUsQ0FBQTtPQUNWLE1BQU07O0FBRUwsY0FBTyx1QkFBdUIsR0FBRyxJQUFJLENBQUMsU0FBUyxHQUFHLEdBQUcsR0FBRyxPQUFPLENBQUMsTUFBTSxDQUFDO09BQ3hFO0tBQ0Y7OztTQXJDRyxVQUFVOzs7QUF3Q2hCLFVBQVUsQ0FBQyxVQUFVLEdBQUcsVUFBVSxDQUFBO0FBQ2xDLFVBQVUsQ0FBQyxJQUFJLEdBQUcsSUFBSSxDQUFBOztBQUV0QixPQUFPLEdBQUcsTUFBTSxDQUFDLE9BQU8sR0FBRyxVQUFVLENBQUE7O0FBRXJDLFNBQVMsWUFBWSxDQUFFLFVBQVUsRUFBRSxJQUFJLEVBQUU7QUFDdkMsTUFBSSxNQUFNLEdBQUc7QUFDWCxRQUFJLEVBQUosSUFBSTtBQUNKLGNBQVUsRUFBVixVQUFVO0FBQ1YsV0FBTyxFQUFFLFVBQVUsQ0FBQyxPQUFPO0dBQzVCLENBQUE7O0FBRUQsU0FBTyxJQUFJLENBQUMsVUFBVSxDQUFDLFlBQVU7QUFDL0IsUUFBSSxHQUFHLEdBQUcsSUFBSSxFQUFFLENBQUE7O0FBRWhCLFFBQUksT0FBTyxHQUFHLEtBQUssVUFBVSxFQUFFO0FBQzVCLGFBQU8sR0FBRyxDQUFDLElBQUksQ0FBQyxVQUFVLEVBQUUsVUFBVSxFQUFFLFVBQVUsQ0FBQyxPQUFPLENBQUMsQ0FBQTtLQUM3RCxNQUFNO0FBQ0wsYUFBTyxHQUFHLENBQUE7S0FDWDtHQUNGLEVBQUUsTUFBTSxDQUFDLEVBQUUsQ0FBQTtDQUNiIiwiZmlsZSI6ImRhdGFfc291cmNlLmpzIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IEFzc2V0IGZyb20gJy4vYXNzZXQnXG5pbXBvcnQgKiBhcyB1dGlsIGZyb20gJy4uL3V0aWwnXG5cbmNvbnN0IEVYVEVOU0lPTlMgPSBbJ2pzJywgJ2pzb24nLCAneWFtbCcsICd5bWwnLCAnY3N2J11cbmNvbnN0IEdMT0IgPSAnKiovKi57JyArIEVYVEVOU0lPTlMuam9pbignLCcpICsgJ30nXG5cbmNsYXNzIERhdGFTb3VyY2UgZXh0ZW5kcyBBc3NldCB7XG4gIGNvbnN0cnVjdG9yICh1cmksIG9wdGlvbnMgPSB7fSkge1xuICAgIHN1cGVyKHVyaSwgb3B0aW9ucylcblxuICAgIHRoaXMubGF6eSgncGFyc2VkJywgKCkgPT4gdGhpcy5wYXJzZSh0aGlzLnJhdykpXG4gICAgdGhpcy5sYXp5KCdpbmRleGVkJywgKCkgPT4gdGhpcy5pbmRleCh0aGlzLnBhcnNlZCwgdGhpcykpXG4gICAgdGhpcy5sYXp5KCd0cmFuc2Zvcm1lZCcsICgpID0+IHRoaXMudHJhbnNmb3JtKHRoaXMuaW5kZXhlZCwgdGhpcykpXG4gICAgdGhpcy5sYXp5KCdkYXRhJywgdGhpcy5nZXREYXRhLCB0cnVlKVxuXG4gICAgdGhpcy5pbmRleGVyID0gb3B0aW9ucy5pbmRleGVyIHx8ICgodmFsKSA9PiB2YWwpXG4gICAgdGhpcy50cmFuc2Zvcm1lciA9IG9wdGlvbnMudHJhbnNmb3JtZXIgfHwgKCh2YWwpID0+IHZhbClcbiAgfVxuXG4gIGdldERhdGEgKCkge1xuICAgIGlmICh0aGlzLmV4dGVuc2lvbiAhPT0gJy5qcycgJiYgKCF0aGlzLnJhdyB8fCB0aGlzLnJhdy5sZW5ndGggPT09IDApKSB7XG4gICAgICB0aGlzLnJ1bkltcG9ydGVyKCdkaXNrJywge2Fzc2V0OiB0aGlzLCBzeW5jOiB0cnVlfSlcbiAgICB9XG5cbiAgICByZXR1cm4gdGhpcy5pbmRleGVkXG4gIH1cblxuICBwYXJzZXIgKGNvbnRlbnQsIGFzc2V0KSB7XG4gICAgY29udGVudCA9IGNvbnRlbnQgfHwgdGhpcy5yYXcgfHwgJydcblxuICAgIGlmICh0aGlzLmV4dGVuc2lvbiA9PT0gJy5qcycpIHtcbiAgICAgIHJldHVybiBoYW5kbGVTY3JpcHQuY2FsbCh0aGlzLCB0aGlzLCAoKSA9PiByZXF1aXJlKHRoaXMucGF0aHMuYWJzb2x1dGUpKVxuICAgIH0gZWxzZSBpZih0aGlzLmV4dGVuc2lvbiA9PT0gJy5qc29uJykge1xuICAgICAgcmV0dXJuIEpTT04ucGFyc2UoY29udGVudCB8fCAne30nKVxuICAgIH0gZWxzZSBpZiAodGhpcy5leHRlbnNpb24gPT09ICcueW1sJykge1xuICAgICAgcmV0dXJuIHJlcXVpcmUoJ2pzLXlhbWwnKS5zYWZlTG9hZChjb250ZW50IHx8ICcnKVxuXG4gICAgfSBlbHNlIGlmICh0aGlzLmV4dGVuc2lvbiA9PT0gJy5jc3YnKSB7XG4gICAgICByZXR1cm4gW11cbiAgICB9IGVsc2Uge1xuXG4gICAgICB0aHJvdyAoJ0ltcGxlbWVudCBwYXJzZXIgZm9yICcgKyB0aGlzLmV4dGVuc2lvbiArICcgJyArIGNvbnRlbnQubGVuZ3RoKVxuICAgIH1cbiAgfVxufVxuXG5EYXRhU291cmNlLkVYVEVOU0lPTlMgPSBFWFRFTlNJT05TXG5EYXRhU291cmNlLkdMT0IgPSBHTE9CXG5cbmV4cG9ydHMgPSBtb2R1bGUuZXhwb3J0cyA9IERhdGFTb3VyY2VcblxuZnVuY3Rpb24gaGFuZGxlU2NyaXB0IChkYXRhc291cmNlLCBsb2FkKSB7XG4gIGxldCBsb2NhbHMgPSB7XG4gICAgdXRpbCxcbiAgICBkYXRhc291cmNlLFxuICAgIHByb2plY3Q6IGRhdGFzb3VyY2UucHJvamVjdFxuICB9XG5cbiAgcmV0dXJuIHV0aWwubm9Db25mbGljdChmdW5jdGlvbigpe1xuICAgIGxldCBleHAgPSBsb2FkKClcblxuICAgIGlmICh0eXBlb2YgZXhwID09PSAnZnVuY3Rpb24nKSB7XG4gICAgICAgcmV0dXJuIGV4cC5jYWxsKGRhdGFzb3VyY2UsIGRhdGFzb3VyY2UsIGRhdGFzb3VyY2UucHJvamVjdClcbiAgICB9IGVsc2Uge1xuICAgICAgcmV0dXJuIGV4cFxuICAgIH1cbiAgfSwgbG9jYWxzKSgpXG59XG4iXX0=
+
+function interpolateValues(obj, template) {
+  (0, _keys2.default)(obj).forEach(function (key) {
+    var value = obj[key];
+
+    if ((typeof value === 'undefined' ? 'undefined' : (0, _typeof3.default)(value)) === 'object') {
+      interpolateValues(value, template);
+    } else if (typeof value === 'string' && value.match(/^env\./i)) {
+      obj[key] = _result(process.env, value.replace(/^env\./i, ''));
+    } else if (typeof value === 'string') {
+      obj[key] = template(value)(value);
+    }
+  });
+
+  return obj;
+}
+
+function parseSettings() {
+  var val = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+  return interpolateValues.call(this, clone(val), this.templater.bind(this));
+}

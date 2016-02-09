@@ -1,97 +1,166 @@
-import colors from 'colors'
-
-import { argv } from 'yargs'
+import { hideProperties } from './util'
 import { join, resolve } from 'path'
 import { writeFileSync as write, createWriteStream as createStream } from 'fs'
 import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
+
 import thunk from 'redux-thunk'
 
-import * as Workspace from './workspace'
+import defaults from 'lodash/object/defaultsDeep'
+import pick from 'lodash/object/pick'
 
-import { screen, app } from 'electron'
+import * as Workspace from './workspace/workspace'
+
+import { screen, app, BrowserWindow, ipcMain as ipc } from 'electron'
+
+
+const { defineProperty, keys, assign } = Object
 
 export class Application {
   constructor (project, options = {}) {
-		let hide = this.hide = (...args) => hideProperties.call(this, ...args)
+		let hide = this.hide = (...args) => hideProperties.call(this, this, ...args)
 
-		hide({ project, env: options.env || 'development' })
+		if (!project || !project.data || !project.data.at('settings')) {
+			throw('Please ensure your project has settings data. data/settings/workspaces.yml for example.')
+		}
 
-		hide({ store: setupStore() })
+		let settings = project.data.at('settings').data
+
+		options = defaults(options, {
+			id: project.name,
+			argv: { workspace: 'main' },
+			command: '',
+			env: 'development',
+			settings: settings || { workspaces: {} },
+			paths:{
+				appData: join(app.getPath('userData'), 'data'),
+				appLogs: join(app.getPath('userData'), 'logs'),
+				public: (project && project.paths && project.paths.public) || join(process.env.PWD, 'public'),
+				temp: app.getPath('temp'),
+				project: (project && project.root) || process.env.PWD
+			}
+		})
+
+		hide(options)
+
+		setupAppHome(options.paths)
+
+		this.paths.actionStream = join(this.paths.appLogs, `${ this.id }-action-stream.js`)
+
+		hide({
+			actionLogger: createStream(
+				this.paths.actionStream
+			),
+			store: setupStore()
+		})
   }
 
-	get dataPath () {
-		return app.getPath('userData')
+	sendMessage(panel, message, payload) {
+		let win = this.browserWindows[panel]
+
+		if (win) {
+			 win.webContents.send(message, payload)
+		}
 	}
 
-	get tempPath () {
-		 return app.getPath('temp')
+	get primaryDisplay () {
+		return screen.getPrimaryDisplay()
 	}
 
-	get actionLogsPath () {
-		 return join(this.dataPath, 'electron', 'app-actions.log')
+	get screenSize () {
+		return this.primaryDisplay.bounds
 	}
 
-	boot () {
-		this.store.subscribe(
-			this.onStateChange.bind(this)
-		)
+	eachBrowserWindow (...args) {
+		let windows = Object.values(this.browserWindows)
+		windows.forEach(...args)
+	}
 
-		this.mainWorkspace.boot()
+	get browserWindows() {
+		let workspace = this.workspace
+		let windows = this.state.workspaces.windows.main
+
+		return keys(windows).reduce((memo,panelName)=>{
+			let w = windows[panelName]
+			memo[panelName] = BrowserWindow.fromId(w.browserWindowId)
+			return memo
+		},{})
 	}
 
 	dispatch (action) {
-		this.logAction(action)
+		BrowserWindow.getAllWindows().forEach(win => {
+			win.webContents.send('skypager:message', 'application:dispatch', action)
+		})
+
 		return this.store.dispatch(action)
 	}
 
+	boot () {
+		this.store.subscribe(this.onStateChange.bind(this))
+
+		this.workspace = this.createWorkspace(this.argv.workspace)
+
+		if (this.workspace) {
+			this.workspace.boot()
+		}
+	}
+
+	createWorkspace(name = 'main', options = {}) {
+		defaults(options, this.workspaceSettings[name], {
+			id: name.toLowerCase()
+		})
+
+		return Workspace.provision(this, options)
+	}
+
 	logAction (action) {
+		if (this.argv.debug) { console.log(JSON.stringify(action, null, 2)) }
+
 		this.actionLogger.write(
 			`dispatch(${JSON.stringify(action)});\n\n`
 		)
 	}
 
 	onStateChange() {
+		this.snapshotState()
+		global.SkypagerElectronAppState = JSON.stringify(this.state)
 
+		BrowserWindow.getAllWindows().forEach(win => {
+			win.webContents.send('skypager:message', 'state:change')
+		})
 	}
 
 	snapshotState () {
-		write(
-			this.project.path('data_sources', 'electron-state.json'),
-			JSON.stringify(this.state, null, 2),
-			'utf8'
-		)
+		if (this.paths && this.paths.appData) {
+			write(
+				join(this.paths.appData, `${ this.id }-electron-state.json`),
+				JSON.stringify(this.state, null, 2),
+				'utf8'
+			)
+		}
 	}
 
 	get state () {
 		return this.store.getState()
 	}
 
-	get projectSettings() {
-		return this.project.data.at('settings').data
+	get workspacePanelNames () {
+		return this.workspace && this.workspace.panelNames
 	}
 
-	get workspaces() {
-		return this.projectSettings.workspaces || {}
+	get workspacePanels () {
+		return this.workspace && this.workspace.panels
 	}
 
-	get mainWorkspace () {
-		let project = this.project
-		let config = this.workspaces.main
+	get workspaceSettings() {
+		let { workspaces } = this.settings
 
-		if (config) {
-			return config
-		}
+		workspaces.main = workspaces.main || mainWorkspaceConfig(this)
 
-		return {
-			id: 'main',
-			panels: {
-				browser:{
-					url: project.path('public', 'index.html')
-				}
-			}
-		}
+		return workspaces
 	}
 }
+
+export default Application
 
 function hide(obj, prop, value) {
 	defineProperty(obj, prop, {
@@ -100,7 +169,6 @@ function hide(obj, prop, value) {
 	})
 }
 
-const { defineProperty, keys, assign } = Object
 
 export function setupStore (options = {}) {
 	let reducers = {
@@ -110,8 +178,8 @@ export function setupStore (options = {}) {
 	let rootReducer = combineReducers(reducers)
 
 	let initialState = assign({
-		workspaces: workspaceState
-	}, options.sate || {})
+		workspaces: Workspace.initialState
+	}, options.state || {})
 
 	let middlewares = applyMiddleware(
 		thunk,
@@ -146,3 +214,26 @@ export function loggerMiddleware({ getState }) {
       return returnValue;
     };
 }
+
+export function setupAppHome (paths) {
+	require('mkdirp').sync(paths.appData)
+	require('mkdirp').sync(paths.appLogs)
+}
+
+function mainWorkspaceConfig (project) {
+	let config = project.workspaces.main
+
+	if (config) {
+		return config
+	}
+
+	return {
+		id: 'main',
+		panels: {
+			browser:{
+				url: project.path('public', 'index.html')
+			}
+		}
+	}
+}
+

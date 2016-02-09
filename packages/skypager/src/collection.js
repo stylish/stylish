@@ -3,9 +3,12 @@ import {filterQuery as query, hide, hidden, lazy, tabelize, values} from './util
 import {relative, basename, dirname, extname, resolve, join} from 'path'
 import minimatch from 'minimatch'
 import carve from 'object-path'
+import { invokeMap, mapValues, groupBy, invoke, pick } from 'lodash'
 
 class Collection {
-  constructor (root, project, assetClass) {
+  constructor (options = {}) {
+    let { root, project, assetClass } = options
+
     let collection = this
 
     collection.root = root
@@ -22,6 +25,9 @@ class Collection {
 
     collection.hidden('assets', () => assets )
     collection.hidden('index', () => index )
+    collection.hidden('assetPattern', () => options.pattern || assetClass.GLOB)
+    collection.hidden('excludePattern', () => options.ignore || '**/node_modules')
+
     hide.property(collection, 'expandDotPaths', () => buildAtInterface(collection, true))
 
     // provides access to document
@@ -30,6 +36,29 @@ class Collection {
     }
 
     buildAtInterface(collection, false)
+  }
+
+  get assetType () {
+    return this.AssetClass.typeAlias
+  }
+
+  get assetGroupName () {
+    return this.AssetClass.groupName
+  }
+
+  globFiles(pattern, options = {}) {
+    let glob = require('glob')
+
+    return new Promise((resolve, reject) => {
+      glob(pattern, {cwd: this.root, ...options }, (err, files) => {
+        if (err) {
+          reject(err)
+          return
+        } else {
+           resolve(files)
+        }
+      })
+    })
   }
 
   get paths() {
@@ -75,6 +104,30 @@ class Collection {
     }, [])
   }
 
+  mapPick(...args) {
+    return this.map(asset => asset.pick(...args))
+  }
+
+  mapResult(...args) {
+    return this.map(asset => asset.result(...args))
+  }
+
+  mapValues(...args) {
+    return mapValues(this.assets, ...args)
+  }
+
+  groupBy(...args) {
+    return groupBy(this.all, ...args)
+  }
+
+  invokeMap(...args) {
+    return invokeMap(this.all, ...args)
+  }
+
+  invoke(...args) {
+    return invoke(this.all, ...args)
+  }
+
   get all () {
     return values(this.assets)
   }
@@ -105,6 +158,13 @@ class Collection {
 
   filter(...args){
     return wrapCollection(this, this.all.filter(...args))
+  }
+
+  createAsset(relativePath) {
+    return new this.AssetClass(relativePath, {
+      collection: this,
+      project: this.project
+    })
   }
 
   add (asset, autoLoad = false, expandDotPath = false) {
@@ -165,7 +225,7 @@ function buildAtInterface (collection, expand = true) {
 module.exports = Collection
 
 function wrapCollection(collection, array) {
-  Object.defineProperty(array, 'condense', {
+  defineProperty(array, 'condense', {
     enumerable: false,
     value: function condense(options = {}) {
       let {prop,key} = options
@@ -183,10 +243,17 @@ function wrapCollection(collection, array) {
     }
   })
 
-  Object.defineProperty(array, 'merge', {
+  defineProperty(array, 'merge', {
     enumerable: false,
     value: function merge(options = {}) {
       return array.condense({key: false, prop: options.prop || 'data'})
+    }
+  })
+
+  defineProperty(array, 'mapPick', {
+    enumerable: false,
+    value: function(...args) {
+      return array.map(asset => asset.pick(...args))
     }
   })
 

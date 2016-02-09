@@ -1,5 +1,7 @@
 action("RunTestcase")
 
+commandPhrase('run test')
+
 params(function(){
   id('id')
 })

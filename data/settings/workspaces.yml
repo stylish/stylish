@@ -1,13 +1,21 @@
 workspaces:
   main:
+    command: 'skypager dev --bundle --platform electron --html-template-path=public/template.html --skip-theme --external-vendors --save-webpack-stats=./webpack-stats.json'
     panels:
       presentation:
-        command: 'skypager dev --bundle --port 3000'
-        url: "http://localhost:3000"
+        path: '/'
+        position: topRight
         window:
-          height: 300
-          width: 200
+          height: '100%' 
+          width: '69%'
+          top: 0
+          left: '30%'
       console:
-        noServer: true
-        url: "http://localhost:3000/console.html"
-
+        path: '/console.html'
+        position: topLeft
+        window:
+          height: '100%'
+          width: '30%'
+          frame: false
+          top: 0
+          left: 0

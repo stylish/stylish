@@ -2,9 +2,7 @@ import { Application } from 'skypager-application'
 
 import MainLayout from 'layouts/MainLayout'
 import HomePage from 'entries/HomePage'
-import UploadDocument from 'entries/UploadDocument'
-
-
+import Button from 'react-bootstrap/lib/Button'
 import project from 'dist/bundle'
 
 Application.create({
@@ -15,9 +13,6 @@ Application.create({
   entryPoints:{
     index: {
       component: HomePage
-    },
-    upload: {
-      component: UploadDocument
     }
   }
 })

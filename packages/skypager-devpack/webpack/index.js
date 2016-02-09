@@ -250,13 +250,13 @@ module.exports = function (argv) {
         allChunks: true
       }])
 
-      .plugin('webpack-uglify', webpack.optimize.UglifyJsPlugin, [{
+      /*.plugin('webpack-uglify', webpack.optimize.UglifyJsPlugin, [{
         compressor: { warnings: false },
         compress: {
           unused: true,
           dead_code: true
         }
-      }])
+      }])*/
   }
 
   config.merge({

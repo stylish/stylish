@@ -1,6 +1,10 @@
 import assign from 'object-assign'
 import { access } from './util'
 
+import pick from 'lodash/object/pick'
+import flatten from 'lodash/array/flatten'
+import compact from 'lodash/array/compact'
+
 if (!Object.assign) {
   Object.assign = assign
 }
@@ -8,6 +12,18 @@ if (!Object.assign) {
 if (!Array.isArray) {
   Array.isArray = function (arg) {
     return Object.prototype.toString.call(arg) === '[object Array]'
+  }
+}
+
+if (!Array.prototype.flatten) {
+  Array.prototype.flatten = function(...args){
+     return flatten(this, ...args)
+  }
+}
+
+if (!Array.prototype.compact) {
+  Array.prototype.compact = function(...args){
+     return compact(this, ...args)
   }
 }
 
@@ -57,4 +73,5 @@ if (!Array.prototype.find) {
     return undefined
   }
 }
+
 module.exports = {}

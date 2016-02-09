@@ -1,17 +1,19 @@
-import {
-  assign,
-  noConflict,
-  tabelize,
-  parameterize,
-  singularize,
-  underscore
-} from '../../util'
+import { any, assign, noConflict, tabelize, parameterize, singularize, underscore } from '../../util'
+
+import trim from 'lodash/string/trim'
+
+const route = require('path-match')({
+  sensitive: false,
+  strict: false,
+  end: false
+})
 
 let tracker = { }
 let _curr
 
 function current () { return tracker[_curr] }
 function clearDefinition () { _curr = null; delete tracker[_curr] }
+
 
 export class ActionDefinition {
   constructor (actionName) {
@@ -23,6 +25,7 @@ export class ActionDefinition {
     this.aliases = {}
     this.validator = function () { return true }
     this.executor = function () { throw ('Define your own executor function') }
+    this.config.pathMatchers = []
   }
 
   describe(value) {
@@ -33,18 +36,75 @@ export class ActionDefinition {
     this.interfaces[platform] = configurator
   }
 
+  addCommandPhrase(phrase){
+    this.config.pathMatchers.push(
+      route(trim(phrase).replace(/\s/g, '/'))
+    )
+  }
+
+  addRouteMatcher(rule){
+    this.config.pathMatchers.push(
+      route(rule)
+    )
+  }
+
+  testRoute(path){
+   let matching = this.config.pathMatchers.find(rule => rule(path))
+   return matching && matching(path)
+  }
+
+  testCommand(phrase){
+    let sample = trim(phrase).replace(/\s/g, '/')
+    let matching = this.config.pathMatchers.find(rule => rule(sample))
+    return matching && matching(sample)
+  }
+
   get api () {
     let def = this
 
     return {
       name: this.name,
       aliases: this.aliases,
+      testCommand: this.testCommand.bind(this),
+      testRoute: this.testRoute.bind(this),
       execute: this.executor,
       validate: this.validator,
       parameters: this.parameters,
-      runner: function (params, action) {
-        if (def.api.validate(params, action)) {
-          return def.api.execute(params, action)
+      runner: function (...args) {
+        let report = {
+          errors:[],
+          suggestions: [],
+          warnings:[]
+        }
+
+        if (def.api.validate(...args)) {
+          noConflict(function(){
+            try {
+              def.api.execute(...args)
+            } catch(err) {
+              report.errors.push('fatal error:' + err.message)
+            }
+          }, {
+              abort(message, ...r) {
+                report.error(message, ...r)
+                process.exit(1)
+              },
+              error(message, ...r) {
+                console.log(message.red, ...r)
+                report.errors.push(message)
+              },
+              warn(message, ...r) {
+                console.log(message.yellow, ...r)
+                report.warnings.push(message)
+              },
+              suggest(message, ...r) {
+                console.log(message.white, ...r)
+                report.suggestions.push(message)
+              },
+              report
+          })(...args)
+
+          return report
         }
       }
     }
@@ -58,6 +118,10 @@ export class ActionDefinition {
 
   aliases (...list) {
     this.aka(...list)
+  }
+
+  pathMatchers(...args) {
+
   }
 
   params (...args) {
@@ -100,6 +164,8 @@ assign(DSL, {
   required: function (...args) { tracker[_curr].required(...args) },
   optional: function (...args) { tracker[_curr].optional(...args) },
   params: function (...args) { tracker[_curr].params(...args) },
+  commandPhrase: function (...args) { tracker[_curr].addCommandPhrase(...args) },
+  route: function (...args) { tracker[_curr].addRouteMatcher(...args) },
   expose: function(...args) { tracker[_curr].expose(...args) },
   cli: function(...args) { tracker[_curr].expose('cli', ...args) },
   ipc: function(...args) { tracker[_curr].expose('ipc', ...args) },

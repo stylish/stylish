@@ -1,8 +1,12 @@
+import { join } from 'path'
+
 import visit from 'unist-util-visit'
 import assign from 'object-assign'
 import dotpath from 'object-path'
 import utile from 'utile'
 import _debug from 'debug'
+
+import { template, templateSettings, kebabCase, any, defaults, result, pick, cloneDeep as clone } from 'lodash'
 
 const inflections = utile.inflect
 const debug = _debug('skypager')
@@ -10,6 +14,13 @@ const DOMAIN_REGEX = /^[a-zA-Z0-9_-]+\.[.a-zA-Z0-9_-]+$/
 
 module.exports.visit = visit
 module.exports.assign = assign
+module.exports.defaults = defaults
+module.exports.pick = pick
+module.exports.any = any
+module.exports.result = result
+module.exports.dotpath = dotpath
+module.exports.clone = clone
+module.exports.template = template
 
 let hidden = {
   getter: function (target, name, fn, configurable = false) {
@@ -36,14 +47,6 @@ module.exports.hidden = hidden
 module.exports.hide = hidden
 
 hidden.getter(module.exports, 'inflections', inflections)
-
-/**
-* clone an object
-*
-*/
-export function clone (base) {
-  return JSON.parse(JSON.stringify(base))
-}
 
 export function humanize (s) {
   return inflections.humanize(s).replace(/-|_/g, ' ')
@@ -85,12 +88,7 @@ export function parameterize (s) {
 }
 
 export function slugify (s) {
-  s = s.replace(/\\|\//g, '-', '')
-  s = s.replace(/[^-\w\s]/g, '')  // remove unneeded chars
-  s = s.replace(/^\s+|\s+$/g, '') // trim leading/trailing spaces
-  s = s.replace(/[-\s]+/g, '-')   // convert spaces to hyphens
-  s = s.toLowerCase()             // convert to lowercase
-  return s
+  return parameterize(s)
 }
 
 export function singularize (word) {
@@ -282,7 +280,7 @@ export function loadProjectFromDirectory (directory) {
 }
 
 export function isPromise (obj) {
-  return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
+  return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function'
 }
 
 export function isArray(arg) {
@@ -290,11 +288,12 @@ export function isArray(arg) {
 }
 
 export function isRegex(val) {
-  if ((typeof val === 'undefined' ? 'undefined' : typeof(val)) === 'object' && Object.getPrototypeOf(val).toString() === '/(?:)/') {
-    return true;
+  if ((typeof val === 'undefined' ? 'undefined' : typeof(val)) === 'object' &&
+      Object.getPrototypeOf(val).toString() === '/(?:)/') {
+    return true
   }
 
-  return false;
+  return false
 }
 
 export function filterQuery (nodeList = [], params) {
@@ -332,3 +331,10 @@ export function abort(message) {
    process.exit(1)
 }
 
+export function skypagerBabel() {
+  require('babel-register')({
+    presets:[
+      require('babel-preset-skypager')
+    ]
+  })
+}

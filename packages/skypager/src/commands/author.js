@@ -1,14 +1,15 @@
 import colors from 'colors'
 import { resolve } from 'path'
-import { existsSync as exists } from 'fs'
+import { existsSync as exists, createReadStream as readSream } from 'fs'
 
 export function author (program, dispatch) {
   program
     .command('author [workspace]')
     .option('--main <require>', 'require this script in the electron main process')
-    .option('--project <path>', 'the project path')
+    .option('--workspace <name>', 'use a different workspace', 'main')
     .option('--interactive', 'run an interactive REPL')
     .option('--dont-boot', 'dont boot the electron app (DEV HELPER)')
+    .option('--stream-actions', 'debug the action stream')
     .description('run an author workspace app')
     .action(dispatch(handle))
 }
@@ -31,6 +32,10 @@ export function handle(workspace, options = {}, context = {}) {
 
   let authorArgs = process.argv.slice(2)
 
+  workspace = workspace || options.workspace || 'main'
+
+  authorArgs.push('--workspace', workspace)
+
   if (project) {
     authorArgs.push('--project', project.root)
   }
@@ -38,10 +43,18 @@ export function handle(workspace, options = {}, context = {}) {
   let proc = require('child_process').spawn(
     electron,
     [ skypagerElectron ].concat(authorArgs)
-  );
+  )
 
-  proc.stdout.on('data', (data) => console.log(data.toString()))
-  proc.stderr.on('data', (data) => console.log(data.toString()))
+  if (options.interactive) {
+    proc.stdout.on('data', (data) => process.stdout.write(data))
+    proc.stderr.on('data', (data) => process.stderr.write(data))
+    process.stdin.on('data', (data) => proc.stdin.write(data))
+  }
+
+  if (!options.interactive) {
+    proc.stdout.on('data', (data) => console.log(data.toString()))
+    proc.stderr.on('data', (data) => console.log(data.toString()))
+  }
 }
 
 function isSkypagerElectronInstalled () {

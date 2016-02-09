@@ -1,6 +1,6 @@
 {
   "name": "skypager-themes",
-  "version": "1.0.0",
+  "version": "1.20.0",
   "description": "",
   "main": "index.js",
   "loader": "index.loader.js",
@@ -8,7 +8,10 @@
     "main": "skypager.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "build:clean": "rm -rf lib dist",
+    "build": "npm run build:clean && npm run test && npm run compile",
+    "compile": "NODE_ENV=production babel -q -d lib src"
   },
   "author": "",
   "license": "ISC"

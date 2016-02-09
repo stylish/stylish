@@ -1,23 +1,105 @@
 'use strict';
 
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.init = init;
 exports.handle = handle;
+
+var _skypager = require('skypager');
+
+var _trim = require('lodash/string/trim');
+
+var _trim2 = _interopRequireDefault(_trim);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function init(program, dispatch) {
-  program.command('init <projectName>').description('create a new skypager project').option('--plugins <list>', 'a comma separated list of plugins to use', list).action(dispatch(handle));
+  program.command('init <projectName>').description('create a new skypager project').option('--overwrite', 'whether or not to replace a project that exists').option('--plugins <list>', 'a comma separated list of plugins to use', list).action(function (projectName, options) {
+    handle(projectName, options);
+  });
 }
 
 function handle(projectName) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+  var _require = require('path');
+
+  var resolve = _require.resolve;
+  var join = _require.join;
+
+  var _require2 = require('fs');
+
+  var existsSync = _require2.existsSync;
+  var writeFileSync = _require2.writeFileSync;
+
+  var destination = resolve(join(process.env.PWD, projectName));
+  var mkdir = require('mkdirp').sync;
+  var set = require('object-path').set;
+
+  if (!existsSync(destination)) {
+    mkdir(destination);
+  }
+
+  var man = {
+    name: projectName,
+    version: '1.0.0',
+    skypager: {
+      main: 'skypager.js',
+      plugins: options.plugins ? ('' + options.plugins).split(',') : []
+    },
+    devDependencies: {
+      'skypager': '^' + _skypager.manifest.version,
+      'skypager-devpack': '^' + _skypager.manifest.version,
+      'babel-preset-skypager': '^' + _skypager.manifest.version,
+      'babel-runtime': '^6.4.0'
+    }
+  };
+
+  if (options.plugins) {
+    plugins.forEach(function (plugin) {
+      man.devDependencies['skypager-plugin-' + plugin] = '*';
+    });
+  }
+
+  var folders = ['docs/pages', 'data/settings', 'src', 'actions'];
+
+  folders.forEach(function (path) {
+    mkdir(join(destination, path));
+  });
+
+  function template() {
+    for (var _len = arguments.length, parts = Array(_len), _key = 0; _key < _len; _key++) {
+      parts[_key] = arguments[_key];
+    }
+
+    return function (content) {
+      writeFileSync(join.apply(undefined, [destination].concat(parts)), content, 'utf8');
+    };
+  }
+
+  template('package.json')((0, _stringify2.default)(man, null, 2));
+
+  template('skypager.js')('\n      require(\'skypager/lib/util\').skypagerBabel()\n\n      module.exports = require(\'skypager\').load(__filename, {\n        manifest: require(\'./package.json\')\n      })\n      ', 'utf8');
+
+  template('.babelrc')('{presets:["skypager"]}');
+
+  template('.gitignore')(['logs/**/*.log', 'tmp/cache', '.DS_Store', '.env'].join("\n"));
+
+  template('docs/outline.md')('---\n      type: outline\n      ---\n\n      ## Sections\n      ### Section A\n      ### Section B\n      '.replace(/^\s+/m, ''));
+
+  template('docs/pages/cover.md')('---\n      type: page\n      cover: true\n      title: ' + projectName + '\n      ---\n\n      # Project Name\n');
 }
 
 exports.default = init;
 
 function list(val) {
   return ('' + val).split(',').map(function (val) {
-    return val.toLowerCase().replace(/^\s+|\s+$/, '');
+    return (0, _trim2.default)(val).toLowerCase();
   });
 }
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jb21tYW5kcy9pbml0LmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7O1FBQWdCLElBQUksR0FBSixJQUFJO1FBUUosTUFBTSxHQUFOLE1BQU07QUFSZixTQUFTLElBQUksQ0FBRSxPQUFPLEVBQUUsUUFBUSxFQUFFO0FBQ3ZDLFNBQU8sQ0FDSixPQUFPLENBQUMsb0JBQW9CLENBQUMsQ0FDN0IsV0FBVyxDQUFDLCtCQUErQixDQUFDLENBQzVDLE1BQU0sQ0FBQyxrQkFBa0IsRUFBRSwwQ0FBMEMsRUFBRSxJQUFJLENBQUMsQ0FDNUUsTUFBTSxDQUFDLFFBQVEsQ0FBQyxNQUFNLENBQUMsQ0FBQyxDQUFBO0NBQzVCOztBQUVNLFNBQVMsTUFBTSxDQUFFLFdBQVcsRUFBZ0I7TUFBZCxPQUFPLHlEQUFHLEVBQUU7Q0FFaEQ7O2tCQUVjLElBQUk7O0FBRW5CLFNBQVMsSUFBSSxDQUFDLEdBQUcsRUFBRTtBQUNqQixTQUFPLE1BQUksR0FBRyxFQUFJLEtBQUssQ0FBQyxHQUFHLENBQUMsQ0FBQyxHQUFHLENBQUMsVUFBQSxHQUFHO1dBQUksR0FBRyxDQUFDLFdBQVcsRUFBRSxDQUFDLE9BQU8sQ0FBQyxXQUFXLEVBQUMsRUFBRSxDQUFDO0dBQUEsQ0FBQyxDQUFBO0NBQ25GIiwiZmlsZSI6ImluaXQuanMiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgZnVuY3Rpb24gaW5pdCAocHJvZ3JhbSwgZGlzcGF0Y2gpIHtcbiAgcHJvZ3JhbVxuICAgIC5jb21tYW5kKCdpbml0IDxwcm9qZWN0TmFtZT4nKVxuICAgIC5kZXNjcmlwdGlvbignY3JlYXRlIGEgbmV3IHNreXBhZ2VyIHByb2plY3QnKVxuICAgIC5vcHRpb24oJy0tcGx1Z2lucyA8bGlzdD4nLCAnYSBjb21tYSBzZXBhcmF0ZWQgbGlzdCBvZiBwbHVnaW5zIHRvIHVzZScsIGxpc3QpXG4gICAgLmFjdGlvbihkaXNwYXRjaChoYW5kbGUpKVxufVxuXG5leHBvcnQgZnVuY3Rpb24gaGFuZGxlIChwcm9qZWN0TmFtZSwgb3B0aW9ucyA9IHt9KSB7XG5cbn1cblxuZXhwb3J0IGRlZmF1bHQgaW5pdFxuXG5mdW5jdGlvbiBsaXN0KHZhbCkge1xuICByZXR1cm4gYCR7IHZhbCB9YC5zcGxpdCgnLCcpLm1hcCh2YWwgPT4gdmFsLnRvTG93ZXJDYXNlKCkucmVwbGFjZSgvXlxccyt8XFxzKyQvLCcnKSlcbn1cbiJdfQ==

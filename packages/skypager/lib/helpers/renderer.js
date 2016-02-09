@@ -1,6 +1,24 @@
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
+
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = require('babel-runtime/helpers/inherits');
+
+var _inherits3 = _interopRequireDefault(_inherits2);
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -12,26 +30,15 @@ var _helper2 = _interopRequireDefault(_helper);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Renderers are functions which turn an entity into something like HTML
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               */
-
 var Renderer = (function (_Helper) {
-  _inherits(Renderer, _Helper);
+  (0, _inherits3.default)(Renderer, _Helper);
 
   function Renderer() {
-    _classCallCheck(this, Renderer);
-
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(Renderer).apply(this, arguments));
+    (0, _classCallCheck3.default)(this, Renderer);
+    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Renderer).apply(this, arguments));
   }
 
-  _createClass(Renderer, [{
+  (0, _createClass3.default)(Renderer, [{
     key: 'helperType',
     get: function get() {
       return 'renderer';
@@ -42,9 +49,11 @@ var Renderer = (function (_Helper) {
       return Renderer;
     }
   }]);
-
   return Renderer;
-})(_helper2.default);
+})(_helper2.default); /**
+                      *
+                      * Renderers are functions which turn an entity into something like HTML
+                      *
+                      */
 
 exports.default = Renderer;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9oZWxwZXJzL3JlbmRlcmVyLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztJQVFxQixRQUFRO1lBQVIsUUFBUTs7V0FBUixRQUFROzBCQUFSLFFBQVE7O2tFQUFSLFFBQVE7OztlQUFSLFFBQVE7O3dCQUNUO0FBQ2hCLGFBQU8sVUFBVSxDQUFBO0tBQ2xCOzs7d0JBRWtCO0FBQ2pCLGFBQU8sUUFBUSxDQUFBO0tBQ2hCOzs7U0FQa0IsUUFBUTs7O2tCQUFSLFFBQVEiLCJmaWxlIjoicmVuZGVyZXIuanMiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbipcbiogUmVuZGVyZXJzIGFyZSBmdW5jdGlvbnMgd2hpY2ggdHVybiBhbiBlbnRpdHkgaW50byBzb21ldGhpbmcgbGlrZSBIVE1MXG4qXG4qL1xuXG5pbXBvcnQgSGVscGVyIGZyb20gJy4vaGVscGVyJ1xuXG5leHBvcnQgZGVmYXVsdCBjbGFzcyBSZW5kZXJlciBleHRlbmRzIEhlbHBlciB7XG4gIGdldCBoZWxwZXJUeXBlICgpIHtcbiAgICByZXR1cm4gJ3JlbmRlcmVyJ1xuICB9XG5cbiAgZ2V0IGhlbHBlckNsYXNzICgpIHtcbiAgICByZXR1cm4gUmVuZGVyZXJcbiAgfVxufVxuIl19

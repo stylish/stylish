@@ -1,9 +1,9 @@
 import * as util from '../src/util'
 
-describe("Utils", ()=>{
-  describe("No Conflict", ()=>{
-    it("makes vars available in the global scope and cleans up after itself", ()=>{
-      
+describe("Utils", function(){
+  describe("No Conflict", function(){
+    it("makes vars available in the global scope and cleans up after itself", function(){
+
       delete(global.clean_this_up)
       delete(global.no_conflict_var)
 
@@ -18,9 +18,9 @@ describe("Utils", ()=>{
           test = 69
         }
       }
-      
+
       util.noConflict(fn, {clean_this_up: true, no_conflict_var: 99})()
-      
+
       test.should.equal(69)
       global.should.have.property('no_conflict_var')
       global.should.not.have.property('clean_this_up')

@@ -1,8 +1,8 @@
 navigation:
   links:
     - label: Home
-      icon: Home
+      icon: rocket
       link: '/'
-    - label: Upload
-      icon: database
+    - label: Whatever
+      icon: cloud
       link: /upload

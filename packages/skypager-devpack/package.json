@@ -1,20 +1,15 @@
 {
   "name": "skypager-devpack",
-  "version": "1.0.5",
+  "version": "1.20.0",
   "description": "configurable webpack dev server and build tool so you don't have to",
   "main": "index.js",
   "dependencies": {
     "babel-core": "^6.4.0",
     "babel-loader": "^6.2.1",
-    "babel-plugin-transform-decorators-legacy": "^1.3.4",
-    "babel-preset-es2015": "^6.3.13",
-    "babel-preset-react": "^6.3.13",
-    "babel-preset-react-hmre": "^1.0.1",
-    "babel-preset-stage-0": "^6.3.13",
-    "commander": "^2.9.0",
+    "babel-preset-react-hmre": "latest",
+    "babel-preset-skypager": "^2.0.3",
     "css-loader": "^0.23.1",
     "debounce": "^1.0.0",
-    "ejs-loader": "^0.2.1",
     "express": "^4.13.3",
     "file-loader": "^0.8.5",
     "html-webpack-plugin": "^2.7.2",
@@ -26,7 +21,9 @@
     "postcss-import": "7.1.3",
     "postcss-loader": "0.8.0",
     "react": "^0.14.6",
+    "stats-webpack-plugin": "^0.3.0",
     "style-loader": "^0.13.0",
+    "surge": "latest",
     "url-loader": "^0.5.7",
     "webpack": "^1.12.11",
     "webpack-configurator": "^0.3.1",
@@ -34,13 +31,19 @@
     "webpack-hot-middleware": "^2.6.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "build:clean": "rm -rf lib dist",
+    "build": "npm run build:clean && npm run test && npm run compile",
+    "compile": "NODE_ENV=production babel -q -d lib src"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/skypager/superdevpack.git"
   },
-  "author": "Mike Kruk <mike@ripeworks.com> (http://ripeworks.com)",
+  "author": [
+    "Mike Kruk <mike@ripeworks.com> (http://ripeworks.com)",
+    "Jonathan Soeder <jon@chicago.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/skypager/superdevpack/issues"

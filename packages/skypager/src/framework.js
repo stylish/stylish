@@ -27,7 +27,7 @@ class Framework {
     this.type = 'framework'
     this.root = __dirname
 
-    util.hide.getter(this, 'manifest', () => assign(require(this.root + '/../package.json'), {root}))
+    util.hide.getter(this, 'manifest', () => Object.assign(require(this.root + '/../package.json'), {root}))
 
     const plugins = [ ]
 

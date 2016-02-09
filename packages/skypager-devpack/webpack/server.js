@@ -2,8 +2,11 @@ const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
 const express = require('express')
+const lodash = require('lodash')
+const isFunction = lodash.isFunction
 
-module.exports = function(argv) {
+module.exports = function(argv, serverOptions) {
+  serverOptions = serverOptions || {}
   if (!argv) { argv = require('yargs').argv }
 
   var app = express()
@@ -17,9 +20,34 @@ module.exports = function(argv) {
 
   config = config.resolve()
 
-  var compiler = webpack(config)
+  // Monkey patching the Webpack Dev Server Compiler
+  // so that when the compile finishes we can do something.
+  // e.g. let the skypager-electron system know the bundle is ready
+  var compiler = webpack(config),
+      originalWatch = compiler.watch
 
-  console.log('Config', config.output)
+  compiler.watch = function(watchOptions, handler) {
+    originalWatch.call(compiler, watchOptions, function(err, stats) {
+      handler && handler(err, stats)
+
+      if (serverOptions.onCompile && isFunction(serverOptions.onCompile)) {
+        serverOptions.onCompile(err, stats)
+      }
+
+      try {
+        if (argv.saveWebpackStats) {
+          fs.writeFileSync(
+            argv.saveWebpackStats,
+            JSON.stringify(stats.toJson(), null, 2),
+            ''
+          )
+        }
+      } catch(error) {
+        console.error('ERRROR', error.message)
+        fs.writeFileSync('/Users/jonathan/Skypager/error.txt', error.message)
+      }
+    })
+  }
 
   var devMiddleware = require('webpack-dev-middleware')(compiler, {
     publicPath: config.output.publicPath,
