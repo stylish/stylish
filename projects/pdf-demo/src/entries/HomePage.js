@@ -7,9 +7,36 @@ import Icon from 'skypager-ui/src/components/Icon'
 import { connect } from 'react-redux'
 const innerGlyphicon = <Icon icon="magnifying-glass" />;
 
+import { SearchBox, RefinementListFilter, Hits, HitsStats, SearchkitComponent,
+    SelectedFilters, MenuFilter,HierarchicalMenuFilter, Pagination, ResetFilters} from "searchkit";
+
+
+
+
+class PropertyHits extends Searchkit.Hits {
+  
+  renderResult(result:any) {
+        let url = "/PropertyDetail" + result._source.id 
+        return (
+            <tr>
+               <td>{result}</td>
+               <td></td>
+               <td></td>
+               <td></td>
+            </tr>
+        )
+    }
+  
+}
+
+
+
+
+
 
 
 export class HomePage extends React.Component {
+	
   constructor (props, context) {
   	super(props)
 
@@ -27,38 +54,50 @@ export class HomePage extends React.Component {
   }
 
   render () {
+    const SearchkitProvider = Searchkit.SearchkitProvider;
+    const Searchbox = Searchkit.SearchBox;
+    const Hits = Searchkit.Hits;	
+  
   	let { searchTerm } = this.state
   	let onSearchChange = this.onSearchChange
 
+  	const sk = new SearchkitManager("https://dori-us-east-1.searchly.com", {
+  		basicAuth:"site:4f98bdfb2b2d3f4dc9b9b86c61bcd10f"
+	  })
+
     return (
-       <div id="container">
+
+        <div id="container">
+        <SearchkitProvider searchkit={sk}>
         <Grid>
-        	<Row>
-        		<Col xs={8}>
-        				<DashboardHeader title='PDF Management System' subtitle='Search Properties'>
-				       	  <Input ref="search" name='searchTerm' type="text" value={searchTerm} onChange={onSearchChange} onKeyUp={onSearchChange} placeholder="Search Properties" addonAfter={innerGlyphicon}/>
-				       	</DashboardHeader>
-        		</Col>
-        	</Row>
-        	<Row>
-        		<Col xs={11}>
-        				<table className='table table-condensed'>
-				       		<thead>
-				       			<tr>
-				       				<th>Property Address</th>
-				       				<th>Status</th>
-				       				<th>Reconciled Value</th>
-				       				<th>Actions</th>
-				       			</tr>
-				       		</thead>
-				       		<tbody />
-				       	</table>
-        		</Col>
-        	</Row>
+          <Row>
+            <Col xs={8}>
+                <DashboardHeader title='PDF Management System' subtitle='Search Properties'>
+                  <Searchbox searchOnChange={true}  />
+                </DashboardHeader>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={11}>
+                <table className='table table-condensed'>
+                  <thead>
+                    <tr>
+                      <th>Property Address</th>
+                      <th>Status</th>
+                      <th>Reconciled Value</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <PropertyHits hitsPerPage={10}/>
+                </table>
+            </Col>
+          </Row>
 
         </Grid>
-       	
-	   </div>
+        </SearchkitProvider>
+     </div>
+
+      
     )
   }
 

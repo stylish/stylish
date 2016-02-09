@@ -1,26 +1,38 @@
 {
   "name": "skypager-central",
-  "version": "1.21.0",
-  "private": "true",
+  "version": "1.1.0",
   "description": "development base for the skypager portfolio",
+  "main": "skypager.js",
   "skypager": {
     "main": "skypager.js",
     "theme": "dashboard",
+    "electron": {
+      "main": "src/electron/main",
+      "defaultUrl": "app/index.html"
+    },
     "plugins": [
       "blueprints"
     ]
   },
+  "blueprint": {
+    "storage": {
+      "packages": "packages",
+      "projects": "projects"
+    }
+  },
   "scripts": {
     "docs": "skypager author docs"
   },
-  "main": "app.js",
   "dependencies": {
     "babel-core": "^6.4.0",
     "babel-loader": "^6.2.1",
-    "babel-preset-skypager": "^2.0.3",
+    "babel-plugin-add-module-exports": "^0.1.2",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-react-hmre": "^1.0.1",
+    "babel-preset-stage-0": "^6.3.13",
     "bootstrap": "^3.3.6",
     "chokidar-cli": "^1.2.0",
-    "classnames": "^2.2.3",
     "commander": "^2.9.0",
     "css-loader": "^0.23.1",
     "electron-prebuilt": "^0.36.7",
@@ -36,6 +48,7 @@
     "json-loader": "^0.5.4",
     "less": "^2.5.3",
     "less-loader": "latest",
+    "lodash": "^4.2.1",
     "postcss-cssnext": "2.4.0",
     "postcss-import": "7.1.3",
     "postcss-loader": "0.8.0",
@@ -43,6 +56,7 @@
     "react-body-classname": "latest",
     "react-bootstrap": "^0.28.2",
     "react-dom": "^0.14.6",
+    "react-dropzone": "^3.3.2",
     "react-redux": "^4.0.6",
     "react-router": "^1.0.3",
     "redbox-react": "^1.2.0",
@@ -50,13 +64,13 @@
     "redux-actions": "^0.9.1",
     "redux-simple-router": "^2.0.2",
     "redux-thunk": "^1.0.3",
-    "skypager": "^1.17.1",
-    "skypager-application": "^1.17.1",
-    "skypager-devpack": "^1.17.1",
-    "skypager-electron": "^1.17.1",
-    "skypager-plugin-blueprints": "^1.17.1",
-    "skypager-themes": "^1.17.1",
-    "skypager-ui": "^1.17.1",
+    "skypager": "file:./packages/skypager",
+    "skypager-application": "file:./packages/skypager-application",
+    "skypager-devpack": "file:./packages/skypager-devpack",
+    "skypager-electron": "file:./packages/skypager-electron",
+    "skypager-plugin-blueprints": "file:./packages/skypager-plugin-blueprints",
+    "skypager-themes": "file:./packages/skypager-themes",
+    "skypager-ui": "file:./packages/skypager-ui",
     "style-loader": "^0.13.0",
     "surge": "^0.17.5",
     "url-loader": "^0.5.7",
