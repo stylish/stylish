@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
   "bin": {
@@ -52,7 +52,7 @@
     "i": "^0.3.3",
     "is-domain": "0.0.1",
     "js-yaml": "^3.4.5",
-    "lodash": "^3.10.1",
+    "lodash": "^4.0.0",
     "md5": "^2.0.0",
     "mdast": "^2.2.2",
     "mdast-html": "^1.2.1",

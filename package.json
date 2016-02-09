@@ -15,9 +15,10 @@
   },
   "main": "app.js",
   "dependencies": {
+    "lodash": "^4.0.0",
     "babel-core": "^6.4.0",
     "babel-loader": "^6.2.1",
-    "babel-preset-skypager": "^2.0.3",
+    "babel-preset-skypager": "^1.21.0",
     "bootstrap": "^3.3.6",
     "chokidar-cli": "^1.2.0",
     "classnames": "^2.2.3",
