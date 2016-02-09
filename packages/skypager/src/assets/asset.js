@@ -70,6 +70,10 @@ class Asset {
     return util.pick(this, ...args)
   }
 
+  get(...args) {
+    return util.result(this, ...args)
+  }
+
   result(...args) {
     return util.result(this, ...args)
   }

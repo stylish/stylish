@@ -1,3 +1,7 @@
+import omit from 'lodash/object/omit'
+import result from 'lodash/object/result'
+import isRegexp from 'lodash/lang/isRegexp'
+
 /**
  * Consumes a Skypager Bundle Export and provides
  * a Project like interface.  It also can generate a Skypager.Application
@@ -18,15 +22,31 @@ class Bundle {
       assign(this, options.computed)
     }
 
-    this.assets = this.bundle.assets
-    this.content = this.bundle.content
-    this.docs = this.content.docs
-    this.data = this.content.data_sources
-    this.entities = this.bundle.entities
-    this.models = this.bundle.models
-    this.project = this.bundle.project
-    this.settings = (this.data.settings && this.data.settings.data) || {}
+    let exporterKeys = keys(bundle)
+    let content = bundle.content
+    let contentCollections = keys(content)
+
+    delegate(this, ...exporterKeys).to(bundle)
+    delegate(this, ...contentCollectons).to(content)
+
     this.entityNames = keys(this.entities || {})
+
+    // naming irregularities
+    assign(this, {
+      get settingsFiles() {
+        return bundle.content.settings
+      },
+      get assetFiles() {
+        return bundle.content.assets
+      },
+      get data() {
+        return bundle.content.data_sources
+      }
+    })
+
+    if (options.subscribe) {
+      this.setupSubscription(options.subscribe)
+    }
   }
 
   createApp(appClass, options = {}) {
@@ -55,6 +75,12 @@ class Bundle {
     }
   }
 
+  // subscribe to a notifications channel which will push updates
+  // whenever the bundle changes
+  setupSubscription(options = {}) {
+
+  }
+
   requireEntryPoint (id) {
     return this.require('script', `entries/${ id }`)
   }
@@ -72,15 +98,14 @@ class Bundle {
   }
 
   require(assetType, assetId) {
-    let key = this.content[assetType + 's'][assetId].paths.relative
+    let key = this.get(`${ assetType }s.${ assetId }.paths.relative`)
+    let asset = this.get(`requireContexts.${ assetType }s`)('./' + key)
 
-    let mod = this.bundle.requireContexts[assetType + 's'](`./${ key }`)
-
-    if (!mod) {
+    if (!asset) {
        throw('Could not find ' + assetType + ' ' + assetId)
     }
 
-    return mod.default ? mod.default : mod
+    return asset.default ? asset.default : asset
   }
 
 
@@ -201,7 +226,7 @@ function filterQuery (list = [], params) {
       let param = params[key]
       let value = item[key]
 
-      if (isRegex(param) && param.test(value)) {
+      if (isRegexp(param) && param.test(value)) {
         return true
       }
 
@@ -227,14 +252,6 @@ function values(obj) {
 
 function isArray(arg) {
   return Object.prototype.toString.call(arg) === '[object Array]'
-}
-
-function isRegex(val) {
-  if ((typeof val === 'undefined' ? 'undefined' : typeof(val)) === 'object' && Object.getPrototypeOf(val).toString() === '/(?:)/') {
-    return true
-  }
-
-  return false
 }
 
 const ProjectReducers = {
@@ -299,5 +316,22 @@ const ProjectReducers = {
   },
 
 }
+
+function delegate(recipient, ...propertyNames) {
+  let i = (source) => {
+    propertyNames.forEach(prop => {
+      defineProperty(recipient, prop, {
+        get: function () {
+          return source[prop]
+        }
+      })
+    })
+  }
+
+  i.to = i
+
+  return i
+}
+
 
 const { defineProperty, keys, assign } = Object

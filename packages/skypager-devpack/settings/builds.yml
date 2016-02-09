@@ -1,0 +1,4 @@
+builds:
+  production:
+    integrations:
+      segment: true

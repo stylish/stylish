@@ -19,14 +19,14 @@ var _trim2 = _interopRequireDefault(_trim);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function init(program, dispatch) {
-  program.command('init <projectName>').description('create a new skypager project').option('--overwrite', 'whether or not to replace a project that exists').option('--plugins <list>', 'a comma separated list of plugins to use', list).action(function (projectName, options) {
+  program.command('init <projectName> [destination]').description('create a new skypager project').option('--overwrite', 'whether or not to replace a project that exists').option('--destination', '').option('--plugins <list>', 'a comma separated list of plugins to use', list).action(function (projectName, options) {
     handle(projectName, options);
   });
 }
 
-function handle(projectName) {
-  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-  var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+function handle(projectName, destination) {
+  var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+  var context = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
 
   var _require = require('path');
 
@@ -38,9 +38,10 @@ function handle(projectName) {
   var existsSync = _require2.existsSync;
   var writeFileSync = _require2.writeFileSync;
 
-  var destination = resolve(join(process.env.PWD, projectName));
   var mkdir = require('mkdirp').sync;
   var set = require('object-path').set;
+
+  destination = destination || options.destination || resolve(join(process.env.PWD, projectName));
 
   if (!existsSync(destination)) {
     mkdir(destination);

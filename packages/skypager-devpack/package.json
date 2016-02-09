@@ -7,7 +7,7 @@
     "babel-core": "^6.4.0",
     "babel-loader": "^6.2.1",
     "babel-preset-react-hmre": "latest",
-    "babel-preset-skypager": "^2.0.3",
+    "babel-preset-skypager": "^1.18.0",
     "css-loader": "^0.23.1",
     "debounce": "^1.0.0",
     "express": "^4.13.3",

@@ -1,23 +1,26 @@
 import { manifest as framework } from 'skypager'
 import trim from 'lodash/string/trim'
+import { dump as toYaml } from 'js-yaml'
 
 export function init (program, dispatch) {
   program
-    .command('init <projectName>')
+    .command('init <projectName> [destination]')
     .description('create a new skypager project')
     .option('--overwrite','whether or not to replace a project that exists')
+    .option('--destination','')
     .option('--plugins <list>', 'a comma separated list of plugins to use', list)
     .action(function(projectName, options) {
       handle(projectName, options)
     })
 }
 
-export function handle (projectName, options = {}, context = {}) {
+export function handle (projectName, destination, options = {}, context = {}) {
   const { resolve, join } = require('path')
   const { existsSync, writeFileSync } = require('fs')
-  const destination = resolve(join(process.env.PWD, projectName))
   const mkdir = require('mkdirp').sync
   const set = require('object-path').set
+
+  destination = destination || options.destination || resolve(join(process.env.PWD, projectName))
 
   if ( !existsSync(destination) ) {
     mkdir(destination)
@@ -46,9 +49,14 @@ export function handle (projectName, options = {}, context = {}) {
 
     const folders = [
       'docs/pages',
-      'data/settings',
+      'settings',
       'src',
-      'actions'
+      'models',
+      'actions',
+      'data',
+      'dist',
+      'public',
+      'tmp/cache'
     ]
 
     folders.forEach(path => {
@@ -59,7 +67,7 @@ export function handle (projectName, options = {}, context = {}) {
       return (content) => {
         writeFileSync(
           join(destination, ...parts),
-          content,
+          content.split("\n").map(line => line.trim()).join("\n"),
           'utf8'
         )
       }
@@ -81,7 +89,35 @@ export function handle (projectName, options = {}, context = {}) {
 
     template('.babelrc')('{presets:["skypager"]}')
 
-    template('.gitignore')(['logs/**/*.log','tmp/cache', '.DS_Store', '.env' ].join("\n"))
+    template('.gitignore')(['logs/**/*.log','tmp/cache', '.DS_Store', '.env', 'settings/secrets.yml' ].join("\n"))
+    template('.npmignore')(['logs/**/*.log','tmp/cache', '.DS_Store', '.env', 'settings/secrets.yml' ].join("\n"))
+
+    template('settings/publishing.yml', toYaml({
+      publishing: {
+        service: 'skypager.io'
+      }
+    }))
+
+    template('settings/integrations.yml', toYaml({
+      dropbox: {
+        token: 'env.DROPBOX_API_TOKEN'
+      },
+      github: {
+        token: 'env.GITHUB_ACCESS_TOKEN'
+      },
+      aws: {
+        secret_access_key: 'env.AWS_SECRET_ACCESS_KEY',
+        access_key_id: 'env.AWS_ACCESS_KEY_ID'
+      },
+      slack: {
+        token: 'env.SLACK_ACCESS_TOKEN'
+      },
+      auth0: {
+        domain: 'env.AUTH0_CLIENT_DOMAIN',
+        clientId: 'env.AUTH0_CLIENT_ID'
+      }
+    }))
+
 
     template('docs/outline.md')(
       `---
@@ -91,8 +127,7 @@ export function handle (projectName, options = {}, context = {}) {
       ## Sections
       ### Section A
       ### Section B
-      `.replace(/^\s+/m, '')
-    )
+      `)
 
     template('docs/pages/cover.md')(
       `---
