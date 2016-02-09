@@ -5,9 +5,8 @@
     "type": "git",
     "url": "https://github.com/architects/skypager-central"
   },
-
-  "skypager":{
-    "plugins":[ 
+  "skypager": {
+    "plugins": [
       "blueprints",
       "integrations"
     ],
@@ -15,16 +14,15 @@
     "theme": "dashboard",
     "domain": "pdf-demo.skypager.io",
     "platform": "web",
-    "featureFlags":{
+    "featureFlags": {
       "API_BASE_URL": "http://localhost:3000"
     },
     "staticAssets": {
-      "headerScripts":[
+      "headerScripts": [
         "https://cdn.auth0.com/js/lock-8.2.js"
       ]
     }
   },
-
   "scripts": {
     "bundle": "skypager export bundle",
     "predev": "npm run bundle",
@@ -33,18 +31,16 @@
     "build": "skypager build --push-state",
     "deploy": "skypager publish"
   },
-
   "dependencies": {
-    "skypager-electron": "latest",
+    "searchkit": "^0.6.1",
     "skypager": "latest",
     "skypager-application": "latest",
-    "skypager-ui": "latest",
-    "skypager-themes": "latest"
+    "skypager-electron": "latest",
+    "skypager-themes": "latest",
+    "skypager-ui": "latest"
   },
-
   "devDependencies": {
     "skypager-devpack": "latest",
     "skypager-plugin-blueprints": "latest"
   }
-
 }
