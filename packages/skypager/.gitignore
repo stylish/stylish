@@ -6,4 +6,4 @@ npm-debug.log
 .env
 .DS_Store
 test/fixture/dist/snapshot.*
-test/fixture/dist/bundle/**/*.js
+test/fixture/dist/bundle/*/*.*

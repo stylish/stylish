@@ -1,3 +1,4 @@
+const BundleWrapperPath = require('path').resolve('../../lib/bundle.js')
 export function BrowserBundle (options = {}) {
   let project = options.project = this
 
@@ -93,7 +94,7 @@ export function ProjectExporter (options = {}, callback) {
     })
   })
 
-  lines.push(`module.exports = require('${ require.resolve('../bundle') }').create(bundle)`)
+  lines.push(`module.exports = require('skypager/lib/bundle').create(bundle)`)
 
   return write(
     project.path('build','bundle','index.js'), lines.join("\n")

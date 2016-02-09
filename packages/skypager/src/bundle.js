@@ -22,8 +22,8 @@ class Bundle {
       assign(this, options.computed)
     }
 
-    let exporterKeys = keys(bundle)
-    let content = bundle.content
+    let exporterKeys = keys(bundle || {})
+    let content = bundle.content || {}
     let contentCollections = keys(content)
 
     delegate(this, ...exporterKeys).to(bundle)
