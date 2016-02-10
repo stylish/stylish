@@ -18,3 +18,4 @@ packages/skypager-webhook-logger
 public/
 webpack-stats.json
 log/electron-actions.json
+node_modules
