@@ -9,16 +9,19 @@ import ViewComponent from './entries/ViewComponent'
 import ViewLayout from './entries/ViewLayout'
 import ViewTheme from './entries/ViewTheme'
 
-Application.create({
-  root: 'app',
-  layout: FluidLayout,
-  entryPoints:{
-    index: HomePage,
-    themes: BrowseThemes,
-    '/themes/:id': ViewTheme,
-    components: BrowseComponents,
-    '/components/:id': ViewComponent,
-    layouts: BrowseLayouts,
-    '/layouts/:id': ViewLayout
-  }
-})
+module.exports = () => {
+  return Application.create({
+    root: 'app',
+    layout: FluidLayout,
+    entryPoints:{
+      index: HomePage,
+      themes: BrowseThemes,
+      '/themes/:id': ViewTheme,
+      components: BrowseComponents,
+      '/components/:id': ViewComponent,
+      layouts: BrowseLayouts,
+      '/layouts/:id': ViewLayout
+    }
+  })
+}
+

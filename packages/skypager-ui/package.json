@@ -1,7 +1,7 @@
 {
   "name": "skypager-ui",
   "description": "collection of ui layouts and components styled by a data-driven bootstrap theme generator",
-  "version": "1.30.0",
+  "version": "1.31.0",
   "main": "index.js",
   "skypager": {
     "main": "./skypager.js"
@@ -14,7 +14,7 @@
     "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
     "build:clean": "rm -rf lib dist",
     "build": "npm run build:clean && npm run test && npm run compile",
-    "compile": "NODE_ENV=production skypager build --output-folder lib --skip-theme --no-content-hash --webpack-config=./webpack.bundle.config.js --entry-only" 
+    "compile": "NODE_ENV=production skypager build --output-folder lib --skip-theme --no-content-hash --webpack-config=./webpack.bundle.config.js --entry-only"
   },
   "dependencies": {
     "bootstrap": "^3.3.6",

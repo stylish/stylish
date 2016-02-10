@@ -1,6 +1,6 @@
 {
   "name": "skypager-devpack",
-  "version": "1.30.0",
+  "version": "1.31.0",
   "description": "configurable webpack dev server and build tool so you don't have to",
   "main": "index.js",
   "dependencies": {
@@ -36,7 +36,7 @@
     "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
     "build:clean": "rm -rf lib dist",
     "build": "npm run build:clean && npm run test && npm run compile",
-    "compile": "NODE_ENV=production babel -q -d lib src"
+    "compile": "NODE_ENV=production babel -q -d lib src && rm -rf lib/ui lib/docs"
   },
   "repository": {
     "type": "git",
