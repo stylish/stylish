@@ -1,6 +1,6 @@
 {
   "name": "babel-preset-skypager",
-  "version": "1.22.0",
+  "version": "1.23.0",
   "description": "babel presets for building react apps in es6",
   "main": "index.js",
   "scripts": {
@@ -17,6 +17,7 @@
   "author": "Jonathan Soeder <jon@chicago.com>",
   "license": "MIT",
   "dependencies": {
+		"babel-runtime": "^6.3.19",
     "babel-plugin-check-es2015-constants": "^6.3.13",
     "babel-plugin-syntax-async-functions": "^6.3.13",
     "babel-plugin-syntax-jsx": "^6.3.13",
@@ -52,12 +53,6 @@
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.2",
     "redbox-react": "^1.2.2"
-  },
-  "devDependencies": {
-    "babel-runtime": "^6.3.19",
-    "babel-preset-skypager": "^1.22.0",
-    "skypager": "^1.22.0",
-    "skypager-devpack": "^1.22.0"
   },
   "peerDependencies": {
     "babel-runtime": "^6.3.19"
