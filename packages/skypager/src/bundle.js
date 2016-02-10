@@ -1,7 +1,3 @@
-import omit from 'lodash/object/omit'
-import result from 'lodash/object/result'
-import isRegexp from 'lodash/lang/isRegexp'
-
 /**
  * Consumes a Skypager Bundle Export and provides
  * a Project like interface.  It also can generate a Skypager.Application
@@ -22,14 +18,29 @@ class Bundle {
       assign(this, options.computed)
     }
 
-    let exporterKeys = keys(bundle || {})
     let content = bundle.content || {}
     let contentCollections = keys(content)
 
-    delegate(this, ...exporterKeys).to(bundle)
-    delegate(this, 'docs', 'data_sources', 'scripts', 'stylesheets').to(content)
+    this.assets = bundle.assets
+    this.project = bundle.project
+    this.entities = bundle.entities
+    this.content = bundle.content
+    this.model = bundle.models
+    this.settings = bundle.settings
+
+    this.assetsContent = this.content.assets
+    this.settingsContent = this.content.settings
+
+    this.docs = this.content.documents
+    this.data = this.content.data_sources
+    this.scripts = this.content.scripts
+    this.stylesheets = this.content.stylesheets
+    this.packages = this.content.packages
+    this.projects = this.content.projects
 
     this.entityNames = keys(this.entities || {})
+
+    this.requireContexts = bundle.requireContexts
 
     // naming irregularities
     assign(this, {
@@ -98,8 +109,8 @@ class Bundle {
   }
 
   require(assetType, assetId) {
-    let key = this.get(`${ assetType }s.${ assetId }.paths.relative`)
-    let asset = this.get(`requireContexts.${ assetType }s`)('./' + key)
+    let key = this[`${assetType}s`][assetId].paths.relative
+    let asset = this.requireContexts[`${assetType}s`]( './' + key )
 
     if (!asset) {
        throw('Could not find ' + assetType + ' ' + assetId)

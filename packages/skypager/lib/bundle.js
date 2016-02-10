@@ -4,10 +4,6 @@ var _typeof2 = require('babel-runtime/helpers/typeof');
 
 var _typeof3 = _interopRequireDefault(_typeof2);
 
-var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
-
-var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
-
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -15,18 +11,6 @@ var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
-
-var _omit = require('lodash/object/omit');
-
-var _omit2 = _interopRequireDefault(_omit);
-
-var _result = require('lodash/object/result');
-
-var _result2 = _interopRequireDefault(_result);
-
-var _isRegexp = require('lodash/lang/isRegexp');
-
-var _isRegexp2 = _interopRequireDefault(_isRegexp);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -58,14 +42,29 @@ module.exports = (function () {
       assign(this, options.computed);
     }
 
-    var exporterKeys = keys(bundle || {});
     var content = bundle.content || {};
     var contentCollections = keys(content);
 
-    delegate.apply(undefined, [this].concat((0, _toConsumableArray3.default)(exporterKeys))).to(bundle);
-    delegate(this, 'docs', 'data_sources', 'scripts', 'stylesheets').to(content);
+    this.assets = bundle.assets;
+    this.project = bundle.project;
+    this.entities = bundle.entities;
+    this.content = bundle.content;
+    this.model = bundle.models;
+    this.settings = bundle.settings;
+
+    this.assetsContent = this.content.assets;
+    this.settingsContent = this.content.settings;
+
+    this.docs = this.content.documents;
+    this.data = this.content.data_sources;
+    this.scripts = this.content.scripts;
+    this.stylesheets = this.content.stylesheets;
+    this.packages = this.content.packages;
+    this.projects = this.content.projects;
 
     this.entityNames = keys(this.entities || {});
+
+    this.requireContexts = bundle.requireContexts;
 
     // naming irregularities
     assign(this, {
@@ -142,8 +141,8 @@ module.exports = (function () {
   }, {
     key: 'require',
     value: function require(assetType, assetId) {
-      var key = this.get(assetType + 's.' + assetId + '.paths.relative');
-      var asset = this.get('requireContexts.' + assetType + 's')('./' + key);
+      var key = this[assetType + 's'][assetId].paths.relative;
+      var asset = this.requireContexts[assetType + 's']('./' + key);
 
       if (!asset) {
         throw 'Could not find ' + assetType + ' ' + assetId;
@@ -285,7 +284,7 @@ function filterQuery() {
       var param = params[key];
       var value = item[key];
 
-      if ((0, _isRegexp2.default)(param) && param.test(value)) {
+      if (isRegexp(param) && param.test(value)) {
         return true;
       }
 

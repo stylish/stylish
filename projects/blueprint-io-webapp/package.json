@@ -8,8 +8,7 @@
 
   "skypager":{
     "plugins":[ 
-      "blueprints",
-      "integrations"
+      "blueprints"
     ],
     "main": "skypager.js",
     "theme": "dashboard-dark",
@@ -35,16 +34,14 @@
   },
 
   "dependencies": {
-    "skypager-electron": "latest",
-    "skypager": "latest",
-    "skypager-application": "latest",
-    "skypager-ui": "latest",
-    "skypager-themes": "latest"
+    "skypager-ui": "^1.27.0",
+    "skypager-application": "^1.27.0"
   },
 
   "devDependencies": {
-    "skypager-devpack": "latest",
-    "skypager-plugin-blueprints": "latest"
+    "skypager-devpack": "^1.27.3",
+    "skypager-plugin-blueprints": "^1.25.0",
+    "skypager": "^1.27.3"
   }
 
 }

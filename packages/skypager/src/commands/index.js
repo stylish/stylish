@@ -112,7 +112,6 @@ function configure (program, options = {}) {
 function loadProject(fromPath, silent = false) {
   try {
     skypagerBabel()
-    console.log('loading project', fromPath)
     return loadProjectFromDirectory(fromPath || process.env.PWD)
   } catch (error) {
     if (!silent && requestedCommand !== 'init' && requestedCommand !== 'help') {
