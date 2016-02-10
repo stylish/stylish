@@ -28,7 +28,9 @@ execute(function(params, context) {
 
   project.query('packages', {id:/packages.skypager/}).forEach(pkg => {
     console.log('  - '.magenta + ' ' + pkg.title)
-    spawn('npm', ['publish'], {cwd: pkg.sourcePath})
+    let proc = spawn('npm', ['publish'], {cwd: pkg.sourcePath})
+    proc.stdout.pipe(process.stdout)
+    proc.stderr.pipe(process.stderr)
   })
 
   console.log('ok.'.green + ' finished.')

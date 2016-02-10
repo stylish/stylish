@@ -27,10 +27,10 @@ module.exports = function (argv) {
     'node_modules'
   ]
 
-  const hasModules = fs.existsSync(path.join(__dirname, '../../node_modules'))
+  const hasModules = fs.existsSync(path.join(__dirname, '../../../node_modules'))
 
   const resolveBabelPackages = packages => {
-    const modulePath = hasModules ? '../../node_modules' : babelModulesPath
+    const modulePath = hasModules ? '../../../node_modules' : babelModulesPath
     return packages.map(p => { return path.resolve(__dirname, modulePath, p) })
   }
 

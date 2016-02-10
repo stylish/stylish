@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "1.27.5",
+  "version": "1.29.0",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
   "bin": {
@@ -72,7 +72,6 @@
     "request": "^2.67.0",
     "rimraf": "^2.5.1",
     "should": "^7.1.1",
-    "skypager-devpack": "^1.27.1",
     "underscore.string": "^3.2.2",
     "unist-util-visit": "^1.0.0",
     "url": "^0.11.0",

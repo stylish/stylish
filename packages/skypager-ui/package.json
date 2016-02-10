@@ -1,12 +1,12 @@
 {
   "name": "skypager-ui",
   "description": "collection of ui layouts and components styled by a data-driven bootstrap theme generator",
-  "version": "1.27.0",
+  "version": "1.29.0",
   "main": "index.js",
   "skypager": {
     "main": "./skypager.js"
   },
-  "repository":{
+  "repository": {
     "type": "git",
     "url": "https://github.com/architects/skypager-central"
   },
