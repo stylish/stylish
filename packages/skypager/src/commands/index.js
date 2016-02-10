@@ -77,7 +77,13 @@ function configure (program, options = {}) {
   const dispatch = (handlerFn) => {
     return (...args) => {
       args.push(context)
-      handlerFn(...args)
+      try {
+        handlerFn(...args)
+      } catch(error) {
+        console.log('Command Error:'.red)
+        console.log(error.message)
+        throw(error)
+      }
     }
   }
 

@@ -10,4 +10,10 @@ module.exports = function LoadsActions (actions) {
   actions.load(
     require('./run_script'), { id: 'run_script', uri: require.resolve('./run_script') }
   )
+
+  actions.load(
+    require('./link_packages'), { id: 'link_packages', uri: require.resolve('./link_packages') }
+  )
+
+
 }

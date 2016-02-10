@@ -36,6 +36,12 @@ execute(function(params, context) {
         console.log('excluding ' + data.name)
       } else {
         data.version = nextVersion
+
+        data.devDependencies = data.devDependencies || {}
+        data.devDependencies['babel-preset-skypager'] = '^' + nextVersion
+        data.devDependencies['skypager'] = '^' + nextVersion
+        data.devDependencies['skypager-devpack'] = '^' + nextVersion
+
         fs.writeFileSync(join(pkg.sourcePath, 'package.json'), JSON.stringify(data, null, 2), 'utf8')
         console.log('Updated ' + data.name + ' to ' + nextVersion)
       }
