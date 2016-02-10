@@ -21,21 +21,20 @@
     "classnames": "^2.2.3",
     "history": "^1.17.0",
     "jquery": "^2.2.0",
-    "react": "^0.14.6",
+    "react": "^0.14.7",
     "react-body-classname": "latest",
     "react-bootstrap": "^0.28.2",
-    "react-dom": "^0.14.6",
-    "react-redux": "^4.0.6",
+    "react-dom": "^0.14.7",
+    "react-redux": "^4.4.0",
     "react-router": "^1.0.3",
-    "redux": "^3.0.5",
+    "redux": "^3.3.1",
     "redux-actions": "^0.9.1",
-    "redux-simple-router": "^2.0.2",
+    "redux-simple-router": "^2.0.4",
     "redux-thunk": "^1.0.3",
-    "skypager-application": "^1.25.1"
+    "skypager-themes": "^1.29.0",
+    "lodash":"^3.4.0"
   },
   "devDependencies": {
-    "babel-preset-skypager": "^1.25.0",
-    "skypager": "^1.26.0",
-    "skypager-devpack": "^1.26.3"
+    "babel-preset-skypager": "^1.29.0"
   }
 }

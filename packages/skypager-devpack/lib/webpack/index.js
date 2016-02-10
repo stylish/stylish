@@ -47,10 +47,10 @@ module.exports = function (argv) {
 
   var modulesDirectories = [directory + '/node_modules', __dirname + '/../../node_modules', 'node_modules'];
 
-  var hasModules = fs.existsSync(path.join(__dirname, '../../node_modules'));
+  var hasModules = fs.existsSync(path.join(__dirname, '../../../node_modules'));
 
   var resolveBabelPackages = function resolveBabelPackages(packages) {
-    var modulePath = hasModules ? '../../node_modules' : babelModulesPath;
+    var modulePath = hasModules ? '../../../node_modules' : babelModulesPath;
     return packages.map(function (p) {
       return path.resolve(__dirname, modulePath, p);
     });
@@ -117,10 +117,10 @@ module.exports = function (argv) {
     loader: 'babel',
     exclude: [/(node_modules|bower_components)/, path.join(process.env.PWD, 'dist', 'bundle')],
     query: {
-      presets: resolveBabelPackages(['babel-preset-skypager']),
+      presets: [require.resolve('babel-preset-skypager')],
       env: {
         development: {
-          presets: resolveBabelPackages(['babel-preset-react-hmre'])
+          presets: [require.resolve('babel-preset-react-hmre')]
         }
       }
     }

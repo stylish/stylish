@@ -74,10 +74,8 @@ function devpack(action, profile, environment, project) {
 
 function webpack(action, options) {
   if (action === 'build' || action === 'compile') {
-    console.log('options', options);
     return require('./webpack/compiler')(options);
   } else if (action === 'develop' || action === 'serve' || action === 'dev' || action === 'dev-server') {
-    console.log('options', options);
     return require('./webpack/server')(options);
   }
 }

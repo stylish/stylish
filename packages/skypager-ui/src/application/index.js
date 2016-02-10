@@ -3,10 +3,12 @@ import LockedApplication from './containers/LockedApplication'
 
 import { stateful } from './util/stateful'
 
-const containers = {
+const application = {
   Application,
   LockedApplication,
-  stateful
+  util: {
+    stateful
+  }
 }
 
-module.exports = containers
+module.exports = application

@@ -112,10 +112,10 @@ module.exports = function (argv) {
         path.join(process.env.PWD, 'dist', 'bundle')
       ],
       query: {
-        presets: resolveBabelPackages(['babel-preset-skypager']),
+        presets: [require.resolve('babel-preset-skypager')],
         env: {
           development: {
-            presets: resolveBabelPackages(['babel-preset-react-hmre'])
+            presets: [require.resolve('babel-preset-react-hmre')]
           }
         }
       }
