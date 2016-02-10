@@ -115,10 +115,9 @@ module.exports = function (argv) {
   }).loader('json', { loader: 'json', test: /.json$/ }).loader('js', {
     test: /\.jsx?$/,
     loader: 'babel',
-    exclude: [/(node_modules|bower_components)/, path.join(argv.project || process.env.PWD, 'dist', 'bundle')],
+    exclude: [/(node_modules|bower_components)/, path.join(process.env.PWD, 'dist', 'bundle'), path.join(argv.project, 'dist', 'bundle')],
     query: {
       presets: resolveBabelPackages(['babel-preset-skypager']),
-      plugins: resolveBabelPackages(['babel-plugin-transform-decorators-legacy']),
       env: {
         development: {
           presets: resolveBabelPackages(['babel-preset-react-hmre'])

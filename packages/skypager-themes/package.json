@@ -1,7 +1,7 @@
 {
   "name": "skypager-themes",
-  "version": "1.25.2",
   "description": "",
+  "version": "1.27.0",
   "main": "index.js",
   "loader": "index.loader.js",
   "skypager": {
@@ -13,7 +13,10 @@
     "build": "npm run build:clean && npm run test && npm run compile",
     "compile": "NODE_ENV=production babel -q -d lib src"
   },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {}
+  "author": "Jonathan Soeder <jon@chicago.com>",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "expose-loader": "^0.7.1"
+  }
 }

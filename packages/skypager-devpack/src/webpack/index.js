@@ -109,8 +109,7 @@ module.exports = function (argv) {
       loader: 'babel',
       exclude: [
         /(node_modules|bower_components)/,
-        path.join(process.env.PWD, 'dist', 'bundle'),
-        path.join(argv.project, 'dist', 'bundle')
+        path.join(process.env.PWD, 'dist', 'bundle')
       ],
       query: {
         presets: resolveBabelPackages(['babel-preset-skypager']),

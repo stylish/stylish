@@ -27,6 +27,18 @@ function handle(preset) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
   var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
+  if (!isDevpackInstalled()) {
+    console.log('The skypager-devpack package is required to use the webpack integration.'.red);
+    process.exit(1);
+  }
+
+  var project = context.project;
+
+  if (!project) {
+    console.log('Can not launch the dev server outside of a skypager project directory. run skypager init first.'.red);
+    process.exit(1);
+  }
+
   options.preset = preset || options.preset;
   options.theme = options.theme || project.options.theme;
 
@@ -42,16 +54,13 @@ function handle(preset) {
     _shelljs2.default.exec(bundleCommand + ' --clean');
   }
 
-  require(pathToDevpack(options.devToolsPath) + '/webpack/lib/compiler')(options);
+  require('skypager-devpack').webpack('build', options);
 }
 
-function pathToDevpack(opt) {
-  return opt && resolve(opt) || process.env.SKYPAGER_DEVPACK_PATH || (0, _path.dirname)(require.resolve('skypager-devpack'));
-}
-
-function isDepackInstalled() {
+function isDevpackInstalled() {
   try {
-    return pathToDevpack();
+    require('skypager-devpack');
+    return true;
   } catch (error) {
     return false;
   }

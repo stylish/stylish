@@ -1,10 +1,14 @@
 {
   "name": "skypager-ui",
   "description": "collection of ui layouts and components styled by a data-driven bootstrap theme generator",
-  "version": "1.25.2",
+  "version": "1.27.0",
   "main": "index.js",
   "skypager": {
     "main": "./skypager.js"
+  },
+  "repository":{
+    "type": "git",
+    "url": "https://github.com/architects/skypager-central"
   },
   "scripts": {
     "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
@@ -17,7 +21,6 @@
     "classnames": "^2.2.3",
     "history": "^1.17.0",
     "jquery": "^2.2.0",
-    "lodash": "^3.10.0",
     "react": "^0.14.6",
     "react-body-classname": "latest",
     "react-bootstrap": "^0.28.2",
@@ -28,8 +31,11 @@
     "redux-actions": "^0.9.1",
     "redux-simple-router": "^2.0.2",
     "redux-thunk": "^1.0.3",
-    "skypager-application": "^1.25.1",
-    "skypager-themes": "^1.25.1"
+    "skypager-application": "^1.25.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "babel-preset-skypager": "^1.25.0",
+    "skypager": "^1.26.0",
+    "skypager-devpack": "^1.26.3"
+  }
 }

@@ -9,7 +9,8 @@ module.exports = {
   availableStages,
   availablePresets,
   availableProfiles,
-  devpack
+  devpack,
+  webpack
 }
 
 function availableProfiles (project) {
@@ -45,9 +46,15 @@ function devpack(action, profile, environment, project, options = {}) {
     return argv
   }
 
+  return webpack(action, argv)
+}
+
+function webpack(action, options) {
   if ( action === 'build' || action === 'compile' ) {
-    return require('../webpack/compiler')(argv)
-  } else if (action === 'develop' || action === 'serve') {
-    return require('../webpack/server')(argv)
+    console.log('options', options)
+    return require('./webpack/compiler')(options)
+  } else if (action === 'develop' || action === 'serve' || action === 'dev' || action === 'dev-server') {
+    console.log('options', options)
+    return require('./webpack/server')(options)
   }
 }

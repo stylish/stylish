@@ -1,3 +1,4 @@
 #!/usr/bin/env node
 
-require('../lib/commands').commander()()
+require('babel-register')
+require('../src/commands').commander()()

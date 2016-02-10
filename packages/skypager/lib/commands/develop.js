@@ -88,6 +88,11 @@ function launchServer(preset) {
     process.exit(1);
   }
 
+  if (!isDevpackInstalled()) {
+    console.log('The skypager-devpack package is required to use the webpack integration.'.red);
+    process.exit(1);
+  }
+
   options.entry = options.entry || project.options.entry || './src';
   options.theme = options.theme || project.options.theme || 'marketing';
 
@@ -97,7 +102,7 @@ function launchServer(preset) {
 
   process.env.NODE_ENV = 'development';
 
-  require(pathToDevpack(options.devToolsPath) + '/lib/webpack/server')(options);
+  require('skypager-devpack').webpack('develop', options);
 }
 
 function launchTunnel(options, context) {
@@ -116,13 +121,10 @@ function launchTunnel(options, context) {
   });
 }
 
-function pathToDevpack(opt) {
-  return opt && (0, _path.resolve)(opt) || process.env.SKYPAGER_DEVPACK_PATH || (0, _path.dirname)(require.resolve('skypager-devpack'));
-}
-
-function isDepackInstalled() {
+function isDevpackInstalled() {
   try {
-    return pathToDevpack();
+    require('skypager-devpack');
+    return true;
   } catch (error) {
     return false;
   }
