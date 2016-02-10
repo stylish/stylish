@@ -10,4 +10,8 @@ module.exports = function LoadsActions (actions) {
   actions.load(
     require('./run_script'), { id: 'run_script', uri: require.resolve('./run_script') }
   )
+
+  actions.load(
+    require('./publish_package'), { id: 'publish_package', uri: require.resolve('./publish_package') }
+  )
 }
