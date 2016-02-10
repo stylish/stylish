@@ -19,7 +19,7 @@ var _util = require('../util');
 
 var _util2 = _interopRequireDefault(_util);
 
-var _pick = require('lodash/pick');
+var _pick = require('lodash/object/pick');
 
 var _pick2 = _interopRequireDefault(_pick);
 
