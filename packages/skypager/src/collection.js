@@ -8,6 +8,7 @@ import { invokeMap, mapValues, groupBy, invoke, pick } from 'lodash'
 class Collection {
   constructor (options = {}) {
     let { root, project, assetClass } = options
+
     let collection = this
 
     collection.root = root
@@ -157,6 +158,13 @@ class Collection {
 
   filter(...args){
     return wrapCollection(this, this.all.filter(...args))
+  }
+
+  createAsset(relativePath) {
+    return new this.AssetClass(relativePath, {
+      collection: this,
+      project: this.project
+    })
   }
 
   add (asset, autoLoad = false, expandDotPath = false) {

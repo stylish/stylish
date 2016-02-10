@@ -1,5 +1,13 @@
 'use strict';
 
+var _typeof2 = require('babel-runtime/helpers/typeof');
+
+var _typeof3 = _interopRequireDefault(_typeof2);
+
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
 var _stringify = require('babel-runtime/core-js/json/stringify');
 
 var _stringify2 = _interopRequireDefault(_stringify);
@@ -36,6 +44,12 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var clone = util.clone;
+var _defaults = util.defaults;
+var _pick = util.pick;
+var _result = util.result;
+var noConflict = util.noConflict;
+
 var EXTENSIONS = ['js', 'json', 'yaml', 'yml', 'csv'];
 var GLOB = '**/*.{' + EXTENSIONS.join(',') + '}';
 
@@ -59,9 +73,14 @@ var DataSource = (function (_Asset) {
     });
     _this.lazy('data', _this.getData, true);
 
-    _this.indexer = options.indexer || function (val) {
-      return val;
-    };
+    if (_this.collection && _this.collection.name === 'settings') {
+      _this.indexer = parseSettings.bind(_this);
+    } else {
+      _this.indexer = options.indexer || function (val) {
+        return val;
+      };
+    }
+
     _this.transformer = options.transformer || function (val) {
       return val;
     };
@@ -75,7 +94,7 @@ var DataSource = (function (_Asset) {
         args[_key] = arguments[_key];
       }
 
-      return util.defaults.apply(util, [this.data].concat(args));
+      return _defaults.apply(undefined, [this.data].concat(args));
     }
   }, {
     key: 'pick',
@@ -84,7 +103,7 @@ var DataSource = (function (_Asset) {
         args[_key2] = arguments[_key2];
       }
 
-      return util.pick.apply(util, [this.data].concat(args));
+      return _pick.apply(undefined, [this.data].concat(args));
     }
   }, {
     key: 'result',
@@ -93,7 +112,7 @@ var DataSource = (function (_Asset) {
         args[_key3] = arguments[_key3];
       }
 
-      return util.result.apply(util, [this.data].concat(args));
+      return _result.apply(undefined, [this.data].concat(args));
     }
   }, {
     key: 'getData',
@@ -180,7 +199,7 @@ function handleScript(datasource, load) {
     project: datasource.project
   };
 
-  return util.noConflict(function () {
+  return noConflict(function () {
     var exp = load();
 
     if (typeof exp === 'function') {
@@ -189,4 +208,26 @@ function handleScript(datasource, load) {
       return exp;
     }
   }, locals)();
+}
+
+function interpolateValues(obj, template) {
+  (0, _keys2.default)(obj).forEach(function (key) {
+    var value = obj[key];
+
+    if ((typeof value === 'undefined' ? 'undefined' : (0, _typeof3.default)(value)) === 'object') {
+      interpolateValues(value, template);
+    } else if (typeof value === 'string' && value.match(/^env\./i)) {
+      obj[key] = _result(process.env, value.replace(/^env\./i, ''));
+    } else if (typeof value === 'string') {
+      obj[key] = template(value)(value);
+    }
+  });
+
+  return obj;
+}
+
+function parseSettings() {
+  var val = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+  return interpolateValues.call(this, clone(val), this.templater.bind(this));
 }

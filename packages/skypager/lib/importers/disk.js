@@ -77,17 +77,24 @@ function ProjectImporter() {
   (0, _keys2.default)(collections).forEach(function (name) {
     var collection = collections[name];
     var pattern = collection.assetPattern;
+    var paths = [];
 
-    var paths = glob.sync(pattern, {
-      cwd: collection.root,
-      ignore: [collection.excludePattern]
-    });
+    try {
+      paths = glob.sync(pattern, {
+        cwd: collection.root,
+        ignore: [collection.excludePattern]
+      });
+    } catch (error) {
+      paths = [];
+    }
 
     collection._willLoadAssets(paths);
 
     paths.forEach(function (rel) {
-      var uri = path.join(collection.root, rel);
-      var asset = new collection.AssetClass(rel, { collection: collection, project: project });
+      //let uri = path.join(collection.root, rel)
+      //let asset = new collection.AssetClass(rel, {collection: collection, project: project})
+
+      var asset = collection.createAsset(rel);
 
       collection.add(asset, false, true);
 

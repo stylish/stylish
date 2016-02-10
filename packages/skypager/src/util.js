@@ -6,7 +6,7 @@ import dotpath from 'object-path'
 import utile from 'utile'
 import _debug from 'debug'
 
-import { kebabCase, any, defaults, result, pick } from 'lodash'
+import { template, templateSettings, kebabCase, any, defaults, result, pick, cloneDeep as clone } from 'lodash'
 
 const inflections = utile.inflect
 const debug = _debug('skypager')
@@ -19,6 +19,8 @@ module.exports.pick = pick
 module.exports.any = any
 module.exports.result = result
 module.exports.dotpath = dotpath
+module.exports.clone = clone
+module.exports.template = template
 
 let hidden = {
   getter: function (target, name, fn, configurable = false) {
@@ -45,14 +47,6 @@ module.exports.hidden = hidden
 module.exports.hide = hidden
 
 hidden.getter(module.exports, 'inflections', inflections)
-
-/**
-* clone an object
-*
-*/
-export function clone (base) {
-  return JSON.parse(JSON.stringify(base))
-}
 
 export function humanize (s) {
   return inflections.humanize(s).replace(/-|_/g, ' ')
@@ -294,7 +288,8 @@ export function isArray(arg) {
 }
 
 export function isRegex(val) {
-  if ((typeof val === 'undefined' ? 'undefined' : typeof(val)) === 'object' && Object.getPrototypeOf(val).toString() === '/(?:)/') {
+  if ((typeof val === 'undefined' ? 'undefined' : typeof(val)) === 'object' &&
+      Object.getPrototypeOf(val).toString() === '/(?:)/') {
     return true
   }
 

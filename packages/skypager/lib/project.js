@@ -557,9 +557,11 @@ var Project = (function () {
       });
     }
   }, {
-    key: 'mergedSettingsData',
+    key: 'settings',
     get: function get() {
-      return this.data_sources.query({ id: /^settings\// }).merge();
+      return this.content.settings.query(function (s) {
+        return true;
+      }).merge();
     }
   }]);
   return Project;
@@ -592,6 +594,7 @@ function paths() {
     logs: (0, _path.join)(this.root, 'log'),
     build: (0, _path.join)(this.root, 'dist'),
     public: (0, _path.join)(this.root, 'public'),
+    settings: (0, _path.join)(this.root, 'settings'),
     join: function join() {
       for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
         args[_key5] = arguments[_key5];
@@ -648,8 +651,28 @@ function buildContentCollectionsManually() {
     scripts: Script.createCollection(this, false),
     stylesheets: Stylesheet.createCollection(this, false),
     vectors: Vector.createCollection(this, false),
-    packages: new _collection2.default({ root: this.paths.packages, project: this, assetClass: DataSource, pattern: '*/package.json', exclude: '**/node_modules' }),
-    projects: new _collection2.default({ root: this.paths.projects, project: this, assetClass: DataSource, pattern: '*/package.json', exclude: '**/node_modules' })
+
+    packages: new _collection2.default({
+      root: this.paths.packages,
+      project: this,
+      assetClass: DataSource,
+      pattern: '*/package.json',
+      exclude: '**/node_modules'
+    }),
+
+    projects: new _collection2.default({
+      root: this.paths.projects,
+      project: this,
+      assetClass: DataSource,
+      pattern: '*/package.json',
+      exclude: '**/node_modules'
+    }),
+
+    settings: new _collection2.default({
+      root: this.paths.settings,
+      project: this,
+      assetClass: DataSource
+    })
   };
 }
 

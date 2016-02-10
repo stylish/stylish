@@ -1,6 +1,8 @@
 import Asset from './asset'
 import * as util from '../util'
 
+const { clone, defaults, pick, result, noConflict } = util
+
 const EXTENSIONS = ['js', 'json', 'yaml', 'yml', 'csv']
 const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
 
@@ -13,20 +15,25 @@ class DataSource extends Asset {
     this.lazy('transformed', () => this.transform(this.indexed, this))
     this.lazy('data', this.getData, true)
 
-    this.indexer = options.indexer || ((val) => val)
+    if (this.collection && this.collection.name === 'settings') {
+      this.indexer = parseSettings.bind(this)
+    } else {
+      this.indexer = options.indexer || ((val) => val)
+    }
+
     this.transformer = options.transformer || ((val) => val)
   }
 
   defaults(...args) {
-    return util.defaults(this.data, ...args)
+    return defaults(this.data, ...args)
   }
 
   pick(...args) {
-    return util.pick(this.data, ...args)
+    return pick(this.data, ...args)
   }
 
   result(...args) {
-    return util.result(this.data, ...args)
+    return result(this.data, ...args)
   }
 
   getData () {
@@ -112,7 +119,7 @@ function handleScript (datasource, load) {
     project: datasource.project
   }
 
-  return util.noConflict(function(){
+  return noConflict(function(){
     let exp = load()
 
     if (typeof exp === 'function') {
@@ -121,4 +128,27 @@ function handleScript (datasource, load) {
       return exp
     }
   }, locals)()
+}
+
+function interpolateValues (obj, template) {
+  Object.keys(obj).forEach(key => {
+    let value = obj[key]
+
+    if (typeof value === 'object') {
+      interpolateValues(value, template)
+    } else if (typeof value === 'string' && value.match(/^env\./i)) {
+      obj[key] = result(
+        process.env,
+        (value.replace(/^env\./i, ''))
+      )
+    } else if (typeof value === 'string' ) {
+      obj[key] = template(value)(value)
+    }
+  })
+
+  return obj
+}
+
+function parseSettings (val = {}) {
+  return interpolateValues.call(this, clone(val), this.templater.bind(this))
 }

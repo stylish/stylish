@@ -225,6 +225,14 @@ var Collection = (function () {
       return wrapCollection(this, (_all4 = this.all).filter.apply(_all4, arguments));
     }
   }, {
+    key: 'createAsset',
+    value: function createAsset(relativePath) {
+      return new this.AssetClass(relativePath, {
+        collection: this,
+        project: this.project
+      });
+    }
+  }, {
     key: 'add',
     value: function add(asset) {
       var autoLoad = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];

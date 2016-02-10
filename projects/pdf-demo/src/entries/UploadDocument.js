@@ -1,20 +1,34 @@
 import React, { Component, PropTypes as types } from 'react'
 
-import { Button } from 'react-bootstrap'
+import { Grid, Row, Col, Button } from 'react-bootstrap'
+
+
+import Dropzone from 'react-dropzone'
 
 export class UploadDocument extends Component {
   render () {
     return (
-      <div>
-				<h3>Upload Document</h3>
+      <div id="container">
+				<h3>Select the files to upload.</h3>
 				<hr />
         <form className="form-inline" role="form">
-            <div className="form-group">
-                <label className="sr-only">Field 2</label>
-                <input className="form-control" placeholder="Field 2" />
-            </div>
-            <button type="submit" className="btn btn-primary">Apply</button>
-            <button type="button" className="btn">Reset</button>
+          <Grid>
+            <Row>
+              <Col xs={3}>
+                <Dropzone onDrop={this.onDrop}>
+                  <div>Drop or select file to upload.</div>
+                </Dropzone>
+              </Col>
+              <Col xs={3}>
+                <Dropzone onDrop={this.onDrop}>
+                  <div>Drop or select file to upload.</div>
+                </Dropzone>
+              </Col>
+              
+              
+            </Row>
+          </Grid>
+          
         </form>
       </div>
     )

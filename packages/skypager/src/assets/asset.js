@@ -46,6 +46,24 @@ class Asset {
     this.lazy('parsed', () => this.parse(this.raw))
     this.lazy('indexed', () => this.index(this.parsed, this))
     this.lazy('transformed', () => this.transform(this.indexed, this))
+
+  }
+
+  templater (string) {
+    let asset = this
+    return util.template(string, {
+      imports: {
+        get project() {
+          return asset.project
+        },
+        get self () {
+          return asset
+        },
+        get process () {
+           return process
+        }
+      }
+    })
   }
 
   pick(...args) {
@@ -103,23 +121,18 @@ class Asset {
   lazy (...args) { return util.lazy(this, ...args) }
 
   render (ast = 'transformed', options = {}) {
-
   }
 
   assetWasImported () {
-
   }
 
   assetWasProcessed () {
-
   }
 
   contentWillChange (oldContent, newContent) {
-
   }
 
   contentDidChange (asset) {
-
   }
 
   get assetClass () {
