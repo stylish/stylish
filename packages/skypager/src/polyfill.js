@@ -1,9 +1,9 @@
 import assign from 'object-assign'
 import { access } from './util'
 
-import pick from 'lodash/object/pick'
-import flatten from 'lodash/array/flatten'
-import compact from 'lodash/array/compact'
+import pick from 'lodash/pick'
+import flatten from 'lodash/flatten'
+import compact from 'lodash/compact'
 
 if (!Object.assign) {
   Object.assign = assign

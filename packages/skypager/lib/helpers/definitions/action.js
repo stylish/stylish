@@ -22,10 +22,6 @@ exports.lookup = lookup;
 
 var _util = require('../../util');
 
-var _trim = require('lodash/string/trim');
-
-var _trim2 = _interopRequireDefault(_trim);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var route = require('path-match')({
@@ -76,7 +72,7 @@ var ActionDefinition = exports.ActionDefinition = (function () {
   }, {
     key: 'addCommandPhrase',
     value: function addCommandPhrase(phrase) {
-      this.config.pathMatchers.push(route((0, _trim2.default)(phrase).replace(/\s/g, '/')));
+      this.config.pathMatchers.push(route(phrase.trim().replace(/\s/g, '/')));
     }
   }, {
     key: 'addRouteMatcher',
@@ -94,7 +90,7 @@ var ActionDefinition = exports.ActionDefinition = (function () {
   }, {
     key: 'testCommand',
     value: function testCommand(phrase) {
-      var sample = (0, _trim2.default)(phrase).replace(/\s/g, '/');
+      var sample = trim(phrase).replace(/\s/g, '/');
       var matching = this.config.pathMatchers.find(function (rule) {
         return rule(sample);
       });

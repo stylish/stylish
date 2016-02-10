@@ -14,15 +14,15 @@ var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
 var _util = require('./util');
 
-var _pick = require('lodash/object/pick');
+var _pick = require('lodash/pick');
 
 var _pick2 = _interopRequireDefault(_pick);
 
-var _flatten = require('lodash/array/flatten');
+var _flatten = require('lodash/flatten');
 
 var _flatten2 = _interopRequireDefault(_flatten);
 
-var _compact = require('lodash/array/compact');
+var _compact = require('lodash/compact');
 
 var _compact2 = _interopRequireDefault(_compact);
 

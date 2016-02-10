@@ -15,5 +15,8 @@ module.exports = function LoadsActions (actions) {
     require('./link_packages'), { id: 'link_packages', uri: require.resolve('./link_packages') }
   )
 
+  actions.load(
+    require('./publish_packages.js'), { id: 'publish_packages', uri: require.resolve('./publish_packages') }
+  )
 
 }
