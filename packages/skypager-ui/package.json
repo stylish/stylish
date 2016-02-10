@@ -34,6 +34,6 @@
     "skypager": "^1.17.1",
     "skypager-devpack": "^1.17.1",
     "babel-runtime": "^6.3.13",
-    "babel-preset-skypager": "^2.0.3"
+    "babel-preset-skypager": "^1.17.0"
   }
 }
