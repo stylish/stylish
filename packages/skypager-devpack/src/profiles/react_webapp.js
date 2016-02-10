@@ -10,7 +10,7 @@ module.exports = {
 }
 
 function react_webapp (env, project, options = {}) {
-  return env === 'production' ? production(project, options) : developmen(project, options)
+  return env === 'production' ? production(project, options) : development(project, options)
 }
 
 function production(project, options = {}) {

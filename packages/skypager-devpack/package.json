@@ -1,6 +1,6 @@
 {
   "name": "skypager-devpack",
-  "version": "1.22.0",
+  "version": "1.25.2",
   "description": "configurable webpack dev server and build tool so you don't have to",
   "main": "index.js",
   "dependencies": {
@@ -49,5 +49,9 @@
   "bugs": {
     "url": "https://github.com/skypager/superdevpack/issues"
   },
-  "homepage": "https://github.com/skypager/superdevpack#readme"
+  "homepage": "https://github.com/skypager/superdevpack#readme",
+  "devDependencies": {
+    "babel-preset-skypager": "latest",
+    "skypager": "file:../skypager"
+  }
 }

@@ -13,9 +13,10 @@
  */
 
 import defaults from 'lodash/object/defaults'
-import { bundles } from 'dist/settings/dependencies'
 
 export function Dependencies (options = {}) {
+  const { bundles } = require('../../dist/settings.json')
+
   if (!validate(options)) {
     return
   }

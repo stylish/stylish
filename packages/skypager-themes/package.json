@@ -1,6 +1,6 @@
 {
   "name": "skypager-themes",
-  "version": "1.22.0",
+  "version": "1.25.2",
   "description": "",
   "main": "index.js",
   "loader": "index.loader.js",
@@ -15,7 +15,5 @@
   },
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "babel-preset-skypager": "^1.22.0"
-  }
+  "devDependencies": {}
 }

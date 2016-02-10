@@ -31,7 +31,7 @@ function availablePresets (project) {
 }
 
 function argsFor(profile, environment, project, options = {}) {
-  return profiles[profile](environment, project, options)
+  return profiles[profile][profile](environment, project, options)
 }
 
 function devpack(action, profile, environment, project, options = {}) {
