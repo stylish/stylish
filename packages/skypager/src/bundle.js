@@ -170,7 +170,6 @@ class Bundle {
   }
 
   buildLayout (props = {}) {
-    debugger
     let project = props.project = this
     let settings = project.settings || {}
     let app = settings.app || {}

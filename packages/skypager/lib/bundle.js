@@ -221,7 +221,6 @@ module.exports = (function () {
     value: function buildLayout() {
       var props = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-      debugger;
       var project = props.project = this;
       var settings = project.settings || {};
       var app = settings.app || {};
