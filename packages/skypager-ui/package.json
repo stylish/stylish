@@ -1,7 +1,7 @@
 {
   "name": "skypager-ui",
   "description": "collection of ui layouts and components styled by a data-driven bootstrap theme generator",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "main": "index.js",
   "skypager": {
     "main": "./skypager.js"

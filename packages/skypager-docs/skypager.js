@@ -1,7 +1,5 @@
+require('skypager/lib/util').skypagerBabel()
 
-      require('skypager/lib/util').skypagerBabel()
-
-      module.exports = require('skypager').load(__filename, {
-        manifest: require('./package.json')
-      })
-      
+module.exports = require('skypager').load(__filename, {
+  manifest: require('./package.json')
+})

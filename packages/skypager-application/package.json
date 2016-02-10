@@ -1,7 +1,7 @@
 {
   "name": "skypager-application",
   "description": "unified react and redux appication runtime for skypager projects supporting the browser, electron, and react native",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "main": "index.js",
   "skypager": {
     "main": "skypager.js"
