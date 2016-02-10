@@ -127,7 +127,13 @@ function configure(program) {
       }
 
       args.push(context);
-      handlerFn.apply(undefined, args);
+      try {
+        handlerFn.apply(undefined, args);
+      } catch (error) {
+        console.log('Command Error:'.red);
+        console.log(error.message);
+        throw error;
+      }
     };
   };
 

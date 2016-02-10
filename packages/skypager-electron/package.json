@@ -1,6 +1,6 @@
 {
   "name": "skypager-electron",
-  "version": "1.21.0",
+  "version": "1.22.0",
   "description": "skypager electron stack",
   "author": "Jonathan Soeder <jon@chicago.com>",
   "license": "UNLICENSED",
@@ -32,9 +32,10 @@
   },
   "devDependencies": {
     "mocha": "^2.4.5",
-    "skypager": "^1.17.1",
-    "skypager-devpack": "^1.17.1",
+    "skypager": "^1.22.0",
+    "skypager-devpack": "^1.22.0",
     "skypager-ui": "^1.17.1",
-    "skypager-application": "^1.17.1"
+    "skypager-application": "^1.17.1",
+    "babel-preset-skypager": "^1.22.0"
   }
 }

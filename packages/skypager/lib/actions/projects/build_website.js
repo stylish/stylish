@@ -23,3 +23,4 @@ execute(function (params = {}, context = {}) {
   let devpack = require('skypager-devpack')
 })
 */
+"use strict";

@@ -1,12 +1,13 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _stringify = require('babel-runtime/core-js/json/stringify');
 
 var _stringify2 = _interopRequireDefault(_stringify);
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.DocumentParserCache = DocumentParserCache;
 
 var _path = require('path');

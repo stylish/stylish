@@ -88,7 +88,6 @@ var Framework = (function () {
       }
     } catch (e) {
       console.log('Tried to eager load project plugins and failed', projectManifest.skypager.plugins);
-      throw e;
     }
 
     if (typeof initializer === 'function') {
@@ -249,9 +248,7 @@ function eagerLoadProjectPlugins(skypager, list) {
   }).forEach(function (plugin) {
     try {
       skypager.loadPlugin(require('skypager-plugin-' + plugin));
-    } catch (error) {
-      console.log('error', error.message);
-    }
+    } catch (error) {}
   });
 }
 module.exports = Framework;

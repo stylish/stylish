@@ -1,6 +1,6 @@
 {
   "name": "babel-preset-skypager",
-  "version": "1.21.0",
+  "version": "1.22.0",
   "description": "babel presets for building react apps in es6",
   "main": "index.js",
   "scripts": {
@@ -54,7 +54,10 @@
     "redbox-react": "^1.2.2"
   },
   "devDependencies": {
-    "babel-runtime": "^6.3.19"
+    "babel-runtime": "^6.3.19",
+    "babel-preset-skypager": "^1.22.0",
+    "skypager": "^1.22.0",
+    "skypager-devpack": "^1.22.0"
   },
   "peerDependencies": {
     "babel-runtime": "^6.3.19"

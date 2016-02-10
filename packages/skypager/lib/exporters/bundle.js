@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _stringify = require('babel-runtime/core-js/json/stringify');
 
 var _stringify2 = _interopRequireDefault(_stringify);
@@ -8,15 +12,13 @@ var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.BrowserBundle = BrowserBundle;
 exports.AssetExporter = AssetExporter;
 exports.ProjectExporter = ProjectExporter;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var BundleWrapperPath = require('path').resolve('../../lib/bundle.js');
 function BrowserBundle() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -108,7 +110,7 @@ function ProjectExporter() {
     });
   });
 
-  lines.push('module.exports = require(\'' + require.resolve('../bundle') + '\').create(bundle)');
+  lines.push('module.exports = require(\'skypager/lib/bundle\').create(bundle)');
 
   return write(project.path('build', 'bundle', 'index.js'), lines.join("\n"));
 }

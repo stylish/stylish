@@ -1,6 +1,6 @@
 {
   "name": "skypager-themes",
-  "version": "1.21.0",
+  "version": "1.22.0",
   "description": "",
   "main": "index.js",
   "loader": "index.loader.js",
@@ -14,5 +14,10 @@
     "compile": "NODE_ENV=production babel -q -d lib src"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "babel-preset-skypager": "^1.22.0",
+    "skypager": "^1.22.0",
+    "skypager-devpack": "^1.22.0"
+  }
 }
