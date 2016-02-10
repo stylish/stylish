@@ -1,6 +1,6 @@
 {
   "name": "babel-preset-skypager",
-  "version": "1.24.0",
+  "version": "1.25.0",
   "description": "babel presets for building react apps in es6",
   "main": "index.js",
   "scripts": {
@@ -53,5 +53,8 @@
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.2",
     "redbox-react": "^1.2.2"
-  }
+  },
+	"devDependencies":{
+		 "react": "^0.14.6"
+	}
 }

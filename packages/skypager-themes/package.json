@@ -16,8 +16,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "babel-preset-skypager": "^1.22.0",
-    "skypager": "^1.22.0",
-    "skypager-devpack": "^1.22.0"
+    "babel-preset-skypager": "^1.22.0"
   }
 }

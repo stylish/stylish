@@ -32,11 +32,11 @@
     "redux-thunk": "^1.0.3"
   },
   "devDependencies": {
-    "babel-preset-skypager": "^1.22.0",
+    "babel-preset-skypager": "^1.24.0",
     "mocha": "^2.4.5",
     "should": "^8.2.1",
     "sinon": "^1.17.3",
-    "skypager": "^1.22.0",
+    "skypager": "^1.24.0",
     "skypager-devpack": "^1.22.0"
   }
 }

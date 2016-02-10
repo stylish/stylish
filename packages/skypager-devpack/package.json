@@ -4,10 +4,10 @@
   "description": "configurable webpack dev server and build tool so you don't have to",
   "main": "index.js",
   "dependencies": {
-    "babel-core": "^6.4.0",
+    "babel-runtime": "^6.4.0",
     "babel-loader": "^6.2.1",
     "babel-preset-react-hmre": "latest",
-    "babel-preset-skypager": "^1.18.0",
+    "babel-preset-skypager": "^1.22.0",
     "css-loader": "^0.23.1",
     "debounce": "^1.0.0",
     "express": "^4.13.3",
@@ -49,10 +49,5 @@
   "bugs": {
     "url": "https://github.com/skypager/superdevpack/issues"
   },
-  "homepage": "https://github.com/skypager/superdevpack#readme",
-  "devDependencies": {
-    "babel-preset-skypager": "^1.22.0",
-    "skypager": "^1.22.0",
-    "skypager-devpack": "^1.22.0"
-  }
+  "homepage": "https://github.com/skypager/superdevpack#readme"
 }

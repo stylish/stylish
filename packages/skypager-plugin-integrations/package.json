@@ -17,9 +17,6 @@
     }
   },
   "devDependencies": {
-    "mocha": "^2.3.4",
-    "babel-preset-skypager": "^1.22.0",
-    "skypager": "^1.22.0",
-    "skypager-devpack": "^1.22.0"
+    "mocha": "^2.3.4"
   }
 }
