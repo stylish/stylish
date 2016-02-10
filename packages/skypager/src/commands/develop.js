@@ -92,6 +92,11 @@ export function launchWatcher(options, context) {
 export function launchServer (preset, options = {}, context = {}) {
   let project = context.project
 
+  if (!project) {
+    console.log('Can not launch the dev server outside of a skypager project directory. run skypager init first.'.red)
+    process.exit(1)
+  }
+
   options.entry = options.entry || project.options.entry || './src'
   options.theme = options.theme || project.options.theme || 'marketing'
 
@@ -101,7 +106,7 @@ export function launchServer (preset, options = {}, context = {}) {
 
   process.env.NODE_ENV = 'development'
 
-  require(`${ pathToDevpack(options.devToolsPath) }/webpack/server`)(options)
+  require(`${ pathToDevpack(options.devToolsPath) }/lib/webpack/server`)(options)
 }
 
 export function launchTunnel(options, context) {

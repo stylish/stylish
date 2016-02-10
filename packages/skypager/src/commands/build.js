@@ -58,7 +58,7 @@ export function handle(preset, options = {}, context = {}) {
     shell.exec(`${ bundleCommand } --clean`)
   }
 
-  require(`${ pathToDevpack(options.devToolsPath) }/webpack/compiler`)(options)
+  require(`${ pathToDevpack(options.devToolsPath) }/webpack/lib/compiler`)(options)
 }
 
 

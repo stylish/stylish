@@ -42,7 +42,7 @@ function handle(preset) {
     _shelljs2.default.exec(bundleCommand + ' --clean');
   }
 
-  require(pathToDevpack(options.devToolsPath) + '/webpack/compiler')(options);
+  require(pathToDevpack(options.devToolsPath) + '/webpack/lib/compiler')(options);
 }
 
 function pathToDevpack(opt) {
