@@ -1,26 +1,36 @@
-import React, { PropTypes as types, createElement as create } from 'react'
-import CardsContainerBase from 'skypager-ui/src/components/CardsContainer'
+import React, { Children } from 'react'
+import { Grid, Col, Row, Panel } from 'react-bootstrap'
 
-export class CardsContainer extends React.Component {
-  static displayName = 'CardsContainer';
+import { range } from 'lodash'
 
-  static propTypes = {
-    card: types.func.isRequired,
-    items: types.array
-  };
+export function CardsContainer (props = {}) {
+  let num = props.perRow || 4
+  let items = each_cons(Children.toArray(props.children), num)
 
-  render () {
-    let {items, card} = this.props
-    let cards = items.map((item,key) => create(card, {item, key}))
+  let colSize = 12 / num;
 
-    let props = this.props
+  let rows = items.map((row,i) => {
+    let columns = row.map((item,j) => {
+      return <Col key={j} xs={colSize}>{item}</Col>
+    })
 
-    return (
-      <CardsContainerBase {...props}>
-        {cards}
-      </CardsContainerBase>
-    )
-  }
+    return <Row key={i}>{columns}</Row>
+  })
+
+  return <Grid>{rows}</Grid>
 }
 
 export default CardsContainer
+
+function each_cons (list, size) {
+  let groupsCount = list.length <= size ? 1 : list.length / size
+
+  return range(0, groupsCount).reduce((m,s,k) => {
+    let beginAt = s * size
+    let endAt = size * (s + 1)
+
+    m.push(list.slice(beginAt, endAt))
+
+    return m
+  }, [])
+}

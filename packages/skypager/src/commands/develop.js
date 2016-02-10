@@ -111,7 +111,6 @@ export function launchServer (preset, options = {}, context = {}) {
 
   process.env.NODE_ENV = 'development'
 
-  console.log(options)
   require('skypager-devpack').webpack('develop', options)
 }
 

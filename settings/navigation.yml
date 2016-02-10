@@ -1,0 +1,8 @@
+navigation:
+  links:
+    - label: Home
+      icon: rocket
+      link: '/'
+    - label: Whatever
+      icon: cloud
+      link: /upload

@@ -1,5 +1,5 @@
 import React, { Component, PropTypes as types } from 'react'
-import IconNavLayout from 'skypager-ui/lib/layouts/IconNavLayout'
+import IconNavLayout from './IconNavLayout'
 
 import project from 'dist/bundle'
 

@@ -59,7 +59,7 @@ export function AssetExporter (options = {}, callback) {
   }
 }
 
-const IncludeExporters = ['assets', 'entities', 'project', 'models' ]
+const IncludeExporters = ['assets', 'entities', 'project', 'models', 'settings' ]
 
 export function ProjectExporter (options = {}, callback) {
   let project = options.project
@@ -77,6 +77,7 @@ export function ProjectExporter (options = {}, callback) {
     `bundle.entities = require('./entities-export.json');`,
     `bundle.assets = require('./assets-export.json');`,
     `bundle.models = require('./models-export.json');`,
+    `bundle.settings = require('./settings-export.json');`,
     `
     bundle.requireContexts = {
       scripts: require.context('${ project.scripts.paths.absolute }', true, /\.js$/i),

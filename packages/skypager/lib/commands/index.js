@@ -168,6 +168,7 @@ function loadProject(fromPath) {
 
   try {
     (0, _util.skypagerBabel)();
+    console.log('loading project', fromPath);
     return (0, _util.loadProjectFromDirectory)(fromPath || process.env.PWD);
   } catch (error) {
     if (!silent && requestedCommand !== 'init' && requestedCommand !== 'help') {

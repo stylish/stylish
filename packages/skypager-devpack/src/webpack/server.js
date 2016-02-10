@@ -11,10 +11,8 @@ module.exports = function(argv, serverOptions) {
 
   var app = express()
 
-  console.log('YO'.green)
   var config = require('./index')(argv)
 
-  console.log('YO'.red)
   if (argv.webpackConfig) {
     var mod = require(path.resolve(argv.webpackConfig))
     config = config.merge(mod)

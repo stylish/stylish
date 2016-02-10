@@ -63,7 +63,7 @@ module.exports = (function () {
     var contentCollections = keys(content);
 
     delegate.apply(undefined, [this].concat((0, _toConsumableArray3.default)(exporterKeys))).to(bundle);
-    delegate.apply(undefined, [this].concat((0, _toConsumableArray3.default)(contentCollectons))).to(content);
+    delegate(this, 'docs', 'data_sources', 'scripts', 'stylesheets').to(content);
 
     this.entityNames = keys(this.entities || {});
 
@@ -221,6 +221,7 @@ module.exports = (function () {
     value: function buildLayout() {
       var props = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
+      debugger;
       var project = props.project = this;
       var settings = project.settings || {};
       var app = settings.app || {};

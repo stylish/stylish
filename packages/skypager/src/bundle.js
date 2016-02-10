@@ -27,7 +27,7 @@ class Bundle {
     let contentCollections = keys(content)
 
     delegate(this, ...exporterKeys).to(bundle)
-    delegate(this, ...contentCollectons).to(content)
+    delegate(this, 'docs', 'data_sources', 'scripts', 'stylesheets').to(content)
 
     this.entityNames = keys(this.entities || {})
 
@@ -170,6 +170,7 @@ class Bundle {
   }
 
   buildLayout (props = {}) {
+    debugger
     let project = props.project = this
     let settings = project.settings || {}
     let app = settings.app || {}

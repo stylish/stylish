@@ -115,7 +115,7 @@ module.exports = function (argv) {
   }).loader('json', { loader: 'json', test: /.json$/ }).loader('js', {
     test: /\.jsx?$/,
     loader: 'babel',
-    exclude: [/(node_modules|bower_components)/, path.join(process.env.PWD, 'dist', 'bundle'), path.join(argv.project, 'dist', 'bundle')],
+    exclude: [/(node_modules|bower_components)/, path.join(process.env.PWD, 'dist', 'bundle')],
     query: {
       presets: resolveBabelPackages(['babel-preset-skypager']),
       env: {

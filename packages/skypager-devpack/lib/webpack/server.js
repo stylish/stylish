@@ -19,10 +19,6 @@ module.exports = function (argv, serverOptions) {
     argv = require('yargs').argv;
   }
 
-  if (argv.preset && argv.project) {
-    argv = require('../lib').devpack('serve', argv.env || process.env.NODE_ENV, argv.project, require('yargs').argv);
-  }
-
   var app = express();
 
   var config = require('./index')(argv);

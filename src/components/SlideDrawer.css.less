@@ -1,0 +1,31 @@
+.drawer {
+	&:global(.position-right) {
+		top: 0px;
+		bottom: 0px;
+		right: 0px;
+		width: 50%;
+	}
+}
+
+.light {
+  background-color: #fff;
+  border-left: 1px solid #333;
+}
+
+.inner {
+  background-color: #fff;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  padding-left: 24px;
+	padding-top: 48px;
+  position: relative;
+}
+
+.inner :global(.close-icon) {
+  font-size: 2em;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}

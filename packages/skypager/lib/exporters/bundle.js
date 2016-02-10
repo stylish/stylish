@@ -82,7 +82,7 @@ function AssetExporter() {
   };
 }
 
-var IncludeExporters = ['assets', 'entities', 'project', 'models'];
+var IncludeExporters = ['assets', 'entities', 'project', 'models', 'settings'];
 
 function ProjectExporter() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -96,7 +96,7 @@ function ProjectExporter() {
     });
   }
 
-  var lines = ['var bundle = module.exports = {};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.assets = require(\'./assets-export.json\');', 'bundle.models = require(\'./models-export.json\');', '\n    bundle.requireContexts = {\n      scripts: require.context(\'' + project.scripts.paths.absolute + '\', true, /.js$/i),\n      stylesheets: require.context(\'' + project.stylesheets.paths.absolute + '\', true, /..*ss$/i)\n    };\n    bundle.content = {}'];
+  var lines = ['var bundle = module.exports = {};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.assets = require(\'./assets-export.json\');', 'bundle.models = require(\'./models-export.json\');', 'bundle.settings = require(\'./settings-export.json\');', '\n    bundle.requireContexts = {\n      scripts: require.context(\'' + project.scripts.paths.absolute + '\', true, /.js$/i),\n      stylesheets: require.context(\'' + project.stylesheets.paths.absolute + '\', true, /..*ss$/i)\n    };\n    bundle.content = {}'];
 
   keys(project.content).forEach(function (key) {
     lines.push('var _' + key + ' = bundle.content.' + key + ' = {};');
