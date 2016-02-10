@@ -1,6 +1,7 @@
-import { manifest as framework } from 'skypager'
 import trim from 'lodash/string/trim'
 import { dump as toYaml } from 'js-yaml'
+
+const VERSION = require('../../package.json').version
 
 export function init (program, dispatch) {
   program
@@ -34,9 +35,9 @@ export function handle (projectName, destination, options = {}, context = {}) {
         plugins: options.plugins ? `${ options.plugins }`.split(',') : []
       },
       devDependencies:{
-        'skypager': `^${ framework.version }`,
-        'skypager-devpack': `^${ framework.version }`,
-        'babel-preset-skypager': `^${ framework.version }`,
+        'skypager': `^${ VERSION }`,
+        'skypager-devpack': `^${ VERSION }`,
+        'babel-preset-skypager': `^${ VERSION }`,
         'babel-runtime': '^6.4.0'
       }
     }

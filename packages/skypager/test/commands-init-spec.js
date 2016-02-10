@@ -1,11 +1,11 @@
 import rimraf from 'rimraf'
 import { existsSync as exists } from 'fs'
 import { join } from 'path'
-import { handle } from 'skypager/src/commands/init'
 
 describe('project init command', function() {
   let project = require('./fixture')
   let tmp = project.path('tmpdir', 'new-project')
+  let handle = require('../src/commands/init').handle
 
   before(function(){
     handle('new-project', tmp, { overwrite: true })

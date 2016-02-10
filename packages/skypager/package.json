@@ -16,7 +16,7 @@
     "lint": "eslint src/**/*",
     "lint:fix": "npm run lint -- --fix",
     "build:clean": "rm -rf lib",
-    "build": "npm run build:clean && npm run test && npm run compile",
+    "build": "npm run test && npm run build:clean && npm run compile",
     "compile": "NODE_ENV=production babel -q -d lib src",
     "compile:watch": "babel -w -d lib src",
     "console": "./bin/skypager.js repl --project-path ./test/fixture"

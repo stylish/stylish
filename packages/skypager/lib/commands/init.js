@@ -11,8 +11,6 @@ var _stringify2 = _interopRequireDefault(_stringify);
 exports.init = init;
 exports.handle = handle;
 
-var _skypager = require('skypager');
-
 var _trim = require('lodash/string/trim');
 
 var _trim2 = _interopRequireDefault(_trim);
@@ -20,6 +18,8 @@ var _trim2 = _interopRequireDefault(_trim);
 var _jsYaml = require('js-yaml');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var VERSION = require('../../package.json').version;
 
 function init(program, dispatch) {
   program.command('init <projectName> [destination]').description('create a new skypager project').option('--overwrite', 'whether or not to replace a project that exists').option('--destination', '').option('--plugins <list>', 'a comma separated list of plugins to use', list).action(function (projectName, options) {
@@ -58,9 +58,9 @@ function handle(projectName, destination) {
       plugins: options.plugins ? ('' + options.plugins).split(',') : []
     },
     devDependencies: {
-      'skypager': '^' + _skypager.manifest.version,
-      'skypager-devpack': '^' + _skypager.manifest.version,
-      'babel-preset-skypager': '^' + _skypager.manifest.version,
+      'skypager': '^' + VERSION,
+      'skypager-devpack': '^' + VERSION,
+      'babel-preset-skypager': '^' + VERSION,
       'babel-runtime': '^6.4.0'
     }
   };

@@ -16,8 +16,9 @@
   "main": "app.js",
   "dependencies": {
     "babel-core": "^6.4.0",
+    "babel-runtime": "^6.5.0",
     "babel-loader": "^6.2.1",
-    "babel-preset-skypager": "^1.21.0",
+    "babel-preset-skypager": "^1.22.0",
     "bootstrap": "^3.3.6",
     "chokidar-cli": "^1.2.0",
     "classnames": "^2.2.3",
@@ -51,13 +52,13 @@
     "redux-actions": "^0.9.1",
     "redux-simple-router": "^2.0.2",
     "redux-thunk": "^1.0.3",
-    "skypager": "^1.17.1",
-    "skypager-application": "^1.17.1",
-    "skypager-devpack": "^1.17.1",
-    "skypager-electron": "^1.17.1",
-    "skypager-plugin-blueprints": "^1.17.1",
-    "skypager-themes": "^1.17.1",
-    "skypager-ui": "^1.17.1",
+    "skypager": "^1.21.0",
+    "skypager-application": "^1.21.0",
+    "skypager-devpack": "^1.21.0",
+    "skypager-electron": "^1.21.0",
+    "skypager-plugin-blueprints": "^1.21.0",
+    "skypager-themes": "^1.21.0",
+    "skypager-ui": "^1.21.0",
     "style-loader": "^0.13.0",
     "surge": "^0.17.5",
     "url-loader": "^0.5.7",
@@ -65,11 +66,6 @@
     "webpack-configurator": "^0.3.1",
     "webpack-dev-middleware": "^1.4.0",
     "webpack-hot-middleware": "^2.6.0"
-  },
-  "devDependencies": {
-    "babel-core": "^6.5.1",
-    "babel-preset-skypager": "^1.22.0",
-    "babel-runtime": "^6.5.0"
   },
   "repository": {
     "type": "git",
