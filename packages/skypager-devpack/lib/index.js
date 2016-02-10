@@ -16,11 +16,16 @@ var _presets = require('./presets');
 
 var presets = _interopRequireWildcard(_presets);
 
+var _stages = require('./stages');
+
+var stages = _interopRequireWildcard(_stages);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 module.exports = {
+  availableStages: availableStages,
   availablePresets: availablePresets,
   availableProfiles: availableProfiles,
   devpack: devpack
@@ -32,8 +37,14 @@ function availableProfiles(project) {
   });
 }
 
+function availableStages(project) {
+  return (0, _mapValues2.default)(stages, function (stage) {
+    return stage.description;
+  });
+}
+
 function availablePresets(project) {
-  return (0, _mapValues2.default)(presets, function (profile) {
+  return (0, _mapValues2.default)(presets, function (preset) {
     return preset.description;
   });
 }
@@ -41,7 +52,7 @@ function availablePresets(project) {
 function argsFor(profile, environment, project) {
   var options = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
 
-  return profiles[profile](environment, project, options);
+  return profiles[profile][profile](environment, project, options);
 }
 
 function devpack(action, profile, environment, project) {

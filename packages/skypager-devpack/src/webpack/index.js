@@ -23,14 +23,14 @@ module.exports = function (argv) {
 
   const modulesDirectories = [
     `${directory}/node_modules`,
-    `${__dirname}/../node_modules`,
+    `${__dirname}/../../node_modules`,
     'node_modules'
   ]
 
-  const hasModules = fs.existsSync(path.join(__dirname, '../node_modules'))
+  const hasModules = fs.existsSync(path.join(__dirname, '../../node_modules'))
 
   const resolveBabelPackages = packages => {
-    const modulePath = hasModules ? '../node_modules' : babelModulesPath
+    const modulePath = hasModules ? '../../node_modules' : babelModulesPath
     return packages.map(p => { return path.resolve(__dirname, modulePath, p) })
   }
 
@@ -54,10 +54,10 @@ module.exports = function (argv) {
 		argv.outputFolder || join(directory, 'public')
 	)
 
-  var templatePath = `${__dirname}/../templates/index.html`
+  var templatePath = `${__dirname}/../../templates/index.html`
 
   if (precompiled && precompiled.match(/dashboard|marketing|social/i)) {
-    templatePath = path.join(__dirname, '../templates', platform, precompiled, 'index.html')
+    templatePath = path.join(__dirname, '../../templates', platform, precompiled, 'index.html')
 	} else if (precompiled) {
 		try {
 			if (exists(resolve(precompiled))) {
@@ -109,11 +109,11 @@ module.exports = function (argv) {
       loader: 'babel',
       exclude: [
         /(node_modules|bower_components)/,
-        path.join(argv.project || process.env.PWD, 'dist', 'bundle')
+        path.join(process.env.PWD, 'dist', 'bundle'),
+        path.join(argv.project, 'dist', 'bundle')
       ],
       query: {
-        presets: resolveBabelPackages(['babel-preset-react', 'babel-preset-es2015', 'babel-preset-stage-0']),
-        plugins: resolveBabelPackages(['babel-plugin-transform-decorators-legacy']),
+        presets: resolveBabelPackages(['babel-preset-skypager']),
         env: {
           development: {
             presets: resolveBabelPackages(['babel-preset-react-hmre'])
