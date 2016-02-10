@@ -1,10 +1,11 @@
 import React from 'react'
-import { stateful } from 'skypager-application'
+import { util } from 'ui/applications'
 
 export class HomePage extends React.Component {
   render () {
     return (
-      <h1>Home is where the heart is</h1>
+      <div>
+      </div>
     )
   }
 }

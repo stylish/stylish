@@ -30,15 +30,16 @@
     "redux-actions": "^0.9.1",
     "redux-simple-router": "^2.0.2",
     "redux-thunk": "^1.0.3",
-    "skypager": "^1.27.3",
-    "skypager-application": "^1.27.0",
-    "skypager-devpack": "^1.27.3",
+    "skypager": "^1.30.0",
+    "skypager-devpack": "^1.30.0",
     "skypager-electron": "^1.25.0",
     "skypager-plugin-blueprints": "^1.25.0",
-    "skypager-themes": "^1.25.0",
-    "skypager-ui": "^1.27.0"
+    "skypager-themes": "^1.30.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+      "babel-preset-skypager": "^1.30.0",
+      "babel-preset-react-hmre": "latest"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/architects/skypager-central.git"

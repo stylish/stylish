@@ -1,22 +1,22 @@
 'use strict';
 
-var _mapValues = require('lodash/object/mapValues');
+var _mapValues = require('lodash/mapValues');
 
 var _mapValues2 = _interopRequireDefault(_mapValues);
 
-var _pick = require('lodash/object/pick');
+var _pick = require('lodash/pick');
 
 var _pick2 = _interopRequireDefault(_pick);
 
-var _profiles = require('./profiles');
+var _profiles = require('./webpack/profiles');
 
 var profiles = _interopRequireWildcard(_profiles);
 
-var _presets = require('./presets');
+var _presets = require('./webpack/profiles/presets');
 
 var presets = _interopRequireWildcard(_presets);
 
-var _stages = require('./stages');
+var _stages = require('./webpack/profiles/stages');
 
 var stages = _interopRequireWildcard(_stages);
 

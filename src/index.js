@@ -1,15 +1,10 @@
-import { Application } from 'skypager-application'
-
-import MainLayout from 'layouts/MainLayout'
-import HomePage from 'entries/HomePage'
-import Button from 'react-bootstrap/lib/Button'
-import project from 'dist/bundle'
+import { Application } from 'ui/applications'
+import DefaultLayout from 'ui/layouts/DefaultLayout'
+import HomePage from './entries/HomePage'
 
 Application.create({
   root: 'app',
-  layout: MainLayout,
-  project,
-  bundle: project,
+  layout: DefaultLayout,
   entryPoints:{
     index: {
       component: HomePage

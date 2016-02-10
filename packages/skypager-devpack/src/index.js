@@ -1,9 +1,9 @@
-import mapValues from 'lodash/object/mapValues'
-import pick from 'lodash/object/pick'
+import mapValues from 'lodash/mapValues'
+import pick from 'lodash/pick'
 
-import * as profiles from './profiles'
-import * as presets from './presets'
-import * as stages from './stages'
+import * as profiles from './webpack/profiles'
+import * as presets from './webpack/profiles/presets'
+import * as stages from './webpack/profiles/stages'
 
 module.exports = {
   availableStages,

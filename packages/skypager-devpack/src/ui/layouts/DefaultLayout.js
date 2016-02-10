@@ -1,5 +1,5 @@
 import React, { Component, PropTypes as types } from 'react'
-import IconNavLayout from './IconNavLayout'
+import IconNavLayout from 'ui/layouts/IconNavLayout'
 
 import project from 'dist/bundle'
 

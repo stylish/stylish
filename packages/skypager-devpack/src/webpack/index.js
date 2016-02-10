@@ -23,16 +23,10 @@ module.exports = function (argv) {
 
   const modulesDirectories = [
     `${directory}/node_modules`,
-    `${__dirname}/../../node_modules`,
-    'node_modules'
+    path.resolve('../../node_modules'),
+    path.join(__dirname, '../../src'),
+    path.join(__dirname, '../..')
   ]
-
-  const hasModules = fs.existsSync(path.join(__dirname, '../../../node_modules'))
-
-  const resolveBabelPackages = packages => {
-    const modulePath = hasModules ? '../../../node_modules' : babelModulesPath
-    return packages.map(p => { return path.resolve(__dirname, modulePath, p) })
-  }
 
   const platform = argv.platform || 'web'
 
@@ -47,7 +41,7 @@ module.exports = function (argv) {
   }
 
   if (!precompiled && !argv.skipTheme && argv.theme) {
-    entry.theme = [`skypager-themes?theme=${ argv.theme }&env=${ env }!${directory}/package.json`]
+    entry.theme = [`skypager-themes?theme=${ argv.theme }&env=${argv.env}!${directory}/package.json`]
   }
 
 	var outputPath = path.resolve(
@@ -56,18 +50,16 @@ module.exports = function (argv) {
 
   var templatePath = `${__dirname}/../../templates/index.html`
 
-  if (precompiled && precompiled.match(/dashboard|marketing|social/i)) {
-    templatePath = path.join(__dirname, '../../templates', platform, precompiled, 'index.html')
-	} else if (precompiled) {
-		try {
-			if (exists(resolve(precompiled))) {
-				templatePath = resolve(precompiled)
-			}
-		} catch(error) {
-			 console.log('Error precompiled path', error.message)
-			 throw(error)
-		}
-	}
+  if (precompiled) {
+    try {
+      if (exists(resolve(precompiled))) {
+        templatePath = resolve(precompiled)
+      }
+    } catch(error) {
+       console.log('Error precompiled path', error.message)
+       throw(error)
+    }
+  }
 
   if (argv.htmlTemplatePath) {
     templatePath = path.resolve(argv.htmlTemplatePath)
@@ -79,6 +71,7 @@ module.exports = function (argv) {
     htmlFilename = '200.html'
   }
 
+  console.log('Modules Directories', modulesDirectories)
   config
     .merge({
       entry: entry,
@@ -88,15 +81,17 @@ module.exports = function (argv) {
         publicPath: (!isDev && platform === 'electron') ? '' : '/'
       },
       resolveLoader: {
-        root: modulesDirectories.concat([ require.resolve('skypager-themes') ])
+        root: modulesDirectories.concat([ path.dirname(require.resolve('skypager-themes')) ])
       },
       resolve: {
 				root: modulesDirectories.concat([
-					require.resolve('skypager-themes')
+          directory,
+          path.dirname(require.resolve('skypager-devpack'))
 				]),
 				modulesDirectories:[
-					'.',
-					'src'
+					'src',
+          'dist',
+          'node_modules'
 				]
       },
       devtool: 'eval'
@@ -108,8 +103,8 @@ module.exports = function (argv) {
       test: /\.jsx?$/,
       loader: 'babel',
       exclude: [
-        /(node_modules|bower_components)/,
-        path.join(process.env.PWD, 'dist', 'bundle')
+        path.join(process.env.PWD, 'dist', 'bundle'),
+        /node_modules/
       ],
       query: {
         presets: [require.resolve('babel-preset-skypager')],
