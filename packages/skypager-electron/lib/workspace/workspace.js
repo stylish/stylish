@@ -1,13 +1,26 @@
 'use strict';
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.Workspace = exports.actions = exports.initialState = exports.store = undefined;
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
 exports.provision = provision;
 
 var _path = require('path');
@@ -31,8 +44,6 @@ var _electronifyServer2 = _interopRequireDefault(_electronifyServer);
 var _actions2 = require('./actions');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var defaultPanels = {
   browser: {
@@ -65,8 +76,7 @@ var Workspace = exports.Workspace = (function () {
   function Workspace(application) {
     var attributes = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
     var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-    _classCallCheck(this, Workspace);
+    (0, _classCallCheck3.default)(this, Workspace);
 
     (0, _util.hideProperties)(this, {
       application: application,
@@ -80,7 +90,7 @@ var Workspace = exports.Workspace = (function () {
     this.panelSettings = this.attributes.panels || defaultPanels;
   }
 
-  _createClass(Workspace, [{
+  (0, _createClass3.default)(Workspace, [{
     key: 'boot',
     value: function boot() {
       var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -138,10 +148,9 @@ var Workspace = exports.Workspace = (function () {
   }, {
     key: 'panelNames',
     get: function get() {
-      return Object.keys(this.panelSettings);
+      return (0, _keys2.default)(this.panelSettings);
     }
   }]);
-
   return Workspace;
 })();
 
@@ -199,7 +208,7 @@ function launch(panelName) {
 
     postLoad: function postLoad(electronApp, win) {
       if (w.panelSettings[panelName].constrained) {
-        win.setBounds(_extends({}, w.panelSettings[panelName].constrained));
+        win.setBounds((0, _extends3.default)({}, w.panelSettings[panelName].constrained));
       }
 
       w.dispatch(panelLoaded(w, panelName, electronApp, win));

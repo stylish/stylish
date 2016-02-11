@@ -1,11 +1,16 @@
 'use strict';
 
-var _reducer;
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.actions = exports.store = exports.initialState = exports.WORKSPACE_PROCESS_CLOSED = exports.WORKSPACE_PROCESS_STARTED = exports.WORKSPACE_PROCESS_ERROR = exports.WORKSPACE_DID_LAUNCH = exports.WORKSPACE_DID_LOAD = exports.WORKSPACE_READY = undefined;
+
+var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
+
+var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+
+var _reducer;
+
 exports.workspaceReducer = workspaceReducer;
 exports.processReducer = processReducer;
 exports.processClosed = processClosed;
@@ -17,7 +22,7 @@ exports.workspaceDidLaunch = workspaceDidLaunch;
 
 var _reduxActions = require('redux-actions');
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var _Object = Object;
 var assign = _Object.assign;
@@ -35,7 +40,7 @@ var initialState = exports.initialState = {
   windows: {}
 };
 
-var store = exports.store = (0, _reduxActions.handleActions)((_reducer = {}, _defineProperty(_reducer, WORKSPACE_READY, workspaceReducer), _defineProperty(_reducer, WORKSPACE_DID_LOAD, workspaceReducer), _defineProperty(_reducer, WORKSPACE_DID_LAUNCH, workspaceReducer), _defineProperty(_reducer, WORKSPACE_PROCESS_STARTED, processReducer), _defineProperty(_reducer, WORKSPACE_PROCESS_ERROR, processReducer), _defineProperty(_reducer, WORKSPACE_PROCESS_CLOSED, processReducer), _reducer), initialState);
+var store = exports.store = (0, _reduxActions.handleActions)((_reducer = {}, (0, _defineProperty3.default)(_reducer, WORKSPACE_READY, workspaceReducer), (0, _defineProperty3.default)(_reducer, WORKSPACE_DID_LOAD, workspaceReducer), (0, _defineProperty3.default)(_reducer, WORKSPACE_DID_LAUNCH, workspaceReducer), (0, _defineProperty3.default)(_reducer, WORKSPACE_PROCESS_STARTED, processReducer), (0, _defineProperty3.default)(_reducer, WORKSPACE_PROCESS_ERROR, processReducer), (0, _defineProperty3.default)(_reducer, WORKSPACE_PROCESS_CLOSED, processReducer), _reducer), initialState);
 
 var actions = exports.actions = {
   processClosed: processClosed,
@@ -58,11 +63,11 @@ function workspaceReducer(state, _ref) {
   var processes = state.processes;
 
   var nextState = assign({}, state, {
-    workspaces: assign({}, workspaces, _defineProperty({}, workspaceId, 'ready'))
+    workspaces: assign({}, workspaces, (0, _defineProperty3.default)({}, workspaceId, 'ready'))
   });
 
   if (panelName && browserWindowId) {
-    nextState.windows[workspaceId] = assign(nextState.windows[workspaceId] || {}, _defineProperty({}, panelName, {
+    nextState.windows[workspaceId] = assign(nextState.windows[workspaceId] || {}, (0, _defineProperty3.default)({}, panelName, {
       browserWindowId: browserWindowId
     }));
   }

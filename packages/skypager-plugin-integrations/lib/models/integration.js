@@ -1,5 +1,11 @@
 'use strict';
 
+var _assign = require('babel-runtime/core-js/object/assign');
+
+var _assign2 = _interopRequireDefault(_assign);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 describe("Integration", function (model) {
   var integration = model,
       integrations = model;
@@ -15,7 +21,7 @@ describe("Integration", function (model) {
 
 function create(options, context) {
   var document = options.document || options.asset;
-  var entity = Object.assign({}, document.data);
+  var entity = (0, _assign2.default)({}, document.data);
 
   entity.categories = entity.categories || [];
   entity.platforms = entity.platforms || {};

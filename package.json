@@ -1,6 +1,6 @@
 {
   "name": "skypager-central",
-  "version": "1.31.0",
+  "version": "1.32.0",
   "private": "true",
   "description": "development base for the skypager portfolio",
   "skypager": {
@@ -11,7 +11,7 @@
     ]
   },
   "scripts": {
-    "docs": "skypager author docs"
+      "test": "skypager run:package:script test"
   },
   "main": "app.js",
   "dependencies": {

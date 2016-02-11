@@ -1,6 +1,6 @@
 describe('Skypager Devpack', function () {
   context('build profiles', function () {
-    const devpack = require('../src').devpack
+    const devpack = require('../src/cli').devpack
     const project = require('../skypager.js')
 
     it('generates options for a production website build', function () {

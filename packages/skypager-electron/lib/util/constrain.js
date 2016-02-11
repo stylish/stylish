@@ -1,10 +1,13 @@
 'use strict';
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 exports.constrain = constrain;
 exports.calculateBounds = calculateBounds;
 exports.calculateSizes = calculateSizes;
@@ -14,6 +17,8 @@ exports.calculatePosition = calculatePosition;
 exports.size = size;
 
 var _lodash = require('lodash');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function constrain(settings, bounds) {
   return assign(calculateBounds(settings, bounds), { bounds: bounds });
@@ -28,7 +33,7 @@ function calculateBounds() {
 
   var outputs = assign(inputs, calculatePosition(inputs, bounds));
 
-  return _extends({}, outputs, {
+  return (0, _extends3.default)({}, outputs, {
     x: outputs.left,
     y: outputs.top
   });
