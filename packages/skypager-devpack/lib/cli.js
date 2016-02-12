@@ -1,5 +1,7 @@
 'use strict';
 
+var _path = require('path');
+
 var _mapValues = require('lodash/mapValues');
 
 var _mapValues2 = _interopRequireDefault(_mapValues);
@@ -73,6 +75,7 @@ function devpack(action, profile, environment, project) {
 }
 
 function webpack(action, options) {
+  console.log('Running skypager-devpack ' + action + ' from ' + (0, _path.join)(__dirname, '..'));
   if (action === 'build' || action === 'compile') {
     return require('./webpack/compiler')(options);
   } else if (action === 'develop' || action === 'serve' || action === 'dev' || action === 'dev-server') {

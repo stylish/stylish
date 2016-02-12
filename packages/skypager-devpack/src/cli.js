@@ -1,3 +1,4 @@
+import { join, resolve } from 'path'
 import mapValues from 'lodash/mapValues'
 import pick from 'lodash/pick'
 
@@ -50,6 +51,7 @@ function devpack(action, profile, environment, project, options = {}) {
 }
 
 function webpack(action, options) {
+  console.log(`Running skypager-devpack ${ action } from ${ join(__dirname, '..') }`)
   if ( action === 'build' || action === 'compile' ) {
     return require('./webpack/compiler')(options)
   } else if (action === 'develop' || action === 'serve' || action === 'dev' || action === 'dev-server') {

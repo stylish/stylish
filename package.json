@@ -1,6 +1,6 @@
 {
   "name": "skypager-central",
-  "version": "1.32.0",
+  "version": "1.33.0",
   "private": "true",
   "description": "development base for the skypager portfolio",
   "skypager": {
@@ -11,16 +11,17 @@
     ]
   },
   "scripts": {
-     "test": "skypager run:package:script test",
-     "prerelease": "npm run test",
-     "version": "skypager run:package:script version",
-     "postversion": "git push && git push --tags && npm publish"
+    "test": "skypager run:package:script test",
+    "prerelease": "npm run test",
+    "version": "skypager run:package:script version",
+    "postversion": "git push && git push --tags && npm publish"
   },
   "main": "app.js",
   "dependencies": {
     "bootstrap": "^3.3.6",
     "chokidar-cli": "^1.2.0",
     "commander": "^2.9.0",
+    "deepstream.io-client-js": "^0.3.8",
     "jquery": "^2.2.0",
     "react": "^0.14.6",
     "react-body-classname": "latest",
@@ -40,8 +41,8 @@
     "skypager-themes": "^1.32.0"
   },
   "devDependencies": {
-      "babel-preset-skypager": "^1.32.0",
-      "babel-preset-react-hmre": "latest"
+    "babel-preset-skypager": "^1.32.0",
+    "babel-preset-react-hmre": "latest"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,36 @@
+{
+  "name": "skypager-server",
+  "description": "skypager project server",
+  "version": "1.32.0",
+  "main": "index.js",
+  "scripts": {
+    "compile": "NODE_ENV=production babel -q -d lib src",
+    "compile": "SKYPAGER_ENV=release babel -q -d lib src",
+    "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
+
+    "test": "SKYPAGER_ENV=test NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "pretest:watch": "SKYPAGER_ENV=development npm run test:bundle",
+    "test:watch": "SKYPAGER_ENV=development NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
+
+    "preversion": "npm run test",
+    "version": "npm run compile && git add -A lib"
+  },
+  "skypager": {
+    "main": "skypager.js",
+    "paths": {
+      "models": "src/models"
+    }
+  },
+  "dependencies": {
+    "skypager": "^1.32.0",
+    "deepstream.io": "^0.2.5",
+    "deepstream.io-cache-redis": "^0.2.5",
+    "deepstream.io-msg-redis": "^0.2.5"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4",
+    "should": "latest",
+    "babel-preset-skypager": "^1.32.0",
+    "skypager-devpack": "^1.32.0"
+  }
+}

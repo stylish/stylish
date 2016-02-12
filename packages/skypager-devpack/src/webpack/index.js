@@ -116,6 +116,19 @@ module.exports = function (argv) {
       }
     })
 
+    .loader('js2', {
+      test: /skypager-devpack\/src.*\.jsx?$/,
+      loader: 'babel',
+      query: {
+        presets: [require.resolve('babel-preset-skypager')],
+        env: {
+          development: {
+            presets: [require.resolve('babel-preset-react-hmre')]
+          }
+        }
+      }
+    })
+
     .loader('less', {
       test: /\.less$/,
       loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
