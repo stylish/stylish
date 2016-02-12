@@ -31,14 +31,15 @@ execute(function(params, context) {
 
   packages.forEach(pkg => {
     let data = require(join(pkg.sourcePath, 'package.json'))
-    if (data.version !== nextVersion) {
       if (params.exclude && data.name.match(params.exclude)) {
         console.log('excluding ' + data.name)
       } else {
         data.version = nextVersion
+
+        data.devDependencies = data.devDependencies || {}
+
         fs.writeFileSync(join(pkg.sourcePath, 'package.json'), JSON.stringify(data, null, 2), 'utf8')
         console.log('Updated ' + data.name + ' to ' + nextVersion)
       }
-    }
   })
 })

@@ -92,6 +92,16 @@ export function launchWatcher(options, context) {
 export function launchServer (preset, options = {}, context = {}) {
   let project = context.project
 
+  if (!project) {
+    console.log('Can not launch the dev server outside of a skypager project directory. run skypager init first.'.red)
+    process.exit(1)
+  }
+
+  if (!isDevpackInstalled()) {
+    console.log('The skypager-devpack package is required to use the webpack integration.'.red)
+    process.exit(1)
+  }
+
   options.entry = options.entry || project.options.entry || './src'
   options.theme = options.theme || project.options.theme || 'marketing'
 
@@ -101,7 +111,7 @@ export function launchServer (preset, options = {}, context = {}) {
 
   process.env.NODE_ENV = 'development'
 
-  require(`${ pathToDevpack(options.devToolsPath) }/webpack/server`)(options)
+  require('skypager-devpack').webpack('develop', options)
 }
 
 export function launchTunnel(options, context) {
@@ -120,11 +130,10 @@ export function launchTunnel(options, context) {
   })
 }
 
-function pathToDevpack (opt) { return (opt && resolve(opt)) || process.env.SKYPAGER_DEVPACK_PATH || dirname( require.resolve('skypager-devpack')) }
-
-function isDepackInstalled () {
+function isDevpackInstalled () {
   try {
-    return pathToDevpack()
+    require('skypager-devpack')
+    return true
   } catch (error) {
     return false
   }

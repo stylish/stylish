@@ -1,11 +1,26 @@
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.Application = undefined;
+
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+var _values = require('babel-runtime/core-js/object/values');
+
+var _values2 = _interopRequireDefault(_values);
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
 exports.setupStore = setupStore;
 exports.loggerMiddleware = loggerMiddleware;
 exports.setupAppHome = setupAppHome;
@@ -40,8 +55,6 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 var _Object = Object;
 var defineProperty = _Object.defineProperty;
 var keys = _Object.keys;
@@ -52,8 +65,7 @@ var Application = exports.Application = (function () {
 		var _this = this;
 
 		var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-		_classCallCheck(this, Application);
+		(0, _classCallCheck3.default)(this, Application);
 
 		var hide = this.hide = function () {
 			for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -63,24 +75,24 @@ var Application = exports.Application = (function () {
 			return _util.hideProperties.call.apply(_util.hideProperties, [_this, _this].concat(args));
 		};
 
-		if (!project || !project.data || !project.data.at('settings')) {
+		if (!project || !project.settings) {
 			throw 'Please ensure your project has settings data. data/settings/workspaces.yml for example.';
 		}
 
-		var settings = project.data.at('settings').data;
+		var settings = project.settings;
 
 		options = (0, _defaultsDeep2.default)(options, {
 			id: project.name,
 			argv: { workspace: 'main' },
 			command: '',
 			env: 'development',
-			settings: settings || { workspaces: {} },
+			settings: settings,
 			paths: {
 				appData: (0, _path.join)(_electron.app.getPath('userData'), 'data'),
 				appLogs: (0, _path.join)(_electron.app.getPath('userData'), 'logs'),
-				public: project && project.paths && project.paths.public || (0, _path.join)(process.env.PWD, 'public'),
+				public: project.paths.public || (0, _path.join)(process.env.PWD, 'public'),
 				temp: _electron.app.getPath('temp'),
-				project: project && project.root || process.env.PWD
+				project: project.root || process.env.PWD
 			}
 		});
 
@@ -94,9 +106,23 @@ var Application = exports.Application = (function () {
 			actionLogger: (0, _fs.createWriteStream)(this.paths.actionStream),
 			store: setupStore()
 		});
+
+		if (!this.settings.workspaces) {
+			(0, _defaultsDeep2.default)(this.settings, {
+				workspaces: {
+					main: {
+						panels: {
+							main: {
+								path: 'index.html'
+							}
+						}
+					}
+				}
+			});
+		}
 	}
 
-	_createClass(Application, [{
+	(0, _createClass3.default)(Application, [{
 		key: 'sendMessage',
 		value: function sendMessage(panel, message, payload) {
 			var win = this.browserWindows[panel];
@@ -108,7 +134,7 @@ var Application = exports.Application = (function () {
 	}, {
 		key: 'eachBrowserWindow',
 		value: function eachBrowserWindow() {
-			var windows = Object.values(this.browserWindows);
+			var windows = (0, _values2.default)(this.browserWindows);
 			windows.forEach.apply(windows, arguments);
 		}
 	}, {
@@ -147,16 +173,16 @@ var Application = exports.Application = (function () {
 		key: 'logAction',
 		value: function logAction(action) {
 			if (this.argv.debug) {
-				console.log(JSON.stringify(action, null, 2));
+				console.log((0, _stringify2.default)(action, null, 2));
 			}
 
-			this.actionLogger.write('dispatch(' + JSON.stringify(action) + ');\n\n');
+			this.actionLogger.write('dispatch(' + (0, _stringify2.default)(action) + ');\n\n');
 		}
 	}, {
 		key: 'onStateChange',
 		value: function onStateChange() {
 			this.snapshotState();
-			global.SkypagerElectronAppState = JSON.stringify(this.state);
+			global.SkypagerElectronAppState = (0, _stringify2.default)(this.state);
 
 			_electron.BrowserWindow.getAllWindows().forEach(function (win) {
 				win.webContents.send('skypager:message', 'state:change');
@@ -166,7 +192,7 @@ var Application = exports.Application = (function () {
 		key: 'snapshotState',
 		value: function snapshotState() {
 			if (this.paths && this.paths.appData) {
-				(0, _fs.writeFileSync)((0, _path.join)(this.paths.appData, this.id + '-electron-state.json'), JSON.stringify(this.state, null, 2), 'utf8');
+				(0, _fs.writeFileSync)((0, _path.join)(this.paths.appData, this.id + '-electron-state.json'), (0, _stringify2.default)(this.state, null, 2), 'utf8');
 			}
 		}
 	}, {
@@ -209,14 +235,12 @@ var Application = exports.Application = (function () {
 	}, {
 		key: 'workspaceSettings',
 		get: function get() {
-			var workspaces = this.settings.workspaces;
-
+			var workspaces = this.settings.workspaces || {};
 			workspaces.main = workspaces.main || mainWorkspaceConfig(this);
 
 			return workspaces;
 		}
 	}]);
-
 	return Application;
 })();
 

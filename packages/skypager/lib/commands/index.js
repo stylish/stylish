@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.commands = undefined;
-exports.commander = commander;
+exports.program = program;
 
 var _colors = require('colors');
 
@@ -68,6 +68,8 @@ var _package2 = _interopRequireDefault(_package);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var isDevMode = _yargs.argv.devMode || process.env.SKYPAGER_ENV === 'development';
+
 var currentDirectory = process.env.PWD;
 
 var commands = exports.commands = {
@@ -85,36 +87,39 @@ var commands = exports.commands = {
 
 var requestedCommand = _yargs.argv._[0];
 
-function commander() {
+function program() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-  var program = require('commander');
+  var commander = require('commander');
 
-  program.version(_package2.default.version).option('--project <path>', 'specify which folder contains the project you wish to work with').option('--debug', 'enable debugging').option('--env <env>', 'which environment should we run in? defaults to NODE_ENV', process.env.NODE_ENV || 'development');
+  commander.version(_package2.default.version).option('--debug', 'enable debugging').option('--dev-mode', 'run skypager in dev mode. for local development').option('--env <env>', 'the application environment', process.env.NODE_ENV || 'development').option('--project <path>', 'the folder contains the project you wish to work with');
 
-  configure(program);
+  configure(commander);
 
-  if (program.commands.map(function (c) {
+  if (!requestedCommand || commander.commands.map(function (c) {
     return c._name;
   }).indexOf(requestedCommand) < 0) {
-    program.outputHelp();
+    // dont duplicate the output
+    if (!_yargs.argv.help) {
+      commander.outputHelp();
+    }
   }
 
   return function () {
-    return program.parse(process.argv);
+    return commander.parse(process.argv);
   };
 }
 
-exports.default = commander;
+exports.default = program;
 
-function configure(program) {
+function configure(commander) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   var project = loadProject(_yargs.argv.project);
   var config = project && project.manifest && project.manifest.skypager;
 
   var context = {
-    program: program,
+    commander: commander,
     project: project,
     config: config,
     isCLI: true
@@ -127,33 +132,53 @@ function configure(program) {
       }
 
       args.push(context);
-      handlerFn.apply(undefined, args);
+      try {
+        handlerFn.apply(undefined, args);
+      } catch (error) {
+        console.log('Command Error:'.red);
+        console.log(error.message);
+        throw error;
+      }
     };
   };
 
-  (0, _author2.default)(program, dispatch);
-  (0, _available2.default)(program, dispatch);
-  (0, _build2.default)(program, dispatch);
-  (0, _repl2.default)(program, dispatch);
-  (0, _create2.default)(program, dispatch);
-  (0, _develop2.default)(program, dispatch);
-  (0, _exporter2.default)(program, dispatch);
-  (0, _init2.default)(program, dispatch);
-  (0, _importer2.default)(program, dispatch);
-  (0, _listen2.default)(program, dispatch);
-  (0, _publish2.default)(program, dispatch);
+  if (isDevMode) {
+    (0, _author2.default)(commander, dispatch);
+    (0, _available2.default)(commander, dispatch);
+  }
+
+  (0, _build2.default)(commander, dispatch);
+
+  if (isDevMode) {
+    (0, _repl2.default)(commander, dispatch);
+    (0, _create2.default)(commander, dispatch);
+  }
+
+  (0, _develop2.default)(commander, dispatch);
+
+  (0, _exporter2.default)(commander, dispatch);
+
+  (0, _init2.default)(commander, dispatch);
+
+  (0, _importer2.default)(commander, dispatch);
+
+  if (isDevMode) {
+    (0, _listen2.default)(commander, dispatch);
+  }
+
+  (0, _publish2.default)(commander, dispatch);
 
   // the project can dynamically add its own cli commands from certain actions
-  if (project) {
+  if (project && project.actions) {
     project.actions.filter(function (action) {
       return _util.dotpath.get(action, 'definition.interfaces.cli');
     }).forEach(function (action) {
-      return _util.dotpath.get(action, 'definition.interfaces.cli').call(action, program, dispatch);
+      return _util.dotpath.get(action, 'definition.interfaces.cli').call(action, commander, dispatch);
     });
   }
 
   return function () {
-    return program.parse(_yargs.argv);
+    return commander.parse(_yargs.argv);
   };
 }
 

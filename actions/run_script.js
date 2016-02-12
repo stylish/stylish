@@ -63,7 +63,7 @@ execute(function(scriptName, params, context) {
   })
 
   packages.forEach((pkg) => {
-    if (typeof pkg.result('scripts.test') === 'undefined') {
+    if (typeof pkg.result(`scripts.test`) === 'undefined') {
       console.log(`${ pkg.name } does not have the ${ scriptName } script`)
       return
     }
@@ -91,7 +91,6 @@ execute(function(scriptName, params, context) {
         console.log(`${ pkg.data.name } ...` + 'not ok'.red)
       }
     })
-
   })
 })
 

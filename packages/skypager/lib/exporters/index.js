@@ -14,5 +14,6 @@ function LoadsExporters(exporters) {
   load(require('./entities'), { uri: resolve('./entities') });
   load(require('./models'), { uri: resolve('./models') });
   load(require('./project'), { uri: resolve('./project') });
+  load(require('./settings'), { uri: resolve('./settings') });
   load(require('./snapshot'), { uri: resolve('./snapshot') });
 }

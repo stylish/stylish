@@ -1,4 +1,0 @@
-app:
-  layout: MainLayout
-  entryPoints:
-    index: HomePage

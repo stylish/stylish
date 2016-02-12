@@ -122,6 +122,10 @@ class Project {
     if (fn) { fn.call(project, ...args) }
   }
 
+  get (...args) {
+    return util.result(this, ...args)
+  }
+
   /**
    * A proxy object that lets you run one of the project helpers.
    *
@@ -171,6 +175,11 @@ class Project {
       }
 
     }
+  }
+
+  findBy(source, params) {
+    params.limit = 1
+    return this.query(source, params)[0]
   }
 
   query (source, params) {
@@ -427,6 +436,7 @@ function paths () {
     scripts: join(this.root, 'src'),
     stylesheets: join(this.root, 'src'),
     manifest: join(this.root, 'package.json'),
+    tmpdir: join(this.root, 'tmp'),
     cache: join(this.root, 'tmp', 'cache'),
     logs: join(this.root, 'log'),
     build: join(this.root, 'dist'),

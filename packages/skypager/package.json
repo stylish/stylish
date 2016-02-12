@@ -1,21 +1,25 @@
 {
   "name": "skypager",
-  "version": "1.20.0",
+  "version": "1.33.0",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
   "bin": {
     "skypager": "./bin/cli.js"
   },
   "scripts": {
-    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
-    "test:watch": "NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
+    "test:bundle:export": "skypager export bundle --clean",
+    "test:bundle:compile": "webpack --config test/webpack.bundle.config.js > /dev/null",
+    "test:bundle": "npm run test:bundle:export && npm run test:bundle:compile && npm run test",
+    "test": "SKYPAGER_ENV=test NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "pretest:watch": "SKYPAGER_ENV=development npm run test:bundle",
+    "test:watch": "SKYPAGER_ENV=development NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
     "lint": "eslint src/**/*",
     "lint:fix": "npm run lint -- --fix",
-    "build:clean": "rm -rf lib test/fixture/dist/*",
-    "build": "npm run build:clean && npm run test && npm run compile",
-    "compile": "NODE_ENV=production babel -q -d lib src",
-    "compile:watch": "babel -w -d lib src",
-    "console": "./bin/skypager.js repl --project-path ./test/fixture"
+    "dev:console": "./bin/skypager.js repl --dev-mode --project ./test/fixture",
+    "compile": "SKYPAGER_ENV=release babel -q -d lib src",
+    "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
+    "preversion": "npm run test",
+    "version": "npm run compile && git add -A lib"
   },
   "repository": {
     "type": "git",
@@ -35,7 +39,6 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.3.13",
-    "babel-preset-skypager": "^2.0.3",
     "babel-register": "^6.3.13",
     "babel-runtime": "^6.3.13",
     "cheerio": "^0.19.0",
@@ -46,7 +49,6 @@
     "csv": "^0.4.6",
     "debug": "^2.2.0",
     "dotenv": "^1.2.0",
-    "easy-ipc": "^0.2.2",
     "fs-promise": "^0.3.1",
     "glob": "^6.0.1",
     "i": "^0.3.3",
@@ -80,8 +82,7 @@
   "devDependencies": {
     "babel-core": "^6.4.0",
     "babel-eslint": "^5.0.0-beta4",
-    "babel-runtime": "^6.3.13",
-    "babel-preset-skypager": "2.0.3",
+    "babel-preset-skypager": "^1.24.0",
     "colors": "^1.1.2",
     "eslint": "^1.10.3",
     "eslint-config-standard": "^4.4.0",

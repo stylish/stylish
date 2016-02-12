@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ModelDefinition = undefined;
+
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -7,10 +12,6 @@ var _keys2 = _interopRequireDefault(_keys);
 var _defineProperty = require('babel-runtime/core-js/object/define-property');
 
 var _defineProperty2 = _interopRequireDefault(_defineProperty);
-
-var _assign = require('babel-runtime/core-js/object/assign');
-
-var _assign2 = _interopRequireDefault(_assign);
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -20,18 +21,12 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ModelDefinition = undefined;
 exports.DSL = DSL;
 exports.lookup = lookup;
 
-var _util = require('../../util');
-
 var _jsYaml = require('js-yaml');
 
-var _jsYaml2 = _interopRequireDefault(_jsYaml);
+var _util = require('../../util');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -69,7 +64,7 @@ var ModelDefinition = exports.ModelDefinition = (function () {
     this.config = {};
 
     if (options.required && options.required.definition) {
-      this.config = (0, _assign2.default)(this.config, options.required.definition);
+      this.config = (0, _util.assign)(this.config, options.required.definition);
     }
 
     _util.hide.getter(this, 'documents', this.configureDocuments.bind(this));
@@ -85,7 +80,7 @@ var ModelDefinition = exports.ModelDefinition = (function () {
           (_currentHelper$api = currentHelper.api).decorate.apply(_currentHelper$api, arguments);
           return (_currentHelper$api2 = currentHelper.api).create.apply(_currentHelper$api2, arguments);
         },
-        config: (0, _assign2.default)({}, _this.config, _this.helperExport.config || {}),
+        config: (0, _util.assign)({}, _this.config, _this.helperExport.config || {}),
         decorate: _this.config.decorator || _this.helperExport.decorate || defaultDecorateMethod,
         generate: _this.config.generator || _this.helperExport.generate || defaultGenerateMethod,
         actions: _this.config.actions || []
@@ -124,7 +119,17 @@ var ModelDefinition = exports.ModelDefinition = (function () {
   }, {
     key: 'configure',
     value: function configure() {
-      this.body(this);
+      var helpers = function helpers(def) {
+        return {
+          example: function example() {},
+          paragraphs: function paragraphs() {},
+          h1: function h1() {},
+          h2: function h2() {},
+          h3: function h3() {}
+        };
+      };
+
+      this.body(this, helpers(this));
       this.documents.configure();
     }
   }, {
@@ -442,11 +447,11 @@ function defaultGenerateMethod() {
   var context = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   var str = '';
-  var frontmatter = (0, _assign2.default)({}, options.data || {});
+  var frontmatter = (0, _util.assign)({}, options.data || {});
   var attrs = options.attributes || options.attrs || {};
 
   if ((0, _keys2.default)(frontmatter).length > 0) {
-    str = '---\n' + _jsYaml2.default.dump(frontmatter) + '---\n\n';
+    str = '---\n' + (0, _jsYaml.dump)(frontmatter) + '---\n\n';
   }
 
   if (attrs.title) {

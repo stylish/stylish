@@ -20,10 +20,6 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-var _index = require('./index');
-
-var _index2 = _interopRequireDefault(_index);
-
 var _util = require('./util');
 
 var _path = require('path');
@@ -39,6 +35,18 @@ var _objectPath2 = _interopRequireDefault(_objectPath);
 var _lodash = require('lodash');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * The Skypager.Collection is a wrapper around local file folders
+ * which is responsible for assigning different types of Asset Classes
+ * to handle different types of source files in the project, which are used to parse,
+ * index, and transform these files so that they can be manipulated programmatically
+ * loaded into a collection, they can easily be searched, queried, aggregated, related,
+ * or whatever.
+ *
+ * Collections work through simple file extensions and folder naming conventions,
+ * however they can be configured to use different patterns and paths to suit your liking.
+ */
 
 var Collection = (function () {
   function Collection() {

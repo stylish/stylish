@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _stringify = require('babel-runtime/core-js/json/stringify');
 
 var _stringify2 = _interopRequireDefault(_stringify);
@@ -8,15 +12,13 @@ var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.BrowserBundle = BrowserBundle;
 exports.AssetExporter = AssetExporter;
 exports.ProjectExporter = ProjectExporter;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var BundleWrapperPath = require('path').resolve('../../lib/bundle.js');
 function BrowserBundle() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -80,7 +82,7 @@ function AssetExporter() {
   };
 }
 
-var IncludeExporters = ['assets', 'entities', 'project', 'models'];
+var IncludeExporters = ['assets', 'entities', 'project', 'models', 'settings'];
 
 function ProjectExporter() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -94,7 +96,7 @@ function ProjectExporter() {
     });
   }
 
-  var lines = ['var bundle = module.exports = {};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.assets = require(\'./assets-export.json\');', 'bundle.models = require(\'./models-export.json\');', '\n    bundle.requireContexts = {\n      scripts: require.context(\'' + project.scripts.paths.absolute + '\', true, /.js$/i),\n      stylesheets: require.context(\'' + project.stylesheets.paths.absolute + '\', true, /..*ss$/i)\n    };\n    bundle.content = {}'];
+  var lines = ['var bundle = module.exports = {};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.assets = require(\'./assets-export.json\');', 'bundle.models = require(\'./models-export.json\');', 'bundle.settings = require(\'./settings-export.json\');', '\n    bundle.requireContexts = {\n      scripts: require.context(\'' + project.scripts.paths.absolute + '\', true, /.js$/i),\n      stylesheets: require.context(\'' + project.stylesheets.paths.absolute + '\', true, /..*ss$/i)\n    };\n    bundle.content = {}'];
 
   keys(project.content).forEach(function (key) {
     lines.push('var _' + key + ' = bundle.content.' + key + ' = {};');
@@ -108,7 +110,7 @@ function ProjectExporter() {
     });
   });
 
-  lines.push('module.exports = require(\'' + require.resolve('../bundle') + '\').create(bundle)');
+  lines.push('module.exports = require(\'skypager/lib/bundle\').create(bundle)');
 
   return write(project.path('build', 'bundle', 'index.js'), lines.join("\n"));
 }

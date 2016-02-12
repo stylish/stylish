@@ -1,3 +1,4 @@
+const BundleWrapperPath = require('path').resolve('../../lib/bundle.js')
 export function BrowserBundle (options = {}) {
   let project = options.project = this
 
@@ -58,7 +59,7 @@ export function AssetExporter (options = {}, callback) {
   }
 }
 
-const IncludeExporters = ['assets', 'entities', 'project', 'models' ]
+const IncludeExporters = ['assets', 'entities', 'project', 'models', 'settings' ]
 
 export function ProjectExporter (options = {}, callback) {
   let project = options.project
@@ -76,6 +77,7 @@ export function ProjectExporter (options = {}, callback) {
     `bundle.entities = require('./entities-export.json');`,
     `bundle.assets = require('./assets-export.json');`,
     `bundle.models = require('./models-export.json');`,
+    `bundle.settings = require('./settings-export.json');`,
     `
     bundle.requireContexts = {
       scripts: require.context('${ project.scripts.paths.absolute }', true, /\.js$/i),
@@ -93,7 +95,7 @@ export function ProjectExporter (options = {}, callback) {
     })
   })
 
-  lines.push(`module.exports = require('${ require.resolve('../bundle') }').create(bundle)`)
+  lines.push(`module.exports = require('skypager/lib/bundle').create(bundle)`)
 
   return write(
     project.path('build','bundle','index.js'), lines.join("\n")

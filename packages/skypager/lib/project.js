@@ -181,6 +181,15 @@ var Project = (function () {
         fn.call.apply(fn, [project].concat(args));
       }
     }
+  }, {
+    key: 'get',
+    value: function get() {
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      return util.result.apply(util, [this].concat(args));
+    }
 
     /**
      * A proxy object that lets you run one of the project helpers.
@@ -192,6 +201,12 @@ var Project = (function () {
      *
      */
 
+  }, {
+    key: 'findBy',
+    value: function findBy(source, params) {
+      params.limit = 1;
+      return this.query(source, params)[0];
+    }
   }, {
     key: 'query',
     value: function query(source, params) {
@@ -307,8 +322,8 @@ var Project = (function () {
     value: function hidden() {
       var _util$hidden;
 
-      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
+      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
       }
 
       return (_util$hidden = util.hidden).getter.apply(_util$hidden, [this].concat(args));
@@ -316,8 +331,8 @@ var Project = (function () {
   }, {
     key: 'lazy',
     value: function lazy() {
-      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        args[_key3] = arguments[_key3];
+      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
       }
 
       return util.lazy.apply(util, [this].concat(args));
@@ -331,8 +346,8 @@ var Project = (function () {
   }, {
     key: 'path',
     value: function path(base) {
-      for (var _len4 = arguments.length, rest = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-        rest[_key4 - 1] = arguments[_key4];
+      for (var _len5 = arguments.length, rest = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
+        rest[_key5 - 1] = arguments[_key5];
       }
 
       return _path.join.apply(undefined, [this.paths[base]].concat(rest));
@@ -590,14 +605,15 @@ function paths() {
     scripts: (0, _path.join)(this.root, 'src'),
     stylesheets: (0, _path.join)(this.root, 'src'),
     manifest: (0, _path.join)(this.root, 'package.json'),
+    tmpdir: (0, _path.join)(this.root, 'tmp'),
     cache: (0, _path.join)(this.root, 'tmp', 'cache'),
     logs: (0, _path.join)(this.root, 'log'),
     build: (0, _path.join)(this.root, 'dist'),
     public: (0, _path.join)(this.root, 'public'),
     settings: (0, _path.join)(this.root, 'settings'),
     join: function join() {
-      for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-        args[_key5] = arguments[_key5];
+      for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+        args[_key6] = arguments[_key6];
       }
 
       return _path.join.apply(undefined, [project.root].concat(args));

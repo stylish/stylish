@@ -1,10 +1,20 @@
-import Skypager from './index'
 import {filterQuery as query, hide, hidden, lazy, tabelize, values} from './util'
 import {relative, basename, dirname, extname, resolve, join} from 'path'
 import minimatch from 'minimatch'
 import carve from 'object-path'
 import { invokeMap, mapValues, groupBy, invoke, pick } from 'lodash'
 
+/**
+ * The Skypager.Collection is a wrapper around local file folders
+ * which is responsible for assigning different types of Asset Classes
+ * to handle different types of source files in the project, which are used to parse,
+ * index, and transform these files so that they can be manipulated programmatically
+ * loaded into a collection, they can easily be searched, queried, aggregated, related,
+ * or whatever.
+ *
+ * Collections work through simple file extensions and folder naming conventions,
+ * however they can be configured to use different patterns and paths to suit your liking.
+ */
 class Collection {
   constructor (options = {}) {
     let { root, project, assetClass } = options

@@ -1,6 +1,5 @@
 import { any, assign, noConflict, tabelize, parameterize, singularize, underscore } from '../../util'
 
-import trim from 'lodash/string/trim'
 
 const route = require('path-match')({
   sensitive: false,
@@ -38,7 +37,7 @@ export class ActionDefinition {
 
   addCommandPhrase(phrase){
     this.config.pathMatchers.push(
-      route(trim(phrase).replace(/\s/g, '/'))
+      route((phrase.trim()).replace(/\s/g, '/'))
     )
   }
 

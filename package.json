@@ -1,59 +1,31 @@
 {
   "name": "skypager-central",
-  "version": "1.1.0",
+  "version": "1.32.0",
+  "private": "true",
   "description": "development base for the skypager portfolio",
-  "main": "skypager.js",
   "skypager": {
     "main": "skypager.js",
     "theme": "dashboard",
-    "electron": {
-      "main": "src/electron/main",
-      "defaultUrl": "app/index.html"
-    },
     "plugins": [
       "blueprints"
     ]
   },
-  "blueprint": {
-    "storage": {
-      "packages": "packages",
-      "projects": "projects"
-    }
-  },
   "scripts": {
-    "docs": "skypager author docs"
+     "test": "skypager run:package:script test",
+     "prerelease": "npm run test",
+     "version": "skypager run:package:script version",
+     "postversion": "git push && git push --tags && npm publish"
   },
+  "main": "app.js",
   "dependencies": {
-    "lodash": "^4.0.0",
-    "babel-core": "^6.4.0",
-    "babel-loader": "^6.2.1",
-    "babel-preset-skypager": "^1.21.0",
     "bootstrap": "^3.3.6",
     "chokidar-cli": "^1.2.0",
     "commander": "^2.9.0",
-    "css-loader": "^0.23.1",
-    "electron-prebuilt": "^0.36.7",
-    "exports-loader": "^0.6.2",
-    "expose-loader": "^0.7.1",
-    "express": "^4.13.3",
-    "extract-text-webpack-plugin": "^1.0.1",
-    "file-loader": "^0.8.5",
-    "history": "^1.17.0",
-    "html-webpack-plugin": "^2.7.2",
-    "imports-loader": "^0.6.5",
     "jquery": "^2.2.0",
-    "json-loader": "^0.5.4",
-    "less": "^2.5.3",
-    "less-loader": "latest",
-    "lodash": "^4.2.1",
-    "postcss-cssnext": "2.4.0",
-    "postcss-import": "7.1.3",
-    "postcss-loader": "0.8.0",
     "react": "^0.14.6",
     "react-body-classname": "latest",
     "react-bootstrap": "^0.28.2",
     "react-dom": "^0.14.6",
-    "react-dropzone": "^3.3.2",
     "react-redux": "^4.0.6",
     "react-router": "^1.0.3",
     "redbox-react": "^1.2.0",
@@ -61,22 +33,16 @@
     "redux-actions": "^0.9.1",
     "redux-simple-router": "^2.0.2",
     "redux-thunk": "^1.0.3",
-    "skypager": "file:./packages/skypager",
-    "skypager-application": "file:./packages/skypager-application",
-    "skypager-devpack": "file:./packages/skypager-devpack",
-    "skypager-electron": "file:./packages/skypager-electron",
-    "skypager-plugin-blueprints": "file:./packages/skypager-plugin-blueprints",
-    "skypager-themes": "file:./packages/skypager-themes",
-    "skypager-ui": "file:./packages/skypager-ui",
-    "style-loader": "^0.13.0",
-    "surge": "^0.17.5",
-    "url-loader": "^0.5.7",
-    "webpack": "^1.12.11",
-    "webpack-configurator": "^0.3.1",
-    "webpack-dev-middleware": "^1.4.0",
-    "webpack-hot-middleware": "^2.6.0"
+    "skypager": "^1.32.0",
+    "skypager-devpack": "^1.32.0",
+    "skypager-electron": "^1.32.0",
+    "skypager-plugin-blueprints": "^1.32.0",
+    "skypager-themes": "^1.32.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+      "babel-preset-skypager": "^1.32.0",
+      "babel-preset-react-hmre": "latest"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/architects/skypager-central.git"

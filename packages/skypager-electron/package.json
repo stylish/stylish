@@ -1,21 +1,21 @@
 {
   "name": "skypager-electron",
-  "version": "1.21.0",
+  "version": "1.33.0",
   "description": "skypager electron stack",
   "author": "Jonathan Soeder <jon@chicago.com>",
   "license": "UNLICENSED",
   "main": "app.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/node/**/*-spec.js",
+    "pretest:electron": "npm run test",
     "test:electron": "NODE_ENV=test electron-mocha --require 'babel-register' --timeout 10000 --require should --require ./test/index.js test/electron/**/*-spec.js",
-    "test:watch": "NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/node/**/*-spec.js",
+    "test:watch": "SKYPAGER_ENV=development NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/node/**/*-spec.js",
     "lint": "eslint src/**/*",
     "lint:fix": "npm run lint -- --fix",
-    "build:clean": "rm -rf lib dist",
-    "build": "npm run build:clean && npm run test && npm run compile",
-    "compile": "NODE_ENV=production babel -q -d lib src",
+    "compile": "SKYPAGER_ENV=release NODE_ENV=production babel -q -d lib src",
     "compile:watch": "babel -w -d lib src",
-    "dev:workspaces:main": "skypager dev --port 9000 --entry ./src/index"
+    "preversion": "SKYPAGER_ENV=release npm run test:electron",
+    "version": "npm run compile && git add -A lib"
   },
   "repository": {
     "type": "git",
@@ -25,16 +25,17 @@
     "entry": "author-app/index.js"
   },
   "dependencies": {
+    "child-process-promise": "^1.1.0",
     "electron-packager": "^5.2.1",
-    "electron-prebuilt": "^0.36.5",
+    "electron-prebuilt": "^0.36.7",
     "electron-rebuild": "^1.1.1",
     "openport": "0.0.4"
   },
   "devDependencies": {
+    "babel-preset-es2015": "^6.5.0",
+    "babel-preset-react": "^6.5.0",
+    "babel-preset-skypager": "latest",
     "mocha": "^2.4.5",
-    "skypager": "^1.17.1",
-    "skypager-devpack": "^1.17.1",
-    "skypager-ui": "^1.17.1",
-    "skypager-application": "^1.17.1"
+    "should": "latest"
   }
 }

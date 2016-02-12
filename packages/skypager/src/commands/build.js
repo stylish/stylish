@@ -43,12 +43,25 @@ export function build (program, dispatch) {
 export default build
 
 export function handle(preset, options = {}, context = {}) {
+  if (!isDevpackInstalled()) {
+    console.log('The skypager-devpack package is required to use the webpack integration.'.red)
+    process.exit(1)
+  }
+
+  let project = context.project
+
+  if (!project) {
+    console.log('Can not launch the dev server outside of a skypager project directory. run skypager init first.'.red)
+    process.exit(1)
+  }
+
   options.preset = preset || options.preset
   options.theme = options.theme || project.options.theme
 
   if (!options.theme && !options.skipTheme) {
     console.log('Are you sure you want to run without a theme?'.yellow)
   }
+
 
   process.env.NODE_ENV = 'production'
 
@@ -58,15 +71,14 @@ export function handle(preset, options = {}, context = {}) {
     shell.exec(`${ bundleCommand } --clean`)
   }
 
-  require(`${ pathToDevpack(options.devToolsPath) }/webpack/compiler`)(options)
+  require('skypager-devpack').webpack('build', options)
 }
 
 
-function pathToDevpack (opt) { return (opt && resolve(opt)) || process.env.SKYPAGER_DEVPACK_PATH || dirname( require.resolve('skypager-devpack')) }
-
-function isDepackInstalled () {
+function isDevpackInstalled () {
   try {
-    return pathToDevpack()
+    require('skypager-devpack')
+    return true
   } catch (error) {
     return false
   }

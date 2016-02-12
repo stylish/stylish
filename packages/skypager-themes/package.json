@@ -1,18 +1,25 @@
 {
   "name": "skypager-themes",
-  "version": "1.21.0",
   "description": "",
+  "version": "1.32.0",
   "main": "index.js",
   "loader": "index.loader.js",
   "skypager": {
     "main": "skypager.js"
   },
   "scripts": {
-    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "test": "exit 0",
     "build:clean": "rm -rf lib dist",
     "build": "npm run build:clean && npm run test && npm run compile",
     "compile": "NODE_ENV=production babel -q -d lib src"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "Jonathan Soeder <jon@chicago.com>",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "expose-loader": "^0.7.1"
+  },
+  "devDependencies": {
+    "babel-preset-skypager": "^1.30.1"
+  }
 }

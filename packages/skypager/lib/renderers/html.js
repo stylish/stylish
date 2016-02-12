@@ -1,13 +1,14 @@
 'use strict';
 
-var _assign = require('babel-runtime/core-js/object/assign');
-
-var _assign2 = _interopRequireDefault(_assign);
-
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.Layouts = undefined;
+
+var _assign = require('babel-runtime/core-js/object/assign');
+
+var _assign2 = _interopRequireDefault(_assign);
+
 exports.HtmlRenderer = HtmlRenderer;
 exports.AssetRenderer = AssetRenderer;
 exports.ProjectRenderer = ProjectRenderer;

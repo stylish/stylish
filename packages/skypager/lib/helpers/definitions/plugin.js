@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.PluginDefinition = undefined;
+
 var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
@@ -16,10 +21,6 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.PluginDefinition = undefined;
 exports.DSL = DSL;
 exports.lookup = lookup;
 

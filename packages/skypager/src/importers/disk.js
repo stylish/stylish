@@ -64,9 +64,6 @@ export function ProjectImporter (options = {}, context = {}) {
     collection._willLoadAssets(paths)
 
     paths.forEach(rel => {
-      //let uri = path.join(collection.root, rel)
-      //let asset = new collection.AssetClass(rel, {collection: collection, project: project})
-
       let asset = collection.createAsset(rel)
 
       collection.add(asset, false, true)

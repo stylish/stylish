@@ -18,15 +18,46 @@ class Bundle {
       assign(this, options.computed)
     }
 
-    this.assets = this.bundle.assets
-    this.content = this.bundle.content
-    this.docs = this.content.docs
+    let content = bundle.content || {}
+    let contentCollections = keys(content)
+
+    this.assets = bundle.assets
+    this.project = bundle.project
+    this.entities = bundle.entities
+    this.content = bundle.content
+    this.model = bundle.models
+    this.settings = bundle.settings
+
+    this.assetsContent = this.content.assets
+    this.settingsContent = this.content.settings
+
+    this.docs = this.content.documents
     this.data = this.content.data_sources
-    this.entities = this.bundle.entities
-    this.models = this.bundle.models
-    this.project = this.bundle.project
-    this.settings = (this.data.settings && this.data.settings.data) || {}
+    this.scripts = this.content.scripts
+    this.stylesheets = this.content.stylesheets
+    this.packages = this.content.packages
+    this.projects = this.content.projects
+
     this.entityNames = keys(this.entities || {})
+
+    this.requireContexts = bundle.requireContexts
+
+    // naming irregularities
+    assign(this, {
+      get settingsFiles() {
+        return bundle.content.settings
+      },
+      get assetFiles() {
+        return bundle.content.assets
+      },
+      get data() {
+        return bundle.content.data_sources
+      }
+    })
+
+    if (options.subscribe) {
+      this.setupSubscription(options.subscribe)
+    }
   }
 
   createApp(appClass, options = {}) {
@@ -55,6 +86,12 @@ class Bundle {
     }
   }
 
+  // subscribe to a notifications channel which will push updates
+  // whenever the bundle changes
+  setupSubscription(options = {}) {
+
+  }
+
   requireEntryPoint (id) {
     return this.require('script', `entries/${ id }`)
   }
@@ -72,15 +109,14 @@ class Bundle {
   }
 
   require(assetType, assetId) {
-    let key = this.content[assetType + 's'][assetId].paths.relative
+    let key = this[`${assetType}s`][assetId].paths.relative
+    let asset = this.requireContexts[`${assetType}s`]( './' + key )
 
-    let mod = this.bundle.requireContexts[assetType + 's'](`./${ key }`)
-
-    if (!mod) {
+    if (!asset) {
        throw('Could not find ' + assetType + ' ' + assetId)
     }
 
-    return mod.default ? mod.default : mod
+    return asset.default ? asset.default : asset
   }
 
 
@@ -201,7 +237,7 @@ function filterQuery (list = [], params) {
       let param = params[key]
       let value = item[key]
 
-      if (isRegex(param) && param.test(value)) {
+      if (isRegexp(param) && param.test(value)) {
         return true
       }
 
@@ -227,14 +263,6 @@ function values(obj) {
 
 function isArray(arg) {
   return Object.prototype.toString.call(arg) === '[object Array]'
-}
-
-function isRegex(val) {
-  if ((typeof val === 'undefined' ? 'undefined' : typeof(val)) === 'object' && Object.getPrototypeOf(val).toString() === '/(?:)/') {
-    return true
-  }
-
-  return false
 }
 
 const ProjectReducers = {
@@ -299,5 +327,22 @@ const ProjectReducers = {
   },
 
 }
+
+function delegate(recipient, ...propertyNames) {
+  let i = (source) => {
+    propertyNames.forEach(prop => {
+      defineProperty(recipient, prop, {
+        get: function () {
+          return source[prop]
+        }
+      })
+    })
+  }
+
+  i.to = i
+
+  return i
+}
+
 
 const { defineProperty, keys, assign } = Object

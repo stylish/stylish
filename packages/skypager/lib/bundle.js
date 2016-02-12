@@ -1,9 +1,5 @@
 'use strict';
 
-var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
-
-var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
-
 var _typeof2 = require('babel-runtime/helpers/typeof');
 
 var _typeof3 = _interopRequireDefault(_typeof2);
@@ -46,15 +42,46 @@ module.exports = (function () {
       assign(this, options.computed);
     }
 
-    this.assets = this.bundle.assets;
-    this.content = this.bundle.content;
-    this.docs = this.content.docs;
+    var content = bundle.content || {};
+    var contentCollections = keys(content);
+
+    this.assets = bundle.assets;
+    this.project = bundle.project;
+    this.entities = bundle.entities;
+    this.content = bundle.content;
+    this.model = bundle.models;
+    this.settings = bundle.settings;
+
+    this.assetsContent = this.content.assets;
+    this.settingsContent = this.content.settings;
+
+    this.docs = this.content.documents;
     this.data = this.content.data_sources;
-    this.entities = this.bundle.entities;
-    this.models = this.bundle.models;
-    this.project = this.bundle.project;
-    this.settings = this.data.settings && this.data.settings.data || {};
+    this.scripts = this.content.scripts;
+    this.stylesheets = this.content.stylesheets;
+    this.packages = this.content.packages;
+    this.projects = this.content.projects;
+
     this.entityNames = keys(this.entities || {});
+
+    this.requireContexts = bundle.requireContexts;
+
+    // naming irregularities
+    assign(this, {
+      get settingsFiles() {
+        return bundle.content.settings;
+      },
+      get assetFiles() {
+        return bundle.content.assets;
+      },
+      get data() {
+        return bundle.content.data_sources;
+      }
+    });
+
+    if (options.subscribe) {
+      this.setupSubscription(options.subscribe);
+    }
   }
 
   (0, _createClass3.default)(Bundle, [{
@@ -82,6 +109,15 @@ module.exports = (function () {
         return filterQuery(values(this.entities[source]), params);
       }
     }
+
+    // subscribe to a notifications channel which will push updates
+    // whenever the bundle changes
+
+  }, {
+    key: 'setupSubscription',
+    value: function setupSubscription() {
+      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+    }
   }, {
     key: 'requireEntryPoint',
     value: function requireEntryPoint(id) {
@@ -105,15 +141,14 @@ module.exports = (function () {
   }, {
     key: 'require',
     value: function require(assetType, assetId) {
-      var key = this.content[assetType + 's'][assetId].paths.relative;
+      var key = this[assetType + 's'][assetId].paths.relative;
+      var asset = this.requireContexts[assetType + 's']('./' + key);
 
-      var mod = this.bundle.requireContexts[assetType + 's']('./' + key);
-
-      if (!mod) {
+      if (!asset) {
         throw 'Could not find ' + assetType + ' ' + assetId;
       }
 
-      return mod.default ? mod.default : mod;
+      return asset.default ? asset.default : asset;
     }
   }, {
     key: 'buildStateMachine',
@@ -249,7 +284,7 @@ function filterQuery() {
       var param = params[key];
       var value = item[key];
 
-      if (isRegex(param) && param.test(value)) {
+      if (isRegexp(param) && param.test(value)) {
         return true;
       }
 
@@ -279,14 +314,6 @@ function values(obj) {
 
 function isArray(arg) {
   return Object.prototype.toString.call(arg) === '[object Array]';
-}
-
-function isRegex(val) {
-  if ((typeof val === 'undefined' ? 'undefined' : typeof val === 'undefined' ? 'undefined' : (0, _typeof3.default)(val)) === 'object' && (0, _getPrototypeOf2.default)(val).toString() === '/(?:)/') {
-    return true;
-  }
-
-  return false;
 }
 
 var ProjectReducers = {
@@ -363,6 +390,26 @@ var ProjectReducers = {
     return state;
   }
 };
+
+function delegate(recipient) {
+  for (var _len2 = arguments.length, propertyNames = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    propertyNames[_key2 - 1] = arguments[_key2];
+  }
+
+  var i = function i(source) {
+    propertyNames.forEach(function (prop) {
+      defineProperty(recipient, prop, {
+        get: function get() {
+          return source[prop];
+        }
+      });
+    });
+  };
+
+  i.to = i;
+
+  return i;
+}
 
 var _Object = Object;
 var defineProperty = _Object.defineProperty;

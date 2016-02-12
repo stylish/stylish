@@ -12,31 +12,30 @@ import * as Workspace from './workspace/workspace'
 
 import { screen, app, BrowserWindow, ipcMain as ipc } from 'electron'
 
-
 const { defineProperty, keys, assign } = Object
 
 export class Application {
   constructor (project, options = {}) {
 		let hide = this.hide = (...args) => hideProperties.call(this, this, ...args)
 
-		if (!project || !project.data || !project.data.at('settings')) {
+		if (!project || !project.settings) {
 			throw('Please ensure your project has settings data. data/settings/workspaces.yml for example.')
 		}
 
-		let settings = project.data.at('settings').data
+		let settings = project.settings
 
 		options = defaults(options, {
 			id: project.name,
 			argv: { workspace: 'main' },
 			command: '',
 			env: 'development',
-			settings: settings || { workspaces: {} },
+			settings,
 			paths:{
 				appData: join(app.getPath('userData'), 'data'),
 				appLogs: join(app.getPath('userData'), 'logs'),
-				public: (project && project.paths && project.paths.public) || join(process.env.PWD, 'public'),
+				public: (project.paths.public) || join(process.env.PWD, 'public'),
 				temp: app.getPath('temp'),
-				project: (project && project.root) || process.env.PWD
+				project: project.root || process.env.PWD
 			}
 		})
 
@@ -52,6 +51,20 @@ export class Application {
 			),
 			store: setupStore()
 		})
+
+		if (!this.settings.workspaces) {
+			defaults(this.settings, {
+				workspaces:{
+					main:{
+						panels:{
+							main:{
+								path: 'index.html'
+							}
+						}
+					}
+				}
+			})
+		}
   }
 
 	sendMessage(panel, message, payload) {
@@ -152,8 +165,7 @@ export class Application {
 	}
 
 	get workspaceSettings() {
-		let { workspaces } = this.settings
-
+		let workspaces = this.settings.workspaces || {}
 		workspaces.main = workspaces.main || mainWorkspaceConfig(this)
 
 		return workspaces

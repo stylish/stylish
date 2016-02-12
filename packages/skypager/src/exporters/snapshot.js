@@ -11,7 +11,8 @@ module.exports = function run_snapshot_exporter (options = {}) {
       cacheKey: project.cacheKey
     },
     assets: project.run.exporter('assets'),
-    content: project.run.exporter('content')
+    content: project.run.exporter('content'),
+    settings: project.run.exporter('settings')
   }
 
   snapshot.html = project.documents.all.reduce((memo, doc) => {

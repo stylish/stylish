@@ -1,12 +1,14 @@
 import React from 'react'
-import { stateful } from 'skypager-application'
+import { util } from 'ui/applications'
+import { connect } from 'react-redux'
 
 export class HomePage extends React.Component {
   render () {
     return (
-      <h1>Home is where the heart is</h1>
+      <div>
+      </div>
     )
   }
 }
 
-export default HomePage
+export default connect()(HomePage)

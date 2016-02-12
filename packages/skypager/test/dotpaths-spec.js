@@ -1,6 +1,30 @@
+import { doesNotThrow as noErrorsBabyNoErrors } from 'assert'
+
 describe("Access Via Dot Paths", function(){
   let project = require('./fixture')
   let doc = project.docs.at('assets/data-source-spec')
+  let isUndefined = require('lodash').isUndefined
+
+  it("lets me safely access anything in project through a get method", function() {
+    project.get("documents.all[0].id").should.equal('assets-spec')
+    isUndefined(project.get('documents.all.what.no.way.dude')).should.equal(true)
+
+    noErrorsBabyNoErrors(() => {
+      project.get('documents.all.what.no.way.dude')
+    })
+
+  })
+
+  it("lets me safely access anything on an asset through a get method", function() {
+    project.get("documents.all[0].id").should.equal('assets-spec')
+
+    let title = project.documents.at('testcases/structure-spec').get('headings.sections[0].value')
+    title.should.equal('Setup')
+
+    noErrorsBabyNoErrors(() => {
+      project.documents.at('testcases/structure-spec').get('headings.sections[99].value')
+    })
+  })
 
   it("lets me access collection content via a dot path interface", function(){
     doc.should.have.property('idPath', 'assets.data_source_spec')

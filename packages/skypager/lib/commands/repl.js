@@ -1,12 +1,13 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.repl = repl;
 exports.handle = handle;
 

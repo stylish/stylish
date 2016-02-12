@@ -1,7 +1,7 @@
 {
   "name": "skypager-plugin-integrations",
   "description": "skypager integrations plugin",
-  "version": "1.21.0",
+  "version": "1.32.0",
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
@@ -17,6 +17,8 @@
     }
   },
   "devDependencies": {
-    "mocha": "^2.3.4"
+    "mocha": "^2.3.4",
+    "babel-preset-skypager": "latest",
+    "skypager": "file:../skypager"
   }
 }

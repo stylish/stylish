@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -8,9 +12,6 @@ var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.DiskImporter = DiskImporter;
 exports.AssetImporter = AssetImporter;
 exports.ProjectImporter = ProjectImporter;
@@ -91,9 +92,6 @@ function ProjectImporter() {
     collection._willLoadAssets(paths);
 
     paths.forEach(function (rel) {
-      //let uri = path.join(collection.root, rel)
-      //let asset = new collection.AssetClass(rel, {collection: collection, project: project})
-
       var asset = collection.createAsset(rel);
 
       collection.add(asset, false, true);

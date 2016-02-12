@@ -1,32 +1,35 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _stringify = require('babel-runtime/core-js/json/stringify');
 
 var _stringify2 = _interopRequireDefault(_stringify);
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.init = init;
 exports.handle = handle;
-
-var _skypager = require('skypager');
 
 var _trim = require('lodash/string/trim');
 
 var _trim2 = _interopRequireDefault(_trim);
 
+var _jsYaml = require('js-yaml');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var VERSION = require('../../package.json').version;
+
 function init(program, dispatch) {
-  program.command('init <projectName>').description('create a new skypager project').option('--overwrite', 'whether or not to replace a project that exists').option('--plugins <list>', 'a comma separated list of plugins to use', list).action(function (projectName, options) {
+  program.command('init <projectName> [destination]').description('create a new skypager project').option('--overwrite', 'whether or not to replace a project that exists').option('--destination', '').option('--plugins <list>', 'a comma separated list of plugins to use', list).action(function (projectName, options) {
     handle(projectName, options);
   });
 }
 
-function handle(projectName) {
-  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-  var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+function handle(projectName, destination) {
+  var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+  var context = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
 
   var _require = require('path');
 
@@ -38,9 +41,10 @@ function handle(projectName) {
   var existsSync = _require2.existsSync;
   var writeFileSync = _require2.writeFileSync;
 
-  var destination = resolve(join(process.env.PWD, projectName));
   var mkdir = require('mkdirp').sync;
   var set = require('object-path').set;
+
+  destination = destination || options.destination || resolve(join(process.env.PWD, projectName));
 
   if (!existsSync(destination)) {
     mkdir(destination);
@@ -54,9 +58,9 @@ function handle(projectName) {
       plugins: options.plugins ? ('' + options.plugins).split(',') : []
     },
     devDependencies: {
-      'skypager': '^' + _skypager.manifest.version,
-      'skypager-devpack': '^' + _skypager.manifest.version,
-      'babel-preset-skypager': '^' + _skypager.manifest.version,
+      'skypager': '^' + VERSION,
+      'skypager-devpack': '^' + VERSION,
+      'babel-preset-skypager': '^' + VERSION,
       'babel-runtime': '^6.4.0'
     }
   };
@@ -67,7 +71,7 @@ function handle(projectName) {
     });
   }
 
-  var folders = ['docs/pages', 'data/settings', 'src', 'actions'];
+  var folders = ['docs/pages', 'settings', 'src', 'models', 'actions', 'data', 'dist', 'public', 'tmp/cache'];
 
   folders.forEach(function (path) {
     mkdir(join(destination, path));
@@ -79,7 +83,9 @@ function handle(projectName) {
     }
 
     return function (content) {
-      writeFileSync(join.apply(undefined, [destination].concat(parts)), content, 'utf8');
+      writeFileSync(join.apply(undefined, [destination].concat(parts)), content.split("\n").map(function (line) {
+        return line.trim();
+      }).join("\n"), 'utf8');
     };
   }
 
@@ -89,9 +95,36 @@ function handle(projectName) {
 
   template('.babelrc')('{presets:["skypager"]}');
 
-  template('.gitignore')(['logs/**/*.log', 'tmp/cache', '.DS_Store', '.env'].join("\n"));
+  template('.gitignore')(['logs/**/*.log', 'tmp/cache', '.DS_Store', '.env', 'settings/secrets.yml'].join("\n"));
+  template('.npmignore')(['logs/**/*.log', 'tmp/cache', '.DS_Store', '.env', 'settings/secrets.yml'].join("\n"));
 
-  template('docs/outline.md')('---\n      type: outline\n      ---\n\n      ## Sections\n      ### Section A\n      ### Section B\n      '.replace(/^\s+/m, ''));
+  template('settings/publishing.yml', (0, _jsYaml.dump)({
+    publishing: {
+      service: 'skypager.io'
+    }
+  }));
+
+  template('settings/integrations.yml', (0, _jsYaml.dump)({
+    dropbox: {
+      token: 'env.DROPBOX_API_TOKEN'
+    },
+    github: {
+      token: 'env.GITHUB_ACCESS_TOKEN'
+    },
+    aws: {
+      secret_access_key: 'env.AWS_SECRET_ACCESS_KEY',
+      access_key_id: 'env.AWS_ACCESS_KEY_ID'
+    },
+    slack: {
+      token: 'env.SLACK_ACCESS_TOKEN'
+    },
+    auth0: {
+      domain: 'env.AUTH0_CLIENT_DOMAIN',
+      clientId: 'env.AUTH0_CLIENT_ID'
+    }
+  }));
+
+  template('docs/outline.md')('---\n      type: outline\n      ---\n\n      ## Sections\n      ### Section A\n      ### Section B\n      ');
 
   template('docs/pages/cover.md')('---\n      type: page\n      cover: true\n      title: ' + projectName + '\n      ---\n\n      # Project Name\n');
 }

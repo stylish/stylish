@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ActionDefinition = undefined;
+
 var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
 
 var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
@@ -12,18 +17,10 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ActionDefinition = undefined;
 exports.DSL = DSL;
 exports.lookup = lookup;
 
 var _util = require('../../util');
-
-var _trim = require('lodash/string/trim');
-
-var _trim2 = _interopRequireDefault(_trim);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -75,7 +72,7 @@ var ActionDefinition = exports.ActionDefinition = (function () {
   }, {
     key: 'addCommandPhrase',
     value: function addCommandPhrase(phrase) {
-      this.config.pathMatchers.push(route((0, _trim2.default)(phrase).replace(/\s/g, '/')));
+      this.config.pathMatchers.push(route(phrase.trim().replace(/\s/g, '/')));
     }
   }, {
     key: 'addRouteMatcher',
@@ -93,7 +90,7 @@ var ActionDefinition = exports.ActionDefinition = (function () {
   }, {
     key: 'testCommand',
     value: function testCommand(phrase) {
-      var sample = (0, _trim2.default)(phrase).replace(/\s/g, '/');
+      var sample = trim(phrase).replace(/\s/g, '/');
       var matching = this.config.pathMatchers.find(function (rule) {
         return rule(sample);
       });
