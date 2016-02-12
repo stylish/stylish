@@ -1,8 +1,0 @@
-navigation:
-  links:
-    - label: Home
-      icon: Home
-      link: '/'
-    - label: Upload
-      icon: database
-      link: /upload
