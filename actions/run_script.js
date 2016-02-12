@@ -22,6 +22,8 @@ execute(function(scriptName, params, context) {
   let project = context.project
   let {isArray, isString, trim, some} = require('lodash')
 
+  let exitCode = 0
+
   if (params.include && isString(params.include)) {
     if(isString(params.include) && params.include.match(',')) {
       params.include = params.include.split(',').map(i => trim(i))
@@ -82,6 +84,7 @@ execute(function(scriptName, params, context) {
       proc.stderr.on('data', (data) => console.log(data.toString()))
     }
 
+
     proc.on('exit', (code) => {
       if ( code == 0 ) {
         console.log(`${ pkg.data.name } ...` + 'ok'.green)
@@ -89,6 +92,8 @@ execute(function(scriptName, params, context) {
 
       if (code !== 0) {
         console.log(`${ pkg.data.name } ...` + 'not ok'.red)
+        exitCode = 1
+        process.exit(1)
       }
     })
   })

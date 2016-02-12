@@ -14,7 +14,7 @@
     "test": "skypager run:package:script test",
     "prerelease": "npm run test",
     "version": "skypager run:package:script version",
-    "postversion": "git push && git push --tags && npm publish"
+    "postversion": "git push && git push --tags"
   },
   "main": "app.js",
   "dependencies": {

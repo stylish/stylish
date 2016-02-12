@@ -13,3 +13,4 @@ node_modules/
 legacy/
 **/*.log
 *.log
+npm-debug.lo*
