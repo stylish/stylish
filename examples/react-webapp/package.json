@@ -1,0 +1,47 @@
+{
+  "name": "@architects/blueprint-io-webapp",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/architects/skypager-central"
+  },
+
+  "skypager":{
+    "plugins":[ 
+      "blueprints"
+    ],
+    "main": "skypager.js",
+    "theme": "dashboard-dark",
+    "domain": "architects.blueprint.io",
+    "platform": "web",
+    "featureFlags":{
+      "API_BASE_URL": "http://localhost:3000"
+    },
+    "staticAssets": {
+      "headerScripts":[
+        "https://cdn.auth0.com/js/lock-8.2.js"
+      ]
+    }
+  },
+
+  "scripts": {
+    "bundle": "skypager export bundle",
+    "predev": "npm run bundle",
+    "dev": "DEBUG_SERVER=true skypager dev",
+    "prebuild": "npm run bundle",
+    "build": "skypager build --push-state",
+    "deploy": "skypager publish"
+  },
+
+  "dependencies": {
+    "skypager-ui": "^1.27.0",
+    "skypager-application": "^1.27.0"
+  },
+
+  "devDependencies": {
+    "skypager-devpack": "^1.27.3",
+    "skypager-plugin-blueprints": "^1.25.0",
+    "skypager": "^1.27.3"
+  }
+
+}

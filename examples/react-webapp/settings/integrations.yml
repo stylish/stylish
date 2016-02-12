@@ -1,0 +1,5 @@
+integrations:
+  auth0:
+    clientId: '9kjZ63jVdIQ1eFXQihdb83FDEVTEUF4z'
+    domain: 'skypager.auth0.com'
+

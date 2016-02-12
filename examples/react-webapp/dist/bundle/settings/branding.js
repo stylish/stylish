@@ -1,0 +1,1 @@
+module.exports = {"id":"branding","paths":{"relative":"branding.yml","project":"settings/branding.yml","projectRequire":"settings/branding.yml","absolute":"/Users/jonathan/Skypager/projects/blueprint-io-webapp/settings/branding.yml"},"assetGroup":"data_sources","fingerprint":"4169216e64470e6038d30172c9f13c63","data":{"branding":{"icon":"github","name":"Blueprint.io"}}};

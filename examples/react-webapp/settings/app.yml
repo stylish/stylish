@@ -1,0 +1,6 @@
+app:
+  layout: MainLayout
+  entryPoints:
+    index: HomePage
+    projects: ProjectsPage
+    packages: PackagesPage
