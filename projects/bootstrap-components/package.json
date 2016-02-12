@@ -13,12 +13,9 @@
   },
 
   "dependencies": {
-    "skypager-electron": "latest",
-    "skypager": "latest",
-    "skypager-application": "latest",
-    "skypager-ui": "latest",
-    "skypager-themes": "latest",
-    "skypager-devpack": "latest",
-    "skypager-plugin-blueprints": "latest"
+    "babel-preset-skypager": "file:../../packages/babel-preset-skypager",
+    "skypager": "file:../../packages/skypager-electron",
+    "skypager-devpack": "file:../../packages/skypager-devpack",
+    "skypager-plugin-blueprints": "file:../../packages/skypager-plugin-blueprints"
   }
 }

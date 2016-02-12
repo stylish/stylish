@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "1.32.1",
+  "version": "1.33.0",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
   "bin": {
@@ -16,7 +16,6 @@
     "lint": "eslint src/**/*",
     "lint:fix": "npm run lint -- --fix",
     "dev:console": "./bin/skypager.js repl --dev-mode --project ./test/fixture",
-
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
     "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
     "preversion": "npm run test",

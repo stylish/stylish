@@ -1,5 +1,6 @@
 import React from 'react'
 import { util } from 'ui/applications'
+import { connect } from 'react-redux'
 
 export class HomePage extends React.Component {
   render () {
@@ -10,4 +11,4 @@ export class HomePage extends React.Component {
   }
 }
 
-export default HomePage
+export default connect()(HomePage)
