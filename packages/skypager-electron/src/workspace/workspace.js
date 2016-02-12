@@ -144,10 +144,18 @@ function launch (panelName, params = {}) {
 		},
 
 		postLoad: function(electronApp, win) {
-      if (w.panelSettings[panelName].constrained) {
-        win.setBounds({
-          ...(w.panelSettings[panelName].constrained)
-        })
+      let constrained = w.panelSettings[panelName].constrained
+
+      if (constrained) {
+        try {
+          win.setBounds({
+            ...constrained
+          })
+        } catch (error) {
+          console.log('')
+          console.log('Error setting window bounds', constrained)
+          console.log(error.message.red)
+        }
       }
 
 			w.dispatch(

@@ -60,7 +60,7 @@ function topPos(v, limit) {
     delete v.bottom;
   }
 
-  return v.top || 0;
+  return Math.floor(v.top || 0);
 }
 
 function leftPos(v, limit) {
@@ -77,7 +77,7 @@ function leftPos(v, limit) {
     delete v.right;
   }
 
-  return v.left || 0;
+  return Math.floor(v.left || 0);
 }
 
 function calculatePosition(settings, screen) {
@@ -98,7 +98,7 @@ function size(value, limit, m) {
     result = parseInt(value);
   }
 
-  return result;
+  return Math.floor(result);
 }
 
 function applyLayout(layoutName, settings, screen) {
@@ -114,8 +114,8 @@ function applyLayout(layoutName, settings, screen) {
 
     default:
       return {
-        height: screen.height * 0.8,
-        width: screen.width * 0.8,
+        height: Math.floor(screen.height * 0.8),
+        width: Math.floor(screen.width * 0.8),
         centered: true
       };
   }

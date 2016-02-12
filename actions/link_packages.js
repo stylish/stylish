@@ -10,6 +10,7 @@ cli(function (program, dispatch){
     .description('make sure the packages are synced with the monorepo version number')
     .option('--exclude <pattern>', 'exclude packages mathing pattern')
     .option('--include <pattern>', 'include packages mathing pattern')
+    .option('--symlink', 'use symlinks instead of npm run')
     .action(dispatch(action.api.runner))
 
   return program

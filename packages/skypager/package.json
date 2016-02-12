@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "1.32.0",
+  "version": "1.32.1",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
   "bin": {
@@ -10,16 +10,17 @@
     "test:bundle:export": "skypager export bundle --clean",
     "test:bundle:compile": "webpack --config test/webpack.bundle.config.js > /dev/null",
     "test:bundle": "npm run test:bundle:export && npm run test:bundle:compile && npm run test",
-    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
-    "pretest:watch": "npm run test:bundle",
-    "test:watch": "NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
+    "test": "SKYPAGER_ENV=test NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "pretest:watch": "SKYPAGER_ENV=development npm run test:bundle",
+    "test:watch": "SKYPAGER_ENV=development NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
     "lint": "eslint src/**/*",
     "lint:fix": "npm run lint -- --fix",
-    "build:clean": "rm -rf lib",
-    "build": "npm run test && npm run build:clean && npm run compile",
-    "compile": "NODE_ENV=production babel -q -d lib src",
-    "compile:watch": "babel -w -d lib src",
-    "console": "./bin/skypager.js repl --project-path ./test/fixture"
+    "dev:console": "./bin/skypager.js repl --dev-mode --project ./test/fixture",
+
+    "compile": "SKYPAGER_ENV=release babel -q -d lib src",
+    "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
+    "preversion": "npm run test",
+    "version": "npm run compile && git add -A lib"
   },
   "repository": {
     "type": "git",

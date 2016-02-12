@@ -33,10 +33,11 @@
     "webpack-hot-middleware": "^2.6.0"
   },
   "scripts": {
-    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
-    "build:clean": "rm -rf lib dist",
-    "build": "npm run build:clean && npm run test && npm run compile",
-    "compile": "NODE_ENV=production babel -q -d lib src && rm -rf lib/ui lib/docs"
+    "compile": "SKYPAGER_ENV=release babel -q -d lib src",
+    "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
+    "preversion": "npm run test",
+    "version": "npm run compile && git add -A dist",
+    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js"
   },
   "repository": {
     "type": "git",

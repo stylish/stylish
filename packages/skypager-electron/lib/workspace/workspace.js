@@ -207,8 +207,16 @@ function launch(panelName) {
     },
 
     postLoad: function postLoad(electronApp, win) {
-      if (w.panelSettings[panelName].constrained) {
-        win.setBounds((0, _extends3.default)({}, w.panelSettings[panelName].constrained));
+      var constrained = w.panelSettings[panelName].constrained;
+
+      if (constrained) {
+        try {
+          win.setBounds((0, _extends3.default)({}, constrained));
+        } catch (error) {
+          console.log('');
+          console.log('Error setting window bounds', constrained);
+          console.log(error.message.red);
+        }
       }
 
       w.dispatch(panelLoaded(w, panelName, electronApp, win));

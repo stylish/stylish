@@ -75,24 +75,24 @@ var Application = exports.Application = (function () {
 			return _util.hideProperties.call.apply(_util.hideProperties, [_this, _this].concat(args));
 		};
 
-		if (!project || !project.data || !project.data.at('settings')) {
+		if (!project || !project.settings) {
 			throw 'Please ensure your project has settings data. data/settings/workspaces.yml for example.';
 		}
 
-		var settings = project.data.at('settings').data;
+		var settings = project.settings;
 
 		options = (0, _defaultsDeep2.default)(options, {
 			id: project.name,
 			argv: { workspace: 'main' },
 			command: '',
 			env: 'development',
-			settings: settings || { workspaces: {} },
+			settings: settings,
 			paths: {
 				appData: (0, _path.join)(_electron.app.getPath('userData'), 'data'),
 				appLogs: (0, _path.join)(_electron.app.getPath('userData'), 'logs'),
-				public: project && project.paths && project.paths.public || (0, _path.join)(process.env.PWD, 'public'),
+				public: project.paths.public || (0, _path.join)(process.env.PWD, 'public'),
 				temp: _electron.app.getPath('temp'),
-				project: project && project.root || process.env.PWD
+				project: project.root || process.env.PWD
 			}
 		});
 
@@ -106,6 +106,20 @@ var Application = exports.Application = (function () {
 			actionLogger: (0, _fs.createWriteStream)(this.paths.actionStream),
 			store: setupStore()
 		});
+
+		if (!this.settings.workspaces) {
+			(0, _defaultsDeep2.default)(this.settings, {
+				workspaces: {
+					main: {
+						panels: {
+							main: {
+								path: 'index.html'
+							}
+						}
+					}
+				}
+			});
+		}
 	}
 
 	(0, _createClass3.default)(Application, [{
@@ -221,8 +235,7 @@ var Application = exports.Application = (function () {
 	}, {
 		key: 'workspaceSettings',
 		get: function get() {
-			var workspaces = this.settings.workspaces;
-
+			var workspaces = this.settings.workspaces || {};
 			workspaces.main = workspaces.main || mainWorkspaceConfig(this);
 
 			return workspaces;
