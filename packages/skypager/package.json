@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "1.34.0",
+  "version": "1.35.0",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
   "bin": {
@@ -19,7 +19,7 @@
     "dev:console": "./bin/skypager.js repl --dev-mode --project ./test/fixture",
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
     "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
-    "preversion": "npm run test",
+    "preversion": "SKYPAGER_ENV=test NODE_ENV=test npm run pretest && mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
     "version": "npm run compile && git add -A lib"
   },
   "repository": {
