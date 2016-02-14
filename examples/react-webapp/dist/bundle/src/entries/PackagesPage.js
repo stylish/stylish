@@ -1,1 +1,0 @@
-module.exports = {"id":"entries/PackagesPage","paths":{"relative":"entries/PackagesPage.js","project":"src/entries/PackagesPage.js","projectRequire":"src/entries/PackagesPage.js","absolute":"/Users/jonathan/Skypager/projects/blueprint-io-webapp/src/entries/PackagesPage.js"},"assetGroup":"stylesheets","fingerprint":"04ca82e6b6520b3ba4c84960831a2b74"};
