@@ -28,10 +28,6 @@ var _minimatch = require('minimatch');
 
 var _minimatch2 = _interopRequireDefault(_minimatch);
 
-var _objectPath = require('object-path');
-
-var _objectPath2 = _interopRequireDefault(_objectPath);
-
 var _lodash = require('lodash');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -257,7 +253,7 @@ var Collection = (function () {
 
       // expand the dot path when a collection is already loaded and a new asset is added
       if (expandDotPath) {
-        _objectPath2.default.set(this.at, asset.idPath, asset);
+        (0, _lodash.set)(this.at, asset.idPath, asset);
       }
     }
   }, {
@@ -383,7 +379,7 @@ function buildAtInterface(collection) {
 
     expanded.forEach(function (id) {
       var dp = id.replace(/-/g, '_').replace(/\//g, '.');
-      _objectPath2.default.set(chain, dp, chain(id));
+      (0, _lodash.set)(chain, dp, chain(id));
     });
   }
 }

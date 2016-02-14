@@ -9,10 +9,6 @@ var _cheerio = require('cheerio');
 
 var _cheerio2 = _interopRequireDefault(_cheerio);
 
-var _cheerioSelect = require('cheerio-select');
-
-var _cheerioSelect2 = _interopRequireDefault(_cheerioSelect);
-
 var _util = require('../../util');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

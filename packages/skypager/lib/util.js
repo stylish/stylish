@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.dotpath = undefined;
 
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
@@ -69,10 +70,6 @@ var _objectAssign = require('object-assign');
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var _objectPath = require('object-path');
-
-var _objectPath2 = _interopRequireDefault(_objectPath);
-
 var _utile = require('utile');
 
 var _utile2 = _interopRequireDefault(_utile);
@@ -89,13 +86,16 @@ var inflections = _utile2.default.inflect;
 var debug = (0, _debug3.default)('skypager');
 var DOMAIN_REGEX = /^[a-zA-Z0-9_-]+\.[.a-zA-Z0-9_-]+$/;
 
+var dotpath = exports.dotpath = {
+  set: _lodash.set, get: _lodash.get
+};
+
 module.exports.visit = _unistUtilVisit2.default;
 module.exports.assign = _objectAssign2.default;
 module.exports.defaults = _lodash.defaults;
 module.exports.pick = _lodash.pick;
 module.exports.any = _lodash.any;
 module.exports.result = _lodash.result;
-module.exports.dotpath = _objectPath2.default;
 module.exports.clone = _lodash.cloneDeep;
 module.exports.template = _lodash.template;
 
@@ -333,7 +333,7 @@ function noConflict(fn) {
 function carve(dataPath, resultValue) {
   var initialValue = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
-  _objectPath2.default.set(initialValue, dataPath, resultValue);
+  dotpath.set(initialValue, dataPath, resultValue);
   return initialValue;
 }
 

@@ -42,7 +42,6 @@ function handle(projectName, destination) {
   var writeFileSync = _require2.writeFileSync;
 
   var mkdir = require('mkdirp').sync;
-  var set = require('object-path').set;
 
   destination = destination || options.destination || resolve(join(process.env.PWD, projectName));
 

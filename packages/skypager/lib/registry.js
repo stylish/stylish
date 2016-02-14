@@ -32,9 +32,7 @@ var _util = require('./util');
 
 var util = _interopRequireWildcard(_util);
 
-var _objectPath = require('object-path');
-
-var _objectPath2 = _interopRequireDefault(_objectPath);
+var _lodash = require('lodash');
 
 var _path = require('path');
 
@@ -565,12 +563,13 @@ function buildAtInterface(host) {
 
           var getter = parts.pop();
           var idPath = parts.join('.').replace(/-/g, '_');
-          var target = _objectPath2.default.get(chain, idPath) || {};
+          var target = (0, _lodash.get)(chain, idPath) || {};
 
           util.assign(target, (_util$assign2 = {}, _mutatorMap2 = {}, _mutatorMap2[getter] = _mutatorMap2[getter] || {}, _mutatorMap2[getter].get = function () {
             return host.lookup(id);
           }, (0, _defineEnumerableProperties3.default)(_util$assign2, _mutatorMap2), _util$assign2));
-          _objectPath2.default.set(chain, idPath, target);
+
+          (0, _lodash.set)(chain, idPath, target);
         })();
       }
     });
