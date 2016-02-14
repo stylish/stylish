@@ -19,7 +19,6 @@ export function handle (projectName, destination, options = {}, context = {}) {
   const { resolve, join } = require('path')
   const { existsSync, writeFileSync } = require('fs')
   const mkdir = require('mkdirp').sync
-  const set = require('object-path').set
 
   destination = destination || options.destination || resolve(join(process.env.PWD, projectName))
 

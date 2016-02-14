@@ -1,5 +1,4 @@
 import cheerio from 'cheerio'
-import select from 'cheerio-select'
 
 import { slugify } from '../../util'
 

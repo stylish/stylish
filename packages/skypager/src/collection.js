@@ -1,8 +1,7 @@
 import {filterQuery as query, hide, hidden, lazy, tabelize, values} from './util'
 import {relative, basename, dirname, extname, resolve, join} from 'path'
 import minimatch from 'minimatch'
-import carve from 'object-path'
-import { invokeMap, mapValues, groupBy, invoke, pick } from 'lodash'
+import { invokeMap, mapValues, groupBy, invoke, pick, set as carve } from 'lodash'
 
 /**
  * The Skypager.Collection is a wrapper around local file folders
@@ -187,7 +186,7 @@ class Collection {
 
     // expand the dot path when a collection is already loaded and a new asset is added
     if (expandDotPath) {
-      carve.set(this.at, asset.idPath, asset)
+      carve(this.at, asset.idPath, asset)
     }
   }
 
@@ -227,7 +226,7 @@ function buildAtInterface (collection, expand = true) {
 
     expanded.forEach(id => {
       let dp = id.replace(/-/g, '_').replace(/\//g, '.')
-      carve.set(chain, dp, chain(id))
+      carve(chain, dp, chain(id))
     })
   }
 }

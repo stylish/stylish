@@ -53,7 +53,8 @@ class Framework {
       initializer(this)
     }
 
-    require('./environment')(this.root)
+    //require('./environment')(this.root)
+
   }
 
   /**

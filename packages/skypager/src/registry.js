@@ -1,7 +1,6 @@
 import Skypager from './index'
 import * as util from './util'
-import carve from 'object-path'
-
+import { get, set } from 'lodash'
 import { basename, join, resolve, dirname, relative } from 'path'
 
 
@@ -426,14 +425,15 @@ function buildAtInterface (host) {
       if (parts.length > 1) {
         let getter = parts.pop()
         let idPath = parts.join('.').replace(/-/g, '_')
-        let target = carve.get(chain, idPath) || { }
+        let target = get(chain, idPath) || { }
 
         util.assign(target, {
           get [getter] () {
             return host.lookup(id)
           }
         })
-        carve.set(chain, idPath, target)
+
+        set(chain, idPath, target)
       }
     })
   }
