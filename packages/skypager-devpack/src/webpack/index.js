@@ -274,6 +274,10 @@ module.exports = function (argv) {
     }
   })
 
+  config.merge({
+    recordsPath: join(directory, 'tmp', '_records')
+  })
+
 	if (argv.exportLibrary) {
 		config.merge({
 			output: {

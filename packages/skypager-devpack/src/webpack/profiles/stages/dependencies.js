@@ -12,7 +12,7 @@
  * feedback in the browser with near instantaneous updates.
  */
 
-import defaults from 'lodash/object/defaults'
+import { defaults } from 'lodash'
 
 export function Dependencies (options = {}) {
   const { bundles } = require('../../dist/settings.json')

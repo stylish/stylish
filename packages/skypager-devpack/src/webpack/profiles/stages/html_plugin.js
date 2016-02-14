@@ -1,4 +1,4 @@
-import defaults from 'lodash/object/defaults'
+import { defaults } from 'lodash'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 
 export function HtmlPlugin (options = {}) {

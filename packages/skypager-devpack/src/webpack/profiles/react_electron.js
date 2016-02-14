@@ -1,6 +1,4 @@
-import defaults from 'lodash/object/defaults'
-import pick from 'lodash/object/pick'
-import get from 'lodash/object/result'
+import { defaults, get, pick } from 'lodash'
 
 const description = 'multi-page React app built for Electron'
 
