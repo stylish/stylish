@@ -3,6 +3,9 @@
   "version": "1.34.0",
   "private": "true",
   "description": "development base for the skypager portfolio",
+  "bin": {
+    "skypager-live": "./packages/skypager/bin/cli.js"
+  },
   "skypager": {
     "main": "skypager.js",
     "theme": "dashboard",
@@ -34,11 +37,13 @@
     "redux-actions": "^0.9.1",
     "redux-simple-router": "^2.0.2",
     "redux-thunk": "^1.0.3",
-    "skypager": "^1.32.0",
-    "skypager-devpack": "^1.32.0",
-    "skypager-electron": "^1.32.0",
-    "skypager-plugin-blueprints": "^1.32.0",
-    "skypager-themes": "^1.32.0"
+
+    "skypager": "^1.34.0",
+    "skypager-devpack": "^1.34.0",
+    "skypager-electron": "^1.34.0",
+    "skypager-plugin-blueprints": "^1.34.0",
+    "skypager-server": "^1.34.0",
+    "skypager-themes": "^1.34.0"
   },
   "devDependencies": {
     "babel-preset-skypager": "^1.32.0",

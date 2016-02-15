@@ -1,21 +1,25 @@
-import { join, dirname } from 'path'
-
-import shell from 'shelljs'
-import util from '../util'
+import { argv } from 'yargs'
+import { start as server } from 'skypager-server'
+import { availableProfiles, devpack } from 'skypager-devpack'
 
 export function serve (program, dispatch) {
   program
-    .command('serve')
-    .option('--port <port>', 'which port? specify any to use any available port', 3000)
-    .option('--host <hostname>', 'which hostname? defaults to localhost', 'localhost')
-    .option('--expose', 'when enabled, will expose this server to the public using ngrok')
-    .option('--expose-config <path>', 'path to a config file for the expose service')
+    .command('serve [profile]')
+    .description('start the project server')
+    .option('--dashboard', 'display a dashboard view of the server processes')
+    .option('--profile', 'which configuration profile to use?', 'web')
+    .option('--env', 'which environment should the server run in?', process.env.NODE_ENV || 'development')
     .action(dispatch(handle))
 }
 
 export default serve
 
-export function handle(options = {}, context = {}) {
-  console.log('TODO handle serve CLI')
-}
+export function handle(arg, options = {}, context = {}) {
+  let { project } = context
 
+  let profile = arg || options.profile || 'web'
+  let env = options.env || 'development'
+  let dashboard = options.dashboard || false
+
+  server({profile, env, dashboard}, {project, options: argv})
+}

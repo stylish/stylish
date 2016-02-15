@@ -71,7 +71,6 @@ module.exports = function (argv) {
     htmlFilename = '200.html'
   }
 
-  console.log('Modules Directories', modulesDirectories)
   config
     .merge({
       entry: entry,
@@ -227,7 +226,6 @@ module.exports = function (argv) {
 			target: argv.target
 		})
 	}
-
   if (argv.externalVendors || precompiled ) {
     config.merge({
       externals: {
@@ -275,7 +273,7 @@ module.exports = function (argv) {
   })
 
   config.merge({
-    recordsPath: join(directory, 'tmp', '_records')
+    recordsPath: join(directory, 'tmp', 'records')
   })
 
 	if (argv.exportLibrary) {

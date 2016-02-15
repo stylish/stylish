@@ -60,6 +60,10 @@ var _repl = require('./repl');
 
 var _repl2 = _interopRequireDefault(_repl);
 
+var _serve = require('./serve');
+
+var _serve2 = _interopRequireDefault(_serve);
+
 var _util = require('../util');
 
 var _package = require('../../package.json');
@@ -167,6 +171,8 @@ function configure(commander) {
   }
 
   (0, _publish2.default)(commander, dispatch);
+
+  (0, _serve2.default)(commander, dispatch);
 
   // the project can dynamically add its own cli commands from certain actions
   if (project && project.actions) {

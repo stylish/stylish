@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack:///./src/index.js?9552"],"names":[],"mappings":";;;;;;;;;;;;;;AAEA,4B","file":"0.6bdf2f58d76d3d958478.hot-update.js","sourcesContent":["import Dashboard from './Dashboard'\n\nDashboard()\n\n\n\n/** WEBPACK FOOTER **\n ** ./src/index.js\n **/"],"sourceRoot":""}
