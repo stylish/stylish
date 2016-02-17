@@ -1,6 +1,6 @@
 {
   "name": "skypager-central",
-  "version": "1.36.0",
+  "version": "1.36.4",
   "private": "true",
   "description": "development base for the skypager portfolio",
   "bin": {
@@ -38,16 +38,16 @@
     "redux-simple-router": "^2.0.2",
     "redux-thunk": "^1.0.3",
 
-    "skypager": "^1.34.0",
-    "skypager-devpack": "^1.34.0",
+    "skypager": "^1.36.4",
+    "skypager-devpack": "^1.36.4",
     "skypager-electron": "^1.34.0",
     "skypager-plugin-blueprints": "^1.34.0",
-    "skypager-server": "^1.34.0",
+    "skypager-server": "^1.36.4",
     "skypager-themes": "^1.34.0"
   },
   "devDependencies": {
-    "babel-preset-skypager": "^1.32.0",
-    "babel-preset-react-hmre": "latest"
+    "babel-preset-skypager": "^1.33.0",
+    "babel-preset-react-hmre": "^1.1.0"
   },
   "repository": {
     "type": "git",

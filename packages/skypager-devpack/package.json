@@ -1,6 +1,6 @@
 {
   "name": "skypager-devpack",
-  "version": "1.36.0",
+  "version": "1.36.4",
   "description": "configurable webpack dev server and build tool so you don't have to",
   "main": "index.js",
   "dependencies": {
@@ -25,15 +25,16 @@
     "postcss-cssnext": "2.4.0",
     "postcss-import": "7.1.3",
     "postcss-loader": "0.8.0",
-    "react": "^0.14.6",
+    "react": "^0.14.7",
     "stats-webpack-plugin": "^0.3.0",
     "style-loader": "^0.13.0",
-    "surge": "latest",
+    "surge": "^0.17.7",
     "url-loader": "^0.5.7",
-    "webpack": "^1.12.11",
+    "webpack": "^1.12.13",
     "webpack-configurator": "^0.3.1",
     "webpack-dev-middleware": "^1.4.0",
-    "webpack-hot-middleware": "^2.6.0"
+    "webpack-hot-middleware": "^2.6.0",
+    "skypager-themes": "^1.32.0"
   },
   "scripts": {
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
@@ -55,5 +56,7 @@
     "url": "https://github.com/skypager/superdevpack/issues"
   },
   "homepage": "https://github.com/skypager/superdevpack#readme",
-  "devDependencies": {}
+  "devDependencies": {
+    "skypager": "^1.36.4"
+  }
 }

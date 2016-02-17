@@ -1,5 +1,5 @@
 module.exports = {
-  content: __dirname,
+  context: __dirname,
   target: 'node',
   entry: __dirname + '/fixture/dist/bundle/index',
   output: {
