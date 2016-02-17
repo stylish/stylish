@@ -65,6 +65,7 @@ function isServerInstalled () {
     require('skypager-server')
     return true
   } catch (error) {
+    console.log('Error requiring skypager-server', error.message)
     return false
   }
 

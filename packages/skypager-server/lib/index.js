@@ -39,7 +39,7 @@ function server() {
   var params = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
   var context = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-  var Server = require('./proc').Server;
+  var Server = require('./server').Server;
   var proc = new Server(params, context);
 
   proc.start();

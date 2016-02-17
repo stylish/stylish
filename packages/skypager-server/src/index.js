@@ -21,7 +21,7 @@ export function deepstream(params = {}, context = {}) {
 }
 
 export function server(params = {}, context = {}) {
-  const Server = require('./proc').Server
+  const Server = require('./server').Server
   let proc = new Server(params, context)
 
   proc.start()
