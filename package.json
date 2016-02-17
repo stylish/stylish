@@ -1,6 +1,6 @@
 {
   "name": "skypager-central",
-  "version": "1.36.7",
+  "version": "1.36.8",
   "private": "true",
   "description": "development base for the skypager portfolio",
   "bin": {
@@ -25,9 +25,8 @@
     "chokidar-cli": "^1.2.0",
     "commander": "^2.9.0",
     "deepstream.io-client-js": "^0.3.8",
-
     "skypager": "^1.36.7",
-    "skypager-devpack": "^1.36.6",
+    "skypager-devpack": "^1.36.8",
     "skypager-electron": "^1.34.0",
     "skypager-plugin-blueprints": "^1.34.0",
     "skypager-server": "^1.36.7",
