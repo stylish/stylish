@@ -1,21 +1,40 @@
-import { join, dirname } from 'path'
-
-import shell from 'shelljs'
-import util from '../util'
+import yargs from 'yargs'
+import { server, defaultSettings as defaultServerSettings } from 'skypager-server'
+import { availableProfiles, devpack } from 'skypager-devpack'
+import { get } from 'lodash'
 
 export function serve (program, dispatch) {
   program
-    .command('serve')
-    .option('--port <port>', 'which port? specify any to use any available port', 3000)
-    .option('--host <hostname>', 'which hostname? defaults to localhost', 'localhost')
-    .option('--expose', 'when enabled, will expose this server to the public using ngrok')
-    .option('--expose-config <path>', 'path to a config file for the expose service')
+    .command('serve [profile]')
+    .description('start the project server')
+    .option('--dashboard', 'display a dashboard view of the server processes')
+    .option('--profile', 'which configuration profile to use?', 'web')
     .action(dispatch(handle))
 }
 
 export default serve
 
-export function handle(options = {}, context = {}) {
-  console.log('TODO handle serve CLI')
+export function handle(arg, options = {}, context = {}) {
+  let { project, argv } = context
+
+  if (!project) {
+    throw('project must be run within a skyager project')
+  }
+
+  let settings = project.settings
+
+  let serverSettings = settings.server || defaultServerSettings
+  let profile = arg || options.profile || Object.keys(serverSettings)[0] || 'web'
+  let env = options.env || process.env.NODE_ENV || 'development'
+  let dashboard = options.dashboard || false
+  let rawArg = yargs.argv._[1]
+
+  if (rawArg === 'deepstream') {
+    require('skypager-server').deepstream({ profile, env }, {project, argv})
+  } else if (rawArg === 'webpack') {
+    devpack('develop', profile, env, project, get(serverSettings, `${profile}.${env}.webpack`) || {})
+  } else {
+    server({profile, env, dashboard}, {project, argv})
+  }
 }
 

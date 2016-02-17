@@ -1,3 +1,1 @@
-import DocsApp from './docs'
-
-DocsApp()
+module.exports = require('./cli')

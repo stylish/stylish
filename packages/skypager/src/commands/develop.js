@@ -46,6 +46,8 @@ export function develop (program, dispatch) {
     .option('--exclude-chunks [list]', 'chunk names to exclude from the html bundle')
     .option('--chunks [list]', 'chunk names to exclude from the html bundle')
     .option('--save-webpack-stats <path>', 'save the webpack compilation stats output')
+    .option('--proxy-target <host:port>', 'the host and port you want to proxy request to')
+    .option('--proxy-path <base-url>', 'base url to handle the proxied request')
     .action(dispatch(handle))
 }
 
@@ -111,6 +113,7 @@ export function launchServer (preset, options = {}, context = {}) {
 
   process.env.NODE_ENV = 'development'
 
+  process.title = 'skypager dev'
   require('skypager-devpack').webpack('develop', options)
 }
 

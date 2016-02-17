@@ -6,11 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.Dependencies = Dependencies;
 exports.validate = validate;
 
-var _defaults = require('lodash/object/defaults');
-
-var _defaults2 = _interopRequireDefault(_defaults);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _lodash = require('lodash');
 
 function Dependencies() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];

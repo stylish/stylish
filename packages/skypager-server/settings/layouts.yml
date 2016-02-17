@@ -1,0 +1,21 @@
+layouts:
+  quad:
+    a:
+      top: 1%
+      left: 1%
+      height: 48%
+    b:
+      top: 51%
+      left: 1%
+      height: 48%
+      width: 48%
+    c:
+      top: 1%
+      left: 51%
+      height: 48%
+      width: 48%
+    d:
+      top: 51%
+      left: 51%
+      height: 48%
+      width: 48%

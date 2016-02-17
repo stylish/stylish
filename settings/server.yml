@@ -1,0 +1,42 @@
+server:
+  web:
+    development:
+      webpack:
+        entry: './src'
+        htmlTemplatePath: 'public/template.html'
+        externalVendors: true
+        skipTheme: true
+        bundle: true
+      deepstream:
+        host: 0.0.0.0
+        port: 9020
+      dashboard:
+        panels:
+          leftPanel: 
+            label: Deepstream Server
+            type: log
+            left: "1%"
+            top: "1%"
+            height: "98%"
+            width: "40%"
+            process: backend
+            borderStyles:
+              style: line
+              color: yellow
+          rightTop:
+            type: log
+            left: "41%"
+            width: "58%"
+            top: "1%"
+            height: "98%"
+            process: frontend
+            label: Frontend Build
+            borderStyles:
+              style: line
+              color: green
+         
+      processes:
+        backend:
+          cmd: 'skypager serve deepstream --profile web --env development'
+        frontend:
+          cmd: 'skypager serve webpack --profile web --env development'

@@ -3,6 +3,7 @@ import { defaults, get, pick } from 'lodash'
 const description = 'multi-page React app built for Electron'
 
 module.exports = {
+  electron: react_electron,
   react_electron,
   description
 }

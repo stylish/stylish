@@ -23,6 +23,7 @@ import importer from './importer'
 import listen from './listen'
 import publish from './publish'
 import repl from './repl'
+import serve from './serve'
 
 import { loadProjectFromDirectory, skypagerBabel, dotpath } from '../util'
 
@@ -119,6 +120,8 @@ function configure (commander, options = {}) {
   }
 
   publish(commander, dispatch)
+
+  serve(commander, dispatch)
 
   // the project can dynamically add its own cli commands from certain actions
   if (project && project.actions) {
