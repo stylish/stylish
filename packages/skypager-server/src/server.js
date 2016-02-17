@@ -1,97 +1,144 @@
-import { values, defaultsDeep as defaults } from 'lodash'
-import Deepstream from './deepstream'
-import { shell, colorize } from './util.js'
-import { Streamer } from './streamer'
+import { pick, set, values, mapValues, get, defaultsDeep as defaults } from 'lodash'
+import { defineProp, colorize, spawn } from './util.js'
 import { dashboard } from './dashboard/index'
+import { createOutputStream as stream} from 'fs-extra'
+import { join, resolve } from 'path'
+import mkdirp from 'mkdirp'
 
 export class Server {
-  constructor (project, config = {}) {
-    let server = this
+  constructor(params = {}, context = {}) {
+    let { project, argv } = context
+    let { env, profile } = params
 
-    this.project = project
-    this.config = config
+    argv = argv || require('yargs').argv
 
-    defineProperty(server, 'processes', {
-      enumerable: false,
-      value: {}
-    })
+    defaults(this, {
+      env,
+      profile,
+      project
+    }, {env: 'development', profile: 'web'})
 
-    this.streamer = new Streamer({
-      root: project.join('log')
-    })
+    let config = get(project, `settings.server.${profile}.${env}`) || defaultSettings[profile][env] || {}
 
-    this.prepare()
+    defineProp(this, 'config', defaults({}, config, {processes:{}}))
+    defineProp(this, 'processes', mapValues(config.processes, (cfg, name) => (cfg.name = name) && cfg))
 
-    process.on('exit', () => {
-      shell(`rm -rf ${ streamer.root }/streamer-*.log`)
-    })
-  }
-
-  start() {
-    if (this.config.dashboard) {
-      dashboard(this, this.config.dashboard)
+    this.paths = {
+      logs: project.path('logs', 'server')
     }
 
-    values(this.config.processes).forEach(p => p.startFn.call(this))
+    values(this.paths).forEach(path => {
+      mkdirp.sync(path)
+    })
+
+    this.state = {
+      processes: {}
+    }
+
+    this.logger = argv.debug
+      ? process.stdout
+      : stream(join(this.paths.logs, `server.${env}.log`))
+  }
+
+  start () {
+    const updateProcess = this.updateProcess.bind(this)
+
+    defineProp(this, '_processes', {})
+
+    this.eachProcess((proc) => {
+      let opts = pick(proc, 'env', 'cwd', 'detached', 'uid', 'gid', 'stdio')
+
+      defaults(opts, {
+        stdio:[
+          'ignore',
+          proc.output,
+          proc.output
+        ]
+      })
+
+      spawn(proc.cmd, opts)
+      .progress((child) => {
+        this._processes[proc.name] = child
+
+        child.title = 'skypager-server: ' + proc.name
+
+        updateProcess(proc.name, {
+          pid: child.pid,
+          status: 'running',
+          ...proc
+        })
+      })
+      .then(result => {
+        updateProcess(proc.name, {
+          status: 'finished',
+          ...proc
+        })
+      })
+      .fail(err => {
+        updateProcess(proc.name, {
+          status: 'failure',
+          ...proc,
+          err
+        })
+      })
+    })
+
+    process.on('exit', () => {
+      values(this._processes).forEach(proc => {
+        proc.kill()
+      })
+    })
+
+    this.log('info', 'server started: ' + process.pid, this.processes)
+
+    process.title = 'skypager-server'
   }
 
   prepare() {
-    Object.keys(this.config.processes).forEach(name => {
-      let cfg = this.config.processes[name]
-      cfg.name = name
-
-      if (cfg.type && cfg.type === 'deepstream') {
-        if (this.config.dashboard) {
-          cfg.paths = cfg.paths || {}
-          cfg.paths.serverLog = this.project.path('logs','streamer-backend.log')
-          cfg.paths.errorLog = this.project.path('logs', 'streamer-backend.log')
-        }
-
-        defineProperty(this, 'deepstream', {
-          enumerable: false,
-          configurable: false,
-          value: setupDeepstream(this, cfg)
-        })
-
-        cfg.startFn = () =>
-          this.deepstream.start()
-
-      } else if (cfg.cmd) {
-
-        cfg.startFn = function(){
-          let output = this.streamer.write(name)
-
-          output.on('open', () => {
-            this.processes[name] = spawn(cfg.cmd, {
-              ...cfg,
-              stdio:[
-                'ignore',
-                output,
-                output
-              ]
-            })
-          })
-        }
-      }
+    this.eachProcess((proc) => {
+      proc.output = stream(this.logPath(`${ process.name }.${ this.env }.log`))
     })
+  }
 
+  eachProcess(fn) {
+    values(this.processes).forEach(fn)
+  }
+
+  updateProcess(name, data = {}) {
+    let current = get(this, `state.processes.${name}`) || {}
+    let updated = current = Object.assign(current, data)
+
+    set(this, `state.processes.${ name }`, updated)
+
+    this.log('info', 'updated process', current)
+  }
+
+  log (level, message, data = {}) {
+    this.logger && this.logger.write(colorize({
+       level,
+       message,
+       data
+    }) + "\n\n")
+  }
+
+  logPath(...args) {
+     return project.path('logs', 'server', ...args)
   }
 }
 
 export default Server
 
-const { defineProperty, getOwnPropertyDescriptor } = Object
-
-function setupDeepstream(server, cfg) {
-  return new Deepstream(cfg, {project: server.project})
+export const defaultSettings = {
+  web: {
+    development: {
+      processes: {
+        devserver: {
+          cmd: 'skypager dev --bundle'
+        }
+      }
+    }
+  }
 }
 
-function spawn(cmd, options = {}) {
-  let proc = shell(cmd, options)
 
-  process.on('exit', () => {
-    try { proc.kill() } catch (e) {  }
-  })
-
-  return proc
-}
+const { keys, defineProperty, getOwnPropertyDescriptor } = Object

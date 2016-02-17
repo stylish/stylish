@@ -1,55 +1,29 @@
 import Dashboard from './dashboard'
-import Streamer from './streamer'
-import Runner from './runner'
-import Server from './server'
-import { colorize } from './util'
-import { defaultsDeep as defaults, get, set } from 'lodash'
+import { defaultSettings, Server } from './server'
+import Deepstream from './deepstream'
 
-export function start(params = {}, context = {}) {
-  let { project } = context
-  params.env = params.env || process.env.NODE_ENV || 'development'
+export const defaultServerSettings = defaultSettings
 
-  let config = defaults(buildOptions(params, context), params)
-  let server = new Server(project, config)
+export function dashboard(params, context={}) {
+  let dashboard = new Dashboard(params, context)
+
+  dashboard.start()
+
+  return dashboard
+}
+
+export function deepstream(params = {}, context = {}) {
+  let deepstream = new Deepstream(params, context)
+
+  deepstream.start()
+
+  return deepstream
+}
+
+export function server(params = {}, context = {}) {
+  let server = new Server(params, context)
 
   server.start()
+
+  return server
 }
-
-export default start
-
-const processes = {
-  preview: {
-    cmd: 'skypager dev --port 3000 --proxy-target="localhost:6020" --proxy-path="/engine.io"'
-  },
-  deepstream: {
-    cmd: 'skypager serve deepstream --host localhost --port 6020'
-  },
-  ngrok: {
-    cmd: 'ngrok http 3000'
-  }
-}
-
-
-function buildOptions(params, context) {
-  let { project, options } = context
-  let { profile, env } = params
-
-  let current = get(project.settings, `server.${ profile }`)
-
-  if (!current) {
-    if(project.settings.server.defaultProfile || Object.keys(project.settings.server)[0]) {
-      profile = (project.settings.server.defaultProfile || Object.keys(project.settings.server)[0])
-    }
-
-    if(current = get(project.settings, `server.${ profile }`)) {
-      console.log(`Using profile: ${ profile }`)
-    }
-  }
-
-  let config = get(project.settings, `server.${ profile }.${ env }`) || {}
-
-  return config || { processes, env }
-}
-
-
-

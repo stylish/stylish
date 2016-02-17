@@ -18,10 +18,11 @@ export function dashboard(server, options) {
   });
 
   // Render React component into screen
-  render(<App processes={server.processes}
-              streamer={server.streamer}
-              options={options}
+  render(<App options={options}
+              logPath={server.logPath}
               project={server.project}
+              env={options.env}
+              processes={server.processes}
               screen={screen} />, screen)
 
   // Don't overwrite the screen

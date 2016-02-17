@@ -1,7 +1,8 @@
 import React, { createElement as el, Component, PropTypes as types } from 'react'
 import { omit, defaultsDeep as defaults, values } from 'lodash'
-import { define, shell, colorize } from '../util.js'
-import { readFileSync as readFile } from 'fs'
+import { defineProp, shell, colorize } from '../util.js'
+import { createReadStream as readable } from 'fs'
+import { join } from 'path'
 
 export class App extends Component {
   static childContextTypes = {
@@ -17,9 +18,9 @@ export class App extends Component {
 
     super(props)
 
-    define(this, 'project', project)
-    define(this, 'screen', screen)
-    define(this, 'log', screen.log.bind(screen))
+    defineProp(this, 'project', project)
+    defineProp(this, 'screen', screen)
+    defineProp(this, 'log', screen.log.bind(screen))
 
     let panels = Object.keys(options.panels).map((ref,key) => {
       let panel = options.panels[ref]
@@ -49,16 +50,20 @@ export class App extends Component {
 
 
   componentDidMount () {
-    let { panels } = this.state
-    let { streamer } = this.props
     let app = this
+    let { panels } = this.state
+    let { logPath, env, processes } = this.props
 
     panels
       .filter(panel => panel.process && panel.type === 'log')
       .forEach(panel => {
-        let logPath = this.project.path('logs', `streamer-${ panel.process }.log`)
-        shell(`tail -f ${ logPath }`, {}, (buffer) => {
-          app.refs[panel.ref].add(buffer.toString())
+        let logPanel = app.refs[panel.ref]
+        let stream = processes[panel.process]
+
+        stream().progress(child => {
+          child.stdout.on('data', (buffer) => {
+            logPanel.add(buffer.toString())
+          })
         })
       })
   }

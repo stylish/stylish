@@ -16,19 +16,20 @@ var _defineProperty = require('babel-runtime/core-js/object/define-property');
 
 var _defineProperty2 = _interopRequireDefault(_defineProperty);
 
-exports.define = define;
+exports.defineProp = defineProp;
+exports.spawn = spawn;
 exports.shell = shell;
 exports.colorize = colorize;
 
 var _child_process = require('child_process');
 
-var _fs = require('fs');
+var _childProcessPromise = require('child-process-promise');
 
 var _lodash = require('lodash');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function define(object, property, value) {
+function defineProp(object, property, value) {
   var enumerable = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
   var configurable = arguments.length <= 4 || arguments[4] === undefined ? false : arguments[4];
 
@@ -37,6 +38,29 @@ function define(object, property, value) {
     enumerable: enumerable,
     configurable: configurable
   });
+}
+
+function spawn(command) {
+  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var progress = arguments[2];
+
+  var _command$split = command.split(' ');
+
+  var _command$split2 = (0, _toArray3.default)(_command$split);
+
+  var cmd = _command$split2[0];
+
+  var args = _command$split2.slice(1);
+
+  // this might be overkill
+
+  if (options.cwd) {
+    options.env = (0, _assign2.default)({}, process.env, options.env || {}, {
+      PWD: options.cwd
+    });
+  }
+
+  return progress ? (0, _childProcessPromise.spawn)(cmd, args, options).progress(progress) : (0, _childProcessPromise.spawn)(cmd, args, options);
 }
 
 function shell(command) {
@@ -48,15 +72,15 @@ function shell(command) {
     options = {};
   }
 
-  var _command$split = command.split(' ');
+  var _command$split3 = command.split(' ');
 
-  var _command$split2 = (0, _toArray3.default)(_command$split);
+  var _command$split4 = (0, _toArray3.default)(_command$split3);
 
-  var cmd = _command$split2[0];
+  var cmd = _command$split4[0];
 
-  var args = _command$split2.slice(1);
+  var args = _command$split4.slice(1);
 
-  var debug = (0, _fs.createWriteStream)(process.env.PWD + '/log/debug.log');
+  var debug = writeable(process.env.PWD + '/log/debug.log');
 
   if (options.cwd) {
     options.env = (0, _assign2.default)({}, process.env, {

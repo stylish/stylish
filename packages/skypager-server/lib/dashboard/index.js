@@ -37,10 +37,11 @@ function dashboard(server, options) {
   });
 
   // Render React component into screen
-  (0, _reactBlessed.render)(_react2.default.createElement(_App2.default, { processes: server.processes,
-    streamer: server.streamer,
-    options: options,
+  (0, _reactBlessed.render)(_react2.default.createElement(_App2.default, { options: options,
+    logPath: server.logPath,
     project: server.project,
+    env: options.env,
+    processes: server.processes,
     screen: screen, __source: {
       fileName: _jsxFileName,
       lineNumber: 21

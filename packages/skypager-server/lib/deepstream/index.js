@@ -3,11 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Server = exports.constants = undefined;
+exports.Deepstream = exports.constants = undefined;
 
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -35,6 +39,8 @@ var _deepstream5 = require('deepstream.io-msg-redis');
 
 var _deepstream6 = _interopRequireDefault(_deepstream5);
 
+var _util = require('../util.js');
+
 var _permissions = require('./permissions');
 
 var permissions = _interopRequireWildcard(_permissions);
@@ -45,16 +51,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var constants = exports.constants = _deepstream2.default.constants;
 
-var Server = exports.Server = (function (_Deepstream) {
-  (0, _inherits3.default)(Server, _Deepstream);
+var Deepstream = exports.Deepstream = (function (_Base) {
+  (0, _inherits3.default)(Deepstream, _Base);
 
-  function Server() {
-    var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+  function Deepstream() {
+    var params = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
     var context = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-    (0, _classCallCheck3.default)(this, Server);
+    (0, _classCallCheck3.default)(this, Deepstream);
     var project = context.project;
+    var argv = context.argv;
 
-    var env = options.env || process.env.NODE_ENV || 'development';
+    var settings = project.settings.server;
+
+    var options = (0, _lodash.defaults)(params, (0, _extends3.default)({}, (0, _lodash.get)(settings, params.profile + '.' + params.env + '.deepstream') || {}));
 
     (0, _lodash.defaults)(options, {
       port: 6020,
@@ -63,14 +72,15 @@ var Server = exports.Server = (function (_Deepstream) {
       cacheHost: 'localhost',
       start: false,
       env: process.env.NODE_ENV || 'development',
-      permissions: permissions,
-      paths: {
-        serverLog: project.path('logs', 'deepstream.server.' + env + '.log'),
-        errorLog: project.path('logs', 'deepstream.error.' + env + '.log')
-      }
+      permissions: permissions
     });
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Server).call(this, options.host + ':' + options.port));
+    (0, _lodash.defaults)(options, {
+      tcpPort: options.port + 1,
+      tcpHost: options.host
+    });
+
+    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Deepstream).call(this, options.host + ':' + options.port));
 
     var cachePort = options.cachePort;
     var cacheHost = options.cacheHost;
@@ -80,12 +90,15 @@ var Server = exports.Server = (function (_Deepstream) {
 
     _this.set('showLogo', false);
 
-    _this.set('logger', require('./logger')(options));
-
     _this.set('cache', new _deepstream4.default({
       port: cachePort,
       host: cacheHost
     }));
+
+    _this.set('host', options.host);
+    _this.set('port', options.port);
+    _this.set('tcpHost', options.tcpHost || options.tcpPort || options.port + 1);
+    _this.set('tcpPort', options.tcpPort || options.port || 6021);
 
     _this.set('messageConnector', new _deepstream6.default({
       port: cachePort,
@@ -112,8 +125,8 @@ var Server = exports.Server = (function (_Deepstream) {
     return _this;
   }
 
-  return Server;
+  return Deepstream;
 })(_deepstream2.default);
 
-Server.constants = constants;
-exports.default = Server;
+Deepstream.constants = constants;
+exports.default = Deepstream;

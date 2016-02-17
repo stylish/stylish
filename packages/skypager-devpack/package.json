@@ -1,6 +1,6 @@
 {
   "name": "skypager-devpack",
-  "version": "1.35.0",
+  "version": "1.36.0",
   "description": "configurable webpack dev server and build tool so you don't have to",
   "main": "index.js",
   "dependencies": {
@@ -15,6 +15,7 @@
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
     "html-webpack-plugin": "^2.7.2",
+    "http-proxy": "^1.13.1",
     "http-proxy-middleware": "^0.10.0",
     "json-loader": "^0.5.4",
     "less": "^2.6.0",

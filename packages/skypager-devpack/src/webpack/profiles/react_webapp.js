@@ -3,6 +3,7 @@ import { defaults, get, pick } from 'lodash'
 const description = 'Multi-page React Webapp with Client-side Routing'
 
 module.exports = {
+  web: react_webapp,
   react_webapp,
   description
 }

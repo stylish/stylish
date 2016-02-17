@@ -17,7 +17,7 @@ fs.readdirSync('node_modules')
   });
 
 var backendConfig = {
-  entry: './src/dashboard.js',
+  entry: './src',
   devtool: 'source-map',
   debug: true,
   target: 'node',

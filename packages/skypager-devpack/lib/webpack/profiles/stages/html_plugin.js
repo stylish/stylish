@@ -5,9 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.HtmlPlugin = HtmlPlugin;
 
-var _defaults = require('lodash/object/defaults');
-
-var _defaults2 = _interopRequireDefault(_defaults);
+var _lodash = require('lodash');
 
 var _htmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -18,7 +16,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function HtmlPlugin() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-  (0, _defaults2.default)(options, {
+  (0, _lodash.defaults)(options, {
     title: 'Skypager',
     id: 'webpack-html',
     hash: false,

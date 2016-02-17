@@ -15,13 +15,15 @@ var C = require('deepstream.io').constants,
 
 var join = require('path').join;
 
-var Logger = function Logger(options) {
+var Logger = function Logger() {
+  var name = arguments.length <= 0 || arguments[0] === undefined ? 'deepstream' : arguments[0];
+  var options = arguments[1];
+
   this.isReady = true;
   this._$useColors = true;
   this._logLevelColors = ['white', 'green', 'yellow', 'red'];
 
-  this.errorLog = writeable(options.paths.errorLog);
-  this.serverLog = writeable(options.paths.serverLog);
+  this.logs = writeable(join(options.logPath, name + '.log'));
 
   this._currentLogLevel = 0;
 };
@@ -44,9 +46,9 @@ Logger.prototype.log = function (logLevel, event, logMessage) {
   var msg = event + ' | ' + logMessage;
 
   if (logLevel === C.LOG_LEVEL.ERROR || logLevel === C.LOG_LEVEL.WARN) {
-    this.errorLog.write(msg[this._logLevelColors[logLevel]] + EOL);
+    this.logs.write(msg[this._logLevelColors[logLevel]] + EOL);
   } else {
-    this.serverLog.write(msg[this._logLevelColors[logLevel]] + EOL);
+    this.logs.write(msg[this._logLevelColors[logLevel]] + EOL);
   }
 };
 

@@ -12,6 +12,7 @@ var webpack = require('webpack');
 var express = require('express');
 var lodash = require('lodash');
 var isFunction = lodash.isFunction;
+var proxyMiddleware = require('http-proxy-middleware');
 
 module.exports = function (argv, serverOptions) {
   serverOptions = serverOptions || {};
@@ -54,6 +55,15 @@ module.exports = function (argv, serverOptions) {
       }
     });
   };
+
+  // use proxyPath = '/engine.io' and proxyTarget 'http://localhost:6020'
+  // to proxy the deepstream server for example
+  if (argv.proxyPath && argv.proxyTarget) {
+    app.use(proxyMiddleware(argv.proxyPath, {
+      target: argv.proxyTarget,
+      ws: true
+    }));
+  }
 
   var devMiddleware = require('webpack-dev-middleware')(compiler, {
     publicPath: config.output.publicPath,

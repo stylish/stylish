@@ -86,7 +86,6 @@ module.exports = function (argv) {
     htmlFilename = '200.html';
   }
 
-  console.log('Modules Directories', modulesDirectories);
   config.merge({
     entry: entry,
     output: {
@@ -198,7 +197,6 @@ module.exports = function (argv) {
       target: argv.target
     });
   }
-
   if (argv.externalVendors || precompiled) {
     config.merge({
       externals: {
@@ -241,6 +239,10 @@ module.exports = function (argv) {
         'dist': argv.distPath && resolve(argv.distPath) || path.join(directory, 'dist')
       }
     }
+  });
+
+  config.merge({
+    recordsPath: join(directory, 'tmp', 'records')
   });
 
   if (argv.exportLibrary) {

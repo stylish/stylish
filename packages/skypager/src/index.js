@@ -1,8 +1,6 @@
 try {
   require('babel-polyfill')
-} catch (e) {
-
-}
+} catch (e) { }
 
 import Framework from './framework'
 import Project from './project'

@@ -33,7 +33,7 @@ var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
 
-var _jsxFileName = 'src/dashboard/App.js';
+var _jsxFileName = 'src/dashboard/app.js';
 
 var _react = require('react');
 
@@ -44,6 +44,8 @@ var _lodash = require('lodash');
 var _util = require('../util.js');
 
 var _fs = require('fs');
+
+var _path = require('path');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -61,9 +63,9 @@ var App = exports.App = (function (_Component) {
 
     var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(App).call(this, props));
 
-    (0, _util.define)(_this, 'project', project);
-    (0, _util.define)(_this, 'screen', screen);
-    (0, _util.define)(_this, 'log', screen.log.bind(screen));
+    (0, _util.defineProp)(_this, 'project', project);
+    (0, _util.defineProp)(_this, 'screen', screen);
+    (0, _util.defineProp)(_this, 'log', screen.log.bind(screen));
 
     var panels = (0, _keys2.default)(options.panels).map(function (ref, key) {
       var panel = options.panels[ref];
@@ -95,19 +97,23 @@ var App = exports.App = (function (_Component) {
   }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
-      var _this2 = this;
-
-      var panels = this.state.panels;
-      var streamer = this.props.streamer;
-
       var app = this;
+      var panels = this.state.panels;
+      var _props = this.props;
+      var logPath = _props.logPath;
+      var env = _props.env;
+      var processes = _props.processes;
 
       panels.filter(function (panel) {
         return panel.process && panel.type === 'log';
       }).forEach(function (panel) {
-        var logPath = _this2.project.path('logs', 'streamer-' + panel.process + '.log');
-        (0, _util.shell)('tail -f ' + logPath, {}, function (buffer) {
-          app.refs[panel.ref].add(buffer.toString());
+        var logPanel = app.refs[panel.ref];
+        var stream = processes[panel.process];
+
+        stream().progress(function (child) {
+          child.stdout.on('data', function (buffer) {
+            logPanel.add(buffer.toString());
+          });
         });
       });
     }
@@ -126,7 +132,7 @@ var App = exports.App = (function (_Component) {
         {
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 78
+            lineNumber: 83
           }
         },
         boxes

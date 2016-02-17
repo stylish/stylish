@@ -14,17 +14,6 @@ server:
             borderStyles:
               style: line
               color: white
-          rightTwo:
-            label: Server Compiler
-            type: log
-            process: server_compiler
-            left: "51%"
-            top: "22%"
-            width: "49%"
-            height: "20%"
-            borderStyles:
-              style: line
-              color: white
           left:
             label: Skypager Test Suite
             type: log
@@ -38,8 +27,6 @@ server:
               color: green
 
       processes:
-        server_compiler:
-          cmd: 'npm run compile:watch'
         skypager_compiler:
           cmd: 'npm run compile:watch'
           cwd: '<%= process.env.HOME %>/Skypager/packages/skypager'

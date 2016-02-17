@@ -1,6 +1,15 @@
 server:
   web:
     development:
+      webpack:
+        entry: './src'
+        htmlTemplatePath: 'public/template.html'
+        externalVendors: true
+        skipTheme: true
+        bundle: true
+      deepstream:
+        host: 0.0.0.0
+        port: 9020
       dashboard:
         panels:
           leftPanel: 
@@ -19,33 +28,15 @@ server:
             left: "41%"
             width: "58%"
             top: "1%"
-            height: "70%"
+            height: "98%"
             process: frontend
-            label: Webpack Build
+            label: Frontend Build
             borderStyles:
               style: line
               color: green
-          rightBottom:
-            label: Ngrok Tunnel
-            left: "41%"
-            width: "58%"
-            top: "71%"
-            height: "27%"
-            process: ngrok
-            type: log
-            borderStyles:
-              style: line
-              color: cyan
-          
+         
       processes:
         backend:
-          type: deepstream
-          options:
-            host: localhost
-            port: 6020
-            serverLog: '<%= process.env.PWD %>/log/deepstream.development.log'
-            errorLog: '<%= process.env.PWD %>/log/deepstream.development.error.log'
+          cmd: 'skypager serve deepstream --profile web --env development'
         frontend:
-          cmd: 'skypager dev --port 3000 --proxy-target="localhost:6020" --proxy-path="/engine.io"'
-        ngrok:
-          cmd: 'ngrok http 3000'
+          cmd: 'skypager dev --bundle --port 3000'

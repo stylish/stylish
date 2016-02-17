@@ -13,7 +13,7 @@ var C = require( 'deepstream.io' ).constants,
 
 var join = require('path').join
 
-var Logger = function(options) {
+var Logger = function(name = 'deepstream', options) {
 	this.isReady = true;
 	this._$useColors = true;
 	this._logLevelColors = [
@@ -23,8 +23,10 @@ var Logger = function(options) {
 		'red'
 	];
 
-  this.errorLog = writeable(options.paths.errorLog)
-  this.serverLog = writeable(options.paths.serverLog)
+  this.logs = writeable(
+    join(options.logPath, `${name}.log`)
+  )
+
 
 	this._currentLogLevel = 0;
 };
@@ -47,9 +49,9 @@ Logger.prototype.log = function( logLevel, event, logMessage ) {
 	var msg = event + ' | ' + logMessage;
 
 	if( logLevel === C.LOG_LEVEL.ERROR || logLevel === C.LOG_LEVEL.WARN ) {
-	  this.errorLog.write( msg[ this._logLevelColors[ logLevel ] ] + EOL );
+	  this.logs.write( msg[ this._logLevelColors[ logLevel ] ] + EOL );
 	} else {
-	  this.serverLog.write( msg[ this._logLevelColors[ logLevel ] ] + EOL );
+	  this.logs.write( msg[ this._logLevelColors[ logLevel ] ] + EOL );
 	}
 };
 

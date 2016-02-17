@@ -1,13 +1,28 @@
-import { spawn } from 'child_process'
-import { createWriteStream as writeable, createReadStream as readable } from 'fs'
+import { spawn as spawnAsync } from 'child_process'
+import { spawn as spawnPromise } from 'child-process-promise'
 import { isString, isEmpty, isFunction, pick, omit, defaultsDeep as defaults } from 'lodash'
 
-export function define(object, property, value, enumerable = false, configurable = false) {
+export function defineProp(object, property, value, enumerable = false, configurable = false) {
   Object.defineProperty(object, property, {
     value,
     enumerable,
     configurable
   })
+}
+
+export function spawn(command, options = {}, progress) {
+  let [cmd, ...args] = command.split(' ')
+
+  // this might be overkill
+  if (options.cwd) {
+    options.env = Object.assign({}, process.env, (options.env || {}), {
+      PWD: options.cwd
+    })
+  }
+
+  return progress
+    ? spawnPromise(cmd, args, options).progress(progress)
+    : spawnPromise(cmd, args, options)
 }
 
 export function shell(command, options = {}, handle){
@@ -28,7 +43,7 @@ export function shell(command, options = {}, handle){
     })
   }
 
-  let proc = spawn(cmd, args, options)
+  let proc = spawnAsync(cmd, args, options)
 
   if (handle) {
     proc.stdout && proc.stdout.on('data', (data) => handle(data.toString()))

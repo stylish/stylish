@@ -1,18 +1,23 @@
-import { defaults } from 'lodash'
-import Deepstream from 'deepstream.io'
+import { get, defaults } from 'lodash'
+import Base from 'deepstream.io'
 import RedisCacheConnector from 'deepstream.io-cache-redis'
 import RedisMessageConnector from 'deepstream.io-msg-redis'
+import { colorize } from '../util.js'
 
 import * as permissions from './permissions'
 
-export const constants = Deepstream.constants
+export const constants = Base.constants
 
-export class Server extends Deepstream {
+export class Deepstream extends Base {
   static constants = constants;
 
-  constructor(options = {}, context = {}) {
-    let { project } = context
-    let env = options.env || process.env.NODE_ENV || 'development'
+  constructor(params = {}, context = {}) {
+    let { project, argv } = context
+    let settings = project.settings.server
+
+    let options = defaults(params, {
+      ...(get(settings,`${params.profile}.${params.env}.deepstream`) || {})
+    })
 
     defaults(options, {
       port: 6020,
@@ -21,11 +26,12 @@ export class Server extends Deepstream {
       cacheHost: 'localhost',
       start: false,
       env: process.env.NODE_ENV || 'development',
-      permissions,
-      paths: {
-        serverLog: project.path('logs', `deepstream.server.${ env }.log`),
-        errorLog: project.path('logs', `deepstream.error.${ env }.log`)
-      }
+      permissions
+    })
+
+    defaults(options, {
+      tcpPort: options.port + 1,
+      tcpHost: options.host
     })
 
     super(`${ options.host }:${ options.port }`)
@@ -35,12 +41,15 @@ export class Server extends Deepstream {
 
     this.set('showLogo', false)
 
-    this.set('logger', require('./logger')(options))
-
     this.set('cache', new RedisCacheConnector({
       port: cachePort,
       host: cacheHost
     }))
+
+    this.set('host', options.host)
+    this.set('port', options.port)
+    this.set('tcpHost', options.tcpHost || options.tcpPort || options.port + 1)
+    this.set('tcpPort', options.tcpPort || options.port || 6021)
 
     this.set('messageConnector', new RedisMessageConnector({
       port: cachePort,
@@ -67,4 +76,4 @@ export class Server extends Deepstream {
   }
 }
 
-export default Server
+export default Deepstream
