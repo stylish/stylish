@@ -27,13 +27,13 @@ var _util = require('./util.js');
 
 var _index = require('./dashboard/index');
 
-var _fsExtra = require('fs-extra');
-
 var _path = require('path');
 
 var _mkdirp = require('mkdirp');
 
 var _mkdirp2 = _interopRequireDefault(_mkdirp);
+
+var _fs = require('fs');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -74,12 +74,18 @@ var Server = exports.Server = (function () {
       processes: {}
     };
 
-    this.logger = argv.debug ? process.stdout : (0, _fsExtra.createOutputStream)((0, _path.join)(this.paths.logs, 'server.' + env + '.log'));
+    this.logger = argv.debug ? process.stdout : stream((0, _path.join)(this.paths.logs, 'server.' + env + '.log'));
   }
 
   (0, _createClass3.default)(Server, [{
     key: 'start',
     value: function start() {
+      this.prepare();
+      this.run();
+    }
+  }, {
+    key: 'run',
+    value: function run() {
       var _this = this;
 
       var updateProcess = this.updateProcess.bind(this);
@@ -89,7 +95,7 @@ var Server = exports.Server = (function () {
       this.eachProcess(function (proc) {
         var opts = (0, _lodash.pick)(proc, 'env', 'cwd', 'detached', 'uid', 'gid', 'stdio');
 
-        (0, _lodash.defaultsDeep)(opts, {
+        opts = (0, _lodash.defaultsDeep)(opts, {
           stdio: ['ignore', proc.output, proc.output]
         });
 
@@ -131,7 +137,8 @@ var Server = exports.Server = (function () {
       var _this2 = this;
 
       this.eachProcess(function (proc) {
-        proc.output = (0, _fsExtra.createOutputStream)(_this2.logPath(process.name + '.' + _this2.env + '.log'));
+        (0, _util.defineProp)(proc, 'output', stream(_this2.logPath(proc.name + '.' + _this2.env + '.log')));
+        proc.output.open();
       });
     }
   }, {
@@ -171,7 +178,7 @@ var Server = exports.Server = (function () {
         args[_key] = arguments[_key];
       }
 
-      return (_project = project).path.apply(_project, ['logs', 'server'].concat(args));
+      return (_project = this.project).path.apply(_project, ['logs', 'server'].concat(args));
     }
   }]);
   return Server;
@@ -194,3 +201,9 @@ var _Object = Object;
 var keys = _Object.keys;
 var defineProperty = _Object.defineProperty;
 var getOwnPropertyDescriptor = _Object.getOwnPropertyDescriptor;
+
+function stream(path) {
+  _mkdirp2.default.sync((0, _path.dirname)(path));
+  var fd = (0, _fs.openSync)(path, 'a+');
+  return (0, _fs.createWriteStream)(path, { fd: fd });
+}

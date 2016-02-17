@@ -39,4 +39,4 @@ server:
         backend:
           cmd: 'skypager serve deepstream --profile web --env development'
         frontend:
-          cmd: 'skypager dev --bundle --port 3000'
+          cmd: 'skypager serve webpack --profile web --env development'

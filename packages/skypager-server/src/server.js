@@ -1,9 +1,9 @@
 import { pick, set, values, mapValues, get, defaultsDeep as defaults } from 'lodash'
 import { defineProp, colorize, spawn } from './util.js'
 import { dashboard } from './dashboard/index'
-import { createOutputStream as stream} from 'fs-extra'
-import { join, resolve } from 'path'
+import { join, resolve, dirname } from 'path'
 import mkdirp from 'mkdirp'
+import { createWriteStream as writeable, createReadStream as readable, openSync, existsSync as exists } from 'fs'
 
 export class Server {
   constructor(params = {}, context = {}) {
@@ -41,6 +41,11 @@ export class Server {
   }
 
   start () {
+    this.prepare()
+    this.run()
+  }
+
+  run () {
     const updateProcess = this.updateProcess.bind(this)
 
     defineProp(this, '_processes', {})
@@ -48,7 +53,7 @@ export class Server {
     this.eachProcess((proc) => {
       let opts = pick(proc, 'env', 'cwd', 'detached', 'uid', 'gid', 'stdio')
 
-      defaults(opts, {
+      opts = defaults(opts, {
         stdio:[
           'ignore',
           proc.output,
@@ -96,7 +101,8 @@ export class Server {
 
   prepare() {
     this.eachProcess((proc) => {
-      proc.output = stream(this.logPath(`${ process.name }.${ this.env }.log`))
+      defineProp(proc, 'output', stream(this.logPath(`${ proc.name }.${ this.env }.log`)))
+      proc.output.open()
     })
   }
 
@@ -122,7 +128,7 @@ export class Server {
   }
 
   logPath(...args) {
-     return project.path('logs', 'server', ...args)
+     return this.project.path('logs', 'server', ...args)
   }
 }
 
@@ -142,3 +148,9 @@ export const defaultSettings = {
 
 
 const { keys, defineProperty, getOwnPropertyDescriptor } = Object
+
+function stream(path) {
+  mkdirp.sync(dirname(path))
+  let fd = openSync(path, 'a+')
+  return writeable(path, {fd: fd})
+}
