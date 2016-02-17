@@ -2,8 +2,7 @@ import React, { Component, PropTypes as types } from 'react'
 import { render } from 'react-dom'
 import { Router } from 'react-router'
 
-import browserHistory from 'history/lib/createBrowserHistory'
-import memoryHistory from 'history/lib/createMemoryHistory'
+import { browserHistory } from 'react-router'
 
 import { stores as buildStore } from '../util/stores'
 import { routes as buildRoutes } from '../util/routes'

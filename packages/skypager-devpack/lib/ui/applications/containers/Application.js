@@ -36,21 +36,13 @@ var _reactDom = require('react-dom');
 
 var _reactRouter = require('react-router');
 
-var _createBrowserHistory = require('history/lib/createBrowserHistory');
-
-var _createBrowserHistory2 = _interopRequireDefault(_createBrowserHistory);
-
-var _createMemoryHistory = require('history/lib/createMemoryHistory');
-
-var _createMemoryHistory2 = _interopRequireDefault(_createMemoryHistory);
-
 var _stores = require('../util/stores');
 
 var _routes = require('../util/routes');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var history = (0, _createBrowserHistory2.default)();
+var history = (0, _reactRouter.browserHistory)();
 
 var defaultInitialState = [];
 var defaultReducers = [];
@@ -105,7 +97,7 @@ var Application = exports.Application = (function (_Component) {
         middlewares: middlewares,
         reducers: reducers, __source: {
           fileName: _jsxFileName,
-          lineNumber: 82
+          lineNumber: 81
         }
       }), document.getElementById(options.root));
 
@@ -169,7 +161,7 @@ var Application = exports.Application = (function (_Component) {
         _reactRouter.Router,
         { history: history, __source: {
             fileName: _jsxFileName,
-            lineNumber: 132
+            lineNumber: 131
           }
         },
         this.routes
