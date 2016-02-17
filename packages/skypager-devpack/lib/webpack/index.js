@@ -45,7 +45,10 @@ module.exports = function (argv) {
   // this assumes the devpack is checked out and in skypager-central/packages/skypager-devpack
   var babelModulesPath = argv.modulesPath || process.env.SKYPAGER_MODULES_PATH || '../../../node_modules';
 
-  var modulesDirectories = [directory + '/node_modules', path.resolve('../../node_modules'), path.join(__dirname, '../../src'), path.join(__dirname, '../..')];
+  var themesModuleRoot = path.dirname(require.resolve('skypager-themes'));
+  var devpackModuleRoot = path.join(__dirname, '../..');
+
+  var modulesDirectories = [devpackModuleRoot, path.join(devpackModuleRoot, 'src'), path.join(devpackModuleRoot, 'src', 'ui'), themesModuleRoot, directory + '/node_modules', path.join(devpackModuleRoot, 'node_modules'), path.join(themesModuleRoot, 'node_modules')];
 
   var platform = argv.platform || 'web';
 
@@ -94,11 +97,11 @@ module.exports = function (argv) {
       publicPath: !isDev && platform === 'electron' ? '' : '/'
     },
     resolveLoader: {
-      root: modulesDirectories.concat([path.dirname(require.resolve('skypager-themes'))])
+      root: modulesDirectories
     },
     resolve: {
       root: modulesDirectories.concat([directory, path.dirname(require.resolve('skypager-devpack'))]),
-      modulesDirectories: ['src', 'dist', 'node_modules']
+      modulesDirectories: ['.', 'src', 'dist', 'node_modules']
     },
     devtool: 'eval'
   }).loader('json', { loader: 'json', test: /.json$/ }).loader('js', {

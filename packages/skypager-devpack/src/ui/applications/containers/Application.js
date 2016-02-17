@@ -1,13 +1,10 @@
 import React, { Component, PropTypes as types } from 'react'
 import { render } from 'react-dom'
-import { Router } from 'react-router'
-
-import { browserHistory } from 'react-router'
+import { Router, browserHistory as history } from 'react-router'
 
 import { stores as buildStore } from '../util/stores'
 import { routes as buildRoutes } from '../util/routes'
 
-const history = browserHistory()
 
 const defaultInitialState = []
 const defaultReducers = []
