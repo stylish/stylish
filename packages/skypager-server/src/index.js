@@ -1,29 +1,30 @@
-import Dashboard from './dashboard'
-import { defaultSettings, Server } from './server'
-import Deepstream from './deepstream'
+import { defaultSettings } from './server'
 
 export const defaultServerSettings = defaultSettings
 
 export function dashboard(params, context={}) {
-  let dashboard = new Dashboard(params, context)
+  const Dashboard = require('./dashboard').Dashboard
+  let proc = new Dashboard(params, context)
 
-  dashboard.start()
+  proc.start()
 
-  return dashboard
+  return proc
 }
 
 export function deepstream(params = {}, context = {}) {
-  let deepstream = new Deepstream(params, context)
+  const Deepstream = require('./deepstream').Deepstream
+  let proc = new Deepstream(params, context)
 
-  deepstream.start()
+  proc.start()
 
-  return deepstream
+  return proc
 }
 
 export function server(params = {}, context = {}) {
-  let server = new Server(params, context)
+  const Server = require('./proc').Server
+  let proc = new Server(params, context)
 
-  server.start()
+  proc.start()
 
-  return server
+  return proc
 }

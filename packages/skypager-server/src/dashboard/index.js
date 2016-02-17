@@ -1,7 +1,4 @@
-import React from 'react';
 import blessed from 'blessed';
-import { render } from 'react-blessed';
-import App from './App';
 
 export function dashboard(server, options) {
    // Create our screen
@@ -16,14 +13,6 @@ export function dashboard(server, options) {
   screen.key(['escape', 'q', 'C-c'], function(ch, key) {
     return process.exit(0);
   });
-
-  // Render React component into screen
-  render(<App options={options}
-              logPath={server.logPath}
-              project={server.project}
-              env={options.env}
-              processes={server.processes}
-              screen={screen} />, screen)
 
   // Don't overwrite the screen
   console.log = function () { };

@@ -1,6 +1,6 @@
 {
   "name": "skypager-devpack",
-  "version": "1.36.4",
+  "version": "1.36.5",
   "description": "configurable webpack dev server and build tool so you don't have to",
   "main": "index.js",
   "dependencies": {
@@ -8,15 +8,18 @@
     "babel-preset-react-hmre": "^1.1.0",
     "babel-preset-skypager": "^1.32.0",
     "babel-runtime": "^6.4.0",
+    "bootstrap": "^3.3.6",
     "css-loader": "^0.23.1",
     "debounce": "^1.0.0",
     "deepstream.io-client-js": "^0.3.8",
     "express": "^4.13.3",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
+    "history": "^2.0.0",
     "html-webpack-plugin": "^2.7.2",
     "http-proxy": "^1.13.1",
     "http-proxy-middleware": "^0.10.0",
+    "jquery": "^2.2.0",
     "json-loader": "^0.5.4",
     "less": "^2.6.0",
     "less-loader": "latest",
@@ -26,6 +29,15 @@
     "postcss-import": "7.1.3",
     "postcss-loader": "0.8.0",
     "react": "^0.14.7",
+    "react-bootstrap": "^0.28.3",
+    "react-dom": "^0.14.7",
+    "react-redux": "^4.4.0",
+    "react-router": "^2.0.0",
+    "redux": "^3.3.1",
+    "redux-actions": "^0.9.1",
+    "redux-simple-router": "^2.0.4",
+    "redux-thunk": "^1.0.3",
+    "skypager-themes": "^1.32.0",
     "stats-webpack-plugin": "^0.3.0",
     "style-loader": "^0.13.0",
     "surge": "^0.17.7",
@@ -33,8 +45,7 @@
     "webpack": "^1.12.13",
     "webpack-configurator": "^0.3.1",
     "webpack-dev-middleware": "^1.4.0",
-    "webpack-hot-middleware": "^2.6.0",
-    "skypager-themes": "^1.32.0"
+    "webpack-hot-middleware": "^2.6.0"
   },
   "scripts": {
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
@@ -57,6 +68,6 @@
   },
   "homepage": "https://github.com/skypager/superdevpack#readme",
   "devDependencies": {
-    "skypager": "^1.36.4"
+    "skypager": "^1.36.5"
   }
 }

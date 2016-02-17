@@ -8,48 +8,41 @@ exports.dashboard = dashboard;
 exports.deepstream = deepstream;
 exports.server = server;
 
-var _dashboard = require('./dashboard');
-
-var _dashboard2 = _interopRequireDefault(_dashboard);
-
 var _server = require('./server');
-
-var _deepstream = require('./deepstream');
-
-var _deepstream2 = _interopRequireDefault(_deepstream);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var defaultServerSettings = exports.defaultServerSettings = _server.defaultSettings;
 
 function dashboard(params) {
   var context = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-  var dashboard = new _dashboard2.default(params, context);
+  var Dashboard = require('./dashboard').Dashboard;
+  var proc = new Dashboard(params, context);
 
-  dashboard.start();
+  proc.start();
 
-  return dashboard;
+  return proc;
 }
 
 function deepstream() {
   var params = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
   var context = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-  var deepstream = new _deepstream2.default(params, context);
+  var Deepstream = require('./deepstream').Deepstream;
+  var proc = new Deepstream(params, context);
 
-  deepstream.start();
+  proc.start();
 
-  return deepstream;
+  return proc;
 }
 
 function server() {
   var params = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
   var context = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-  var server = new _server.Server(params, context);
+  var Server = require('./proc').Server;
+  var proc = new Server(params, context);
 
-  server.start();
+  proc.start();
 
-  return server;
+  return proc;
 }
