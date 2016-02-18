@@ -4,29 +4,35 @@ var yargs = require('yargs'),
 
 var loader;
 
-if (argv.devMode || process.env.SKYPAGER_ENV == 'dev') {
-  require('babel-register')({
-    presets:['skypager']
-  })
-
-  loader = require('./src/boot')
-} else {
-  loader = require('./lib/boot')
+if (process.argv && process.argv[0] === 'electron') {
+  bootApp()
 }
 
-var skypagerMain = loader.enter({
-    project: yargs.argv.project || process.env.PWD,
-    argv: argv,
-    command: argv._
-  });
+function bootApp() {
+  if (argv.devMode || process.env.SKYPAGER_ENV == 'dev') {
+    require('babel-register')({
+      presets:['skypager']
+    })
 
-if (yargs.argv.interactive) {
-  var server = require('repl').start({
-    prompt: 'skypager-'.magenta + 'electron'.yellow + ' ' + ':'.white + '> ',
-    input: process.stdin,
-    output: process.stdout
-  })
+    loader = require('./src/boot')
+  } else {
+    loader = require('./lib/boot')
+  }
 
-  server.context.project = skypagerMain.project
-  server.context.app = skypagerMain
+  var skypagerMain = loader.enter({
+      project: yargs.argv.project || process.env.PWD,
+      argv: argv,
+      command: argv._
+    });
+
+  if (yargs.argv.interactive) {
+    var server = require('repl').start({
+      prompt: 'skypager-'.magenta + 'electron'.yellow + ' ' + ':'.white + '> ',
+      input: process.stdin,
+      output: process.stdout
+    })
+
+    server.context.project = skypagerMain.project
+    server.context.app = skypagerMain
+  }
 }
