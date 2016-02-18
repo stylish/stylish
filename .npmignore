@@ -1,5 +1,9 @@
-skypager/
-skypager-core/
-skypager-author/
+projects/
+experiments/
+.env
+legacy/
+settings/*.yml
+data/
 docs/
-app/
+log/
+public/
