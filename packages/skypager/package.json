@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "1.37.0",
+  "version": "1.38.1",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
   "bin": {
@@ -85,7 +85,7 @@
     "mocha": "^2.3.4"
   },
   "optionalDependencies": {
-     "skypager-devpack": "^1.36.10",
-     "skypager-server": "^1.36.7"
+    "skypager-devpack": "^1.36.10",
+    "skypager-server": "^1.36.7"
   }
 }

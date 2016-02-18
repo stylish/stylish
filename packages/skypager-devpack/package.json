@@ -1,6 +1,6 @@
 {
   "name": "skypager-devpack",
-  "version": "1.37.0",
+  "version": "1.38.1",
   "description": "configurable webpack dev server and build tool so you don't have to",
   "main": "index.js",
   "dependencies": {
@@ -37,7 +37,7 @@
     "redux-actions": "^0.9.1",
     "redux-simple-router": "^2.0.4",
     "redux-thunk": "^1.0.3",
-    "skypager-themes": "^1.34.0",
+    "skypager-themes": "^1.38.1",
     "stats-webpack-plugin": "^0.3.0",
     "style-loader": "^0.13.0",
     "surge": "^0.17.7",
@@ -68,6 +68,6 @@
   },
   "homepage": "https://github.com/skypager/superdevpack#readme",
   "devDependencies": {
-    "skypager": "^1.36.7"
+    "skypager": "^1.38.1"
   }
 }

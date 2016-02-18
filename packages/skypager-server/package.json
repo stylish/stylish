@@ -1,7 +1,7 @@
 {
   "name": "skypager-server",
   "description": "skypager project server",
-  "version": "1.36.7",
+  "version": "1.38.1",
   "main": "index.js",
   "scripts": {
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
@@ -17,8 +17,8 @@
   },
   "license": "UNLICENSED",
   "repository": {
-     "type": "git",
-     "url": "https://github.com/architects/skypager-central"
+    "type": "git",
+    "url": "https://github.com/architects/skypager-central"
   },
   "dependencies": {
     "blessed": "^0.1.81",
@@ -37,7 +37,7 @@
   "devDependencies": {
     "babel-preset-skypager": "^1.34.0",
     "mocha": "^2.3.4",
-    "skypager": "^1.36.6",
+    "skypager": "^1.38.1",
     "should": "^8.2.2"
   }
 }

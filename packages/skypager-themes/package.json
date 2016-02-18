@@ -1,7 +1,7 @@
 {
   "name": "skypager-themes",
   "description": "manage a library of themes to use with skypager projects. variables for the themes can be configured via an external yaml file.",
-  "version": "1.37.0",
+  "version": "1.38.1",
   "main": "index.js",
   "loader": "index.loader.js",
   "skypager": {
