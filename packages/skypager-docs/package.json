@@ -1,6 +1,6 @@
 {
   "name": "skypager-docs",
-  "version": "1.0.0",
+  "version": "1.38.2",
   "skypager": {
     "main": "skypager.js",
     "plugins": []
