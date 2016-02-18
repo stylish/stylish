@@ -146,13 +146,14 @@ class Bundle {
     let settings = project.settings || {}
     let app = settings.app || {}
 
-    props.entryPoints = assign(app.entryPoints || {}, props.entryPoints || {})
+    props.entryPoints = assign({}, app.entryPoints || {}, props.entryPoints || {})
 
     let entryPaths = keys(props.entryPoints)
 
-    if (entryPaths.length < 1) {
+    /*
+      if (entryPaths.length < 1) {
       throw('Invalid Application Settings; missing an entry point')
-    }
+    }*/
 
     entryPaths.forEach(path => {
       let cfg = props.entryPoints[path]

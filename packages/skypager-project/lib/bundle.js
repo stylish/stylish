@@ -183,13 +183,14 @@ module.exports = (function () {
       var settings = project.settings || {};
       var app = settings.app || {};
 
-      props.entryPoints = assign(app.entryPoints || {}, props.entryPoints || {});
+      props.entryPoints = assign({}, app.entryPoints || {}, props.entryPoints || {});
 
       var entryPaths = keys(props.entryPoints);
 
-      if (entryPaths.length < 1) {
-        throw 'Invalid Application Settings; missing an entry point';
-      }
+      /*
+        if (entryPaths.length < 1) {
+        throw('Invalid Application Settings; missing an entry point')
+      }*/
 
       entryPaths.forEach(function (path) {
         var cfg = props.entryPoints[path];

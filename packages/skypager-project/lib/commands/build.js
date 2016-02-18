@@ -40,11 +40,7 @@ function handle(preset) {
   }
 
   options.preset = preset || options.preset;
-  options.theme = options.theme || project.options.theme;
-
-  if (!options.theme && !options.skipTheme) {
-    console.log('Are you sure you want to run without a theme?'.yellow);
-  }
+  options.theme = options.theme || project.get('settings.branding.theme') || project.get('settings.style.theme') || project.options.theme || 'marketing';
 
   process.env.NODE_ENV = 'production';
 

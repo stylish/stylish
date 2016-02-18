@@ -96,7 +96,7 @@ function ProjectExporter() {
     });
   }
 
-  var lines = ['var bundle = module.exports = {};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.assets = require(\'./assets-export.json\');', 'bundle.models = require(\'./models-export.json\');', 'bundle.settings = require(\'./settings-export.json\');', '\n    bundle.requireContexts = {\n      scripts: require.context(\'' + project.scripts.paths.absolute + '\', true, /.js$/i),\n      stylesheets: require.context(\'' + project.stylesheets.paths.absolute + '\', true, /..*ss$/i)\n    };\n    bundle.content = {}'];
+  var lines = [contextPolyfill(), 'var bundle = module.exports = {};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.assets = require(\'./assets-export.json\');', 'bundle.models = require(\'./models-export.json\');', 'bundle.settings = require(\'./settings-export.json\');', '\n    bundle.requireContexts = {\n      scripts: require.context(\'' + project.scripts.paths.absolute + '\', true, /.js$/i),\n      stylesheets: require.context(\'' + project.stylesheets.paths.absolute + '\', true, /..*ss$/i)\n    };\n    bundle.content = {}'];
 
   keys(project.content).forEach(function (key) {
     lines.push('var _' + key + ' = bundle.content.' + key + ' = {};');
@@ -144,3 +144,8 @@ function generateRequireContexts(project) {}
 
 var _Object = Object;
 var keys = _Object.keys;
+
+function contextPolyfill() {
+  return;
+  'if (typeof require.context === \'undefined\') {\n  require.context = function(){\n    return {\n      keys:function(){ return [] },\n      req:function(){}\n    }\n  }\n}';
+}

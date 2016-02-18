@@ -64,7 +64,6 @@ const IncludeExporters = ['assets', 'entities', 'project', 'models', 'settings' 
 export function ProjectExporter (options = {}, callback) {
   let project = options.project
 
-
   if (options.runIncluded !== false) {
     IncludeExporters.forEach(exporter =>
       runAndSave(project, exporter, options)
@@ -72,6 +71,7 @@ export function ProjectExporter (options = {}, callback) {
   }
 
   let lines = [
+    contextPolyfill(),
     `var bundle = module.exports = {};`,
     `bundle.project = require('./project-export.json');`,
     `bundle.entities = require('./entities-export.json');`,
@@ -131,3 +131,15 @@ function generateRequireContexts (project) {
 }
 
 const { keys } = Object
+
+function contextPolyfill(){
+return
+`if (typeof require.context === 'undefined') {
+  require.context = function(){
+    return {
+      keys:function(){ return [] },
+      req:function(){}
+    }
+  }
+}`
+}

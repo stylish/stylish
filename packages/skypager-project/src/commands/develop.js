@@ -76,7 +76,11 @@ export function launchWatcher(options, context) {
   shell.exec(`${ bundleCommand } --clean`)
 
   console.log('Launching project bundler'.yellow)
-  var proc = shell.exec(`chokidar './{data,docs}/**/*.*' --silent --ignore --debounce 1200 -c '${ bundleCommand }'`, {async: true})
+  var proc = shell.exec(`chokidar './{data,docs,settings,src}/**/*.*' --silent --ignore --debounce 1200 -c '${ bundleCommand }'`, {async: true})
+
+  proc.on('error', (err) => {
+    console.log('Error launching the bundler watch command', error)
+  })
 
   proc.stdout.on('data', (data) => {
     if(!options.silent) {
@@ -105,7 +109,7 @@ export function launchServer (preset, options = {}, context = {}) {
   }
 
   options.entry = options.entry || project.options.entry || './src'
-  options.theme = options.theme || project.options.theme || 'marketing'
+  options.theme = options.theme || project.get('settings.branding.theme') || project.get('settings.style.theme') || project.options.theme || 'marketing'
 
   options.staticAssets = options.staticAssets || project.options.staticAssets || {}
 
