@@ -7,7 +7,9 @@ var launch
 
 if (process.env.SKYPAGER_ENV == 'development') {
   require('babel-register')({
-    presets:['skypager']
+    presets:[
+      require('babel-preset-skypager')
+    ]
   })
 
 	process.env.SKYPAGER_ENV = 'development'

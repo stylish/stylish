@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "2.0.0-alpha0",
+  "version": "2.0.1-beta1",
   "description": "skypager: cloud publishing framework",
   "skypager": {
     "main": "skypager.js",
@@ -10,19 +10,17 @@
     ]
   },
   "scripts": {
-    "test": "skypager run:package:script test",
-    "prerelease": "npm run test",
-    "version": "skypager run:package:script version",
-    "postversion": "git push && git push --tags"
+    "test": "skypager run:package:script test"
   },
   "main": "app.js",
   "dependencies": {
-    "skypager-project": "^1.38.2",
-    "skypager-devpack": "^1.38.1",
-    "skypager-electron": "^1.38.1",
-    "skypager-plugin-blueprints": "^1.38.1",
-    "skypager-server": "^1.38.1",
-    "skypager-themes": "^1.38.1"
+    "babel-preset-skypager": "^2.0.0-beta1",
+    "skypager-project": "^2.0.0-beta1",
+    "skypager-devpack": "^2.0.0-beta1",
+    "skypager-electron": "^2.0.0-beta1",
+    "skypager-plugin-blueprints": "^2.0.0-beta1",
+    "skypager-server": "^2.0.0-beta1",
+    "skypager-themes": "^2.0.0-beta1"
   },
   "devDependencies": {
     "babel-preset-react-hmre": "^1.1.0",
