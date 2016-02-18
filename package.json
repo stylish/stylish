@@ -1,11 +1,7 @@
 {
-  "name": "skypager-central",
-  "version": "1.38.2",
-  "private": "true",
-  "description": "development base for the skypager portfolio",
-  "bin": {
-    "skypager-live": "./packages/skypager/bin/cli.js"
-  },
+  "name": "skypager",
+  "version": "2.0.0-alpha0",
+  "description": "skypager: cloud publishing framework",
   "skypager": {
     "main": "skypager.js",
     "theme": "dashboard",
@@ -21,22 +17,21 @@
   },
   "main": "app.js",
   "dependencies": {
-    "skypager": "^1.38.2",
-    "skypager-devpack": "^1.38.2",
-    "skypager-electron": "^1.38.2",
-    "skypager-plugin-blueprints": "^1.38.2",
-    "skypager-server": "^1.38.2",
-    "skypager-themes": "^1.38.2"
+    "skypager-project": "^1.38.2",
+    "skypager-devpack": "^1.38.1",
+    "skypager-electron": "^1.38.1",
+    "skypager-plugin-blueprints": "^1.38.1",
+    "skypager-server": "^1.38.1",
+    "skypager-themes": "^1.38.1"
   },
   "devDependencies": {
     "babel-preset-react-hmre": "^1.1.0",
-    "babel-preset-skypager": "^1.38.2",
     "lerna": "^1.1.1"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/architects/skypager-central.git"
+    "url": "git+ssh://git@github.com/skypager/skypager.git"
   },
-  "author": "Jonathan Soeder <jon@architects.io>",
-  "license": "UNLICENSED"
+  "author": "Jonathan Soeder <jon@chicago.com",
+  "license": "SEE LICENSE IN License.md"
 }

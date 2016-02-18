@@ -1,0 +1,3 @@
+describe("Inspiration", function(model){
+
+})
