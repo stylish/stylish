@@ -3,6 +3,9 @@
   "version": "1.38.2",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
+  "bin":{
+    "skypager": "./bin/cli.js"
+  },
   "scripts": {
     "test:bundle:export": "skypager export bundle --clean",
     "test:bundle:compile": "skypager build --webpack-config test/webpack.bundle.config.js > /dev/null",
