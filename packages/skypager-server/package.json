@@ -24,7 +24,7 @@
     "blessed": "^0.1.81",
     "colorz": "^0.1.9",
     "deepstream.io": ">= 0.7.1",
-    "deepstream.io-cache-redis": ">= 0.2.5",
+    "deepstream.io-cache-redis": "github:arxpoetica/deepstream.io-cache-redis",
     "deepstream.io-client-js": "^0.3.8",
     "deepstream.io-msg-redis": ">= 0.2.7",
     "hiredis": ">= 0.4.1",
