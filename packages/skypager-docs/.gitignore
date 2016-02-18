@@ -1,4 +1,0 @@
-logs/**/*.log
-tmp/cache
-.DS_Store
-.env
