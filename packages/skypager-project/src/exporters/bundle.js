@@ -95,7 +95,7 @@ export function ProjectExporter (options = {}, callback) {
     })
   })
 
-  lines.push(`module.exports = require('skypager/lib/bundle').create(bundle)`)
+  lines.push(`module.exports = require('skypager-project/lib/bundle').create(bundle)`)
 
   return write(
     project.path('build','bundle','index.js'), lines.join("\n")
