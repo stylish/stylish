@@ -5,7 +5,7 @@ var yargs = require('yargs'),
 
 var launch
 
-if (argv.devMode || process.env.SKYPAGER_ENV == 'development') {
+if (process.env.SKYPAGER_ENV == 'development') {
   require('babel-register')({
     presets:['skypager']
   })
