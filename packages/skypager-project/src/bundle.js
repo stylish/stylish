@@ -160,21 +160,24 @@ class Bundle {
 
       if (typeof cfg === 'string') {
         cfg = props.entryPoints[path] = {
-          component: project.requireEntryPoint(cfg)
+          component: project.requireEntryPoint(
+            cfg.replace(/^entries\//,'')
+          )
         }
       }
 
       if (typeof cfg === 'object' && typeof cfg.component === 'string') {
-         cfg.component = project.requireEntryPoint(cfg.component)
+         cfg.component = project.requireEntryPoint(cfg.component.replace(/^entries\//,''))
+      } else if (typeof cfg === 'object' && cfg.index && typeof cfg.index === 'string') {
+         cfg.component = project.requireEntryPoint(cfg.index.replace(/^entries\//,''))
+      } else if (typeof cfg === 'object' && cfg.index && typeof cfg.index === 'object') {
+         cfg.component = project.requireEntryPoint(cfg.index.component.replace(/^entries\//,''))
+      } else if (typeof cfg === 'function') {
+        cfg = {
+          component: cfg
+        }
       }
 
-      if (typeof cfg === 'object' && cfg.index && typeof cfg.index === 'string') {
-         cfg.index = project.requireEntryPoint(cfg.index)
-      }
-
-      if (typeof cfg === 'object' && cfg.index && typeof cfg.index === 'object') {
-         cfg.index.component = project.requireEntryPoint(cfg.index.component)
-      }
 
     })
 

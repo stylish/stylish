@@ -1,6 +1,7 @@
 import { PropTypes as types } from 'react'
 import { connect } from 'react-redux'
-import { pick } from 'lodash'
+
+import get from 'lodash/get'
 
 export default stateful
 
@@ -13,7 +14,13 @@ export function stateful (component, ...args) {
   component.contextTypes.project = types.object.isRequired
 
   function  mapSelectedProps (state) {
-    return pick(state, ...stateProps)
+    return stateProps.reduce((memo,prop) => {
+      let p = prop.split('.')
+      let propName = p[ p.length - 1 ]
+      memo[propName] = get(state, prop)
+
+      return memo
+    }, {})
   }
 
   if (stateProps && stateProps.length > 0) {

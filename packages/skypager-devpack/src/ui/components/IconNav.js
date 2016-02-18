@@ -11,7 +11,7 @@ export class IconNav extends React.Component {
   static displayName = 'IconNav';
 
   static propTypes = {
-    brandIcon: types.string.isRequired,
+    brandIcon: types.string,
     brandStyle: types.string,
     links: types.arrayOf(types.shape({
       link: types.string.isRequired,
@@ -21,11 +21,10 @@ export class IconNav extends React.Component {
   };
 
   render () {
-    const { brandIcon, brandStyle } = this.props
+    const { brandStyle, brandIcon } = this.props
 
     const links = (this.props.links || []).map((link,index) => {
       let active = false
-
 
       return (
         <li key={index} className={active ? 'active' : undefined}>

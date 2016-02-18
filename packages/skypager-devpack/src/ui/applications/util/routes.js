@@ -1,3 +1,5 @@
+import isEmpty from 'lodash/isEmpty'
+
 import { createRoutes as create } from 'react-router'
 
 export default routes
@@ -11,8 +13,15 @@ export function routes(component, options = {}) {
   const { entryPoints } = options
   const root = { path: "/", component, childRoutes:[] }
 
+  if (entryPoints['/']) {
+    entryPoints.index = entryPoints['/']
+    delete(entryPoints['/'])
+  }
+
   if (entryPoints.index) {
-    root.indexRoute = entryPoints.index
+    root.indexRoute = entryPoints.index.component
+      ? entryPoints.index.component
+      : { component: entryPoints.index }
   }
 
   let childRoutes = keys(entryPoints)

@@ -1,23 +1,33 @@
 import React, { Component, PropTypes as types } from 'react'
+import FluidLayout from 'ui/layouts/FluidLayout'
 import IconNavLayout from 'ui/layouts/IconNavLayout'
 
-import project from 'dist/bundle'
+import stateful from '../applications/util/stateful'
 
-export class MainLayout extends Component {
-  static displayName = 'MainLayout';
+import pick from 'lodash/pick'
+
+export class DefaultLayout extends Component {
+  static displayName = 'DefaultLayout';
 
   render () {
-    const settings = project.settings
-    const {branding, navigation} = settings
+    const { settings } = this.props
 
-    console.log(settings)
+    const { branding, navigation, app } = settings
 
-    return (
-      <IconNavLayout wide brandIcon={branding.icon} links={navigation.links}>
-        {this.props.children}
-      </IconNavLayout>
+    const layoutComponent = IconNavLayout
+
+    const layoutProps = {
+      ...(settings.layout || {}),
+      branding,
+      navigation
+    }
+
+    return React.createElement(
+      layoutComponent,
+      layoutProps,
+      this.props.children
     )
   }
 }
 
-export default MainLayout
+export default stateful(DefaultLayout, 'settings')

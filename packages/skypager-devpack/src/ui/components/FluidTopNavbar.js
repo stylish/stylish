@@ -1,13 +1,40 @@
-import React from 'react'
+import React, { Component, PropTypes as types } from 'react'
 import BodyClassName from 'react-body-classname'
 import classnames from 'classnames'
 
 import { Link } from 'react-router'
 import Icon from './Icon'
 
-export class FluidTopNavbar extends React.Component {
+export class FluidTopNavbar extends Component {
+  static displayName = 'FluidTopNavbar';
+
+  static propTypes = {
+    searchForm: types.node,
+
+    links: types.arrayOf(types.shape({
+      label: types.string,
+      link: types.string
+    })),
+
+    branding: types.shape({
+      icon: types.string,
+      brand: types.string
+    })
+  }
+
   render () {
     const classes = classnames({'fluid-layout': true, 'with-top-navbar': true})
+
+    const { searchForm, branding, links } = this.props
+
+    const navLinks = links.map((item, key) => {
+      const active = item.link
+      return (
+        <li key={key} className={active}>
+          <Link to={item.link}>{item.label}</Link>
+        </li>
+      )
+    })
 
     return (
       <BodyClassName className={classes}>
@@ -21,30 +48,21 @@ export class FluidTopNavbar extends React.Component {
                 <span className='icon-bar'></span>
               </button>
               <Link className='navbar-brand navbar-brand-emphasized' to='/'>
-                <Icon className='navbar-brand-icon' icon='leaf' />
-                Dashboard
+                <Icon className='navbar-brand-icon' icon={branding.icon} />
+                { branding.brand }
               </Link>
             </div>
             <div id='navbar' className='navbar-collapse collapse'>
               <ul className='nav navbar-nav'>
-                {this.props.children}
+                { navLinks }
               </ul>
-              <form className='form-inline navbar-form navbar-right'>
-                <div className='input-with-icon'>
-                  <input className='form-control' type='text' placeholder='Search...' />
-                  <span className='icon icon-magnifying-glass'></span>
-                </div>
-              </form>
+              { searchForm }
             </div>
           </div>
         </nav>
       </BodyClassName>
     )
   }
-}
-
-FluidTopNavbar.propTypes = {
-  children: React.PropTypes.array
 }
 
 export default FluidTopNavbar

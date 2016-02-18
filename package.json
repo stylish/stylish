@@ -12,11 +12,11 @@
   "scripts": {
     "test": "skypager run:package:script test"
   },
-  "main": "app.js",
+  "main": "index.js",
   "dependencies": {
     "babel-preset-skypager": "^2.1.0-beta1",
     "skypager-project": "^2.1.0-beta1",
-    "skypager-devpack": "^2.1.0-beta1",
+    "skypager-devpack": "^2.1.1-beta1",
     "skypager-electron": "^2.1.0-beta1",
     "skypager-plugin-blueprints": "^2.1.0-beta1",
     "skypager-server": "^2.1.0-beta1",

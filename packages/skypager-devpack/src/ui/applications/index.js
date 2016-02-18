@@ -6,6 +6,7 @@ import { stateful } from './util/stateful'
 const application = {
   Application,
   LockedApplication,
+  stateful,
   util: {
     stateful
   }
