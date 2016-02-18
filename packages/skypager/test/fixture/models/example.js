@@ -1,3 +1,0 @@
-describe("Example", function(model){
-
-})

@@ -1,3 +1,0 @@
-describe("Changelog", function(model){
-
-})
