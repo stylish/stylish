@@ -1,6 +1,6 @@
 {
   "name": "skypager-devpack",
-  "version": "2.1.0-beta1",
+  "version": "2.1.1-beta1",
   "description": "configurable webpack dev server and build tool so you don't have to",
   "main": "index.js",
   "dependencies": {
@@ -47,7 +47,7 @@
     "webpack-hot-middleware": "^2.6.0"
   },
   "peerDependencies":{
-    "skypager-themes": "^2.0.0-beta1"
+    "skypager-themes": "^2.1.0-beta1"
   },
   "scripts": {
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
