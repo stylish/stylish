@@ -1,6 +1,8 @@
 import yargs from 'yargs'
 import get from 'lodash/get'
 
+import { handle as handleWebpack } from './develop'
+
 export function serve (program, dispatch) {
   program
     .command('serve [profile]')
@@ -39,13 +41,9 @@ export function handle(arg, options = {}, context = {}) {
   if (rawArg === 'deepstream') {
     require('skypager-server').deepstream({ profile, env }, {project, argv})
   } else if (rawArg === 'webpack') {
+    let opts = get(serverSettings, `${profile}.${env}.webpack`) || {}
 
-    if (!isDevpackInstalled()) {
-     console.log('This command requires the skypager-devpack package'.red)
-     process.exit(1)
-    }
-
-    devpack('develop', profile, env, project, get(serverSettings, `${profile}.${env}.webpack`) || {})
+    handleWebpack(profile, opts, context)
   } else {
     server({profile, env, dashboard}, {project, argv})
   }

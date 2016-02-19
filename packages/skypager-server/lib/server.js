@@ -21,21 +21,23 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
+var _path = require('path');
+
+var _fs = require('fs');
+
 var _lodash = require('lodash');
 
 var _util = require('./util.js');
-
-var _path = require('path');
 
 var _mkdirp = require('mkdirp');
 
 var _mkdirp2 = _interopRequireDefault(_mkdirp);
 
-var _fs = require('fs');
-
 var _winston = require('winston');
 
 var _winston2 = _interopRequireDefault(_winston);
+
+var _express = require('./server/express');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -96,6 +98,8 @@ var Server = exports.Server = (function () {
   }, {
     key: 'listen',
     value: function listen() {
+      var _this = this;
+
       var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
       (0, _lodash.defaultsDeep)(options, {
@@ -103,13 +107,25 @@ var Server = exports.Server = (function () {
         host: this.config.host || '0.0.0.0'
       });
 
+      var app = (0, _express.express)(this, options);
+
       var host = options.host;
       var port = options.port;
+
+      this.log('info', 'express app starting', options);
+
+      app.listen(port, host, function (err) {
+        if (err) {
+          _this.log('error', 'error launching espress', {
+            err: err
+          });
+        }
+      });
     }
   }, {
     key: 'run',
     value: function run() {
-      var _this = this;
+      var _this2 = this;
 
       var updateProcess = this.updateProcess.bind(this);
 
@@ -127,7 +143,7 @@ var Server = exports.Server = (function () {
         });
 
         (0, _util.spawn)(proc.cmd, opts).progress(function (child) {
-          _this._processes[proc.name] = child;
+          _this2._processes[proc.name] = child;
 
           child.title = 'skypager-server: ' + proc.name;
 
@@ -149,7 +165,7 @@ var Server = exports.Server = (function () {
       });
 
       process.on('exit', function () {
-        (0, _lodash.values)(_this._processes).forEach(function (proc) {
+        (0, _lodash.values)(_this2._processes).forEach(function (proc) {
           if (proc) {
             proc.kill();
           }
@@ -160,27 +176,27 @@ var Server = exports.Server = (function () {
 
       process.title = 'skypager-server';
     }
+
+    /**
+    * The output on stdout for each of the processes we spawn will be streamed
+    * to a log file. The dashboard can stream this for visual purposes, or it can
+    * be analyzed elsewhere.
+    */
+
   }, {
     key: 'prepare',
     value: function prepare() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.eachProcess(function (proc) {
-        if (!proc) {
-          return;
-        }
-        (0, _util.defineProp)(proc, 'output', stream(_this2.logPath(proc.name + '.' + _this2.env + '.log')));
+        (0, _util.defineProp)(proc, 'output', stream(_this3.logPath(proc.name + '.' + _this3.env + '.log')));
         proc.output.open();
       });
     }
   }, {
     key: 'eachProcess',
     value: function eachProcess(fn) {
-      (0, _lodash.values)(this.processes).forEach(function (proc, index) {
-        if (proc) {
-          fn(proc, index);
-        } else {}
-      });
+      (0, _lodash.values)(this.processes).forEach(fn);
     }
   }, {
     key: 'updateProcess',

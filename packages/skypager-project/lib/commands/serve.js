@@ -19,6 +19,8 @@ var _get = require('lodash/get');
 
 var _get2 = _interopRequireDefault(_get);
 
+var _develop = require('./develop');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function serve(program, dispatch) {
@@ -62,13 +64,9 @@ function handle(arg) {
   if (rawArg === 'deepstream') {
     require('skypager-server').deepstream({ profile: profile, env: env }, { project: project, argv: argv });
   } else if (rawArg === 'webpack') {
+    var opts = (0, _get2.default)(serverSettings, profile + '.' + env + '.webpack') || {};
 
-    if (!isDevpackInstalled()) {
-      console.log('This command requires the skypager-devpack package'.red);
-      process.exit(1);
-    }
-
-    devpack('develop', profile, env, project, (0, _get2.default)(serverSettings, profile + '.' + env + '.webpack') || {});
+    (0, _develop.handle)(profile, opts, context);
   } else {
     server({ profile: profile, env: env, dashboard: dashboard }, { project: project, argv: argv });
   }

@@ -21,6 +21,10 @@ var _httpProxyMiddleware = require('http-proxy-middleware');
 
 var _httpProxyMiddleware2 = _interopRequireDefault(_httpProxyMiddleware);
 
+var _defaults = require('lodash/defaults');
+
+var _defaults2 = _interopRequireDefault(_defaults);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function express(server) {
@@ -29,14 +33,22 @@ function express(server) {
   var app = (0, _express3.default)();
   var config = server.config;
 
-  if (config.deepstream) {
-    setupDeepstreamProxy(app, config.deepstream, server);
+  if (!config) {
+    throw 'no config';
   }
 
-  app.use(express.static(server.paths.public));
+  if (config.deepstream) {
+    setupDeepstreamProxy(app, (0, _defaults2.default)({}, config.deepstream, {
+      path: '/engine.io',
+      port: 6020,
+      host: '0.0.0.0'
+    }), server);
+  }
+
+  app.use(_express3.default.static(server.paths.public));
 
   if (config.api) {
-    setupExpressAPI(app, config.api, server);
+    setupExpressAPI(app, (0, _defaults2.default)({}, config.api, {}), server);
   }
 
   if (config.webpack) {
@@ -49,6 +61,8 @@ function express(server) {
 exports.default = express;
 
 function setupWebpackProxy(app, _ref) {
+  var _ref$path = _ref.path;
+  var path = _ref$path === undefined ? '/' : _ref$path;
   var _ref$host = _ref.host;
   var host = _ref$host === undefined ? 'localhost' : _ref$host;
   var _ref$port = _ref.port;
@@ -56,24 +70,25 @@ function setupWebpackProxy(app, _ref) {
   var _ref$proto = _ref.proto;
   var proto = _ref$proto === undefined ? 'http' : _ref$proto;
 
-  var target = proto + '://' + config.host + ':' + config.port;
+  var target = proto + '://' + host + ':' + port;
 
-  app.use((0, _httpProxyMiddleware2.default)('/', {
+  app.use((0, _httpProxyMiddleware2.default)(path, {
     target: target,
     ws: true
   }));
 }
 
 function setupDeepstreamProxy(app, _ref2) {
+  var _ref2$path = _ref2.path;
+  var path = _ref2$path === undefined ? '/engine.io' : _ref2$path;
   var host = _ref2.host;
   var port = _ref2.port;
   var _ref2$proto = _ref2.proto;
   var proto = _ref2$proto === undefined ? 'http' : _ref2$proto;
 
-  var root = config.path || '/engine.io';
-  var target = proto + '://' + config.host + ':' + config.port;
+  var target = proto + '://' + host + ':' + port;
 
-  app.use(proxyMiddlware(root, {
+  app.use((0, _httpProxyMiddleware2.default)(path, {
     target: target,
     ws: true
   }));

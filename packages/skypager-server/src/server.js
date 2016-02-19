@@ -1,10 +1,14 @@
-import { pick, set, values, mapValues, get, defaultsDeep as defaults } from 'lodash'
-import { defineProp, colorize, spawn } from './util.js'
 import { join, resolve, dirname } from 'path'
-import mkdirp from 'mkdirp'
 import { createWriteStream as writeable, createReadStream as readable, openSync, existsSync as exists } from 'fs'
 
+import { pick, set, values, mapValues, get, defaultsDeep as defaults } from 'lodash'
+import { defineProp, colorize, spawn } from './util.js'
+
+import mkdirp from 'mkdirp'
+
 import winston from 'winston'
+
+import { express } from './server/express'
 
 export class Server {
   constructor(params = {}, context = {}) {
@@ -58,7 +62,19 @@ export class Server {
       host: this.config.host || '0.0.0.0'
     })
 
+    let app = express(this, options)
+
     let {host, port} = options
+
+    this.log('info', 'express app starting', options)
+
+    app.listen(port, host, (err) => {
+      if(err) {
+        this.log('error', 'error launching espress', {
+          err
+        })
+      }
+    })
   }
 
   run () {
@@ -119,21 +135,20 @@ export class Server {
     process.title = 'skypager-server'
   }
 
+  /**
+  * The output on stdout for each of the processes we spawn will be streamed
+  * to a log file. The dashboard can stream this for visual purposes, or it can
+  * be analyzed elsewhere.
+  */
   prepare() {
     this.eachProcess((proc) => {
-      if(!proc) { return }
       defineProp(proc, 'output', stream(this.logPath(`${ proc.name }.${ this.env }.log`)))
       proc.output.open()
     })
   }
 
   eachProcess(fn) {
-    values(this.processes).forEach((proc, index) => {
-      if(proc) {
-        fn(proc, index)
-      } else {
-      }
-    })
+    values(this.processes).forEach(fn)
   }
 
   updateProcess(name, data = {}) {

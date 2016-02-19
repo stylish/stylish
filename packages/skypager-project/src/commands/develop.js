@@ -115,7 +115,7 @@ export function launchServer (preset, options = {}, context = {}) {
 
   console.log(`Launching server with entry`.cyan + ` ${ options.entry }`.white)
 
-  process.env.NODE_ENV = 'development'
+  process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
   function onCompile(err, stats) {
     project.debug('skypager:afterDevCompile', {

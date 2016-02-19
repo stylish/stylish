@@ -2,25 +2,46 @@ import _express from 'express'
 import winston from 'winston'
 import expressWinston from 'express-winston'
 import proxyMiddleware from 'http-proxy-middleware'
+import defaults from 'lodash/defaults'
 
 export function express(server, options = {}) {
   const app = _express()
   const config = server.config
 
+  if(!config) {
+    throw('no config')
+  }
+
   if (config.deepstream) {
-    setupDeepstreamProxy(app, config.deepstream, server)
+    setupDeepstreamProxy(
+      app,
+      defaults({}, config.deepstream,{
+        path: '/engine.io',
+        port: 6020,
+        host: '0.0.0.0'
+      }),
+      server
+    )
   }
 
   app.use(
-    express.static(server.paths.public)
+    _express.static(server.paths.public)
   )
 
   if (config.api) {
-    setupExpressAPI(app, config.api, server)
+    setupExpressAPI(
+      app,
+      defaults({}, config.api,{ }),
+      server
+    )
   }
 
   if (config.webpack) {
-     setupWebpackProxy(app, config.webpack, server)
+     setupWebpackProxy(
+       app,
+       config.webpack,
+       server
+     )
   }
 
   return app
@@ -28,23 +49,22 @@ export function express(server, options = {}) {
 
 export default express
 
-function setupWebpackProxy(app, { host = 'localhost', port=3000, proto='http' }){
-  let target = `${proto}://${ config.host }:${ config.port }`
+function setupWebpackProxy(app, { path='/', host = 'localhost', port=3000, proto='http' }){
+  let target = `${proto}://${ host }:${ port }`
 
   app.use(
-    proxyMiddleware('/', {
+    proxyMiddleware(path, {
       target,
       ws: true
     })
   )
 }
 
-function setupDeepstreamProxy(app, { host, port, proto='http' }) {
-  let root = config.path || '/engine.io'
-  let target = `${proto}://${ config.host }:${ config.port }`
+function setupDeepstreamProxy(app, { path='/engine.io', host, port, proto='http' }) {
+  let target = `${proto}://${ host }:${ port }`
 
   app.use(
-    proxyMiddlware(root, {
+    proxyMiddleware(path, {
       target,
       ws: true
     })
