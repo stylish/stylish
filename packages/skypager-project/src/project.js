@@ -8,12 +8,12 @@ import resolver from './resolver'
 import * as Helpers from './helpers'
 import * as Assets from './assets'
 import * as util from './util'
+import logger from './logger'
 
 import { resolve, dirname, join, basename, extname } from 'path'
 
-import _debug from 'debug'
+import mapValues from 'lodash/mapValues'
 
-const debug = _debug('skypager:project')
 const hide = util.hide.getter
 const lazy = util.lazy
 
@@ -29,9 +29,6 @@ const HOOKS = [
 
 class Project {
   constructor (uri, options = {}) {
-    debug('project created at: ' + uri)
-    debug('Option keys: ' + Object.keys(options))
-
     uri.should.be.a.String()
     uri.should.not.be.empty()
 
@@ -50,14 +47,19 @@ class Project {
       value: options.manifest || {}
     })
 
+    project.name = options.name || basename(project.root)
+
     // autobind hooks functions passed in as options
     project.hidden('hooks', setupHooks.call(project, options.hooks))
 
     project.hidden('paths', paths.bind(project))
 
+    project.env = options.env || process.env.NODE_ENV || 'development'
+
+    logger(project, options)
+
     project.hidden('registries', registries.call(project), false)
 
-    project.name = options.name || basename(project.root)
 
     const plugins = [ ]
     util.hide.getter(project, 'enabledPlugins', () => plugins)
@@ -80,7 +82,7 @@ class Project {
     project.emit('contentDidInitialize')
 
     if (options.autoImport !== false) {
-      debug('running autoimport', options.autoLoad)
+      project.debug('running autoimport', options.autoLoad)
 
       project.emit('projectWillAutoImport')
 
@@ -103,11 +105,11 @@ class Project {
       configurable: true,
       get: function () {
         delete project.entities
-        debug('building entities')
-
         project.emit('willBuildEntities')
         project.entities = entities.call(project)
         project.emit('didBuildEntities', project, project.entities)
+
+        project.debug('built entities', Object.keys(project.entities))
 
         return project.entities
       }
@@ -464,9 +466,9 @@ function runImporter (options = {}) {
   let collections = project.collections
   let { autoLoad, importer } = options
 
-  debug('import starting')
+  project.logger.profile('import starting')
   let result = project.importers.run(importer || 'disk', { project: this, collections: this.content, autoLoad })
-  debug('import finishing')
+  project.logger.profile('import finishing')
 
   return result
 }

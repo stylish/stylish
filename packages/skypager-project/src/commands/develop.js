@@ -2,7 +2,7 @@ import { join, resolve, dirname } from 'path'
 
 import shell from 'shelljs'
 import util from '../util'
-import pick from 'lodash/object/pick'
+import pick from 'lodash/pick'
 
 /**
  * This is a low level wrapper around webpack dev server and how we use it to build react / bootstrap / redux

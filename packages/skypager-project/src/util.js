@@ -3,12 +3,11 @@ import { join } from 'path'
 import visit from 'unist-util-visit'
 import assign from 'object-assign'
 import utile from 'utile'
-import _debug from 'debug'
 
-import { set, get, template, templateSettings, kebabCase, any, defaults, result, pick, cloneDeep as clone } from 'lodash'
+import { set, get, template, templateSettings, kebabCase,
+  any, defaults, result, pick, cloneDeep as clone } from 'lodash'
 
 const inflections = utile.inflect
-const debug = _debug('skypager')
 const DOMAIN_REGEX = /^[a-zA-Z0-9_-]+\.[.a-zA-Z0-9_-]+$/
 
 export const dotpath = {

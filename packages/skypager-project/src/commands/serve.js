@@ -1,5 +1,5 @@
 import yargs from 'yargs'
-import { get } from 'lodash'
+import get from 'lodash/get'
 
 export function serve (program, dispatch) {
   program

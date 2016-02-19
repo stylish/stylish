@@ -3,10 +3,6 @@ import * as util from './util'
 import { get, set } from 'lodash'
 import { basename, join, resolve, dirname, relative } from 'path'
 
-
-import _debug from 'debug'
-const debug = _debug('skypager:registry')
-
 const Fallbacks = {}
 
 class Registry {

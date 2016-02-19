@@ -1,7 +1,7 @@
-var debug = require('debug')('skypager:exporters')
-
 function CollectionBundle(options = {}){
   let project = options.project || this
+
+  let error = project.logger.error
 
   let bundle = { }
 
@@ -11,7 +11,7 @@ function CollectionBundle(options = {}){
       try {
         if(!asset.raw) { asset.runImporter('disk', {sync:true}) }
       } catch(e) {
-        debug('collection bundle error: ' + asset.uri)
+        error('collection bundle error: ' + asset.uri)
         throw(e)
       }
     })
@@ -32,7 +32,7 @@ function CollectionBundle(options = {}){
       }
 
     } catch(e) {
-      debug("Collection Bundle Asset Error", e.message)
+      error("Collection Bundle Asset Error", e.message)
       throw(e)
     }
   })

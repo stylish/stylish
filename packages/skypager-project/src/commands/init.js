@@ -1,4 +1,3 @@
-import trim from 'lodash/string/trim'
 import { dump as toYaml } from 'js-yaml'
 
 const VERSION = require('../../package.json').version
@@ -143,5 +142,5 @@ export default init
 
 
 function list(val) {
-  return `${ val }`.split(',').map(val => trim(val).toLowerCase())
+  return `${ val }`.split(',').map(val => val.trim().toLowerCase())
 }
