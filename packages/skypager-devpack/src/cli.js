@@ -50,10 +50,10 @@ function devpack(action, profile, environment, project, options = {}) {
   return webpack(action, argv)
 }
 
-function webpack(action, options) {
+function webpack(action, ...args) {
   if ( action === 'build' || action === 'compile' ) {
-    return require('./webpack/compiler')(options)
+    return require('./webpack/compiler')(...args)
   } else if (action === 'develop' || action === 'serve' || action === 'dev' || action === 'dev-server') {
-    return require('./webpack/server')(options)
+    return require('./webpack/server')(...args)
   }
 }

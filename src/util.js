@@ -1,1 +1,3 @@
-module.exports = require('skypager-project/lib/util')
+'use strict';
+
+module.exports = require('skypager-project/lib/util');

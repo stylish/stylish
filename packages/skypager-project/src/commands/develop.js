@@ -76,19 +76,19 @@ export function launchWatcher(options, context) {
   shell.exec(`${ bundleCommand } --clean`)
 
   console.log('Launching project bundler'.yellow)
-  var proc = shell.exec(`chokidar './{data,docs,settings,src}/**/*.*' --silent --ignore --debounce 1200 -c '${ bundleCommand }'`, {async: true})
+  var watcherProc = shell.exec(`chokidar './{data,docs,settings,src}/**/*.*' --silent --ignore --debounce 1200 -c '${ bundleCommand }'`, {async: true})
 
-  proc.on('error', (err) => {
+  watcherProc.on('error', (err) => {
     console.log('Error launching the bundler watch command', error)
   })
 
-  proc.stdout.on('data', (data) => {
+  watcherProc.stdout.on('data', (data) => {
     if(!options.silent) {
       console.log(data)
     }
   })
 
-  proc.stderr.on('data', (data) => {
+  watcherProc.stderr.on('data', (data) => {
     if(options.debug) {
       console.log(data)
     }
@@ -117,9 +117,22 @@ export function launchServer (preset, options = {}, context = {}) {
 
   process.env.NODE_ENV = 'development'
 
+  function onCompile(err, stats) {
+    project.debug('skypager:afterDevCompile', {
+      stats: (stats && Object.keys(stats.toJson()))
+    })
+  }
+
+  function beforeCompile(err, data) {
+    project.debug('skypager:beforeDevCompile', {
+      ...data
+    })
+  }
+
   process.title = 'skypager dev'
-  require('skypager-devpack').webpack('develop', options)
+  require('skypager-devpack').webpack('develop', options, {beforeCompile, onCompile})
 }
+
 
 export function launchTunnel(options, context) {
   var server = shell.exec(`ngrok http ${ options.port || 3000 }`, {async: true})

@@ -14,6 +14,10 @@ var _typeof3 = _interopRequireDefault(_typeof2);
 
 exports.routes = routes;
 
+var _isEmpty = require('lodash/isEmpty');
+
+var _isEmpty2 = _interopRequireDefault(_isEmpty);
+
 var _reactRouter = require('react-router');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -34,8 +38,13 @@ function routes(component) {
 
   var root = { path: "/", component: component, childRoutes: [] };
 
+  if (entryPoints['/']) {
+    entryPoints.index = entryPoints['/'];
+    delete entryPoints['/'];
+  }
+
   if (entryPoints.index) {
-    root.indexRoute = entryPoints.index;
+    root.indexRoute = entryPoints.index.component ? entryPoints.index.component : { component: entryPoints.index };
   }
 
   var childRoutes = keys(entryPoints).filter(function (key) {

@@ -9,19 +9,17 @@ export class IconNavLayout extends React.Component {
   static displayName = 'IconNavLayout';
 
   static propTypes = {
-    branding: types.shape({
-      icon: types.string,
-      style: types.string,
-      brand: types.string
-    }).isRequired,
     children: types.node.isRequired,
     containerClassName: types.string,
-    navigation: types.shape({
-      links: types.arrayOf(types.shape({
+    settings: types.shape({
+      navigation: types.shape({
+        links: types.array
+      }),
+      branding: types.shape({
         icon: types.string,
-        label: types.string,
-        links: types.string
-      }))
+        brand: types.string,
+        style: types.string
+      })
     }).isRequired,
     thin: types.bool,
     wide: types.bool
@@ -34,15 +32,8 @@ export class IconNavLayout extends React.Component {
       [ styles.wrapper ]: true
     })
 
-    let {
-      settings,
-      children,
-      containerClassName,
-      branding,
-      navigation
-    } = this.props
-
-    console.log('This Props', this.props)
+    let { settings, children, containerClassName } = this.props
+    let { branding, navigation } = settings
 
     return (
       <div className={classes}>

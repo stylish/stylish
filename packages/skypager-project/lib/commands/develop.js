@@ -3,6 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
 exports.develop = develop;
 exports.handle = handle;
 exports.launchWatcher = launchWatcher;
@@ -19,7 +28,7 @@ var _util = require('../util');
 
 var _util2 = _interopRequireDefault(_util);
 
-var _pick = require('lodash/object/pick');
+var _pick = require('lodash/pick');
 
 var _pick2 = _interopRequireDefault(_pick);
 
@@ -62,19 +71,19 @@ function launchWatcher(options, context) {
   _shelljs2.default.exec(bundleCommand + ' --clean');
 
   console.log('Launching project bundler'.yellow);
-  var proc = _shelljs2.default.exec('chokidar \'./{data,docs,settings,src}/**/*.*\' --silent --ignore --debounce 1200 -c \'' + bundleCommand + '\'', { async: true });
+  var watcherProc = _shelljs2.default.exec('chokidar \'./{data,docs,settings,src}/**/*.*\' --silent --ignore --debounce 1200 -c \'' + bundleCommand + '\'', { async: true });
 
-  proc.on('error', function (err) {
+  watcherProc.on('error', function (err) {
     console.log('Error launching the bundler watch command', error);
   });
 
-  proc.stdout.on('data', function (data) {
+  watcherProc.stdout.on('data', function (data) {
     if (!options.silent) {
       console.log(data);
     }
   });
 
-  proc.stderr.on('data', function (data) {
+  watcherProc.stderr.on('data', function (data) {
     if (options.debug) {
       console.log(data);
     }
@@ -106,8 +115,18 @@ function launchServer(preset) {
 
   process.env.NODE_ENV = 'development';
 
+  function onCompile(err, stats) {
+    project.debug('skypager:afterDevCompile', {
+      stats: stats && (0, _keys2.default)(stats.toJson())
+    });
+  }
+
+  function beforeCompile(err, data) {
+    project.debug('skypager:beforeDevCompile', (0, _extends3.default)({}, data));
+  }
+
   process.title = 'skypager dev';
-  require('skypager-devpack').webpack('develop', options);
+  require('skypager-devpack').webpack('develop', options, { beforeCompile: beforeCompile, onCompile: onCompile });
 }
 
 function launchTunnel(options, context) {

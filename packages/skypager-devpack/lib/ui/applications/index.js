@@ -15,6 +15,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var application = {
   Application: _Application2.default,
   LockedApplication: _LockedApplication2.default,
+  stateful: _stateful.stateful,
   util: {
     stateful: _stateful.stateful
   }

@@ -1,11 +1,11 @@
 'use strict';
 
-var debug = require('debug')('skypager:exporters');
-
 function CollectionBundle() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
   var project = options.project || this;
+
+  var error = project.logger.error;
 
   var bundle = {};
 
@@ -17,7 +17,7 @@ function CollectionBundle() {
         asset.runImporter('disk', { sync: true });
       }
     } catch (e) {
-      debug('collection bundle error: ' + asset.uri);
+      error('collection bundle error: ' + asset.uri);
       throw e;
     }
   });
@@ -37,7 +37,7 @@ function CollectionBundle() {
         entry.data = asset.data;
       }
     } catch (e) {
-      debug("Collection Bundle Asset Error", e.message);
+      error("Collection Bundle Asset Error", e.message);
       throw e;
     }
   });

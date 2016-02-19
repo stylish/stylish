@@ -15,13 +15,8 @@ export function logger(project, options = {}) {
     })
   ]
 
-  if (!options.silent) {
-    _transports.unshift(
-      new transports.Console({
-        json: true,
-        colorize: options.colorize != false
-      })
-    )
+  if (options.debug || process.env.SKYPAGER_LOGGER==='stdout') {
+    _transports.unshift( new transports.Console({ colorize: true }))
   }
 
   defineProperty(project, 'logger', {
@@ -35,6 +30,10 @@ export function logger(project, options = {}) {
   assign(project, {
     log(...args) {
       project.logger.log('info', ...args)
+    },
+
+    error(...args) {
+      project.logger.log('error', ...args)
     },
 
     debug(...args) {

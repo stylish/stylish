@@ -1,6 +1,6 @@
 {
   "name": "skypager-devpack",
-  "version": "2.1.2-beta1",
+  "version": "2.1.6-beta1",
   "description": "configurable webpack dev server and build tool so you don't have to",
   "main": "index.js",
   "dependencies": {
@@ -13,6 +13,7 @@
     "debounce": "^1.0.0",
     "deepstream.io-client-js": "^0.3.8",
     "express": "^4.13.3",
+    "express-winston": "^1.2.0",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
     "history": "^2.0.0",
@@ -45,7 +46,8 @@
     "webpack": "^1.12.13",
     "webpack-configurator": "^0.3.1",
     "webpack-dev-middleware": "^1.4.0",
-    "webpack-hot-middleware": "^2.6.0"
+    "webpack-hot-middleware": "^2.6.0",
+    "winston": "^2.1.1"
   },
   "peerDependencies": {
     "skypager-themes": "^2.1.0-beta1"

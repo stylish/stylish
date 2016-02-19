@@ -22,9 +22,12 @@ export function deepstream(params = {}, context = {}) {
 
 export function server(params = {}, context = {}) {
   const Server = require('./server').Server
-  let proc = new Server(params, context)
 
-  proc.start()
-
-  return proc
+  try {
+    let proc = new Server(params, context)
+    proc.start()
+    return proc
+  } catch (error) {
+    console.log('Error starting server', error.message, error.stack)
+  }
 }

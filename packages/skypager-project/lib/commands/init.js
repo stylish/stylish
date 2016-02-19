@@ -11,10 +11,6 @@ var _stringify2 = _interopRequireDefault(_stringify);
 exports.init = init;
 exports.handle = handle;
 
-var _trim = require('lodash/string/trim');
-
-var _trim2 = _interopRequireDefault(_trim);
-
 var _jsYaml = require('js-yaml');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -132,6 +128,6 @@ exports.default = init;
 
 function list(val) {
   return ('' + val).split(',').map(function (val) {
-    return (0, _trim2.default)(val).toLowerCase();
+    return val.trim().toLowerCase();
   });
 }

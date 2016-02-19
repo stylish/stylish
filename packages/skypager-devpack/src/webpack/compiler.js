@@ -5,12 +5,10 @@ const md5 = require('md5')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const fs = require('fs')
 
-module.exports = function(argv) {
-  if (!argv) { argv = require('yargs').argv }
+module.exports = function(argv, compilerOptions = {}) {
+  const { onCompile, beforeCompile } = compilerOptions
 
-  if (argv.preset && argv.project) {
-    argv = require('../lib').devpack('build', argv.env || process.env.NODE_ENV, argv.project, require('yargs').argv)
-  }
+  if (!argv) { argv = require('yargs').argv }
 
   var config = require('./index')(argv)
 
@@ -33,10 +31,14 @@ module.exports = function(argv) {
     console.log('Error', e.message)
   }
 
+  if (beforeCompile) {  beforeCompile({ config, argv }) }
+
   compiler.run((err, stats) => {
     var compilation = stats.compilation,
         errors = compilation.errors,
         warnings = compilation.warnings;
+
+    if (onCompile) { onCompile(err, stats) }
 
     if (err) {
       console.log(err)

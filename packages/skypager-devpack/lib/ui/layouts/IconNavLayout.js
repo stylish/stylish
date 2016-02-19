@@ -43,6 +43,10 @@ var _IconNav = require('../components/IconNav');
 
 var _IconNav2 = _interopRequireDefault(_IconNav);
 
+var _defaultsDeep = require('lodash/defaultsDeep');
+
+var _defaultsDeep2 = _interopRequireDefault(_defaultsDeep);
+
 var _IconNavLayoutCss = require('./IconNavLayout.css.less');
 
 var _IconNavLayoutCss2 = _interopRequireDefault(_IconNavLayoutCss);
@@ -62,35 +66,35 @@ var IconNavLayout = exports.IconNavLayout = (function (_React$Component) {
     value: function render() {
       var classes = (0, _classnames3.default)((0, _defineProperty3.default)({
         'with-iconav': true,
-        'iconav-wide': this.props.wide
+        'iconav-wide': this.props.wide || !this.props.thin
       }, _IconNavLayoutCss2.default.wrapper, true));
 
       var _props = this.props;
-      var brandStyle = _props.brandStyle;
-      var brandIcon = _props.brandIcon;
+      var settings = _props.settings;
       var children = _props.children;
       var containerClassName = _props.containerClassName;
-      var links = _props.links;
+      var branding = settings.branding;
+      var navigation = settings.navigation;
 
       return _react2.default.createElement(
         'div',
         { className: classes, __source: {
             fileName: _jsxFileName,
-            lineNumber: 35
+            lineNumber: 39
           }
         },
-        _react2.default.createElement(_IconNav2.default, { brandStyle: brandStyle,
-          brandIcon: brandIcon,
-          links: links, __source: {
+        _react2.default.createElement(_IconNav2.default, { brandStyle: branding.style,
+          brandIcon: branding.icon,
+          links: navigation.links, __source: {
             fileName: _jsxFileName,
-            lineNumber: 36
+            lineNumber: 40
           }
         }),
         _react2.default.createElement(
           'div',
           { className: containerClassName || 'container', __source: {
               fileName: _jsxFileName,
-              lineNumber: 40
+              lineNumber: 44
             }
           },
           children
@@ -104,10 +108,18 @@ var IconNavLayout = exports.IconNavLayout = (function (_React$Component) {
 IconNavLayout.displayName = 'IconNavLayout';
 IconNavLayout.propTypes = {
   children: _react.PropTypes.node.isRequired,
-  wide: _react.PropTypes.bool,
   containerClassName: _react.PropTypes.string,
-  links: _react.PropTypes.array.isRequired,
-  brandIcon: _react.PropTypes.string,
-  brandStyle: _react.PropTypes.string
+  settings: _react.PropTypes.shape({
+    navigation: _react.PropTypes.shape({
+      links: _react.PropTypes.array
+    }),
+    branding: _react.PropTypes.shape({
+      icon: _react.PropTypes.string,
+      brand: _react.PropTypes.string,
+      style: _react.PropTypes.string
+    })
+  }).isRequired,
+  thin: _react.PropTypes.bool,
+  wide: _react.PropTypes.bool
 };
 exports.default = IconNavLayout;

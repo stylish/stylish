@@ -10,3 +10,4 @@ window.ReduxActions = require('redux-actions');
 window.ReduxThunk = require('redux-thunk');
 window.ReduxSimpleRouter = require('redux-simple-router');
 window.History = require('history');
+window.BodyClassName = require('react-body-classname');

@@ -69,9 +69,21 @@ export function handle(preset, options = {}, context = {}) {
     shell.exec(`${ bundleCommand } --clean`)
   }
 
-  require('skypager-devpack').webpack('build', options)
-}
+  function beforeCompile({config, argv}) {
+    project.debug('skypager:beforeCompile', {
+      ...argv,
+      config
+    })
+  }
 
+  function onCompile(err, stats) {
+    project.debug('skypager:afterCompile', {
+      stats: (stats && Object.keys(stats.toJson()))
+    })
+  }
+
+  require('skypager-devpack').webpack('build', options, {beforeCompile, onCompile})
+}
 
 function isDevpackInstalled () {
   try {

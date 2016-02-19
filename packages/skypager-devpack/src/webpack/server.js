@@ -6,8 +6,9 @@ const lodash = require('lodash')
 const isFunction = lodash.isFunction
 const proxyMiddleware = require('http-proxy-middleware')
 
-module.exports = function(argv, serverOptions) {
-  serverOptions = serverOptions || {}
+module.exports = function(argv, compilerOptions = {}) {
+  const { onCompile, beforeCompile } = compilerOptions
+
   if (!argv) { argv = require('yargs').argv }
 
   var app = express()
@@ -21,6 +22,8 @@ module.exports = function(argv, serverOptions) {
 
   config = config.resolve()
 
+  if (beforeCompile) {  beforeCompile({ config, argv }) }
+
   // Monkey patching the Webpack Dev Server Compiler
   // so that when the compile finishes we can do something.
   // e.g. let the skypager-electron system know the bundle is ready
@@ -31,8 +34,8 @@ module.exports = function(argv, serverOptions) {
     originalWatch.call(compiler, watchOptions, function(err, stats) {
       handler && handler(err, stats)
 
-      if (serverOptions.onCompile && isFunction(serverOptions.onCompile)) {
-        serverOptions.onCompile(err, stats)
+      if (onCompile && isFunction(onCompile)) {
+        onCompile(err, stats)
       }
 
       try {
@@ -44,8 +47,7 @@ module.exports = function(argv, serverOptions) {
           )
         }
       } catch(error) {
-        console.error('ERRROR', error.message)
-        fs.writeFileSync('/Users/jonathan/Skypager/error.txt', error.message)
+
       }
     })
   }

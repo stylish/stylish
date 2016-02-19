@@ -74,10 +74,14 @@ function devpack(action, profile, environment, project) {
   return webpack(action, argv);
 }
 
-function webpack(action, options) {
+function webpack(action) {
+  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
   if (action === 'build' || action === 'compile') {
-    return require('./webpack/compiler')(options);
+    return require('./webpack/compiler').apply(undefined, args);
   } else if (action === 'develop' || action === 'serve' || action === 'dev' || action === 'dev-server') {
-    return require('./webpack/server')(options);
+    return require('./webpack/server').apply(undefined, args);
   }
 }

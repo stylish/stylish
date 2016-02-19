@@ -14,8 +14,11 @@ var lodash = require('lodash');
 var isFunction = lodash.isFunction;
 var proxyMiddleware = require('http-proxy-middleware');
 
-module.exports = function (argv, serverOptions) {
-  serverOptions = serverOptions || {};
+module.exports = function (argv) {
+  var compilerOptions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var onCompile = compilerOptions.onCompile;
+  var beforeCompile = compilerOptions.beforeCompile;
+
   if (!argv) {
     argv = require('yargs').argv;
   }
@@ -31,6 +34,10 @@ module.exports = function (argv, serverOptions) {
 
   config = config.resolve();
 
+  if (beforeCompile) {
+    beforeCompile({ config: config, argv: argv });
+  }
+
   // Monkey patching the Webpack Dev Server Compiler
   // so that when the compile finishes we can do something.
   // e.g. let the skypager-electron system know the bundle is ready
@@ -41,18 +48,15 @@ module.exports = function (argv, serverOptions) {
     originalWatch.call(compiler, watchOptions, function (err, stats) {
       handler && handler(err, stats);
 
-      if (serverOptions.onCompile && isFunction(serverOptions.onCompile)) {
-        serverOptions.onCompile(err, stats);
+      if (onCompile && isFunction(onCompile)) {
+        onCompile(err, stats);
       }
 
       try {
         if (argv.saveWebpackStats) {
           fs.writeFileSync(argv.saveWebpackStats, (0, _stringify2.default)(stats.toJson(), null, 2), '');
         }
-      } catch (error) {
-        console.error('ERRROR', error.message);
-        fs.writeFileSync('/Users/jonathan/Skypager/error.txt', error.message);
-      }
+      } catch (error) {}
     });
   };
 

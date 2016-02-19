@@ -15,7 +15,9 @@ var _yargs = require('yargs');
 
 var _yargs2 = _interopRequireDefault(_yargs);
 
-var _lodash = require('lodash');
+var _get = require('lodash/get');
+
+var _get2 = _interopRequireDefault(_get);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -66,7 +68,7 @@ function handle(arg) {
       process.exit(1);
     }
 
-    devpack('develop', profile, env, project, (0, _lodash.get)(serverSettings, profile + '.' + env + '.webpack') || {});
+    devpack('develop', profile, env, project, (0, _get2.default)(serverSettings, profile + '.' + env + '.webpack') || {});
   } else {
     server({ profile: profile, env: env, dashboard: dashboard }, { project: project, argv: argv });
   }

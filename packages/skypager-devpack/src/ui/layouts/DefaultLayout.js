@@ -6,25 +6,28 @@ import stateful from '../applications/util/stateful'
 
 import pick from 'lodash/pick'
 
+const layouts = {
+  fluid: FluidLayout,
+  iconNav: IconNavLayout,
+  icon: IconNavLayout
+}
+
 export class DefaultLayout extends Component {
   static displayName = 'DefaultLayout';
 
   render () {
     const { settings } = this.props
+    const { app } = settings
 
-    const { branding, navigation, app } = settings
-
-    const layoutComponent = IconNavLayout
-
-    const layoutProps = {
-      ...(settings.layout || {}),
-      branding,
-      navigation
-    }
+    const layoutComponent = app && app.defaultLayout
+      ? layouts[app.defaultLayout] || IconNavLayout
+      : IconNavLayout
 
     return React.createElement(
       layoutComponent,
-      layoutProps,
+      {
+        settings
+      },
       this.props.children
     )
   }

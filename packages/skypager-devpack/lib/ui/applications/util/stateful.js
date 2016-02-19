@@ -3,18 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
-
-var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
-
 exports.stateful = stateful;
 
 var _react = require('react');
 
 var _reactRedux = require('react-redux');
 
-var _lodash = require('lodash');
+var _get = require('lodash/get');
+
+var _get2 = _interopRequireDefault(_get);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34,7 +31,13 @@ function stateful(component) {
   component.contextTypes.project = _react.PropTypes.object.isRequired;
 
   function mapSelectedProps(state) {
-    return _lodash.pick.apply(undefined, [state].concat((0, _toConsumableArray3.default)(stateProps)));
+    return stateProps.reduce(function (memo, prop) {
+      var p = prop.split('.');
+      var propName = p[p.length - 1];
+      memo[propName] = (0, _get2.default)(state, prop);
+
+      return memo;
+    }, {});
   }
 
   if (stateProps && stateProps.length > 0) {

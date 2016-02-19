@@ -37,8 +37,8 @@ var _FluidTopNavbar2 = _interopRequireDefault(_FluidTopNavbar);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var FluidLayout = exports.FluidLayout = (function (_React$Component) {
-  (0, _inherits3.default)(FluidLayout, _React$Component);
+var FluidLayout = exports.FluidLayout = (function (_Component) {
+  (0, _inherits3.default)(FluidLayout, _Component);
 
   function FluidLayout() {
     (0, _classCallCheck3.default)(this, FluidLayout);
@@ -48,23 +48,29 @@ var FluidLayout = exports.FluidLayout = (function (_React$Component) {
   (0, _createClass3.default)(FluidLayout, [{
     key: 'render',
     value: function render() {
+      var _props = this.props;
+      var navigation = _props.navigation;
+      var branding = _props.branding;
+      var searchForm = _props.searchForm;
+      var links = navigation.links;
+
       return _react2.default.createElement(
         'div',
         { className: 'fluid-layout', __source: {
             fileName: _jsxFileName,
-            lineNumber: 8
+            lineNumber: 48
           }
         },
-        _react2.default.createElement(_FluidTopNavbar2.default, { children: this.props.navbarItems, __source: {
+        _react2.default.createElement(_FluidTopNavbar2.default, { searchForm: searchForm, branding: branding, links: links, __source: {
             fileName: _jsxFileName,
-            lineNumber: 9
+            lineNumber: 49
           }
         }),
         _react2.default.createElement(
           'div',
           { className: 'container-fluid container-fluid-spacious', __source: {
               fileName: _jsxFileName,
-              lineNumber: 11
+              lineNumber: 51
             }
           },
           this.props.children
@@ -73,11 +79,44 @@ var FluidLayout = exports.FluidLayout = (function (_React$Component) {
     }
   }]);
   return FluidLayout;
-})(_react2.default.Component);
+})(_react.Component);
 
+FluidLayout.displayName = 'FluidLayout';
 FluidLayout.propTypes = {
-  children: _react2.default.PropTypes.array,
-  navbarItems: _react2.default.PropTypes.array
+  branding: _react.PropTypes.shape({
+    icon: _react.PropTypes.string,
+    style: _react.PropTypes.string,
+    brand: _react.PropTypes.string
+  }),
+  children: _react.PropTypes.node.isRequired,
+  containerClassName: _react.PropTypes.string,
+  searchForm: _react.PropTypes.node,
+  navigation: _react.PropTypes.shape({
+    links: _react.PropTypes.arrayOf(_react.PropTypes.shape({
+      icon: _react.PropTypes.string,
+      label: _react.PropTypes.string,
+      link: _react.PropTypes.string
+    }))
+  })
 };
-
+FluidLayout.defaultProps = {
+  searchForm: _react2.default.createElement('div', {
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 27
+    }
+  }),
+  branding: {
+    icon: 'rocket',
+    style: 'default',
+    brand: 'Skypager'
+  },
+  navigation: {
+    links: [{
+      label: 'Home',
+      link: '/',
+      icon: 'home'
+    }]
+  }
+};
 exports.default = FluidLayout;

@@ -3,7 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DefaultLayout = undefined;
+exports.Wrapper = undefined;
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
 
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
@@ -25,13 +29,11 @@ var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
 
+var _jsxFileName = 'src/ui/layouts/Wrapper.js';
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
-
-var _FluidLayout = require('ui/layouts/FluidLayout');
-
-var _FluidLayout2 = _interopRequireDefault(_FluidLayout);
 
 var _IconNavLayout = require('ui/layouts/IconNavLayout');
 
@@ -41,41 +43,45 @@ var _stateful = require('../applications/util/stateful');
 
 var _stateful2 = _interopRequireDefault(_stateful);
 
-var _pick = require('lodash/pick');
+var _pick2 = require('lodash/pick');
 
-var _pick2 = _interopRequireDefault(_pick);
+var _pick3 = _interopRequireDefault(_pick2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var layouts = {
-  fluid: _FluidLayout2.default,
-  iconNav: _IconNavLayout2.default,
-  icon: _IconNavLayout2.default
-};
+var Wrapper = exports.Wrapper = (function (_Component) {
+  (0, _inherits3.default)(Wrapper, _Component);
 
-var DefaultLayout = exports.DefaultLayout = (function (_Component) {
-  (0, _inherits3.default)(DefaultLayout, _Component);
-
-  function DefaultLayout() {
-    (0, _classCallCheck3.default)(this, DefaultLayout);
-    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(DefaultLayout).apply(this, arguments));
+  function Wrapper() {
+    (0, _classCallCheck3.default)(this, Wrapper);
+    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Wrapper).apply(this, arguments));
   }
 
-  (0, _createClass3.default)(DefaultLayout, [{
+  (0, _createClass3.default)(Wrapper, [{
     key: 'render',
     value: function render() {
-      var settings = this.props.settings;
-      var app = settings.app;
+      var _pick = (0, _pick3.default)(this.props, 'navigation', 'app', 'branding');
 
-      var layoutComponent = app && app.defaultLayout ? layouts[app.defaultLayout] || _IconNavLayout2.default : _IconNavLayout2.default;
+      var settings = _pick.settings;
 
-      return _react2.default.createElement(layoutComponent, {
-        settings: settings
-      }, this.props.children);
+      var layoutProps = assign({}, settings, settings.layout || {});
+
+      return _react2.default.createElement(
+        _IconNavLayout2.default,
+        (0, _extends3.default)({}, layoutProps, {
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 16
+          }
+        }),
+        this.props.children
+      );
     }
   }]);
-  return DefaultLayout;
+  return Wrapper;
 })(_react.Component);
 
-DefaultLayout.displayName = 'DefaultLayout';
-exports.default = (0, _stateful2.default)(DefaultLayout, 'settings');
+Wrapper.displayName = 'Wrapper';
+exports.default = (0, _stateful2.default)(Wrapper, 'settings');
+var _Object = Object;
+var assign = _Object.assign;

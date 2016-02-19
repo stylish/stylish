@@ -14,12 +14,12 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var fs = require('fs');
 
 module.exports = function (argv) {
+  var compilerOptions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var onCompile = compilerOptions.onCompile;
+  var beforeCompile = compilerOptions.beforeCompile;
+
   if (!argv) {
     argv = require('yargs').argv;
-  }
-
-  if (argv.preset && argv.project) {
-    argv = require('../lib').devpack('build', argv.env || process.env.NODE_ENV, argv.project, require('yargs').argv);
   }
 
   var config = require('./index')(argv);
@@ -43,10 +43,18 @@ module.exports = function (argv) {
     console.log('Error', e.message);
   }
 
+  if (beforeCompile) {
+    beforeCompile({ config: config, argv: argv });
+  }
+
   compiler.run(function (err, stats) {
     var compilation = stats.compilation,
         errors = compilation.errors,
         warnings = compilation.warnings;
+
+    if (onCompile) {
+      onCompile(err, stats);
+    }
 
     if (err) {
       console.log(err);

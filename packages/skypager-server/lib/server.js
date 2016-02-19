@@ -25,8 +25,6 @@ var _lodash = require('lodash');
 
 var _util = require('./util.js');
 
-var _index = require('./dashboard/index');
-
 var _path = require('path');
 
 var _mkdirp = require('mkdirp');
@@ -34,6 +32,10 @@ var _mkdirp = require('mkdirp');
 var _mkdirp2 = _interopRequireDefault(_mkdirp);
 
 var _fs = require('fs');
+
+var _winston = require('winston');
+
+var _winston2 = _interopRequireDefault(_winston);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -63,7 +65,8 @@ var Server = exports.Server = (function () {
     }));
 
     this.paths = {
-      logs: project.path('logs', 'server')
+      logs: project.path('logs', 'server'),
+      public: project.paths.public
     };
 
     (0, _lodash.values)(this.paths).forEach(function (path) {
@@ -74,7 +77,13 @@ var Server = exports.Server = (function () {
       processes: {}
     };
 
-    this.logger = argv.debug ? process.stdout : stream((0, _path.join)(this.paths.logs, 'server.' + env + '.log'));
+    project.logger.add(_winston2.default.transports.File, {
+      name: 'server-logger',
+      level: 'debug',
+      filename: (0, _path.join)(this.paths.logs, 'server.' + env + '.log')
+    });
+
+    this.logger = project.logger;
   }
 
   (0, _createClass3.default)(Server, [{
@@ -82,6 +91,20 @@ var Server = exports.Server = (function () {
     value: function start() {
       this.prepare();
       this.run();
+      this.listen();
+    }
+  }, {
+    key: 'listen',
+    value: function listen() {
+      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      (0, _lodash.defaultsDeep)(options, {
+        port: this.config.port || 8080,
+        host: this.config.host || '0.0.0.0'
+      });
+
+      var host = options.host;
+      var port = options.port;
     }
   }, {
     key: 'run',
@@ -93,6 +116,10 @@ var Server = exports.Server = (function () {
       (0, _util.defineProp)(this, '_processes', {});
 
       this.eachProcess(function (proc) {
+        if (!proc) {
+          return;
+        }
+
         var opts = (0, _lodash.pick)(proc, 'env', 'cwd', 'detached', 'uid', 'gid', 'stdio');
 
         opts = (0, _lodash.defaultsDeep)(opts, {
@@ -123,7 +150,9 @@ var Server = exports.Server = (function () {
 
       process.on('exit', function () {
         (0, _lodash.values)(_this._processes).forEach(function (proc) {
-          proc.kill();
+          if (proc) {
+            proc.kill();
+          }
         });
       });
 
@@ -137,6 +166,9 @@ var Server = exports.Server = (function () {
       var _this2 = this;
 
       this.eachProcess(function (proc) {
+        if (!proc) {
+          return;
+        }
         (0, _util.defineProp)(proc, 'output', stream(_this2.logPath(proc.name + '.' + _this2.env + '.log')));
         proc.output.open();
       });
@@ -144,7 +176,11 @@ var Server = exports.Server = (function () {
   }, {
     key: 'eachProcess',
     value: function eachProcess(fn) {
-      (0, _lodash.values)(this.processes).forEach(fn);
+      (0, _lodash.values)(this.processes).forEach(function (proc, index) {
+        if (proc) {
+          fn(proc, index);
+        } else {}
+      });
     }
   }, {
     key: 'updateProcess',
@@ -156,26 +192,26 @@ var Server = exports.Server = (function () {
 
       (0, _lodash.set)(this, 'state.processes.' + name, updated);
 
-      this.log('info', 'updated process', current);
+      this.log('debug', 'updated process', current);
     }
   }, {
     key: 'log',
-    value: function log(level, message) {
-      var data = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+    value: function log(level) {
+      var _logger;
 
-      this.logger && this.logger.write((0, _util.colorize)({
-        level: level,
-        message: message,
-        data: data
-      }) + "\n\n");
+      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
+      (_logger = this.logger).log.apply(_logger, [level].concat(args));
     }
   }, {
     key: 'logPath',
     value: function logPath() {
       var _project;
 
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
       }
 
       return (_project = this.project).path.apply(_project, ['logs', 'server'].concat(args));

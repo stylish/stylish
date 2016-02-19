@@ -1,9 +1,10 @@
 import { pick, set, values, mapValues, get, defaultsDeep as defaults } from 'lodash'
 import { defineProp, colorize, spawn } from './util.js'
-import { dashboard } from './dashboard/index'
 import { join, resolve, dirname } from 'path'
 import mkdirp from 'mkdirp'
 import { createWriteStream as writeable, createReadStream as readable, openSync, existsSync as exists } from 'fs'
+
+import winston from 'winston'
 
 export class Server {
   constructor(params = {}, context = {}) {
@@ -24,7 +25,8 @@ export class Server {
     defineProp(this, 'processes', mapValues(config.processes, (cfg, name) => (cfg.name = name) && cfg))
 
     this.paths = {
-      logs: project.path('logs', 'server')
+      logs: project.path('logs', 'server'),
+      public: project.paths.public
     }
 
     values(this.paths).forEach(path => {
@@ -35,14 +37,28 @@ export class Server {
       processes: {}
     }
 
-    this.logger = argv.debug
-      ? process.stdout
-      : stream(join(this.paths.logs, `server.${env}.log`))
+    project.logger.add(winston.transports.File,{
+      name: 'server-logger',
+      level: 'debug',
+      filename: join(this.paths.logs, `server.${ env }.log`)
+    })
+
+    this.logger = project.logger
   }
 
   start () {
     this.prepare()
     this.run()
+    this.listen()
+  }
+
+  listen (options = {}) {
+    defaults(options, {
+      port: this.config.port || 8080,
+      host: this.config.host || '0.0.0.0'
+    })
+
+    let {host, port} = options
   }
 
   run () {
@@ -51,6 +67,8 @@ export class Server {
     defineProp(this, '_processes', {})
 
     this.eachProcess((proc) => {
+      if (!proc) { return }
+
       let opts = pick(proc, 'env', 'cwd', 'detached', 'uid', 'gid', 'stdio')
 
       opts = defaults(opts, {
@@ -90,7 +108,9 @@ export class Server {
 
     process.on('exit', () => {
       values(this._processes).forEach(proc => {
-        proc.kill()
+        if(proc) {
+          proc.kill()
+        }
       })
     })
 
@@ -101,13 +121,19 @@ export class Server {
 
   prepare() {
     this.eachProcess((proc) => {
+      if(!proc) { return }
       defineProp(proc, 'output', stream(this.logPath(`${ proc.name }.${ this.env }.log`)))
       proc.output.open()
     })
   }
 
   eachProcess(fn) {
-    values(this.processes).forEach(fn)
+    values(this.processes).forEach((proc, index) => {
+      if(proc) {
+        fn(proc, index)
+      } else {
+      }
+    })
   }
 
   updateProcess(name, data = {}) {
@@ -116,15 +142,11 @@ export class Server {
 
     set(this, `state.processes.${ name }`, updated)
 
-    this.log('info', 'updated process', current)
+    this.log('debug', 'updated process', current)
   }
 
-  log (level, message, data = {}) {
-    this.logger && this.logger.write(colorize({
-       level,
-       message,
-       data
-    }) + "\n\n")
+  log (level, ...args) {
+    this.logger.log(level, ...args)
   }
 
   logPath(...args) {

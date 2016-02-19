@@ -40,9 +40,12 @@ function server() {
   var context = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   var Server = require('./server').Server;
-  var proc = new Server(params, context);
 
-  proc.start();
-
-  return proc;
+  try {
+    var proc = new Server(params, context);
+    proc.start();
+    return proc;
+  } catch (error) {
+    console.log('Error starting server', error.message, error.stack);
+  }
 }

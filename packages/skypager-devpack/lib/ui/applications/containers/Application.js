@@ -40,6 +40,10 @@ var _stores = require('../util/stores');
 
 var _routes = require('../util/routes');
 
+var _DefaultLayout = require('ui/layouts/DefaultLayout');
+
+var _DefaultLayout2 = _interopRequireDefault(_DefaultLayout);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var defaultInitialState = [];
@@ -53,12 +57,42 @@ var Application = exports.Application = (function (_Component) {
   (0, _inherits3.default)(Application, _Component);
   (0, _createClass3.default)(Application, null, [{
     key: 'create',
+
+    /**
+     * Main Entry Point
+     *
+     * @example
+     *
+     * import project from 'dist/bundle'
+     *
+     * Application.create({
+     *  project
+     * })
+     *
+     */
     value: function create() {
       var _this2 = this;
 
       var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
       options = sanitize(options);
+
+      var _options = options;
+      var project = _options.project;
+
+      if (!project) {
+        throw 'Must supply a skypager project bundle to launch this application';
+      }
+
+      if (project) {
+        if (!options.setup && !project.settings.app) {
+          return require('ui/applications/setup').setup(project);
+        }
+      }
+
+      if (options.layout && typeof options.layout === 'function') {
+        options.layout = stateful(options.layout, 'settings', 'settings.navigation', 'settings.branding');
+      }
 
       var renderer = function renderer() {
         _this2.render(options);
@@ -79,25 +113,30 @@ var Application = exports.Application = (function (_Component) {
 
       var props = project ? project.buildApp(options) : sanitize(options);
 
+      var client = props.client;
       var layout = props.layout;
       var entryPoints = props.entryPoints;
       var middlewares = props.middlewares;
       var reducers = props.reducers;
       var initialState = props.initialState;
 
-      if (version >= 1 && project) {}
+      if (version >= 1 && project && app && options.hot) {
+        //console.log('Reloading Bundle')
+        app.reloadBundle(project);
+      }
 
       app = (0, _reactDom.render)(_react2.default.createElement(Application, { entryPoints: entryPoints,
         initialState: initialState,
         layout: layout,
         project: project,
+        client: client,
         version: version,
         middlewares: middlewares,
         reducers: reducers, __source: {
           fileName: _jsxFileName,
-          lineNumber: 78
+          lineNumber: 120
         }
-      }), document.getElementById(options.root));
+      }), document.getElementById(options.root || 'app'));
 
       version = version + 1;
       return app;
@@ -121,6 +160,8 @@ var Application = exports.Application = (function (_Component) {
     var project = _this$props2.project;
 
     _this.routes = (0, _routes.routes)(layout, { entryPoints: entryPoints });
+
+    //console.log('Application Creating', props, context)
 
     _this.store = (0, _stores.stores)({
       reducers: reducers,
@@ -147,9 +188,17 @@ var Application = exports.Application = (function (_Component) {
   }, {
     key: 'getChildContext',
     value: function getChildContext() {
+      var _props = this.props;
+      var project = _props.project;
+      var client = _props.client;
+
+      var settings = project.settings || {};
+
       return {
         store: this.store,
-        project: this.props.project
+        project: project,
+        client: client,
+        settings: settings
       };
     }
   }, {
@@ -159,7 +208,7 @@ var Application = exports.Application = (function (_Component) {
         _reactRouter.Router,
         { history: _reactRouter.browserHistory, __source: {
             fileName: _jsxFileName,
-            lineNumber: 128
+            lineNumber: 178
           }
         },
         this.routes
@@ -176,24 +225,33 @@ Application.propTypes = {
   // an array of objects which will get merged into an initialState
   state: _react.PropTypes.arrayOf(_react.PropTypes.object),
   // the layout layout component to wrap the app in
-  layout: _react.PropTypes.func.isRequired,
+  layout: _react.PropTypes.func,
 
   // entry point configuration
-  entryPoints: _react.PropTypes.object.isRequired,
+  entryPoints: _react.PropTypes.object,
 
   // an array of redux middlewares to inject into the store
   middlewares: _react.PropTypes.array,
 
-  project: _react.PropTypes.object
+  project: _react.PropTypes.object,
+
+  client: _react.PropTypes.object
+};
+Application.defaultProps = {
+  layout: _DefaultLayout2.default
 };
 Application.childContextTypes = {
+  client: _react.PropTypes.object,
+
   store: _react.PropTypes.shape({
     subscribe: _react.PropTypes.func.isRequired,
     dispatch: _react.PropTypes.func.isRequired,
     getState: _react.PropTypes.func.isRequired
   }),
 
-  project: _react.PropTypes.object
+  project: _react.PropTypes.object,
+
+  settings: _react.PropTypes.object
 };
 Application.sanitize = sanitize;
 exports.default = Application;
@@ -204,6 +262,11 @@ function isArray(arg) {
 
 function sanitize() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+  if (!options.project && options.bundle) {
+    options.project = options.bundle;
+    delete options.bundle;
+  }
 
   var initialState = options.initialState = options.initialState || defaultInitialState;
   var middlewares = options.middlewares = options.middlewares || defaultMiddlewares;

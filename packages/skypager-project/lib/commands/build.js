@@ -3,6 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 exports.build = build;
 exports.handle = handle;
 
@@ -50,7 +59,22 @@ function handle(preset) {
     _shelljs2.default.exec(bundleCommand + ' --clean');
   }
 
-  require('skypager-devpack').webpack('build', options);
+  function beforeCompile(_ref) {
+    var config = _ref.config;
+    var argv = _ref.argv;
+
+    project.debug('skypager:beforeCompile', (0, _extends3.default)({}, argv, {
+      config: config
+    }));
+  }
+
+  function onCompile(err, stats) {
+    project.debug('skypager:afterCompile', {
+      stats: stats && (0, _keys2.default)(stats.toJson())
+    });
+  }
+
+  require('skypager-devpack').webpack('build', options, { beforeCompile: beforeCompile, onCompile: onCompile });
 }
 
 function isDevpackInstalled() {

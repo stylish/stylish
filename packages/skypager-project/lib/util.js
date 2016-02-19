@@ -74,16 +74,11 @@ var _utile = require('utile');
 
 var _utile2 = _interopRequireDefault(_utile);
 
-var _debug2 = require('debug');
-
-var _debug3 = _interopRequireDefault(_debug2);
-
 var _lodash = require('lodash');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var inflections = _utile2.default.inflect;
-var debug = (0, _debug3.default)('skypager');
 var DOMAIN_REGEX = /^[a-zA-Z0-9_-]+\.[.a-zA-Z0-9_-]+$/;
 
 var dotpath = exports.dotpath = {

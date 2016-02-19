@@ -52,17 +52,20 @@ var _util = require('./util');
 
 var util = _interopRequireWildcard(_util);
 
+var _logger = require('./logger');
+
+var _logger2 = _interopRequireDefault(_logger);
+
 var _path = require('path');
 
-var _debug2 = require('debug');
+var _mapValues = require('lodash/mapValues');
 
-var _debug3 = _interopRequireDefault(_debug2);
+var _mapValues2 = _interopRequireDefault(_mapValues);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var debug = (0, _debug3.default)('skypager:project');
 var hide = util.hide.getter;
 var lazy = util.lazy;
 
@@ -74,9 +77,6 @@ var Project = (function () {
 
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
     (0, _classCallCheck3.default)(this, Project);
-
-    debug('project created at: ' + uri);
-    debug('Option keys: ' + (0, _keys2.default)(options));
 
     uri.should.be.a.String();
     uri.should.not.be.empty();
@@ -98,14 +98,18 @@ var Project = (function () {
       value: options.manifest || {}
     });
 
+    project.name = options.name || (0, _path.basename)(project.root);
+
     // autobind hooks functions passed in as options
     project.hidden('hooks', setupHooks.call(project, options.hooks));
 
     project.hidden('paths', paths.bind(project));
 
-    project.hidden('registries', registries.call(project), false);
+    project.env = options.env || process.env.NODE_ENV || 'development';
 
-    project.name = options.name || (0, _path.basename)(project.root);
+    (0, _logger2.default)(project, options);
+
+    project.hidden('registries', registries.call(project), false);
 
     var plugins = [];
     util.hide.getter(project, 'enabledPlugins', function () {
@@ -130,7 +134,7 @@ var Project = (function () {
     project.emit('contentDidInitialize');
 
     if (options.autoImport !== false) {
-      debug('running autoimport', options.autoLoad);
+      project.debug('running autoimport', options.autoLoad);
 
       project.emit('projectWillAutoImport');
 
@@ -155,11 +159,11 @@ var Project = (function () {
       configurable: true,
       get: function get() {
         delete project.entities;
-        debug('building entities');
-
         project.emit('willBuildEntities');
         project.entities = entities.call(project);
         project.emit('didBuildEntities', project, project.entities);
+
+        project.debug('built entities', (0, _keys2.default)(project.entities));
 
         return project.entities;
       }
@@ -640,9 +644,9 @@ function runImporter() {
   var autoLoad = options.autoLoad;
   var importer = options.importer;
 
-  debug('import starting');
+  project.logger.profile('import starting');
   var result = project.importers.run(importer || 'disk', { project: this, collections: this.content, autoLoad: autoLoad });
-  debug('import finishing');
+  project.logger.profile('import finishing');
 
   return result;
 }

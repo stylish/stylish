@@ -111,8 +111,9 @@ export class Application extends Component {
       initialState
     } = props
 
-    if (version >= 1 && project) {
-      console.log(`skypager application version increase ${ version }`)
+    if (version >= 1 && project && app && options.hot) {
+      //console.log('Reloading Bundle')
+      app.reloadBundle(project)
     }
 
     app = render(
@@ -139,6 +140,8 @@ export class Application extends Component {
     let { reducers, middlewares, initialState, project } = this.props
 
     this.routes = buildRoutes(layout, { entryPoints })
+
+    //console.log('Application Creating', props, context)
 
     this.store = buildStore({
       reducers,

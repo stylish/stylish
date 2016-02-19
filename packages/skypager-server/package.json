@@ -27,12 +27,14 @@
     "deepstream.io-cache-redis": "github:arxpoetica/deepstream.io-cache-redis",
     "deepstream.io-client-js": "^0.3.8",
     "deepstream.io-msg-redis": ">= 0.2.7",
-    "hiredis": ">= 0.4.1",
+    "express-winston": "^1.2.0",
     "fs-extra-promise": "^0.3.1",
+    "hiredis": ">= 0.4.1",
     "lodash": "^4.3.0",
     "nodemon": "^1.8.1",
     "pty.js": "^0.3.0",
-    "term.js": "0.0.7"
+    "term.js": "0.0.7",
+    "winston": "^2.1.1"
   },
   "devDependencies": {
     "babel-preset-skypager": "^1.34.0",

@@ -63,8 +63,8 @@ var IconNav = exports.IconNav = (function (_React$Component) {
     key: 'render',
     value: function render() {
       var _props = this.props;
-      var brandIcon = _props.brandIcon;
       var brandStyle = _props.brandStyle;
+      var brandIcon = _props.brandIcon;
 
       var links = (this.props.links || []).map(function (link, index) {
         var active = false;
@@ -73,26 +73,26 @@ var IconNav = exports.IconNav = (function (_React$Component) {
           'li',
           { key: index, className: active ? 'active' : undefined, __source: {
               fileName: _jsxFileName,
-              lineNumber: 31
+              lineNumber: 30
             }
           },
           _react2.default.createElement(
             _reactRouter.Link,
             { to: link.link, title: link.label, __source: {
                 fileName: _jsxFileName,
-                lineNumber: 32
+                lineNumber: 31
               }
             },
             _react2.default.createElement(_Icon2.default, { icon: link.icon, __source: {
                 fileName: _jsxFileName,
-                lineNumber: 33
+                lineNumber: 32
               }
             }),
             _react2.default.createElement(
               'span',
               { className: 'nav-label', __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 34
+                  lineNumber: 33
                 }
               },
               link.label
@@ -107,20 +107,20 @@ var IconNav = exports.IconNav = (function (_React$Component) {
         'nav',
         { className: classes, __source: {
             fileName: _jsxFileName,
-            lineNumber: 43
+            lineNumber: 42
           }
         },
         _react2.default.createElement(
           _reactRouter.Link,
           { to: '/', className: 'iconav-brand', __source: {
               fileName: _jsxFileName,
-              lineNumber: 44
+              lineNumber: 43
             }
           },
           _react2.default.createElement(_Icon2.default, { className: 'iconav-brand-icon ' + brandStyle,
             icon: brandIcon, __source: {
               fileName: _jsxFileName,
-              lineNumber: 45
+              lineNumber: 44
             }
           })
         ),
@@ -128,14 +128,14 @@ var IconNav = exports.IconNav = (function (_React$Component) {
           'div',
           { className: 'iconav-slider', __source: {
               fileName: _jsxFileName,
-              lineNumber: 49
+              lineNumber: 48
             }
           },
           _react2.default.createElement(
             'ul',
             { className: 'nav nav-pills iconav-nav', __source: {
                 fileName: _jsxFileName,
-                lineNumber: 50
+                lineNumber: 49
               }
             },
             links
@@ -149,7 +149,7 @@ var IconNav = exports.IconNav = (function (_React$Component) {
 
 IconNav.displayName = 'IconNav';
 IconNav.propTypes = {
-  brandIcon: _react.PropTypes.string.isRequired,
+  brandIcon: _react.PropTypes.string,
   brandStyle: _react.PropTypes.string,
   links: _react.PropTypes.arrayOf(_react.PropTypes.shape({
     link: _react.PropTypes.string.isRequired,
