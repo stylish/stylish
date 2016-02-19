@@ -33,11 +33,19 @@ var _mkdirp = require('mkdirp');
 
 var _mkdirp2 = _interopRequireDefault(_mkdirp);
 
+var _rimraf = require('rimraf');
+
+var _rimraf2 = _interopRequireDefault(_rimraf);
+
 var _winston = require('winston');
 
 var _winston2 = _interopRequireDefault(_winston);
 
 var _express = require('./server/express');
+
+var _dashboard = require('./dashboard');
+
+var _dashboard2 = _interopRequireDefault(_dashboard);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -50,10 +58,14 @@ var Server = exports.Server = (function () {
     var argv = context.argv;
     var env = params.env;
     var profile = params.profile;
+    var dashboard = params.dashboard;
 
-    argv = argv || require('yargs').argv;
+    var server = this;
 
-    (0, _lodash.defaultsDeep)(this, {
+    this.dashboard = dashboard;
+    this.debug = argv && argv.debug || require('yargs').argv.debug;
+
+    (0, _lodash.defaultsDeep)(server, {
       env: env,
       profile: profile,
       project: project
@@ -61,31 +73,50 @@ var Server = exports.Server = (function () {
 
     var config = (0, _lodash.get)(project, 'settings.server.' + profile + '.' + env) || defaultSettings[profile][env] || {};
 
-    (0, _util.defineProp)(this, 'config', (0, _lodash.defaultsDeep)({}, config, { processes: {} }));
-    (0, _util.defineProp)(this, 'processes', (0, _lodash.mapValues)(config.processes, function (cfg, name) {
+    (0, _util.defineProp)(server, 'config', (0, _lodash.defaultsDeep)({}, config, { processes: {} }));
+    (0, _util.defineProp)(server, 'processes', (0, _lodash.mapValues)(config.processes, function (cfg, name) {
       return (cfg.name = name) && cfg;
     }));
 
-    this.paths = {
+    server.paths = {
       logs: project.path('logs', 'server'),
       public: project.paths.public
     };
 
-    (0, _lodash.values)(this.paths).forEach(function (path) {
+    if (env === 'development') {
+      _rimraf2.default.sync(server.paths.logs, {});
+    }
+
+    (0, _lodash.values)(server.paths).forEach(function (path) {
       _mkdirp2.default.sync(path);
     });
 
-    this.state = {
+    server.state = {
       processes: {}
     };
 
-    project.logger.add(_winston2.default.transports.File, {
-      name: 'server-logger',
+    server.logger = new _winston2.default.Logger({
       level: 'debug',
-      filename: (0, _path.join)(this.paths.logs, 'server.' + env + '.log')
-    });
+      get transports() {
+        var t = [];
 
-    this.logger = project.logger;
+        if (!this.dashboard) {
+          t.push(new _winston2.default.transports.Console({
+            level: 'debug',
+            colorize: true
+          }));
+        }
+
+        t.push(new _winston2.default.transports.File({
+          name: 'server-log',
+          filename: (0, _path.join)(server.paths.logs, 'server.' + env + '.log'),
+          level: this.debug ? 'debug' : 'info',
+          colorize: true
+        }));
+
+        return t;
+      }
+    });
   }
 
   (0, _createClass3.default)(Server, [{
@@ -94,6 +125,10 @@ var Server = exports.Server = (function () {
       this.prepare();
       this.run();
       this.listen();
+
+      if (this.dashboard && this.config.dashboard) {
+        (0, _dashboard2.default)(this, this.config.dashboard);
+      }
     }
   }, {
     key: 'listen',
@@ -139,13 +174,11 @@ var Server = exports.Server = (function () {
         var opts = (0, _lodash.pick)(proc, 'env', 'cwd', 'detached', 'uid', 'gid', 'stdio');
 
         opts = (0, _lodash.defaultsDeep)(opts, {
-          stdio: ['ignore', proc.output, proc.output]
+          stdio: ['ignore', _this2.debug ? 'inherit' : proc.output, _this2.debug ? 'inherit' : proc.output]
         });
 
         (0, _util.spawn)(proc.cmd, opts).progress(function (child) {
           _this2._processes[proc.name] = child;
-
-          child.title = 'skypager-server: ' + proc.name;
 
           updateProcess(proc.name, (0, _extends3.default)({
             pid: child.pid,
@@ -164,8 +197,25 @@ var Server = exports.Server = (function () {
         });
       });
 
-      process.on('exit', function () {
+      process.on('uncaughtException', function () {
+        _this2.log('error', 'uncaught exception: shutting down...');
+
         (0, _lodash.values)(_this2._processes).forEach(function (proc) {
+          _this2.log('info', 'killing child process', proc && proc.pid);
+
+          if (proc) {
+            proc.kill();
+          }
+        });
+
+        process.exit(1);
+      });
+
+      process.on('exit', function () {
+        _this2.log('info', 'shutting down...');
+
+        (0, _lodash.values)(_this2._processes).forEach(function (proc) {
+          _this2.log('info', 'killing child process', proc && proc.pid);
           if (proc) {
             proc.kill();
           }
@@ -189,8 +239,9 @@ var Server = exports.Server = (function () {
       var _this3 = this;
 
       this.eachProcess(function (proc) {
-        (0, _util.defineProp)(proc, 'output', stream(_this3.logPath(proc.name + '.' + _this3.env + '.log')));
-        proc.output.open();
+        var output = stream(_this3.logPath(proc.name + '.' + _this3.env + '.log'));
+        (0, _util.defineProp)(proc, 'output', output);
+        output.open();
       });
     }
   }, {
@@ -207,7 +258,6 @@ var Server = exports.Server = (function () {
       var updated = current = (0, _assign2.default)(current, data);
 
       (0, _lodash.set)(this, 'state.processes.' + name, updated);
-
       this.log('debug', 'updated process', current);
     }
   }, {

@@ -49,24 +49,30 @@ export function express(server, options = {}) {
 
 export default express
 
-function setupWebpackProxy(app, { path='/', host = 'localhost', port=3000, proto='http' }){
+function setupWebpackProxy(app, { path='/', host = 'localhost', port=3000, proto='http' }, server){
   let target = `${proto}://${ host }:${ port }`
 
   app.use(
     proxyMiddleware(path, {
       target,
-      ws: true
+      ws: true,
+      logProvider: function() {
+         return server.logger
+      }
     })
   )
 }
 
-function setupDeepstreamProxy(app, { path='/engine.io', host, port, proto='http' }) {
+function setupDeepstreamProxy(app, { path='/engine.io', host, port, proto='http' }, server) {
   let target = `${proto}://${ host }:${ port }`
 
   app.use(
     proxyMiddleware(path, {
       target,
-      ws: true
+      ws: true,
+      logProvider: function() {
+         return server.logger
+      }
     })
   )
 }

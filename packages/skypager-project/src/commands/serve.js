@@ -15,7 +15,7 @@ export function serve (program, dispatch) {
 export default serve
 
 export function handle(arg, options = {}, context = {}) {
-  let { project, argv } = context
+  let { project } = context
 
   if (!project) {
     throw('project must be run within a skyager project')
@@ -39,13 +39,13 @@ export function handle(arg, options = {}, context = {}) {
 
 
   if (rawArg === 'deepstream') {
-    require('skypager-server').deepstream({ profile, env }, {project, argv})
+    require('skypager-server').deepstream({ profile, env }, {project, argv: yargs.argv})
   } else if (rawArg === 'webpack') {
     let opts = get(serverSettings, `${profile}.${env}.webpack`) || {}
-
+    context.argv = yargs.argv
     handleWebpack(profile, opts, context)
   } else {
-    server({profile, env, dashboard}, {project, argv})
+    server({profile, env, dashboard}, {project, argv: yargs.argv})
   }
 }
 

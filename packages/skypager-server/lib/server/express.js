@@ -60,7 +60,7 @@ function express(server) {
 
 exports.default = express;
 
-function setupWebpackProxy(app, _ref) {
+function setupWebpackProxy(app, _ref, server) {
   var _ref$path = _ref.path;
   var path = _ref$path === undefined ? '/' : _ref$path;
   var _ref$host = _ref.host;
@@ -74,11 +74,14 @@ function setupWebpackProxy(app, _ref) {
 
   app.use((0, _httpProxyMiddleware2.default)(path, {
     target: target,
-    ws: true
+    ws: true,
+    logProvider: function logProvider() {
+      return server.logger;
+    }
   }));
 }
 
-function setupDeepstreamProxy(app, _ref2) {
+function setupDeepstreamProxy(app, _ref2, server) {
   var _ref2$path = _ref2.path;
   var path = _ref2$path === undefined ? '/engine.io' : _ref2$path;
   var host = _ref2.host;
@@ -90,7 +93,10 @@ function setupDeepstreamProxy(app, _ref2) {
 
   app.use((0, _httpProxyMiddleware2.default)(path, {
     target: target,
-    ws: true
+    ws: true,
+    logProvider: function logProvider() {
+      return server.logger;
+    }
   }));
 }
 

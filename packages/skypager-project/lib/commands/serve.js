@@ -32,7 +32,6 @@ function handle(arg) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
   var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
   var project = context.project;
-  var argv = context.argv;
 
   if (!project) {
     throw 'project must be run within a skyager project';
@@ -62,13 +61,13 @@ function handle(arg) {
   var rawArg = _yargs2.default.argv._[1];
 
   if (rawArg === 'deepstream') {
-    require('skypager-server').deepstream({ profile: profile, env: env }, { project: project, argv: argv });
+    require('skypager-server').deepstream({ profile: profile, env: env }, { project: project, argv: _yargs2.default.argv });
   } else if (rawArg === 'webpack') {
     var opts = (0, _get2.default)(serverSettings, profile + '.' + env + '.webpack') || {};
-
+    context.argv = _yargs2.default.argv;
     (0, _develop.handle)(profile, opts, context);
   } else {
-    server({ profile: profile, env: env, dashboard: dashboard }, { project: project, argv: argv });
+    server({ profile: profile, env: env, dashboard: dashboard }, { project: project, argv: _yargs2.default.argv });
   }
 }
 

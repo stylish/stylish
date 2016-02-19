@@ -5,19 +5,24 @@ import { pick, set, values, mapValues, get, defaultsDeep as defaults } from 'lod
 import { defineProp, colorize, spawn } from './util.js'
 
 import mkdirp from 'mkdirp'
+import rimraf from 'rimraf'
 
 import winston from 'winston'
 
 import { express } from './server/express'
+import dashboard from './dashboard'
 
 export class Server {
   constructor(params = {}, context = {}) {
     let { project, argv } = context
-    let { env, profile } = params
+    let { env, profile, dashboard } = params
 
-    argv = argv || require('yargs').argv
+    let server = this
 
-    defaults(this, {
+    this.dashboard = dashboard
+    this.debug = argv && argv.debug || require('yargs').argv.debug
+
+    defaults(server, {
       env,
       profile,
       project
@@ -25,35 +30,62 @@ export class Server {
 
     let config = get(project, `settings.server.${profile}.${env}`) || defaultSettings[profile][env] || {}
 
-    defineProp(this, 'config', defaults({}, config, {processes:{}}))
-    defineProp(this, 'processes', mapValues(config.processes, (cfg, name) => (cfg.name = name) && cfg))
+    defineProp(server, 'config', defaults({}, config, {processes:{}}))
+    defineProp(server, 'processes', mapValues(config.processes, (cfg, name) => (cfg.name = name) && cfg))
 
-    this.paths = {
+    server.paths = {
       logs: project.path('logs', 'server'),
       public: project.paths.public
     }
 
-    values(this.paths).forEach(path => {
+    if (env === 'development') {
+      rimraf.sync(server.paths.logs, {})
+    }
+
+    values(server.paths).forEach(path => {
       mkdirp.sync(path)
     })
 
-    this.state = {
+    server.state = {
       processes: {}
     }
 
-    project.logger.add(winston.transports.File,{
-      name: 'server-logger',
+    server.logger = new winston.Logger({
       level: 'debug',
-      filename: join(this.paths.logs, `server.${ env }.log`)
-    })
+      get transports() {
+        let t = []
 
-    this.logger = project.logger
+        if(!this.dashboard) {
+          t.push(
+            new winston.transports.Console({
+              level: 'debug',
+              colorize: true
+            })
+          )
+        }
+
+        t.push(
+          new winston.transports.File({
+            name: 'server-log',
+            filename: join(server.paths.logs, `server.${env}.log`),
+            level: this.debug ? 'debug' : 'info',
+            colorize: true
+          })
+        )
+
+        return t
+      }
+    })
   }
 
   start () {
     this.prepare()
     this.run()
     this.listen()
+
+    if (this.dashboard && this.config.dashboard) {
+      dashboard(this, this.config.dashboard)
+    }
   }
 
   listen (options = {}) {
@@ -90,16 +122,14 @@ export class Server {
       opts = defaults(opts, {
         stdio:[
           'ignore',
-          proc.output,
-          proc.output
+          this.debug ? 'inherit' : proc.output,
+          this.debug ? 'inherit' : proc.output
         ]
       })
 
       spawn(proc.cmd, opts)
       .progress((child) => {
         this._processes[proc.name] = child
-
-        child.title = 'skypager-server: ' + proc.name
 
         updateProcess(proc.name, {
           pid: child.pid,
@@ -122,8 +152,25 @@ export class Server {
       })
     })
 
-    process.on('exit', () => {
+    process.on('uncaughtException', () => {
+      this.log('error', 'uncaught exception: shutting down...')
+
       values(this._processes).forEach(proc => {
+        this.log('info', 'killing child process', proc && proc.pid)
+
+        if(proc) {
+          proc.kill()
+        }
+      })
+
+      process.exit(1)
+    })
+
+    process.on('exit', () => {
+      this.log('info', 'shutting down...')
+
+      values(this._processes).forEach(proc => {
+        this.log('info', 'killing child process', proc && proc.pid)
         if(proc) {
           proc.kill()
         }
@@ -142,8 +189,9 @@ export class Server {
   */
   prepare() {
     this.eachProcess((proc) => {
-      defineProp(proc, 'output', stream(this.logPath(`${ proc.name }.${ this.env }.log`)))
-      proc.output.open()
+      let output = stream(this.logPath(`${ proc.name }.${ this.env }.log`))
+      defineProp(proc, 'output', output)
+      output.open()
     })
   }
 
@@ -156,7 +204,6 @@ export class Server {
     let updated = current = Object.assign(current, data)
 
     set(this, `state.processes.${ name }`, updated)
-
     this.log('debug', 'updated process', current)
   }
 
