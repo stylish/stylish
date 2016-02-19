@@ -1,16 +1,10 @@
 {
   "name": "skypager",
-  "version": "2.2.2",
+  "version": "2.2.1",
   "description": "skypager: cloud publishing framework",
   "skypager": {
     "main": "skypager.js",
-    "theme": "dashboard",
-    "plugins": [
-      "blueprints"
-    ]
-  },
-  "scripts": {
-    "test": "skypager run:package:script test"
+    "theme": "dashboard"
   },
   "main": "index.js",
   "dependencies": {

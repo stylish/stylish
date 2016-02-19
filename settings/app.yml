@@ -1,4 +1,4 @@
 app:
-  layout: MainLayout
+  defaultLayout: fluid
   entryPoints:
     index: HomePage

@@ -1,2 +1,5 @@
 branding:
-  icon: leaf
+  theme: marketing-bold
+  icon: rocket
+  style: bold
+  brand: Skypager.io
