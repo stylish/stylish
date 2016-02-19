@@ -1,4 +1,4 @@
 app:
-  defaultLayout: fluid
+  defaultLayout: icon
   entryPoints:
     index: HomePage

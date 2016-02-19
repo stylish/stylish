@@ -3,3 +3,6 @@ navigation:
     - label: Home
       icon: home
       link: '/'
+    - label: About
+      icon: cog
+      link: '/about'

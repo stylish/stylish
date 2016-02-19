@@ -25,5 +25,8 @@
     "url": "git+ssh://git@github.com/skypager/skypager.git"
   },
   "author": "Jonathan Soeder <jon@chicago.com",
-  "license": "SEE LICENSE IN License.md"
+  "license": "SEE LICENSE IN License.md",
+  "scripts": {
+      "start": "skypager serve web --profile web --env development --debug"
+  }
 }

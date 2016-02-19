@@ -4,6 +4,7 @@ import { Router, browserHistory as history } from 'react-router'
 
 import { stores as buildStore } from '../util/stores'
 import { routes as buildRoutes } from '../util/routes'
+import stateful from '../util/stateful'
 
 import DefaultLayout from 'ui/layouts/DefaultLayout'
 
