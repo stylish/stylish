@@ -7,8 +7,8 @@
     "skypager-cli": "./bin/cli.js"
   },
   "scripts": {
-    "test:bundle:export": "skypager export bundle --clean",
-    "test:bundle:compile": "skypager build --webpack-config test/webpack.bundle.config.js > /dev/null",
+    "test:bundle:export": "./bin/cli.js export bundle --clean",
+    "test:bundle:compile": "./bin/cli.js build --webpack-config test/webpack.bundle.config.js > /dev/null",
     "test:bundle": "npm run test:bundle:export && npm run test:bundle:compile",
     "_pretest": "SKYPAGER_ENV=development npm run test:bundle",
     "test": "SKYPAGER_ENV=test NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
@@ -16,7 +16,6 @@
     "test:watch": "SKYPAGER_ENV=development NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
     "lint": "eslint src/**/*",
     "lint:fix": "npm run lint -- --fix",
-    "dev:console": "./bin/skypager.js repl --dev-mode --project ./test/fixture",
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
     "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
     "preversion": "SKYPAGER_ENV=test NODE_ENV=test npm run pretest && mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",

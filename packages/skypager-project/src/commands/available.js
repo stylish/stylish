@@ -1,26 +1,56 @@
 import { pluralize } from '../util'
 
+import { capitalize } from 'lodash'
+
 export function available (program, dispatch) {
   program
-    .command('available [helperType]')
+    .command('info')
     .description('list available helpers in this project')
-    .option('--type <helperType>', 'the type of helpers you want to list. valid options are action, context, exporter, importer, model, plugin, renderer, store, view')
     .action(dispatch(handle))
 }
 
 export default available
 
-export function handle(type, options = {}, context = {}) {
-  let helperType = type || options.type
+export function handle(options = {}, context = {}) {
   let { project } = context
 
-  helperType = pluralize(helperType).toLowerCase()
+  console.log('Support Libraries'.magenta)
+  console.log('================='.white)
 
-  console.log(`Available ${ helperType }`.green + ':')
+  supportLibraries.forEach(mod => {
+    try {
+      require(mod)
+      console.log(mod.cyan)
+      console.log('    found in: ' + require.resolve(mod))
+      console.log('')
+    } catch (error) {
+      console.log(mod + ': ' + 'Missing.'.red )
+    }
+  })
 
-  let registry = project.registries[helperType]
+  console.log('')
+  console.log('Available Helpers'.green)
+  console.log('================='.white)
+  console.log('')
 
-  registry.available.sort().forEach(val => {
-    console.log(val)
+  let regs = Object.keys(project.registries)
+
+  regs.forEach(regName => {
+    console.log(`${ capitalize( regName ) }:`.cyan)
+    console.log('-----')
+    let registry = project.registries[regName]
+
+    registry.available.sort().forEach(val => {
+      console.log(`    ${ val }`)
+    })
+
+    console.log('')
   })
 }
+
+const supportLibraries = [
+  'skypager-project',
+  'skypager-devpack',
+  'skypager-themes',
+  'skypager-server'
+]

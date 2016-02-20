@@ -19,13 +19,13 @@ var missingSuggested = filter(suggestedPackages, isMissing)
 
 if (missingRequirements.length > 0) {
   missingRequirements.forEach(function(pkg) {
-    abort('The required package ' + pkg.magenta + ' is not found. npm install \'skypager\' should provide it.')
+    //abort('The required package ' + pkg.magenta + ' is not found. npm install \'skypager\' should provide it.')
   })
 }
 
 if (missingSuggested.length > 0) {
   missingSuggested.forEach(function(pkg) {
-    warn('The package ' + pkg.magenta + ' was not found. We suggest installing it.')
+    //warn('The package ' + pkg.magenta + ' was not found. We suggest installing it.')
   })
 }
 

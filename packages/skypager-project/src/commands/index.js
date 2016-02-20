@@ -101,11 +101,11 @@ function configure (commander, options = {}) {
 
   build(commander, dispatch)
 
+  repl(commander, dispatch)
+
   if (isDevMode) {
-    repl(commander, dispatch)
     create(commander, dispatch)
   }
-
 
   develop(commander, dispatch)
 
@@ -114,10 +114,6 @@ function configure (commander, options = {}) {
   init(commander, dispatch)
 
   importer(commander, dispatch)
-
-  if (isDevMode) {
-    listen(commander, dispatch)
-  }
 
   publish(commander, dispatch)
 
