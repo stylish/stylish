@@ -1,4 +1,5 @@
-const BundleWrapperPath = require('path').resolve('../../lib/bundle.js')
+const IncludeCollections = ['data_sources','documents', 'settings'];
+
 export function BrowserBundle (options = {}) {
   let project = options.project = this
 
@@ -78,16 +79,16 @@ export function ProjectExporter (options = {}, callback) {
     `bundle.assets = require('./assets-export.json');`,
     `bundle.models = require('./models-export.json');`,
     `bundle.settings = require('./settings-export.json');`,
-    `
-    bundle.requireContexts = {
-      scripts: require.context('${ project.scripts.paths.absolute }', true, /\.js$/i),
-      stylesheets: require.context('${ project.stylesheets.paths.absolute }', true, /\..*ss$/i)
-    };
-    bundle.content = {}`
+    `bundle.content = {}`,
   ]
 
-  keys(project.content).forEach(key => {
+   IncludeCollections.forEach(key => {
     lines.push(`var _${ key } = bundle.content.${ key } = {};`)
+
+    if (!project.content[key]) {
+      console.error('No such content colection', key, Object.keys(project.content))
+      throw('No such content collection ' + key)
+    }
 
     project.content[key].forEach(asset => {
       let { requirePath } = AssetExporter.call(project, { asset, options, key })

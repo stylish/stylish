@@ -28,27 +28,24 @@ class Bundle {
     this.model = bundle.models
     this.settings = bundle.settings
 
-    this.assetsContent = this.content.assets
+    //this.assetsContent = this.content.assets
     this.settingsContent = this.content.settings
-
     this.docs = this.content.documents
     this.data = this.content.data_sources
-    this.scripts = this.content.scripts
-    this.stylesheets = this.content.stylesheets
-    this.packages = this.content.packages
-    this.projects = this.content.projects
+
+    //this.scripts = this.content.scripts
+    //this.stylesheets = this.content.stylesheets
+    //this.packages = this.content.packages
+    //this.projects = this.content.projects
 
     this.entityNames = keys(this.entities || {})
 
-    this.requireContexts = bundle.requireContexts
+    //this.requireContexts = bundle.requireContexts
 
     // naming irregularities
     assign(this, {
       get settingsFiles() {
         return bundle.content.settings
-      },
-      get assetFiles() {
-        return bundle.content.assets
       },
       get data() {
         return bundle.content.data_sources
@@ -93,22 +90,27 @@ class Bundle {
   }
 
   requireEntryPoint (id) {
+    throw('This feature is deprecated', id)
     return this.require('script', `entries/${ id }`)
   }
 
   requireLayout (id) {
+    throw('This feature is deprecated', id)
     return this.require('script', `layouts/${ id }`)
   }
 
   requireComponent (id) {
+    throw('This feature is deprecated', id)
     return this.require('script', `components/${ id }`)
   }
 
   requireStyleSheet (id) {
+    throw('This feature is deprecated', id)
     return this.require('stylesheet', id)
   }
 
   require(assetType, assetId) {
+    throw('This feature is deprecated', id)
     let key = this[`${assetType}s`][assetId].paths.relative
     let asset = this.requireContexts[`${assetType}s`]( './' + key )
 
@@ -122,8 +124,6 @@ class Bundle {
 
   buildStateMachine (props = {}) {
     let project = props.project = this
-
-    let { settings } = ProjectReducers
 
     props.reducers = props.reducers || []
     props.initialState = props.initialState || []
@@ -170,7 +170,7 @@ class Bundle {
          cfg.component = project.requireEntryPoint(cfg.component.replace(/^entries\//,''))
       } else if (typeof cfg === 'object' && cfg.index && typeof cfg.index === 'string') {
          cfg.component = project.requireEntryPoint(cfg.index.replace(/^entries\//,''))
-      } else if (typeof cfg === 'object' && cfg.index && typeof cfg.index === 'object') {
+      } else if (typeof cfg === 'object' && cfg.index && typeof cfg.index === 'object' && typeof cfg.index.component === 'string') {
          cfg.component = project.requireEntryPoint(cfg.index.component.replace(/^entries\//,''))
       } else if (typeof cfg === 'function') {
         cfg = {
