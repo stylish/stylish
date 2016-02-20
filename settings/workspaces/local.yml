@@ -1,0 +1,14 @@
+local:
+  processes:
+    project_watcher:
+      cmd: npm run test:watch
+      cwd: '<%= process.env.PWD + "/packages/skypager-project" %>'
+    project_compiler:
+      cmd: npm run compile:watch
+      cwd: '<%= process.env.PWD + "/packages/skypager-project" %>'
+    server_watcher:
+      cmd: npm run test:watch
+      cwd: '<%= process.env.PWD + "/packages/skypager-server" %>'
+    server_compiler:
+      cmd: npm run compile:watch
+      cwd: '<%= process.env.PWD + "/packages/skypager-server" %>'

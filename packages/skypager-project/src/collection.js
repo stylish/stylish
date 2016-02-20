@@ -1,7 +1,7 @@
 import {filterQuery as query, hide, hidden, lazy, tabelize, values} from './util'
 import {relative, basename, dirname, extname, resolve, join} from 'path'
 import minimatch from 'minimatch'
-import { invokeMap, mapValues, groupBy, invoke, pick, set as carve } from 'lodash'
+import { invokeMap, mapValues, transform, groupBy, invoke, pick, set as carve } from 'lodash'
 
 /**
  * The Skypager.Collection is a wrapper around local file folders
@@ -119,6 +119,10 @@ class Collection {
 
   mapResult(...args) {
     return this.map(asset => asset.result(...args))
+  }
+
+  transform(...args) {
+    return transform(this.assets, ...args)
   }
 
   mapValues(...args) {
@@ -245,6 +249,12 @@ function wrapCollection(collection, array) {
 
       return array.reduce((memo,a) => {
         let asset = prop ? a[prop] : a
+
+        if (key === 'idpath') {
+          carve(memo, a.id.replace(/\//g,'.'), asset)
+          return memo
+        }
+
         let payload = key ? { [a[key]]: asset } : asset
 
         return assign(memo, payload)

@@ -17,6 +17,6 @@ describe('The Settings System', function(){
   it('has a dedicated settings path', function(){
     project.paths.should.have.property('settings')
     project.paths.settings.should.match(/test.fixture.settings/)
-    project.content.settings.should.have.property('root')
+    project.content.settings_files.should.have.property('root')
   })
 })

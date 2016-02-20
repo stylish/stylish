@@ -1,58 +1,57 @@
 server:
-  web:
-    development:
-      port: 8080
+  development:
+    port: 8080
+    host: 0.0.0.0
+    
+    webpack:
+      entry: './src'
+      bundle: true
       host: 0.0.0.0
-      
-      webpack:
-        entry: './src'
-        bundle: true
-        host: 0.0.0.0
-        port: 3000
+      port: 3000
 
+    deepstream:
+      host: 0.0.0.0
+      port: 9020
+
+    processes:
       deepstream:
-        host: 0.0.0.0
-        port: 9020
+        cmd: 'skypager serve deepstream --profile web --env development'
+      webpack:
+        cmd: 'skypager serve webpack --profile web --env development'
 
-      processes:
-        deepstream:
-          cmd: 'skypager serve deepstream --profile web --env development'
-        webpack:
-          cmd: 'skypager serve webpack --profile web --env development'
+    dashboard:
+      panels:
+        leftPanel: 
+          label: API
+          type: log
+          left: "1%"
+          top: "1%"
+          height: "98%"
+          width: "40%"
+          process: server
+          borderStyles:
+            type: line
+            color: yellow
+        rightTop:
+          type: log
+          left: "41%"
+          width: "58%"
+          top: "1%"
+          height: "68%"
+          process: webpack
+          label: Frontend Build
+          borderStyles:
+            type: line
+            color: green
 
-      dashboard:
-        panels:
-          leftPanel: 
-            label: API
-            type: log
-            left: "1%"
-            top: "1%"
-            height: "98%"
-            width: "40%"
-            process: server
-            borderStyles:
-              type: line
-              color: yellow
-          rightTop:
-            type: log
-            left: "41%"
-            width: "58%"
-            top: "1%"
-            height: "68%"
-            process: webpack
-            label: Frontend Build
-            borderStyles:
-              type: line
-              color: green
-
-          rightBottom:
-            type: log
-            left: "41%"
-            width: "58%"
-            height: "29%"
-            top: "70%"
-            label: Deepstream Server
-            process: deepstream
-            borderStyles:
-              type: line
-              color: cyan
+        rightBottom:
+          type: log
+          left: "41%"
+          width: "58%"
+          height: "29%"
+          top: "70%"
+          label: Deepstream Server
+          process: deepstream
+          borderStyles:
+            type: line
+            color: cyan

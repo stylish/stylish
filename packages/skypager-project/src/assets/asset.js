@@ -34,19 +34,17 @@ class Asset {
     this.hidden('project', () => options.project)
     this.hidden('collection', () => options.collection)
 
-    this.id = this.paths.relative.replace(this.extension, '')
+    this.id = this.generateId()
     this.slug = this.id.replace(/\//g,'__')
-
-    Object.defineProperty(this, 'asts', {
-      get: function () {
-        return asts
-      }
-    })
 
     this.lazy('parsed', () => this.parse(this.raw))
     this.lazy('indexed', () => this.index(this.parsed, this))
     this.lazy('transformed', () => this.transform(this.indexed, this))
 
+  }
+
+  generateId() {
+     return this.paths.relative.replace(this.extension, '')
   }
 
   templater (string) {

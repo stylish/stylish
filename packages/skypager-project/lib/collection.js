@@ -157,10 +157,19 @@ var Collection = (function () {
       });
     }
   }, {
-    key: 'mapValues',
-    value: function mapValues() {
+    key: 'transform',
+    value: function transform() {
       for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
         args[_key3] = arguments[_key3];
+      }
+
+      return _lodash.transform.apply(undefined, [this.assets].concat(args));
+    }
+  }, {
+    key: 'mapValues',
+    value: function mapValues() {
+      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
       }
 
       return _lodash.mapValues.apply(undefined, [this.assets].concat(args));
@@ -168,8 +177,8 @@ var Collection = (function () {
   }, {
     key: 'groupBy',
     value: function groupBy() {
-      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-        args[_key4] = arguments[_key4];
+      for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+        args[_key5] = arguments[_key5];
       }
 
       return _lodash.groupBy.apply(undefined, [this.all].concat(args));
@@ -177,8 +186,8 @@ var Collection = (function () {
   }, {
     key: 'invokeMap',
     value: function invokeMap() {
-      for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-        args[_key5] = arguments[_key5];
+      for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+        args[_key6] = arguments[_key6];
       }
 
       return _lodash.invokeMap.apply(undefined, [this.all].concat(args));
@@ -186,8 +195,8 @@ var Collection = (function () {
   }, {
     key: 'invoke',
     value: function invoke() {
-      for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-        args[_key6] = arguments[_key6];
+      for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+        args[_key7] = arguments[_key7];
       }
 
       return _lodash.invoke.apply(undefined, [this.all].concat(args));
@@ -259,8 +268,8 @@ var Collection = (function () {
   }, {
     key: 'hidden',
     value: function hidden() {
-      for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-        args[_key7] = arguments[_key7];
+      for (var _len8 = arguments.length, args = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
+        args[_key8] = arguments[_key8];
       }
 
       return _util.hidden.getter.apply(_util.hidden, [this].concat(args));
@@ -268,8 +277,8 @@ var Collection = (function () {
   }, {
     key: 'lazy',
     value: function lazy() {
-      for (var _len8 = arguments.length, args = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
-        args[_key8] = arguments[_key8];
+      for (var _len9 = arguments.length, args = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
+        args[_key9] = arguments[_key9];
       }
 
       return _util.lazy.apply(undefined, [this].concat(args));
@@ -400,6 +409,12 @@ function wrapCollection(collection, array) {
 
       return array.reduce(function (memo, a) {
         var asset = prop ? a[prop] : a;
+
+        if (key === 'idpath') {
+          (0, _lodash.set)(memo, a.id.replace(/\//g, '.'), asset);
+          return memo;
+        }
+
         var payload = key ? (0, _defineProperty3.default)({}, a[key], asset) : asset;
 
         return assign(memo, payload);
@@ -419,8 +434,8 @@ function wrapCollection(collection, array) {
   defineProperty(array, 'mapPick', {
     enumerable: false,
     value: function value() {
-      for (var _len9 = arguments.length, args = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
-        args[_key9] = arguments[_key9];
+      for (var _len10 = arguments.length, args = Array(_len10), _key10 = 0; _key10 < _len10; _key10++) {
+        args[_key10] = arguments[_key10];
       }
 
       return array.map(function (asset) {

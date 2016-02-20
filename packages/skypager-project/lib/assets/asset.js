@@ -84,14 +84,8 @@ var Asset = (function () {
       return options.collection;
     });
 
-    this.id = this.paths.relative.replace(this.extension, '');
+    this.id = this.generateId();
     this.slug = this.id.replace(/\//g, '__');
-
-    Object.defineProperty(this, 'asts', {
-      get: function get() {
-        return asts;
-      }
-    });
 
     this.lazy('parsed', function () {
       return _this.parse(_this.raw);
@@ -105,6 +99,11 @@ var Asset = (function () {
   }
 
   (0, _createClass3.default)(Asset, [{
+    key: 'generateId',
+    value: function generateId() {
+      return this.paths.relative.replace(this.extension, '');
+    }
+  }, {
     key: 'templater',
     value: function templater(string) {
       var asset = this;

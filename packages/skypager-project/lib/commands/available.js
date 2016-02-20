@@ -3,30 +3,62 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
 exports.available = available;
 exports.handle = handle;
 
 var _util = require('../util');
 
+var _lodash = require('lodash');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function available(program, dispatch) {
-  program.command('available [helperType]').description('list available helpers in this project').option('--type <helperType>', 'the type of helpers you want to list. valid options are action, context, exporter, importer, model, plugin, renderer, store, view').action(dispatch(handle));
+  program.command('info').description('list available helpers in this project').action(dispatch(handle));
 }
 
 exports.default = available;
-function handle(type) {
-  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-  var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-  var helperType = type || options.type;
+function handle() {
+  var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+  var context = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
   var project = context.project;
 
-  helperType = (0, _util.pluralize)(helperType).toLowerCase();
+  console.log('Support Libraries'.magenta);
+  console.log('================='.white);
 
-  console.log(('Available ' + helperType).green + ':');
+  supportLibraries.forEach(function (mod) {
+    try {
+      require(mod);
+      console.log(mod.cyan);
+      console.log('    found in: ' + require.resolve(mod));
+      console.log('');
+    } catch (error) {
+      console.log(mod + ': ' + 'Missing.'.red);
+    }
+  });
 
-  var registry = project.registries[helperType];
+  console.log('');
+  console.log('Available Helpers'.green);
+  console.log('================='.white);
+  console.log('');
 
-  registry.available.sort().forEach(function (val) {
-    console.log(val);
+  var regs = (0, _keys2.default)(project.registries);
+
+  regs.forEach(function (regName) {
+    console.log(((0, _lodash.capitalize)(regName) + ':').cyan);
+    console.log('-----');
+    var registry = project.registries[regName];
+
+    registry.available.sort().forEach(function (val) {
+      console.log('    ' + val);
+    });
+
+    console.log('');
   });
 }
+
+var supportLibraries = ['skypager-project', 'skypager-devpack', 'skypager-themes', 'skypager-server'];

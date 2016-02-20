@@ -52,27 +52,24 @@ module.exports = (function () {
     this.model = bundle.models;
     this.settings = bundle.settings;
 
-    this.assetsContent = this.content.assets;
+    //this.assetsContent = this.content.assets
     this.settingsContent = this.content.settings;
-
     this.docs = this.content.documents;
     this.data = this.content.data_sources;
-    this.scripts = this.content.scripts;
-    this.stylesheets = this.content.stylesheets;
-    this.packages = this.content.packages;
-    this.projects = this.content.projects;
+
+    //this.scripts = this.content.scripts
+    //this.stylesheets = this.content.stylesheets
+    //this.packages = this.content.packages
+    //this.projects = this.content.projects
 
     this.entityNames = keys(this.entities || {});
 
-    this.requireContexts = bundle.requireContexts;
+    //this.requireContexts = bundle.requireContexts
 
     // naming irregularities
     assign(this, {
       get settingsFiles() {
         return bundle.content.settings;
-      },
-      get assetFiles() {
-        return bundle.content.assets;
       },
       get data() {
         return bundle.content.data_sources;
@@ -121,26 +118,31 @@ module.exports = (function () {
   }, {
     key: 'requireEntryPoint',
     value: function requireEntryPoint(id) {
+      throw ('This feature is deprecated', id);
       return this.require('script', 'entries/' + id);
     }
   }, {
     key: 'requireLayout',
     value: function requireLayout(id) {
+      throw ('This feature is deprecated', id);
       return this.require('script', 'layouts/' + id);
     }
   }, {
     key: 'requireComponent',
     value: function requireComponent(id) {
+      throw ('This feature is deprecated', id);
       return this.require('script', 'components/' + id);
     }
   }, {
     key: 'requireStyleSheet',
     value: function requireStyleSheet(id) {
+      throw ('This feature is deprecated', id);
       return this.require('stylesheet', id);
     }
   }, {
     key: 'require',
     value: function require(assetType, assetId) {
+      throw ('This feature is deprecated', id);
       var key = this[assetType + 's'][assetId].paths.relative;
       var asset = this.requireContexts[assetType + 's']('./' + key);
 
@@ -156,8 +158,6 @@ module.exports = (function () {
       var props = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
       var project = props.project = this;
-
-      var settings = ProjectReducers.settings;
 
       props.reducers = props.reducers || [];
       props.initialState = props.initialState || [];
@@ -205,7 +205,7 @@ module.exports = (function () {
           cfg.component = project.requireEntryPoint(cfg.component.replace(/^entries\//, ''));
         } else if ((typeof cfg === 'undefined' ? 'undefined' : (0, _typeof3.default)(cfg)) === 'object' && cfg.index && typeof cfg.index === 'string') {
           cfg.component = project.requireEntryPoint(cfg.index.replace(/^entries\//, ''));
-        } else if ((typeof cfg === 'undefined' ? 'undefined' : (0, _typeof3.default)(cfg)) === 'object' && cfg.index && (0, _typeof3.default)(cfg.index) === 'object') {
+        } else if ((typeof cfg === 'undefined' ? 'undefined' : (0, _typeof3.default)(cfg)) === 'object' && cfg.index && (0, _typeof3.default)(cfg.index) === 'object' && typeof cfg.index.component === 'string') {
           cfg.component = project.requireEntryPoint(cfg.index.component.replace(/^entries\//, ''));
         } else if (typeof cfg === 'function') {
           cfg = {

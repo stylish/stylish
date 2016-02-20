@@ -14,11 +14,11 @@ export function spawn(command, options = {}, progress) {
   let [cmd, ...args] = command.split(' ')
 
   // this might be overkill
-  if (options.cwd) {
+  /*if (options.cwd) {
     options.env = Object.assign({}, process.env, (options.env || {}), {
       PWD: options.cwd
     })
-  }
+  }*/
 
   return progress
     ? spawnPromise(cmd, args, options).progress(progress)

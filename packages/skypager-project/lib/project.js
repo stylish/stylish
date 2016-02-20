@@ -578,9 +578,12 @@ var Project = (function () {
   }, {
     key: 'settings',
     get: function get() {
-      return this.content.settings.query(function (s) {
+      return this.content.settings_files.query(function (s) {
         return true;
-      }).merge();
+      }).condense({
+        key: 'idpath',
+        prop: 'data'
+      });
     }
   }]);
   return Project;
@@ -661,6 +664,8 @@ function buildContentCollectionsManually() {
   var Image = Assets.Image;
   var Script = Assets.Script;
   var Stylesheet = Assets.Stylesheet;
+  var ProjectManifest = Assets.ProjectManifest;
+  var SettingsFile = Assets.SettingsFile;
   var Vector = Assets.Vector;
 
   return {
@@ -675,7 +680,7 @@ function buildContentCollectionsManually() {
     packages: new _collection2.default({
       root: this.paths.packages,
       project: this,
-      assetClass: DataSource,
+      assetClass: ProjectManifest,
       pattern: '*/package.json',
       exclude: '**/node_modules'
     }),
@@ -683,15 +688,15 @@ function buildContentCollectionsManually() {
     projects: new _collection2.default({
       root: this.paths.projects,
       project: this,
-      assetClass: DataSource,
+      assetClass: ProjectManifest,
       pattern: '*/package.json',
       exclude: '**/node_modules'
     }),
 
-    settings: new _collection2.default({
+    settings_files: new _collection2.default({
       root: this.paths.settings,
       project: this,
-      assetClass: DataSource
+      assetClass: SettingsFile
     })
   };
 }

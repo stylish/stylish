@@ -1,3 +1,5 @@
+import set from 'lodash/set'
+
 describe("Content Collections", function(){
   const project = require('./fixture')
   const content = project.content
@@ -55,5 +57,4 @@ describe("Content Collections", function(){
     condensed.should.have.property('merge/alpha')
     condensed.should.have.property('merge/bravo')
   })
-
 })

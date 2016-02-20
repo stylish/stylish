@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
 var _stringify = require('babel-runtime/core-js/json/stringify');
 
 var _stringify2 = _interopRequireDefault(_stringify);
@@ -18,7 +22,8 @@ exports.ProjectExporter = ProjectExporter;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var BundleWrapperPath = require('path').resolve('../../lib/bundle.js');
+var IncludeCollections = ['data_sources', 'documents', 'settings_files'];
+
 function BrowserBundle() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -96,10 +101,15 @@ function ProjectExporter() {
     });
   }
 
-  var lines = [contextPolyfill(), 'var bundle = module.exports = {};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.assets = require(\'./assets-export.json\');', 'bundle.models = require(\'./models-export.json\');', 'bundle.settings = require(\'./settings-export.json\');', '\n    bundle.requireContexts = {\n      scripts: require.context(\'' + project.scripts.paths.absolute + '\', true, /.js$/i),\n      stylesheets: require.context(\'' + project.stylesheets.paths.absolute + '\', true, /..*ss$/i)\n    };\n    bundle.content = {}'];
+  var lines = [contextPolyfill(), 'var bundle = module.exports = {};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.assets = require(\'./assets-export.json\');', 'bundle.models = require(\'./models-export.json\');', 'bundle.settings = require(\'./settings-export.json\');', 'bundle.content = {}'];
 
-  keys(project.content).forEach(function (key) {
+  IncludeCollections.forEach(function (key) {
     lines.push('var _' + key + ' = bundle.content.' + key + ' = {};');
+
+    if (!project.content[key]) {
+      console.error('No such content colection', key, (0, _keys2.default)(project.content));
+      throw 'No such content collection ' + key;
+    }
 
     project.content[key].forEach(function (asset) {
       var _AssetExporter$call = AssetExporter.call(project, { asset: asset, options: options, key: key });

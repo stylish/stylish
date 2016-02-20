@@ -15,12 +15,7 @@ class DataSource extends Asset {
     this.lazy('transformed', () => this.transform(this.indexed, this))
     this.lazy('data', this.getData, true)
 
-    if (this.collection && this.collection.name === 'settings') {
-      this.indexer = parseSettings.bind(this)
-    } else {
-      this.indexer = options.indexer || ((val) => val)
-    }
-
+    this.indexer = options.indexer || ((val) => val)
     this.transformer = options.transformer || ((val) => val)
   }
 

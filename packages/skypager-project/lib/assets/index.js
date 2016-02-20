@@ -22,9 +22,17 @@ var _image = require('./image');
 
 var _image2 = _interopRequireDefault(_image);
 
+var _project_manifest = require('./project_manifest');
+
+var _project_manifest2 = _interopRequireDefault(_project_manifest);
+
 var _script = require('./script');
 
 var _script2 = _interopRequireDefault(_script);
+
+var _settings_file = require('./settings_file');
+
+var _settings_file2 = _interopRequireDefault(_settings_file);
 
 var _stylesheet = require('./stylesheet');
 
@@ -49,7 +57,9 @@ module.exports = {
   DataSource: _data_source2.default,
   Document: _document2.default,
   Image: _image2.default,
+  ProjectManifest: _project_manifest2.default,
   Script: _script2.default,
   Stylesheet: _stylesheet2.default,
+  SettingsFile: _settings_file2.default,
   Vector: _vector2.default
 };

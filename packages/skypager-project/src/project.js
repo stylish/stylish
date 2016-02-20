@@ -411,7 +411,10 @@ class Project {
   }
 
   get settings () {
-    return this.content.settings.query((s) => true).merge()
+    return this.content.settings_files.query((s) => true).condense({
+      key: 'idpath',
+      prop: 'data'
+    })
   }
 }
 
@@ -477,7 +480,7 @@ function buildContentCollectionsManually () {
   const project = this
   const paths = project.paths
 
-  let { Asset, DataSource, Document, Image, Script, Stylesheet, Vector } = Assets
+  let { Asset, DataSource, Document, Image, Script, Stylesheet, ProjectManifest, SettingsFile, Vector } = Assets
 
   return {
     assets: Asset.createCollection(this, false),
@@ -491,7 +494,7 @@ function buildContentCollectionsManually () {
     packages: new Collection({
       root: this.paths.packages,
       project: this,
-      assetClass: DataSource,
+      assetClass: ProjectManifest,
       pattern: '*/package.json',
       exclude: '**/node_modules'
     }),
@@ -499,15 +502,15 @@ function buildContentCollectionsManually () {
     projects: new Collection({
       root: this.paths.projects,
       project: this,
-      assetClass: DataSource,
+      assetClass: ProjectManifest,
       pattern: '*/package.json',
       exclude: '**/node_modules'
     }),
 
-    settings: new Collection({
+    settings_files: new Collection({
       root: this.paths.settings,
       project: this,
-      assetClass: DataSource
+      assetClass: SettingsFile
     })
   }
 }

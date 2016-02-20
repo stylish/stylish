@@ -1,4 +1,4 @@
-const IncludeCollections = ['data_sources','documents', 'settings'];
+const IncludeCollections = ['data_sources','documents', 'settings_files'];
 
 export function BrowserBundle (options = {}) {
   let project = options.project = this

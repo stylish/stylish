@@ -73,14 +73,9 @@ var DataSource = (function (_Asset) {
     });
     _this.lazy('data', _this.getData, true);
 
-    if (_this.collection && _this.collection.name === 'settings') {
-      _this.indexer = parseSettings.bind(_this);
-    } else {
-      _this.indexer = options.indexer || function (val) {
-        return val;
-      };
-    }
-
+    _this.indexer = options.indexer || function (val) {
+      return val;
+    };
     _this.transformer = options.transformer || function (val) {
       return val;
     };
