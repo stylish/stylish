@@ -6,10 +6,8 @@ cli(function (program, dispatch){
   let action = this
 
   program
-    .command('run:package:script <scriptName>')
-    .description('ensures that a project document exists for each project')
-    .option('--packages-only', 'only include packages')
-    .option('--projects-only', 'only include projects')
+    .command('each:package <commandsFiles>')
+    .description('')
     .option('--exclude <list>','exclude a comma separated list of package names')
     .option('--include <list>','include a comma separated list of package names')
     .action(dispatch(action.api.runner))
@@ -64,39 +62,6 @@ execute(function(scriptName, params, context) {
     return true
   })
 
-  packages.forEach((pkg) => {
-    if (typeof pkg.result(`scripts.test`) === 'undefined') {
-      console.log(`${ pkg.name } does not have the ${ scriptName } script`)
-      return
-    }
-
-    let proc = require('child_process').spawn('npm', ['run', scriptName], {
-      cwd: require('path').dirname(
-        pkg.paths.absolute
-      )
-    })
-
-    if (params.stdout) {
-      proc.stdout.on('data', (data) => console.log(data.toString()))
-    }
-
-    if (params.stderr) {
-      proc.stderr.on('data', (data) => console.log(data.toString()))
-    }
-
-
-    proc.on('exit', (code) => {
-      if ( code == 0 ) {
-        console.log(`${ pkg.data.name } ...` + 'ok'.green)
-      }
-
-      if (code !== 0) {
-        console.log(`${ pkg.data.name } ...` + 'not ok'.red)
-        exitCode = 1
-        process.exit(1)
-      }
-    })
-  })
 })
 
 function forEachPackage(project ,fn) {

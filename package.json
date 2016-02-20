@@ -8,11 +8,15 @@
   },
   "main": "index.js",
   "dependencies": {
+    "async": "^1.5.2",
     "babel-preset-skypager": "^2.2.1",
-    "skypager-project": "^2.2.1",
+    "pad": "^1.0.0",
+    "progress": "^1.1.8",
+    "skypager-cli": "^2.2.1",
     "skypager-devpack": "^2.2.1",
     "skypager-electron": "^2.2.1",
     "skypager-plugin-blueprints": "^2.2.1",
+    "skypager-project": "^2.2.1",
     "skypager-server": "^2.2.1",
     "skypager-themes": "^2.2.1"
   },
@@ -27,6 +31,6 @@
   "author": "Jonathan Soeder <jon@chicago.com",
   "license": "SEE LICENSE IN License.md",
   "scripts": {
-      "start": "skypager serve web --profile web --env development --debug"
+    "start": "skypager serve web --profile web --env development --debug"
   }
 }
