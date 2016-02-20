@@ -3,7 +3,7 @@ import classnames from 'classnames'
 
 import IconNav from '../components/IconNav'
 import defaults from 'lodash/defaultsDeep'
-import styles from './IconNavLayout.css.less'
+import styles from './IconNavLayout.less'
 
 export class IconNavLayout extends React.Component {
   static displayName = 'IconNavLayout';

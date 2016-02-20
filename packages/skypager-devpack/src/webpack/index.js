@@ -221,8 +221,6 @@ module.exports = function (argv) {
           'redux-thunk',
           'redux-actions',
           'redux-simple-router'
-          //'skypager-ui',
-          //'skypager-application'
         ]
       }
 		})

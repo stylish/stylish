@@ -5,7 +5,7 @@ import classnames from 'classnames'
 
 import Icon from './Icon'
 
-import styles from './IconNav.css.less'
+//import styles from './IconNav.less'
 
 export class IconNav extends React.Component {
   static displayName = 'IconNav';
