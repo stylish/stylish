@@ -49,9 +49,6 @@
     "webpack-hot-middleware": "^2.6.0",
     "winston": "^2.1.1"
   },
-  "peerDependencies": {
-    "skypager-themes": "^2.1.0-beta1"
-  },
   "scripts": {
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
     "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
@@ -71,8 +68,5 @@
   "bugs": {
     "url": "https://github.com/skypager/superdevpack/issues"
   },
-  "homepage": "https://github.com/skypager/superdevpack#readme",
-  "devDependencies": {
-    "skypager": "^1.38.1"
-  }
+  "homepage": "https://github.com/skypager/superdevpack#readme"
 }

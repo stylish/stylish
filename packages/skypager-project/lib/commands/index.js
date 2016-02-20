@@ -153,8 +153,9 @@ function configure(commander) {
 
   (0, _build2.default)(commander, dispatch);
 
+  (0, _repl2.default)(commander, dispatch);
+
   if (isDevMode) {
-    (0, _repl2.default)(commander, dispatch);
     (0, _create2.default)(commander, dispatch);
   }
 
@@ -165,10 +166,6 @@ function configure(commander) {
   (0, _init2.default)(commander, dispatch);
 
   (0, _importer2.default)(commander, dispatch);
-
-  if (isDevMode) {
-    (0, _listen2.default)(commander, dispatch);
-  }
 
   (0, _publish2.default)(commander, dispatch);
 
