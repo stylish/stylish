@@ -1,0 +1,130 @@
+development:
+  port: 8080
+  host: 0.0.0.0
+  webpack:
+    theme: dashboard
+  webstream:
+    port: 5000
+  dashboard:
+    panels:
+      project_watcher:
+        type: log
+        process: project_watcher
+        label: Skypager Project Tests
+        top: "31%"
+        left: "1%"
+        width: "48%"
+        height: "69%"
+        borderStyles:
+          type: line
+          color: green
+
+      project_compiler:
+        type: log
+        process: project_compiler
+        label: Skypager Compiler
+        top: "1%"
+        left: "1%"
+        width: "48%"
+        height: "29%"
+        borderStyles:
+          type: line
+          color: yellow
+
+      server_watcher:
+        type: log
+        process: server_watcher
+        label: Server Compiler
+        top: "1%"
+        left: "51%"
+        width: "48%"
+        height: "15%"
+        borderStyles:
+          type: line
+          color: magenta
+
+      docs_webapp:
+        type: log
+        process: webpack
+        label: Docs Webapp
+        top: "17%"
+        left: "51%"
+        width: "48%"
+        height: "82%"
+        borderStyles:
+          type: line
+          color: cyan
+
+
+  processes:
+    project_watcher:
+      cmd: npm run test:watch
+      cwd: '<%= process.env.PWD + "/packages/skypager-project" %>'
+
+    project_compiler:
+      cmd: npm run compile:watch
+      cwd: '<%= process.env.PWD + "/packages/skypager-project" %>'
+
+    server_compiler:
+      cmd: npm run compile:watch
+      cwd: '<%= process.env.PWD + "/packages/skypager-server" %>'
+
+    webpack: 
+      cmd: 'skypager dev web'
+
+production:
+  port: 8080
+  host: 0.0.0.0
+  
+  webpack:
+    entry: './src'
+    bundle: true
+    host: 0.0.0.0
+    port: 3000
+
+  deepstream:
+    host: 0.0.0.0
+    port: 9020
+
+  processes:
+    deepstream:
+      cmd: 'skypager serve deepstream --profile web --env development'
+    webpack:
+      cmd: 'skypager serve webpack --profile web --env development'
+
+  dashboard:
+    panels:
+      leftPanel: 
+        label: API
+        type: log
+        left: "1%"
+        top: "1%"
+        height: "98%"
+        width: "40%"
+        process: server
+        borderStyles:
+          type: line
+          color: yellow
+      rightTop:
+        type: log
+        left: "41%"
+        width: "58%"
+        top: "1%"
+        height: "68%"
+        process: webpack
+        label: Frontend Build
+        borderStyles:
+          type: line
+          color: green
+
+      rightBottom:
+        type: log
+        left: "41%"
+        width: "58%"
+        height: "29%"
+        top: "70%"
+        label: Deepstream Server
+        process: deepstream
+        borderStyles:
+          type: line
+          color: cyan
