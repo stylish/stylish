@@ -71,7 +71,7 @@ var Server = exports.Server = (function () {
       project: project
     }, { env: 'development', profile: 'web' });
 
-    var config = (0, _lodash.get)(project, 'settings.server.' + profile + '.' + env) || defaultSettings[profile][env] || {};
+    var config = (0, _lodash.get)(project, 'settings.servers.' + profile) || defaultSettings[profile] || {};
 
     (0, _util.defineProp)(server, 'config', (0, _lodash.defaultsDeep)({}, config, { processes: {} }));
     (0, _util.defineProp)(server, 'processes', (0, _lodash.mapValues)(config.processes, function (cfg, name) {
@@ -125,6 +125,12 @@ var Server = exports.Server = (function () {
       this.prepare();
       this.run();
       this.listen();
+
+      if (this.config.webstream && process.env.NODE_ENV === 'development') {
+        require('webstream').createServer(function (stream) {
+          require('repl').start('skypager:> ', stream);
+        }).listen(this.config.webstream.port || 5000);
+      }
 
       if (this.dashboard && this.config.dashboard) {
         (0, _dashboard2.default)(this, this.config.dashboard);

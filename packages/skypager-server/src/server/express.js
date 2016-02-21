@@ -12,6 +12,17 @@ export function express(server, options = {}) {
     throw('no config')
   }
 
+  if (config.webstream) {
+    setupWebstreamProxy(
+      app,
+      defaults({}, config.webstream, {
+        path: '/webstream/' + config.webstream.channel,
+        port: 5000
+      }),
+      server
+    )
+  }
+
   if (config.deepstream) {
     setupDeepstreamProxy(
       app,
@@ -48,6 +59,20 @@ export function express(server, options = {}) {
 }
 
 export default express
+
+function setupWebstreamProxy(app, { path='/', host = 'localhost', port=5000, proto='http' }, server){
+  let target = `${proto}://${ host }:${ port }`
+
+  app.use(
+    proxyMiddleware(path, {
+      target,
+      ws: true,
+      logProvider: function() {
+         return server.logger
+      }
+    })
+  )
+}
 
 function setupWebpackProxy(app, { path='/', host = 'localhost', port=3000, proto='http' }, server){
   let target = `${proto}://${ host }:${ port }`

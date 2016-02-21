@@ -11,13 +11,8 @@ export const constants = Base.constants
 export class Deepstream extends Base {
   static constants = constants;
 
-  constructor(params = {}, context = {}) {
+  constructor(options = {}, context = {}) {
     let { project, argv } = context
-    let settings = project.settings.server
-
-    let options = defaults(params, {
-      ...(get(settings,`${params.profile}.${params.env}.deepstream`) || {})
-    })
 
     defaults(options, {
       port: 6020,
@@ -41,20 +36,22 @@ export class Deepstream extends Base {
 
     this.set('showLogo', false)
 
-    this.set('cache', new RedisCacheConnector({
-      port: cachePort,
-      host: cacheHost
-    }))
-
     this.set('host', options.host)
     this.set('port', options.port)
     this.set('tcpHost', options.tcpHost || options.tcpPort || options.port + 1)
     this.set('tcpPort', options.tcpPort || options.port || 6021)
 
-    this.set('messageConnector', new RedisMessageConnector({
-      port: cachePort,
-      host: cacheHost
-    }))
+    if (options.backend === 'redis') {
+      this.set('cache', new RedisCacheConnector({
+        port: cachePort,
+        host: cacheHost
+      }))
+
+      this.set('messageConnector', new RedisMessageConnector({
+        port: cachePort,
+        host: cacheHost
+      }))
+    }
 
     this.set('permissionHandler', {
       isValidUser: function (connectionData, authData, callback) {

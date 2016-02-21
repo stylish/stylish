@@ -28,7 +28,7 @@ export class Server {
       project
     }, {env: 'development', profile: 'web'})
 
-    let config = get(project, `settings.server.${profile}.${env}`) || defaultSettings[profile][env] || {}
+    let config = get(project, `settings.servers.${profile}`) || defaultSettings[profile]|| {}
 
     defineProp(server, 'config', defaults({}, config, {processes:{}}))
     defineProp(server, 'processes', mapValues(config.processes, (cfg, name) => (cfg.name = name) && cfg))
@@ -82,6 +82,14 @@ export class Server {
     this.prepare()
     this.run()
     this.listen()
+
+    if (this.config.webstream && process.env.NODE_ENV === 'development') {
+      require('webstream').createServer((stream) => {
+        require('repl').start(`skypager:> `, stream)
+      }).listen(
+        this.config.webstream.port || 5000
+      )
+    }
 
     if (this.dashboard && this.config.dashboard) {
       dashboard(this, this.config.dashboard)

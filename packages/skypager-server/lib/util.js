@@ -53,12 +53,11 @@ function spawn(command) {
   var args = _command$split2.slice(1);
 
   // this might be overkill
-
-  if (options.cwd) {
-    options.env = (0, _assign2.default)({}, process.env, options.env || {}, {
+  /*if (options.cwd) {
+    options.env = Object.assign({}, process.env, (options.env || {}), {
       PWD: options.cwd
-    });
-  }
+    })
+  }*/
 
   return progress ? (0, _childProcessPromise.spawn)(cmd, args, options).progress(progress) : (0, _childProcessPromise.spawn)(cmd, args, options);
 }

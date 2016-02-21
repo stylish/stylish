@@ -37,6 +37,13 @@ function express(server) {
     throw 'no config';
   }
 
+  if (config.webstream) {
+    setupWebstreamProxy(app, (0, _defaults2.default)({}, config.webstream, {
+      path: '/webstream/' + config.webstream.channel,
+      port: 5000
+    }), server);
+  }
+
   if (config.deepstream) {
     setupDeepstreamProxy(app, (0, _defaults2.default)({}, config.deepstream, {
       path: '/engine.io',
@@ -60,13 +67,13 @@ function express(server) {
 
 exports.default = express;
 
-function setupWebpackProxy(app, _ref, server) {
+function setupWebstreamProxy(app, _ref, server) {
   var _ref$path = _ref.path;
   var path = _ref$path === undefined ? '/' : _ref$path;
   var _ref$host = _ref.host;
   var host = _ref$host === undefined ? 'localhost' : _ref$host;
   var _ref$port = _ref.port;
-  var port = _ref$port === undefined ? 3000 : _ref$port;
+  var port = _ref$port === undefined ? 5000 : _ref$port;
   var _ref$proto = _ref.proto;
   var proto = _ref$proto === undefined ? 'http' : _ref$proto;
 
@@ -81,13 +88,34 @@ function setupWebpackProxy(app, _ref, server) {
   }));
 }
 
-function setupDeepstreamProxy(app, _ref2, server) {
+function setupWebpackProxy(app, _ref2, server) {
   var _ref2$path = _ref2.path;
-  var path = _ref2$path === undefined ? '/engine.io' : _ref2$path;
-  var host = _ref2.host;
-  var port = _ref2.port;
+  var path = _ref2$path === undefined ? '/' : _ref2$path;
+  var _ref2$host = _ref2.host;
+  var host = _ref2$host === undefined ? 'localhost' : _ref2$host;
+  var _ref2$port = _ref2.port;
+  var port = _ref2$port === undefined ? 3000 : _ref2$port;
   var _ref2$proto = _ref2.proto;
   var proto = _ref2$proto === undefined ? 'http' : _ref2$proto;
+
+  var target = proto + '://' + host + ':' + port;
+
+  app.use((0, _httpProxyMiddleware2.default)(path, {
+    target: target,
+    ws: true,
+    logProvider: function logProvider() {
+      return server.logger;
+    }
+  }));
+}
+
+function setupDeepstreamProxy(app, _ref3, server) {
+  var _ref3$path = _ref3.path;
+  var path = _ref3$path === undefined ? '/engine.io' : _ref3$path;
+  var host = _ref3.host;
+  var port = _ref3.port;
+  var _ref3$proto = _ref3.proto;
+  var proto = _ref3$proto === undefined ? 'http' : _ref3$proto;
 
   var target = proto + '://' + host + ':' + port;
 
