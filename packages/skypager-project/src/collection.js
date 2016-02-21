@@ -22,7 +22,7 @@ class Collection {
 
     collection.root = root
 
-    collection.name = basename(root)
+    collection.name = options.name || basename(root)
 
     collection.hidden('project', project)
     collection.hidden('AssetClass', () => assetClass)
@@ -45,6 +45,28 @@ class Collection {
     }
 
     buildAtInterface(collection, false)
+
+    if (options.autoLoad) {
+       this.loadAssetsFromDisk()
+    }
+  }
+
+  loadAssetsFromDisk (paths) {
+    if (!paths) {
+      paths = require('glob').sync(this.assetPattern, {
+        cwd: this.root,
+        ignore: [this.excludePattern]
+      })
+    }
+
+    this._willLoadAssets(paths)
+
+    paths.forEach(rel => {
+      let asset = this.createAsset(rel)
+      this.add(asset, true, true)
+    })
+
+    this._didLoadAssets(paths, false)
   }
 
   get assetType () {
@@ -55,8 +77,10 @@ class Collection {
     return this.AssetClass.groupName
   }
 
-  globFiles(pattern, options = {}) {
+  globFiles(pattern = this.assetPattern, options = {}) {
     let glob = require('glob')
+
+    options.exclude = options.exclude || [this.excludePattern]
 
     return new Promise((resolve, reject) => {
       glob(pattern, {cwd: this.root, ...options }, (err, files) => {

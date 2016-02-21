@@ -57,4 +57,15 @@ describe("Content Collections", function(){
     condensed.should.have.property('merge/alpha')
     condensed.should.have.property('merge/bravo')
   })
+
+  describe('Custom Collections', function() {
+    it('can pull collection config from settings data', function(){
+      let testpath = project.path('documents')
+      project.settings.collections.should.have.property('testcases')
+      project.settings.collections.testcases.should.have.property('root', testpath)
+    })
+
+    it('adds collections based on custom ones found in the settings data', function(){
+    })
+  })
 })

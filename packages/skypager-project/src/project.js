@@ -13,6 +13,8 @@ import logger from './logger'
 import { resolve, dirname, join, basename, extname } from 'path'
 
 import mapValues from 'lodash/mapValues'
+import defaults from 'lodash/defaults'
+import pick from 'lodash/pick'
 
 const hide = util.hide.getter
 const lazy = util.lazy
@@ -77,6 +79,7 @@ class Project {
     project.emit('contentWillInitialize')
     // wrap the content interface in a getter but make sure
     // the documents collection is loaded and available right away
+
     project.hidden('content', content.call(project))
 
     project.emit('contentDidInitialize')
@@ -98,6 +101,28 @@ class Project {
       project.emit('projectDidAutoImport')
     }
 
+    if (project.settings.collections) {
+      defaults(
+        project.content,
+        mapValues(project.settings.collections, (cfg, name) => {
+          let assetClass = Assets[cfg.assetClass]
+
+          if (!assetClass) {
+             throw(`Invalid Collection Definition in settings. Invalid assetClass key.
+                   Pick one of: ${  Object.keys(Assets).join(' ,') }`)
+          }
+
+          return new Collection({
+            root: cfg.root,
+            project,
+            assetClass,
+            name,
+            ...(pick(cfg,'exclude','pattern', 'autoLoad'))
+          })
+        })
+      )
+    }
+
     util.hide.getter(project, 'supportedAssetExtensions', () => Assets.Asset.SupportedExtensions )
 
     // lazy load / memoize the entity builder
@@ -116,6 +141,7 @@ class Project {
     })
 
     util.hide.getter(project, 'modelDefinitions', modelDefinitions.bind(this))
+
   }
 
   emit(name, ...args) {
@@ -442,6 +468,7 @@ function paths () {
     stylesheets: join(this.root, 'src'),
     manifest: join(this.root, 'package.json'),
     tmpdir: join(this.root, 'tmp'),
+    temp: join(this.root, 'tmp'),
     cache: join(this.root, 'tmp', 'cache'),
     logs: join(this.root, 'log'),
     build: join(this.root, 'dist'),

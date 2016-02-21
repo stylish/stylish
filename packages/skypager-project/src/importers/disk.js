@@ -49,31 +49,7 @@ export function ProjectImporter (options = {}, context = {}) {
 
   Object.keys(collections).forEach(name => {
     let collection = collections[name]
-    let pattern = collection.assetPattern
-    let paths = []
-
-    try {
-      paths = glob.sync(pattern, {
-        cwd: collection.root,
-        ignore: [collection.excludePattern]
-      })
-    } catch(error) {
-      paths = []
-    }
-
-    collection._willLoadAssets(paths)
-
-    paths.forEach(rel => {
-      let asset = collection.createAsset(rel)
-
-      collection.add(asset, false, true)
-
-      if (autoLoad[name]) {
-        AssetImporter.call(project, {project, collection, asset})
-      }
-    })
-
-    collection._didLoadAssets(paths, false)
+    collection.loadAssetsFromDisk()
   })
 
   let callback = options.onComplete

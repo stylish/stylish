@@ -6,6 +6,16 @@ describe('The Settings System', function(){
     project.settings.should.have.property('integrations')
   })
 
+  it('merges a folder into a single structure keyed by the filename', function(){
+    project.settings.should.have.property('servers')
+    project.settings.servers.should.have.property('local')
+    project.settings.servers.should.have.property('dev')
+  })
+
+  it('automatically detects environment branches in the settings', function(){
+     project.settings.servers.dev.should.have.property('env', 'test')
+  })
+
   it('interpolates values using the lodash template syntax', function(){
     project.settings.app.env.should.equal('test')
   })
