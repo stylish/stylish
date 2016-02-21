@@ -76,20 +76,42 @@ class Framework {
   * Load a project in the specified path immediately.
   *
   */
-  load (projectFile, options = {}) {
+  load (projectFile = process.env.PWD, options = {}) {
     let skypager = this
+
+    if (typeof projectFile === 'object') {
+      if (isEmpty(options)) {
+        options = projectFile
+      }
+
+      projectFile = options.root || process.env.PWD
+    }
 
     if (ProjectCache.projects[projectFile]) {
        return ProjectCache.projects[projectFile]
     }
 
-    let root = projectFile.match(/.js/i) ? dirname(projectFile) : projectFile
+    let root = projectFile
 
-    // get the project manifest, which should include a skypager key
-    try { options.manifest = options.manifest || Object.assign(options.manifest, require(root + '/package.json')) } catch (error) { }
+    if(projectFile.match(/\.(js|json)$/i)) {
+      root = dirname(projectFile)
+    }
 
-    options.manifest = options.manifest || {}
-    options.manifest.skypager = options.manifest.skypager || {}
+    if (!options.manifest) {
+      try {
+        options.manifest = require( join(root, 'package.json'))
+      } catch(error) {
+        console.log('Error loading manifest', error.message, join(root,'package.json'))
+      }
+    }
+
+    defaults(options, {
+      manifest: {
+        skypager: {
+          plugins:[]
+        }
+      }
+    })
 
     let project = (new this.Project(projectFile, options))
 

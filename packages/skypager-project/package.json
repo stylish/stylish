@@ -1,6 +1,6 @@
 {
   "name": "skypager-project",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
   "bin": {
@@ -45,6 +45,7 @@
     "chokidar-cli": "^1.2.0",
     "colors": "^1.1.2",
     "css": "^2.2.1",
+    "eyes": "^0.1.8",
     "fs-promise": "^0.3.1",
     "git-rev": "^0.2.1",
     "glob": "^6.0.1",
@@ -59,6 +60,7 @@
     "mdast-yaml": "^1.0.0",
     "minimatch": "^3.0.0",
     "mkdirp": "^0.5.1",
+    "node-emoji": "^1.0.4",
     "path-match": "^1.2.3",
     "path-to-regexp": "^1.2.1",
     "pkginfo": "^0.3.1",

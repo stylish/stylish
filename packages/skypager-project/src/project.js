@@ -447,6 +447,57 @@ class Project {
       prop: 'data'
     })
   }
+
+  streamFile(path, type = 'readable', mode) {
+    let fd = require('fs').openSync(path, 'a+')
+    let stream
+
+    if ( type.match(/read/) ) {
+      try {
+        stream = require('fs').createReadStream(path, {fd})
+      } catch(error) {
+         console.log(error.message, 'readable')
+      }
+    } else if (type.match(/write/)) {
+      try {
+        stream = require('fs').createWriteStream(path, {fd})
+      } catch(error) {
+         console.log(error.message, 'writeable')
+      }
+    } else {
+      // TODO: How to do bidirectional?
+    }
+
+    return stream
+  }
+
+  exists(path) {
+    try {
+      return require('fs').existsSync(path)
+    } catch(error) {
+       return false
+    }
+  }
+
+  ensureFolder(name) {
+    let fs = require('fs')
+    let path = this.paths[name]
+
+    return new Promise((resolve,reject) => {
+      if (this.exists(path)) { resolve(path); return path }
+
+      require('fs').mkdir(path, (err) => {
+        if(err) { reject(err); return false }
+        resolve(path)
+      })
+    })
+  }
+
+  ensurePath(name) {
+    if(this.paths[name]) {
+       return this.ensureFolder(name)
+    }
+  }
 }
 
 module.exports = Project

@@ -42,19 +42,15 @@ export function handle(workspace, options = {}, context = {}) {
 
   let proc = require('child_process').spawn(
     electron,
-    [ skypagerElectron ].concat(authorArgs)
+    [ skypagerElectron ].concat(authorArgs),
+    {
+      stdio:[
+        process.stdin,
+        process.stdout,
+        process.stderr
+      ]
+    }
   )
-
-  if (options.interactive) {
-    proc.stdout.on('data', (data) => process.stdout.write(data))
-    proc.stderr.on('data', (data) => process.stderr.write(data))
-    process.stdin.on('data', (data) => proc.stdin.write(data))
-  }
-
-  if (!options.interactive) {
-    proc.stdout.on('data', (data) => console.log(data.toString()))
-    proc.stderr.on('data', (data) => console.log(data.toString()))
-  }
 }
 
 function isSkypagerElectronInstalled () {
