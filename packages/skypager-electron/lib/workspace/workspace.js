@@ -5,10 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Workspace = exports.actions = exports.initialState = exports.store = undefined;
 
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -211,7 +207,7 @@ function launch(panelName) {
 
       if (constrained) {
         try {
-          win.setBounds((0, _extends3.default)({}, constrained));
+          win.show();
         } catch (error) {
           console.log('');
           console.log('Error setting window bounds', constrained);

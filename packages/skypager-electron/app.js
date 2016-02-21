@@ -4,7 +4,7 @@ var yargs = require('yargs'),
 
 var loader;
 
-if (process.argv && process.argv[0] === 'electron') {
+if (process.argv && process.argv[0] && process.argv[0].match(/Electron/i)) {
   bootApp()
 }
 

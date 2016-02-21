@@ -11,7 +11,7 @@ var _application = require('./application');
 
 var _yargs = require('yargs');
 
-var _util = require('skypager/lib/util');
+var _util = require('skypager-project/lib/util');
 
 var _defaults = require('lodash/object/defaults');
 

@@ -1,7 +1,7 @@
 import { join, resolve } from 'path'
 import { handleActions as reducer, createAction as action } from 'redux-actions'
 import { hideProperties } from '../util'
-import { compact, pick, isNumber, isString } from 'lodash'
+import { defaults, compact, pick, isNumber, isString } from 'lodash'
 import { constrain } from '../util/constrain'
 import chokidar from 'chokidar'
 import electronify from './electronify-server'
@@ -82,7 +82,7 @@ export class Workspace {
 	launchPanels () {
     this.panels.forEach(panel => {
       if (process.env.NODE_ENV !== 'test') {
-        launch.call(this, panel.id, assign(panel.opts, {window: (panel.window || DEFAULT_WINDOW)}))
+        launch.call(this, panel.id, assign(panel.opts, {window: defaults(panel.window, DEFAULT_WINDOW)}))
       }
     })
 	}
@@ -146,8 +146,12 @@ function launch (panelName, params = {}) {
 		postLoad: function(electronApp, win) {
       let constrained = w.panelSettings[panelName].constrained
 
+      win.show()
+
       if (constrained) {
         try {
+          win.show()
+
           win.setBounds({
             ...constrained
           })
@@ -212,6 +216,7 @@ function launch (panelName, params = {}) {
 
   options.window.preload = require.resolve('../client-bootstrap.js')
 
+  options.url = 'http://localhost:8080'
   let proc = electronify(options)
 
   proc.on('child-started', (child) => {

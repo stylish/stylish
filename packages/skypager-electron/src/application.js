@@ -32,7 +32,7 @@ export class Application {
 			settings,
 			paths:{
 				appData: join(app.getPath('userData'), 'data'),
-				appLogs: join(app.getPath('userData'), 'logs'),
+				appLogs: project.path('logs','electron'),
 				public: (project.paths.public) || join(process.env.PWD, 'public'),
 				temp: app.getPath('temp'),
 				project: project.root || process.env.PWD
@@ -43,10 +43,11 @@ export class Application {
 
 		setupAppHome(options.paths)
 
+		console.log('Streaming Actions', this.paths.appLogs)
 		this.paths.actionStream = join(this.paths.appLogs, `${ this.id }-action-stream.js`)
 
 		hide({
-			actionLogger: createStream(
+			actionLogger: stream(
 				this.paths.actionStream
 			),
 			store: setupStore()
@@ -127,6 +128,7 @@ export class Application {
 
 	logAction (action) {
 		if (this.argv.debug) { console.log(JSON.stringify(action, null, 2)) }
+		if (!this.argv.debug) { console.log(JSON.stringify(action, null, 2)) }
 
 		this.actionLogger.write(
 			`dispatch(${JSON.stringify(action)});\n\n`
@@ -249,3 +251,7 @@ function mainWorkspaceConfig (project) {
 	}
 }
 
+function stream(path) {
+	let fd = require('fs').openSync(path, 'a+')
+	return createStream(path, {fd})
+}

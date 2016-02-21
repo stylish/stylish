@@ -1,7 +1,7 @@
 import { app } from 'electron'
 import { Application } from './application'
 import { argv } from 'yargs'
-import { loadProjectFromDirectory as loadProject } from 'skypager/lib/util'
+import { loadProjectFromDirectory as loadProject } from 'skypager-project/lib/util'
 
 import defaults from 'lodash/object/defaults'
 
