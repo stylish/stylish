@@ -37,15 +37,27 @@ export function handle(arg, options = {}, context = {}) {
   let dashboard = options.dashboard || false
   let rawArg = yargs.argv._[1]
 
+  let opts = {}
+  context.argv = yargs.argv
 
   if (rawArg === 'deepstream') {
-    require('skypager-server').deepstream({ profile, env }, {project, argv: yargs.argv})
+    opts = get(project, `settings.servers.deepstream.${ profile }`) ||
+           get(project, `settings.servers.${ profile }.deepstream`) ||
+           get(project, `settings.deepstream.${ profile }`) ||
+           get(project, 'settings.deepstream')
+
+    require('skypager-server').deepstream(opts, context)
+
   } else if (rawArg === 'webpack') {
-    let opts = get(serverSettings, `${profile}.${env}.webpack`) || {}
-    context.argv = yargs.argv
+     opts = get(project, `settings.servers.webpack.${ profile }`) ||
+           get(project, `settings.servers.${ profile }.webpack`) ||
+           get(project, `settings.webpack.${ profile }`) ||
+           get(project, 'settings.webpack')
+
+    console.log('Handling Webpack', profile, opts)
     handleWebpack(profile, opts, context)
   } else {
-    server({profile, env, dashboard}, {project, argv: yargs.argv})
+    server({profile, env, dashboard}, context)
   }
 }
 
