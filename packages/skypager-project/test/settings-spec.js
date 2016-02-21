@@ -29,4 +29,11 @@ describe('The Settings System', function(){
     project.paths.settings.should.match(/test.fixture.settings/)
     project.content.settings_files.should.have.property('root')
   })
+
+  it('should not let me expose environment variables that arent whitelisted', function(){
+     project.settings.security.environment.ok.should.equal(process.env.PWD)
+     project.settings.security.environment.should.have.property('unsafe', '')
+     project.settings.security.environment.should.have.property('safe')
+     project.settings.security.environment.nobueno.should.equal(' is cool')
+  })
 })

@@ -9,6 +9,7 @@ import * as Helpers from './helpers'
 import * as Assets from './assets'
 import * as util from './util'
 import logger from './logger'
+import vault from './vault'
 
 import { resolve, dirname, join, basename, extname } from 'path'
 
@@ -152,6 +153,10 @@ class Project {
 
   get (...args) {
     return util.result(this, ...args)
+  }
+
+  get vault() {
+    return vault(this)
   }
 
   /**

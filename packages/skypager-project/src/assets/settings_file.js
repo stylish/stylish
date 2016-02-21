@@ -46,16 +46,16 @@ export class SettingsFile extends DataSource {
 export default SettingsFile
 
 function interpolateValues (obj, template) {
+  let datasource = this
+
   Object.keys(obj).forEach(key => {
     let value = obj[key]
 
     if (typeof value === 'object') {
-      interpolateValues(value, template)
-    } else if (typeof value === 'string' && value.match(/^env\./i)) {
-      obj[key] = result(
-        process.env,
-        (value.replace(/^env\./i, ''))
-      )
+      interpolateValues.call(datasource, value, template)
+    } else if (typeof value === 'string' && value.match(/^env\.\w+$/i)) {
+      value = `<%= process.${ value } %>`
+      obj[key] = template(value)(value)
     } else if (typeof value === 'string' ) {
       obj[key] = template(value)(value)
     }
@@ -63,6 +63,7 @@ function interpolateValues (obj, template) {
 
   return obj
 }
+
 
 function parseSettings (val = {}) {
   return interpolateValues.call(this, clone(val), this.templater.bind(this))

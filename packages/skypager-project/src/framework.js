@@ -10,6 +10,8 @@ import * as Helpers from './helpers'
 
 import { dirname, resolve, join, basename, extname } from 'path'
 
+import defaults from 'lodash/defaultsDeep'
+
 require('./polyfill')
 require('should')
 
@@ -27,7 +29,8 @@ class Framework {
     this.type = 'framework'
     this.root = __dirname
 
-    util.hide.getter(this, 'manifest', () => Object.assign(require(this.root + '/../package.json'), {root}))
+
+    util.hide.getter(this, 'manifest', require('../package.json'))
 
     const plugins = [ ]
 

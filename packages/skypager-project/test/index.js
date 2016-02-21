@@ -1,5 +1,7 @@
 import Skypager from '../src/index'
 
+process.env.UNSAFE_TEMPLATE_VAR = true
+
 Object.defineProperties(Skypager, {
   fixture: {
     configurable: true,

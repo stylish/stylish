@@ -10,6 +10,8 @@ const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
 
 const { defineProperties } = Object
 
+import pick from 'lodash/pick'
+
 class Asset {
   static decorateCollection (collection) {
     if (this.collectionInterface) {
@@ -49,16 +51,31 @@ class Asset {
 
   templater (string) {
     let asset = this
+    let project = asset.project
+
+    let accessibleEnvVars = project.vault.templates.accessibleEnvVars
+
     return util.template(string, {
       imports: {
         get project() {
           return asset.project
         },
+        get settings () {
+          return asset.project && asset.project.settings
+        },
+        get collection () {
+          return asset.collection
+        },
         get self () {
           return asset
         },
         get process () {
-           return process
+          return {
+            env: pick(process.env, ...accessibleEnvVars)
+          }
+        },
+        get env () {
+          return pick(process.env, ...accessibleEnvVars)
         }
       }
     })
