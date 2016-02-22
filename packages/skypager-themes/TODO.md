@@ -1,3 +1,0 @@
-- [ ] Make sure the rest of the themes work
-- [ ] Make theme configurable by argv or package.json override
-- [ ] Let theme specify path for variables.less override

@@ -1,15 +1,23 @@
 var ExtractText = require('extract-text-webpack-plugin')
 
-module.exports = function () {};
+module.exports = function () { };
 
-module.exports.pitch = function (remainingRequest) {
+module.exports.pitch = function (remainingRequest, preceding, data) {
   this.cacheable(true);
 
+  if (remainingRequest.match(/.yml/)) {
+    this.query = `${this.query}&configPath=${remainingRequest}`
+  }
+
+  if (remainingRequest.match(/package.json/)) {
+    this.query = `${this.query}&configPath=${remainingRequest}`
+  }
+
   var styleLoaders = [
-    require.resolve("style-loader"),
-    require.resolve("css-loader"),
-    require.resolve("less-loader"),
-    require.resolve('./bootstrap-styles.loader.js') + this.query
+    'style-loader',
+    'css-loader',
+    'less-loader',
+    require.resolve('./lib/bootstrap-styles.loader.js') + this.query
   ];
 
   var devLoader = styleLoaders.join('!'),
@@ -19,12 +27,12 @@ module.exports.pitch = function (remainingRequest) {
       );
 
   var scriptLoader = wrap([
-      require.resolve("./bootstrap-scripts.loader.js") + this.query,
+      require.resolve("./lib/bootstrap-scripts.loader.js") + this.query,
       remainingRequest
     ].join("!")
   );
 
-  var styleLoader = this.query && this.query.match(/production/)
+  var styleLoader = process.env.NODE_ENV === 'production'
     ? prodLoader
     : devLoader;
 
@@ -45,9 +53,3 @@ function wrap (str, result) {
 
   return result
 }
-
-/*
-require("-!/Users/jonathan/Skypager/node_modules/style-loader/index.js!/Users/jonathan/Skypager/node_modules/css-loader/index.js!/Users/jonathan/S
-kypager/node_modules/less-loader/index.js!/Users/jonathan/Skypager/packages/skypager-themes/bootstrap-styles.loader.js?theme=dashboard!/Users/jona
-than/Skypager/node_modules/json-loader/index.js!/Users/jonathan/Skypager/package.json")
-*/
