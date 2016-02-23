@@ -1,5 +1,9 @@
 'use strict';
 
+var _typeof2 = require('babel-runtime/helpers/typeof');
+
+var _typeof3 = _interopRequireDefault(_typeof2);
+
 var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
@@ -38,12 +42,17 @@ var Helpers = _interopRequireWildcard(_helpers);
 
 var _path = require('path');
 
+var _defaultsDeep = require('lodash/defaultsDeep');
+
+var _defaultsDeep2 = _interopRequireDefault(_defaultsDeep);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-require('./polyfill'); //if (!process.env.SKYPAGER_DIST) { require('./environment')() }
+//if (!process.env.SKYPAGER_DIST) { require('./environment')() }
 
+require('./polyfill');
 require('should');
 
 // temp
@@ -57,16 +66,12 @@ var ProjectCache = {
 
 var Framework = (function () {
   function Framework(root, initializer) {
-    var _this = this;
-
     (0, _classCallCheck3.default)(this, Framework);
 
     this.type = 'framework';
     this.root = __dirname;
 
-    util.hide.getter(this, 'manifest', function () {
-      return (0, _assign2.default)(require(_this.root + '/../package.json'), { root: root });
-    });
+    util.hide.getter(this, 'manifest', require('../package.json'));
 
     var plugins = [];
 
@@ -123,24 +128,45 @@ var Framework = (function () {
 
   }, {
     key: 'load',
-    value: function load(projectFile) {
+    value: function load() {
+      var projectFile = arguments.length <= 0 || arguments[0] === undefined ? process.env.PWD : arguments[0];
       var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
       var skypager = this;
+
+      if ((typeof projectFile === 'undefined' ? 'undefined' : (0, _typeof3.default)(projectFile)) === 'object') {
+        if (isEmpty(options)) {
+          options = projectFile;
+        }
+
+        projectFile = options.root || process.env.PWD;
+      }
 
       if (ProjectCache.projects[projectFile]) {
         return ProjectCache.projects[projectFile];
       }
 
-      var root = projectFile.match(/.js/i) ? (0, _path.dirname)(projectFile) : projectFile;
+      var root = projectFile;
 
-      // get the project manifest, which should include a skypager key
-      try {
-        options.manifest = options.manifest || (0, _assign2.default)(options.manifest, require(root + '/package.json'));
-      } catch (error) {}
+      if (projectFile.match(/\.(js|json)$/i)) {
+        root = (0, _path.dirname)(projectFile);
+      }
 
-      options.manifest = options.manifest || {};
-      options.manifest.skypager = options.manifest.skypager || {};
+      if (!options.manifest) {
+        try {
+          options.manifest = require((0, _path.join)(root, 'package.json'));
+        } catch (error) {
+          console.log('Error loading manifest', error.message, (0, _path.join)(root, 'package.json'));
+        }
+      }
+
+      (0, _defaultsDeep2.default)(options, {
+        manifest: {
+          skypager: {
+            plugins: []
+          }
+        }
+      });
 
       var project = new this.Project(projectFile, options);
 
@@ -149,7 +175,7 @@ var Framework = (function () {
   }, {
     key: 'use',
     value: function use(plugins) {
-      var _this2 = this;
+      var _this = this;
 
       var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -158,17 +184,17 @@ var Framework = (function () {
       }
 
       plugins.forEach(function (plugin) {
-        var pluginConfig = _this2.plugins.lookup(plugin);
+        var pluginConfig = _this.plugins.lookup(plugin);
 
         if (pluginConfig && pluginConfig.api && pluginConfig.api.modify) {
-          pluginConfig.api.modify(_this2);
+          pluginConfig.api.modify(_this);
         } else {
           if (typeof pluginConfig.api === 'function') {
-            pluginConfig.api.call(_this2, _this2, pluginConfig);
+            pluginConfig.api.call(_this, _this, pluginConfig);
           }
         }
 
-        _this2.enabledPlugins.push(plugin);
+        _this.enabledPlugins.push(plugin);
       });
     }
   }, {

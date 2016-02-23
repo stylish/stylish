@@ -54,7 +54,7 @@ export function handle(arg, options = {}, context = {}) {
            get(project, `settings.webpack.${ profile }`) ||
            get(project, 'settings.webpack')
 
-    console.log('Handling Webpack', profile, opts)
+    opts.devpack_api = 'v2'
     handleWebpack(profile, opts, context)
   } else {
     server({profile, env, dashboard}, context)

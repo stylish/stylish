@@ -1,4 +1,37 @@
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+
+const DefaultVendorStack = [
+  'history',
+  'jquery',
+  'react',
+  'react-dom',
+  'react-redux',
+  'react-router',
+  'react-bootstrap',
+  'redux',
+  'redux-thunk',
+  'redux-actions',
+  'redux-simple-router'
+]
+
+const ExternalVendorMappings = {
+  'jquery': 'jQuery',
+  'react': 'React',
+  'react-dom': 'ReactDOM',
+  'react-bootstrap': 'ReactBootstrap',
+  'redux': 'Redux',
+  'react-router': 'Router',
+  'redux-actions': 'ReduxActions',
+  'redux-thunk': 'ReduxThunk',
+  'redux-simple-router': 'ReduxSimpleRouter',
+  'history': 'History'
+}
+
 module.exports = function (argv) {
+
+  inspect(argv)
+
 	const md5 = require('md5')
   const path = require('path')
   const fs = require('fs')
@@ -25,36 +58,41 @@ module.exports = function (argv) {
   const devpackModuleRoot = path.join(__dirname, '../..')
 
   const modulesDirectories = [
+    directory,
+    join(directory,'src'),
     devpackModuleRoot,
-    path.join(devpackModuleRoot, 'src'),
-    path.join(devpackModuleRoot, 'src', 'ui'),
+    join(devpackModuleRoot, 'src'),
     themesModuleRoot,
-    `${directory}/node_modules`,
-    path.join(devpackModuleRoot, 'node_modules'),
-    path.join(themesModuleRoot, 'node_modules')
+    join(directory, 'node_modules'),
+    join(devpackModuleRoot, 'node_modules')
   ]
 
   const platform = argv.platform || 'web'
-
-  const entry = {
-    [argv.entryName || 'app']: [ argv.entry || './src' ],
-  }
-
   const precompiled = argv.precompiled || argv.usePrecompiledTemplate
 
-  if (env === 'development') {
-    entry.app.unshift('webpack-hot-middleware/client')
+  let entry = {}
+
+  if (argv.entryPoints && argv.devpack_api === 'v2') {
+    entry = assign(entry, argv.entryPoints)
+  } else {
+    entry = assign(entry, {
+      [argv.entryName || 'app']: [ argv.entry || './src' ],
+    })
+
   }
 
-  if (!precompiled && !argv.skipTheme && argv.theme) {
-    entry.theme = [`skypager-themes?theme=${ argv.theme }&env=${argv.env}!${directory}/package.json`]
+  entry = mapValues(entry, (v,k) => typeof v === 'string' ? [v] : v)
+
+  if (isDev) {
+    entry = mapValues(entry, (v,k) => {
+       v.unshift('webpack-hot-middleware/client')
+       return v
+    })
   }
 
-	var outputPath = path.resolve(
-		argv.outputFolder || join(directory, 'public')
-	)
+	var outputPath = argv.outputFolder ? path.resolve(argv.outputFolder)  : join(directory, 'public')
 
-  var templatePath = `${__dirname}/../../templates/index.html`
+  var templatePath = join(devpackModuleRoot, 'templates', 'index.html')
 
   if (precompiled) {
     try {
@@ -71,7 +109,7 @@ module.exports = function (argv) {
     templatePath = path.resolve(argv.htmlTemplatePath)
   }
 
-  var htmlFilename = argv.htmlFilename || 'index.html'
+  var htmlFilename = argv.htmlFilename || argv.outputFile || 'index.html'
 
   if (env === 'production' && platform === 'web' && !argv.htmlFilename && argv.pushState) {
     htmlFilename = '200.html'
@@ -83,21 +121,18 @@ module.exports = function (argv) {
       output: {
         path: outputPath,
         filename: (argv.noContentHash || argv.contentHash === false || isDev ? '[name].js' : '[name]-[hash].js'),
-        publicPath: (!isDev && platform === 'electron') ? '' : '/'
+        publicPath: (!isDev && platform === 'electron') ? '' : '/',
+        contentBase: argv.contentBase || join(directory, 'src')
       },
       resolveLoader: {
         root: modulesDirectories
       },
       resolve: {
-				root: modulesDirectories.concat([
-          directory,
-          path.dirname(
-            require.resolve('skypager-devpack')
-          )
-				]),
+				root: modulesDirectories,
+        fallback: argv.moduleFallback || devpackModuleRoot,
 				modulesDirectories:[
-          '.',
 					'src',
+          'src/ui',
           'dist',
           'node_modules'
 				]
@@ -112,21 +147,8 @@ module.exports = function (argv) {
       loader: 'babel',
       exclude: [
         path.join(process.env.PWD, 'dist', 'bundle'),
-        /node_modules/
+        excludeNodeModulesExceptSkypagers
       ],
-      query: {
-        presets: [require.resolve('babel-preset-skypager')],
-        env: {
-          development: {
-            presets: [require.resolve('babel-preset-react-hmre')]
-          }
-        }
-      }
-    })
-
-    .loader('js2', {
-      test: /skypager-devpack\/src.*\.jsx?$/,
-      loader: 'babel',
       query: {
         presets: [require.resolve('babel-preset-skypager')],
         env: {
@@ -139,6 +161,14 @@ module.exports = function (argv) {
 
     .loader('less', {
       test: /\.less$/,
+      include:[
+        join(directory, 'src'),
+        join(devpackModuleRoot, 'src', 'ui')
+      ],
+      exclude:[
+        excludeNodeModulesExceptSkypagers,
+        themesModuleRoot
+      ],
       loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
                       : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')
 
@@ -206,22 +236,10 @@ module.exports = function (argv) {
   }
 
 
-  if ((argv.noVendorLibraries || argv.vendorLibraries !== false) && !argv.externalVendors && !precompiled) {
+  if ((argv.noVendorLibraries || argv.vendorLibraries === false) && !argv.externalVendors && !precompiled) {
     config.merge({
       entry: {
-        vendor: [
-          'history',
-          'jquery',
-          'react',
-          'react-dom',
-          'react-redux',
-          'react-router',
-          'react-bootstrap',
-          'redux',
-          'redux-thunk',
-          'redux-actions',
-          'redux-simple-router'
-        ]
+        vendor: buildVendorStack(argv)
       }
 		})
 
@@ -235,18 +253,7 @@ module.exports = function (argv) {
 	}
   if (argv.externalVendors || precompiled ) {
     config.merge({
-      externals: {
-        'jquery': 'jQuery',
-        'react': 'React',
-        'react-dom': 'ReactDOM',
-        'react-bootstrap': 'ReactBootstrap',
-        'redux': 'Redux',
-        'react-router': 'Router',
-        'redux-actions': 'ReduxActions',
-        'redux-thunk': 'ReduxThunk',
-        'redux-simple-router': 'ReduxSimpleRouter',
-        'history': 'History'
-      }
+      externals: buildExternals(argv)
     })
   }
 
@@ -292,5 +299,45 @@ module.exports = function (argv) {
 		})
 	}
 
+  console.log('Final Config')
+  console.log(inspect(config.resolve()))
   return config
+}
+
+function excludeNodeModulesExceptSkypagers(absolutePath) {
+  if (absolutePath.match(/node_modules/)){
+    if(absolutePath.match(/skypager/) && absolutePath.match(/src/)) {
+      return false
+    }
+
+    return true
+  }
+
+  return false
+}
+
+function buildVendorStack(argv) {
+  if (argv.vendor && typeof argv.vendor === 'object') {
+    return argv.vendor
+  }
+
+  return DefaultVendorStack
+}
+
+function buildExternals(argv) {
+  if (argv.externalVendors && typeof argv.externalVendors === 'object') {
+    return argv.externalVendors
+  }
+
+  return ExternalVendorMappings
+}
+
+function inspect(obj) {
+  console.log(
+    JSON.stringify(
+      omit(obj,'commands', 'options', '_execs', '_allowUnknownOption', '_args', '_name', '_noHelp', 'parent', '_alias', '_description', '_events', '_eventsCount'),
+      null,
+      2
+    )
+  )
 }

@@ -1,9 +1,10 @@
 development:
   port: 3001
   host: localhost
+  outputFolder: editor
   entryPoints:
-    theme: 'dashboard'
-    app: ./src/index
+    theme: 'dashboard-dark'
+    editor: ./src/editor
 
 production:
   outputFolder: public

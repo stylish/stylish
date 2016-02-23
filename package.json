@@ -3,8 +3,7 @@
   "version": "2.2.1",
   "description": "skypager: cloud publishing framework",
   "skypager": {
-    "main": "skypager.js",
-    "theme": "dashboard"
+    "main": "skypager.js"
   },
   "main": "index.js",
   "dependencies": {

@@ -47,28 +47,9 @@ function handle(workspace) {
     authorArgs.push('--project', project.root);
   }
 
-  var proc = require('child_process').spawn(electron, [skypagerElectron].concat(authorArgs));
-
-  if (options.interactive) {
-    proc.stdout.on('data', function (data) {
-      return process.stdout.write(data);
-    });
-    proc.stderr.on('data', function (data) {
-      return process.stderr.write(data);
-    });
-    process.stdin.on('data', function (data) {
-      return proc.stdin.write(data);
-    });
-  }
-
-  if (!options.interactive) {
-    proc.stdout.on('data', function (data) {
-      return console.log(data.toString());
-    });
-    proc.stderr.on('data', function (data) {
-      return console.log(data.toString());
-    });
-  }
+  var proc = require('child_process').spawn(electron, [skypagerElectron].concat(authorArgs), {
+    stdio: [process.stdin, process.stdout, process.stderr]
+  });
 }
 
 function isSkypagerElectronInstalled() {

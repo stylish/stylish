@@ -1,28 +1,5 @@
-import { Application } from 'ui/applications'
+import setup from 'ui/applications/setup'
 
-import HomePage from './entries/HomePage'
-import MainLayout from './layouts/MainLayout'
+import project from 'dist/bundle'
 
-function loadApp(project, hot = false) {
-  Application.create({
-    project,
-    layout: MainLayout,
-    hot,
-    entryPoints:{
-      index: HomePage
-    }
-  })
-}
-
-loadApp(
-  require('dist/bundle')
-)
-
-if (module.hot) {
-  module.hot.accept('dist/bundle', () => {
-    loadApp(
-      require('dist/bundle'),
-      true
-    )
-  })
-}
+setup(project)

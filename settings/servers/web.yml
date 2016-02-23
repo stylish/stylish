@@ -12,38 +12,38 @@ development:
     webpack:
       cmd: 'skypager serve webpack --profile web' 
     editor:
-      cmd: 'skypager dev web --port 9090 --entry ./src/editor --entry-name editor --theme dashboard-dark' 
+      cmd: 'skypager serve webpack --profile electron' 
 
   dashboard:
     panels:
       leftPanel: 
-        label: API
+        label: Editor Build
         type: log
         left: "1%"
         top: "1%"
         height: "68%"
-        width: "40%"
-        process: server
+        width: "50%"
+        process: editor
         borderStyles:
           type: line
           color: yellow
 
       leftPanelTwo: 
-        label: Editor Build
+        label: API
         type: log
         left: "1%"
         top: "70%"
         height: "29%"
-        width: "40%"
-        process: editor
+        width: "50%"
+        process: server
         borderStyles:
           type: line
           color: magenta
 
       rightTop:
         type: log
-        left: "41%"
-        width: "58%"
+        left: "51%"
+        width: "48%"
         top: "1%"
         height: "68%"
         process: webpack
@@ -54,8 +54,8 @@ development:
 
       rightBottom:
         type: log
-        left: "41%"
-        width: "58%"
+        left: "51%"
+        width: "48%"
         height: "29%"
         top: "70%"
         label: Deepstream Server

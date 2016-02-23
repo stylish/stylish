@@ -77,31 +77,7 @@ function ProjectImporter() {
 
   (0, _keys2.default)(collections).forEach(function (name) {
     var collection = collections[name];
-    var pattern = collection.assetPattern;
-    var paths = [];
-
-    try {
-      paths = glob.sync(pattern, {
-        cwd: collection.root,
-        ignore: [collection.excludePattern]
-      });
-    } catch (error) {
-      paths = [];
-    }
-
-    collection._willLoadAssets(paths);
-
-    paths.forEach(function (rel) {
-      var asset = collection.createAsset(rel);
-
-      collection.add(asset, false, true);
-
-      if (autoLoad[name]) {
-        AssetImporter.call(project, { project: project, collection: collection, asset: asset });
-      }
-    });
-
-    collection._didLoadAssets(paths, false);
+    collection.loadAssetsFromDisk();
   });
 
   var callback = options.onComplete;

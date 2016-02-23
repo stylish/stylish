@@ -32,6 +32,10 @@ var _pick = require('lodash/pick');
 
 var _pick2 = _interopRequireDefault(_pick);
 
+var _mapValues = require('lodash/mapValues');
+
+var _mapValues2 = _interopRequireDefault(_mapValues);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -95,6 +99,7 @@ function launchServer(preset) {
   var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
   var project = context.project;
+  preset = preset || options.preset;
 
   if (!project) {
     console.log('Can not launch the dev server outside of a skypager project directory. run skypager init first.'.red);
@@ -106,15 +111,6 @@ function launchServer(preset) {
     process.exit(1);
   }
 
-  options.entry = options.entry || project.options.entry || './src';
-  options.theme = options.theme || project.get('settings.branding.theme') || project.get('settings.style.theme') || project.options.theme || 'marketing';
-
-  options.staticAssets = options.staticAssets || project.options.staticAssets || {};
-
-  console.log('Launching server with entry'.cyan + (' ' + options.entry).white);
-
-  process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-
   function onCompile(err, stats) {
     project.debug('skypager:afterDevCompile', {
       stats: stats && (0, _keys2.default)(stats.toJson())
@@ -125,7 +121,31 @@ function launchServer(preset) {
     project.debug('skypager:beforeDevCompile', (0, _extends3.default)({}, data));
   }
 
-  process.title = 'skypager dev';
+  if (preset && options.devpack_api === 'v2') {
+    if (options.entryPoints) {
+      options.entryPoints = (0, _mapValues2.default)(options.entryPoints, function (v, k) {
+        if (k === 'theme' && typeof v === 'string' && !v.match(/skypager-themes/)) {
+
+          var cfg = project.get('settings.themes.' + v) ? project.content.settings_files.at('themes/' + v).paths.absolute : project.paths.manifest;
+
+          return ['skypager-themes?theme=' + v + '!' + cfg];
+        }
+
+        if (typeof v === 'string') {
+          return [v];
+        }
+      });
+    }
+  } else {
+    options.theme = options.theme || project.get('settings.branding.theme') || project.get('settings.style.theme') || project.options.theme;
+  }
+
+  if (!options.entry && !options.entryPoints) {
+    options.entry = options.entry || project.options.entry || './src';
+  }
+
+  options.staticAssets = options.staticAssets || project.options.staticAssets || {};
+
   require('skypager-devpack').webpack('develop', options, { beforeCompile: beforeCompile, onCompile: onCompile });
 }
 

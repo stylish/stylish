@@ -31,7 +31,7 @@ module.exports = function (argv) {
 
   config = config.resolve();
 
-  config.devtool = 'eval';
+  config.devtool = 'cheap-module-eval-sourcemap';
 
   if (argv.platform === 'electron') {
     config.output.publicPath = '';

@@ -60,14 +60,20 @@ function handle(arg) {
   var dashboard = options.dashboard || false;
   var rawArg = _yargs2.default.argv._[1];
 
+  var opts = {};
+  context.argv = _yargs2.default.argv;
+
   if (rawArg === 'deepstream') {
-    require('skypager-server').deepstream({ profile: profile, env: env }, { project: project, argv: _yargs2.default.argv });
+    opts = (0, _get2.default)(project, 'settings.servers.deepstream.' + profile) || (0, _get2.default)(project, 'settings.servers.' + profile + '.deepstream') || (0, _get2.default)(project, 'settings.deepstream.' + profile) || (0, _get2.default)(project, 'settings.deepstream');
+
+    require('skypager-server').deepstream(opts, context);
   } else if (rawArg === 'webpack') {
-    var opts = (0, _get2.default)(serverSettings, profile + '.' + env + '.webpack') || {};
-    context.argv = _yargs2.default.argv;
+    opts = (0, _get2.default)(project, 'settings.servers.webpack.' + profile) || (0, _get2.default)(project, 'settings.servers.' + profile + '.webpack') || (0, _get2.default)(project, 'settings.webpack.' + profile) || (0, _get2.default)(project, 'settings.webpack');
+
+    opts.devpack_api = 'v2';
     (0, _develop.handle)(profile, opts, context);
   } else {
-    server({ profile: profile, env: env, dashboard: dashboard }, { project: project, argv: _yargs2.default.argv });
+    server({ profile: profile, env: env, dashboard: dashboard }, context);
   }
 }
 

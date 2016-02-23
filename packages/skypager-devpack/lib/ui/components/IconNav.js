@@ -45,9 +45,9 @@ var _Icon = require('./Icon');
 
 var _Icon2 = _interopRequireDefault(_Icon);
 
-var _IconNavCss = require('./IconNav.css.less');
+var _IconNav = require('./IconNav.less');
 
-var _IconNavCss2 = _interopRequireDefault(_IconNavCss);
+var _IconNav2 = _interopRequireDefault(_IconNav);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -101,7 +101,7 @@ var IconNav = exports.IconNav = (function (_React$Component) {
         );
       });
 
-      var classes = (0, _classnames3.default)((0, _defineProperty3.default)({ iconav: true }, _IconNavCss2.default.iconav, true));
+      var classes = (0, _classnames3.default)((0, _defineProperty3.default)({ iconav: true }, _IconNav2.default.iconav, true));
 
       return _react2.default.createElement(
         'nav',

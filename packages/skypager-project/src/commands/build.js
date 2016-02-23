@@ -82,6 +82,18 @@ export function handle(preset, options = {}, context = {}) {
     })
   }
 
+  if (options.preset) {
+    let opts = project.get(`settings.webpack.${ options.preset }.build`) ||
+               project.get(`settings.webpack.${ options.preset }`) ||
+               project.get(`settings.builds.${ options.preset }.webpack`) ||
+               project.get(`settings.builds.${ options.preset }`);
+
+               if (opts) {
+                 options.devpack_api = v2
+                 options = assign(options, opts)
+               }
+  }
+
   require('skypager-devpack').webpack('build', options, {beforeCompile, onCompile})
 }
 

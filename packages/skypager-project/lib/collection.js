@@ -56,7 +56,7 @@ var Collection = (function () {
 
     collection.root = root;
 
-    collection.name = (0, _path.basename)(root);
+    collection.name = options.name || (0, _path.basename)(root);
 
     collection.hidden('project', project);
     collection.hidden('AssetClass', function () {
@@ -93,19 +93,47 @@ var Collection = (function () {
     }
 
     buildAtInterface(collection, false);
+
+    if (options.autoLoad) {
+      this.loadAssetsFromDisk();
+    }
   }
 
   (0, _createClass3.default)(Collection, [{
-    key: 'globFiles',
-    value: function globFiles(pattern) {
+    key: 'loadAssetsFromDisk',
+    value: function loadAssetsFromDisk(paths) {
       var _this = this;
 
+      if (!paths) {
+        paths = require('glob').sync(this.assetPattern, {
+          cwd: this.root,
+          ignore: [this.excludePattern]
+        });
+      }
+
+      this._willLoadAssets(paths);
+
+      paths.forEach(function (rel) {
+        var asset = _this.createAsset(rel);
+        _this.add(asset, true, true);
+      });
+
+      this._didLoadAssets(paths, false);
+    }
+  }, {
+    key: 'globFiles',
+    value: function globFiles() {
+      var _this2 = this;
+
+      var pattern = arguments.length <= 0 || arguments[0] === undefined ? this.assetPattern : arguments[0];
       var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
       var glob = require('glob');
 
+      options.exclude = options.exclude || [this.excludePattern];
+
       return new _promise2.default(function (resolve, reject) {
-        glob(pattern, (0, _extends3.default)({ cwd: _this.root }, options), function (err, files) {
+        glob(pattern, (0, _extends3.default)({ cwd: _this2.root }, options), function (err, files) {
           if (err) {
             reject(err);
             return;
@@ -126,12 +154,12 @@ var Collection = (function () {
   }, {
     key: 'relatedGlob',
     value: function relatedGlob(target) {
-      var _this2 = this;
+      var _this3 = this;
 
       var patterns = [target.id + '.{' + this.AssetClass.EXTENSIONS.join(',') + '}', target.id + '/**/*.{' + this.AssetClass.EXTENSIONS.join(',') + '}'];
 
       return patterns.reduce(function (m, a) {
-        return m.concat(_this2.glob(a));
+        return m.concat(_this3.glob(a));
       }, []);
     }
   }, {
@@ -330,10 +358,10 @@ var Collection = (function () {
   }, {
     key: 'subfolderPaths',
     get: function get() {
-      var _this3 = this;
+      var _this4 = this;
 
       return this.assetPaths.map(function (p) {
-        return (0, _path.relative)(_this3.root, (0, _path.dirname)(p));
+        return (0, _path.relative)(_this4.root, (0, _path.dirname)(p));
       }).unique().filter(function (i) {
         return i.length > 0;
       }).sort(function (a, b) {

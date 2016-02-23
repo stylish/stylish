@@ -47,9 +47,9 @@ var _defaultsDeep = require('lodash/defaultsDeep');
 
 var _defaultsDeep2 = _interopRequireDefault(_defaultsDeep);
 
-var _IconNavLayoutCss = require('./IconNavLayout.css.less');
+var _IconNavLayout = require('./IconNavLayout.less');
 
-var _IconNavLayoutCss2 = _interopRequireDefault(_IconNavLayoutCss);
+var _IconNavLayout2 = _interopRequireDefault(_IconNavLayout);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -67,7 +67,7 @@ var IconNavLayout = exports.IconNavLayout = (function (_React$Component) {
       var classes = (0, _classnames3.default)((0, _defineProperty3.default)({
         'with-iconav': true,
         'iconav-wide': this.props.wide || !this.props.thin
-      }, _IconNavLayoutCss2.default.wrapper, true));
+      }, _IconNavLayout2.default.wrapper, true));
 
       var _props = this.props;
       var settings = _props.settings;

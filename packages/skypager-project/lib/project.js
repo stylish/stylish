@@ -8,6 +8,14 @@ var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
 
+var _promise = require('babel-runtime/core-js/promise');
+
+var _promise2 = _interopRequireDefault(_promise);
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -56,11 +64,23 @@ var _logger = require('./logger');
 
 var _logger2 = _interopRequireDefault(_logger);
 
+var _vault = require('./vault');
+
+var _vault2 = _interopRequireDefault(_vault);
+
 var _path = require('path');
 
 var _mapValues = require('lodash/mapValues');
 
 var _mapValues2 = _interopRequireDefault(_mapValues);
+
+var _defaults = require('lodash/defaults');
+
+var _defaults2 = _interopRequireDefault(_defaults);
+
+var _pick = require('lodash/pick');
+
+var _pick2 = _interopRequireDefault(_pick);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -129,6 +149,7 @@ var Project = (function () {
     project.emit('contentWillInitialize');
     // wrap the content interface in a getter but make sure
     // the documents collection is loaded and available right away
+
     project.hidden('content', content.call(project));
 
     project.emit('contentDidInitialize');
@@ -148,6 +169,23 @@ var Project = (function () {
       });
 
       project.emit('projectDidAutoImport');
+    }
+
+    if (project.settings.collections) {
+      (0, _defaults2.default)(project.content, (0, _mapValues2.default)(project.settings.collections, function (cfg, name) {
+        var assetClass = Assets[cfg.assetClass];
+
+        if (!assetClass) {
+          throw 'Invalid Collection Definition in settings. Invalid assetClass key.\n                   Pick one of: ' + (0, _keys2.default)(Assets).join(' ,');
+        }
+
+        return new _collection2.default((0, _extends3.default)({
+          root: cfg.root,
+          project: project,
+          assetClass: assetClass,
+          name: name
+        }, (0, _pick2.default)(cfg, 'exclude', 'pattern', 'autoLoad')));
+      }));
     }
 
     util.hide.getter(project, 'supportedAssetExtensions', function () {
@@ -194,17 +232,6 @@ var Project = (function () {
 
       return util.result.apply(util, [this].concat(args));
     }
-
-    /**
-     * A proxy object that lets you run one of the project helpers.
-     *
-     * @example
-     *
-     * project.run.importer('disk')
-     * project.run.action('snapshots/save', '/path/to/snapshot.json')
-     *
-     */
-
   }, {
     key: 'findBy',
     value: function findBy(source, params) {
@@ -369,6 +396,86 @@ var Project = (function () {
     *
     * These can be used to access document collections within the project
     */
+
+  }, {
+    key: 'streamFile',
+    value: function streamFile(path) {
+      var type = arguments.length <= 1 || arguments[1] === undefined ? 'readable' : arguments[1];
+      var mode = arguments[2];
+
+      var fd = require('fs').openSync(path, 'a+');
+      var stream = undefined;
+
+      if (type.match(/read/)) {
+        try {
+          stream = require('fs').createReadStream(path, { fd: fd });
+        } catch (error) {
+          console.log(error.message, 'readable');
+        }
+      } else if (type.match(/write/)) {
+        try {
+          stream = require('fs').createWriteStream(path, { fd: fd });
+        } catch (error) {
+          console.log(error.message, 'writeable');
+        }
+      } else {
+        // TODO: How to do bidirectional?
+      }
+
+      return stream;
+    }
+  }, {
+    key: 'exists',
+    value: function exists(path) {
+      try {
+        return require('fs').existsSync(path);
+      } catch (error) {
+        return false;
+      }
+    }
+  }, {
+    key: 'ensureFolder',
+    value: function ensureFolder(name) {
+      var _this3 = this;
+
+      var fs = require('fs');
+      var path = this.paths[name];
+
+      return new _promise2.default(function (resolve, reject) {
+        if (_this3.exists(path)) {
+          resolve(path);return path;
+        }
+
+        require('fs').mkdir(path, function (err) {
+          if (err) {
+            reject(err);return false;
+          }
+          resolve(path);
+        });
+      });
+    }
+  }, {
+    key: 'ensurePath',
+    value: function ensurePath(name) {
+      if (this.paths[name]) {
+        return this.ensureFolder(name);
+      }
+    }
+  }, {
+    key: 'vault',
+    get: function get() {
+      return (0, _vault2.default)(this);
+    }
+
+    /**
+     * A proxy object that lets you run one of the project helpers.
+     *
+     * @example
+     *
+     * project.run.importer('disk')
+     * project.run.action('snapshots/save', '/path/to/snapshot.json')
+     *
+     */
 
   }, {
     key: 'run',
@@ -613,6 +720,7 @@ function paths() {
     stylesheets: (0, _path.join)(this.root, 'src'),
     manifest: (0, _path.join)(this.root, 'package.json'),
     tmpdir: (0, _path.join)(this.root, 'tmp'),
+    temp: (0, _path.join)(this.root, 'tmp'),
     cache: (0, _path.join)(this.root, 'tmp', 'cache'),
     logs: (0, _path.join)(this.root, 'log'),
     build: (0, _path.join)(this.root, 'dist'),
@@ -717,12 +825,12 @@ function registries() {
 }
 
 function modelDefinitions() {
-  var _this3 = this;
+  var _this4 = this;
 
   return this.models.available.reduce(function (memo, id) {
     var _util$tabelize, _Object$assign2, _mutatorMap;
 
-    var model = _this3.models.lookup(id);
+    var model = _this4.models.lookup(id);
 
     (0, _assign2.default)(memo, (_Object$assign2 = {}, _util$tabelize = util.tabelize(util.underscore(model.name)), _mutatorMap = {}, _mutatorMap[_util$tabelize] = _mutatorMap[_util$tabelize] || {}, _mutatorMap[_util$tabelize].get = function () {
       return model.definition;
@@ -733,12 +841,12 @@ function modelDefinitions() {
 }
 
 function entities() {
-  var _this4 = this;
+  var _this5 = this;
 
   return this.models.available.reduce(function (memo, id) {
     var _util$tabelize2, _Object$assign3, _mutatorMap2;
 
-    var model = _this4.models.lookup(id);
+    var model = _this5.models.lookup(id);
     var entities = model.entities = model.entities || {};
 
     (0, _assign2.default)(memo, (_Object$assign3 = {}, _util$tabelize2 = util.tabelize(util.underscore(model.name)), _mutatorMap2 = {}, _mutatorMap2[_util$tabelize2] = _mutatorMap2[_util$tabelize2] || {}, _mutatorMap2[_util$tabelize2].get = function () {

@@ -40,6 +40,10 @@ var _stores = require('../util/stores');
 
 var _routes = require('../util/routes');
 
+var _stateful = require('../util/stateful');
+
+var _stateful2 = _interopRequireDefault(_stateful);
+
 var _DefaultLayout = require('ui/layouts/DefaultLayout');
 
 var _DefaultLayout2 = _interopRequireDefault(_DefaultLayout);
@@ -91,7 +95,7 @@ var Application = exports.Application = (function (_Component) {
       }
 
       if (options.layout && typeof options.layout === 'function') {
-        options.layout = stateful(options.layout, 'settings', 'settings.navigation', 'settings.branding');
+        options.layout = (0, _stateful2.default)(options.layout, 'settings', 'settings.navigation', 'settings.branding');
       }
 
       var renderer = function renderer() {
@@ -134,7 +138,7 @@ var Application = exports.Application = (function (_Component) {
         middlewares: middlewares,
         reducers: reducers, __source: {
           fileName: _jsxFileName,
-          lineNumber: 120
+          lineNumber: 121
         }
       }), document.getElementById(options.root || 'app'));
 
@@ -208,7 +212,7 @@ var Application = exports.Application = (function (_Component) {
         _reactRouter.Router,
         { history: _reactRouter.browserHistory, __source: {
             fileName: _jsxFileName,
-            lineNumber: 178
+            lineNumber: 179
           }
         },
         this.routes

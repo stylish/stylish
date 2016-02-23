@@ -206,13 +206,16 @@ function handleScript(datasource, load) {
 }
 
 function interpolateValues(obj, template) {
+  var datasource = this;
+
   (0, _keys2.default)(obj).forEach(function (key) {
     var value = obj[key];
 
     if ((typeof value === 'undefined' ? 'undefined' : (0, _typeof3.default)(value)) === 'object') {
-      interpolateValues(value, template);
-    } else if (typeof value === 'string' && value.match(/^env\./i)) {
-      obj[key] = _result(process.env, value.replace(/^env\./i, ''));
+      interpolateValues.call(datasource, value, template);
+    } else if (typeof value === 'string' && value.match(/^env\.\w+$/i)) {
+      value = '<%= process.' + value + ' %>';
+      obj[key] = template(value)(value);
     } else if (typeof value === 'string') {
       obj[key] = template(value)(value);
     }

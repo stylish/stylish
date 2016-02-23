@@ -8,6 +8,10 @@ var _extends2 = require('babel-runtime/helpers/extends');
 
 var _extends3 = _interopRequireDefault(_extends2);
 
+var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -33,6 +37,10 @@ var _md2 = _interopRequireDefault(_md);
 var _util = require('../util');
 
 var util = _interopRequireWildcard(_util);
+
+var _pick = require('lodash/pick');
+
+var _pick2 = _interopRequireDefault(_pick);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -107,16 +115,31 @@ var Asset = (function () {
     key: 'templater',
     value: function templater(string) {
       var asset = this;
+      var project = asset.project;
+
+      var accessibleEnvVars = project.vault.templates.accessibleEnvVars;
+
       return util.template(string, {
         imports: {
           get project() {
             return asset.project;
           },
+          get settings() {
+            return asset.project && asset.project.settings;
+          },
+          get collection() {
+            return asset.collection;
+          },
           get self() {
             return asset;
           },
           get process() {
-            return process;
+            return {
+              env: _pick2.default.apply(undefined, [process.env].concat((0, _toConsumableArray3.default)(accessibleEnvVars)))
+            };
+          },
+          get env() {
+            return _pick2.default.apply(undefined, [process.env].concat((0, _toConsumableArray3.default)(accessibleEnvVars)));
           }
         }
       });

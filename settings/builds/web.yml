@@ -1,0 +1,6 @@
+development:
+  outputFolder: public
+  entry: ./src/index
+production:
+  outputFolder: public
+  entry: ./src/index
