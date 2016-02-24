@@ -36,7 +36,7 @@ var _uniq2 = _interopRequireDefault(_uniq);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function build(program, dispatch) {
-  program.command('build [preset]').description('build a website for this project using our preconfigured webpack bundle').option('--output-folder <path>', 'relative path to the output folder', 'public').option('--preset <name>', 'use a preset instead of all of this configuration').option('--platform <name>', 'which platform are we building for? electron or web', 'web').option('--theme <name>', 'the name of the theme to use', 'dashboard').action(dispatch(handle));
+  program.command('build [preset]').allowUnknownOption(true).description('build a website for this project using our preconfigured webpack bundle').option('--output-folder <path>', 'relative path to the output folder', 'public').option('--preset <name>', 'use a preset instead of all of this configuration').option('--platform <name>', 'which platform are we building for? electron or web', 'web').option('--theme <name>', 'the name of the theme to use', 'dashboard').action(dispatch(handle));
 }
 
 exports.default = build;

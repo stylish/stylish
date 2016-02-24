@@ -7,6 +7,7 @@ import uniq from 'lodash/uniq'
 export function build (program, dispatch) {
   program
     .command('build [preset]')
+    .allowUnknownOption(true)
     .description('build a website for this project using our preconfigured webpack bundle')
     .option('--output-folder <path>', 'relative path to the output folder', 'public')
     .option('--preset <name>', 'use a preset instead of all of this configuration')

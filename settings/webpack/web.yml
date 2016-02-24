@@ -1,9 +1,9 @@
 development:
   port: 3001
   host: localhost
+  theme: 'marketing-bold'
   entryPoints:
     app: ./src/index
-    theme: 'themes/marketing-bold'
 
 production:
   outputFolder: public

@@ -179,20 +179,20 @@ module.exports = function (argv) {
   });
 
   config.loader('less-2', {
-    test: /themes.*\.less$/,
-    include: [themesModuleRoot],
+    test: /theme.*\.less$/,
+    include: [themesModuleRoot, projectThemePath],
     exclude: [excludeNodeModulesExceptSkypagers],
     loader: isDev ? 'style-loader!css-loader!less-loader' : ExtractTextPlugin.extract('style-loader', 'css-loader?sourceMap!less')
 
   }).loader('less', {
     test: /\.less$/,
     include: [join(directory, 'src'), join(devpackModuleRoot, 'src', 'ui')],
-    exclude: [excludeNodeModulesExceptSkypagers, themesModuleRoot],
+    exclude: [excludeNodeModulesExceptSkypagers, themesModuleRoot, projectThemePath],
     loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less' : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')
 
   }).loader('url-1', { test: /\.woff(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff' }).loader('url-2', { test: /\.woff2(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff2' }).loader('url-3', { test: /\.ttf(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream' }).loader('file', { test: /\.eot(\?.*)?$/, loader: 'file?prefix=' + fontsPrefix + '/&name=[path][name].[ext]' }).loader('url-4', { test: /\.svg(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml' }).loader('url-5', { test: /\.(png|jpg)$/, loader: 'url?limit=8192' }).loader('ejs', { test: /\.ejs/, loader: 'ejs' });
 
-  config.plugin('webpack-order', webpack.optimize.OccurenceOrderPlugin).plugin('webpack-noerrors', webpack.NoErrorsPlugin);
+  config.plugin('webpack-order', webpack.optimize.OccurenceOrderPlugin).plugin('webpack-dedupe', webpack.optimize.DedupePlugin);
 
   var featureFlags = {
     '__PLATFORM__': (0, _stringify2.default)(platform),
@@ -241,7 +241,7 @@ module.exports = function (argv) {
 
   // development
   if (isDev) {
-    config.plugin('webpack-hmr', webpack.HotModuleReplacementPlugin);
+    config.plugin('webpack-hmr', webpack.HotModuleReplacementPlugin).plugin('webpack-noerrors', webpack.NoErrorsPlugin);
   }
 
   if (argv.target) {
@@ -259,12 +259,16 @@ module.exports = function (argv) {
   if (!isDev) {
     config.merge({ devtool: 'cheap-module-source-map' });
 
-    var extractFilename = platform === 'electron' || argv.noContentHash || argv.contentHash === false ? '[name].js' : '[name]-[hash].js';
+    var extractFilename = platform === 'electron' || argv.noContentHash || argv.contentHash === false ? '[name].css' : '[name]-[contenthash].css';
 
     config.plugin('extract-text', ExtractTextPlugin, [extractFilename, {
       allChunks: true
     }]).plugin('webpack-uglify', webpack.optimize.UglifyJsPlugin, [{
-      compressor: { warnings: false }
+      compress: {
+        unused: true,
+        dead_code: true,
+        warnings: false
+      }
     }]);
   }
 

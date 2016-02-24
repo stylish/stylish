@@ -188,9 +188,10 @@ module.exports = function (argv) {
 
   config
     .loader('less-2', {
-      test: /themes.*\.less$/,
+      test: /theme.*\.less$/,
       include:[
-        themesModuleRoot
+        themesModuleRoot,
+        projectThemePath
       ],
       exclude:[
         excludeNodeModulesExceptSkypagers
@@ -208,7 +209,8 @@ module.exports = function (argv) {
       ],
       exclude:[
         excludeNodeModulesExceptSkypagers,
-        themesModuleRoot
+        themesModuleRoot,
+        projectThemePath
       ],
       loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
                      : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')
@@ -225,7 +227,7 @@ module.exports = function (argv) {
 
   config
     .plugin('webpack-order', webpack.optimize.OccurenceOrderPlugin)
-    .plugin('webpack-noerrors', webpack.NoErrorsPlugin)
+    .plugin('webpack-dedupe', webpack.optimize.DedupePlugin)
 
 
 	let featureFlags = {
@@ -277,7 +279,9 @@ module.exports = function (argv) {
 
   // development
   if (isDev) {
-    config.plugin('webpack-hmr', webpack.HotModuleReplacementPlugin)
+    config
+      .plugin('webpack-hmr', webpack.HotModuleReplacementPlugin)
+      .plugin('webpack-noerrors', webpack.NoErrorsPlugin)
   }
 
 	if (argv.target) {
@@ -295,7 +299,9 @@ module.exports = function (argv) {
   if (!isDev) {
   	config .merge({ devtool: 'cheap-module-source-map' })
 
-		let extractFilename = (platform === 'electron' || argv.noContentHash || argv.contentHash === false) ? '[name].js' : '[name]-[hash].js'
+		let extractFilename = (platform === 'electron' || argv.noContentHash || argv.contentHash === false)
+      ? '[name].css'
+      : '[name]-[contenthash].css'
 
 		config
       .plugin('extract-text', ExtractTextPlugin, [extractFilename, {
@@ -303,7 +309,11 @@ module.exports = function (argv) {
       }])
 
       .plugin('webpack-uglify', webpack.optimize.UglifyJsPlugin, [{
-        compressor: { warnings: false },
+        compress:{
+          unused: true,
+          dead_code: true,
+          warnings: false
+        }
       }])
   }
 

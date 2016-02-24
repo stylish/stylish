@@ -1,17 +1,13 @@
-import React from 'react'
-import { render } from 'react-dom'
+import { Application } from 'ui/applications'
 
-class App extends React.Component {
-  render() {
-    return (
-      <div className='container'>
-        <h1>Hello</h1>
-      </div>
-    )
+import project from 'dist/bundle'
+import MainLayout from './layouts/MainLayout'
+import HomePage from './entries/HomePage'
+
+Application.create({
+  project,
+  layout: MainLayout,
+  entryPoints: {
+    index: HomePage
   }
-}
-
-render(
-  <App />,
-  document.getElementById('app')
-)
+})

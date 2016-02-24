@@ -162,9 +162,9 @@
 @custom-control-indicator-active-border:   lighten(@brand-primary, 15%);
 @custom-control-indicator-disabled-bg:     darken(@input-bg, 5%);
 @custom-control-indicator-disabled-border: @custom-control-indicator-border;
-
 // General
 @body-bg: #000;
+
 
 // panels
 @navbar-transparent-color: #000;
@@ -201,3 +201,13 @@
 @stage-toggle-hover-color:    #fff;
 @stage-toggle-hover-bg:       #000;
 
+html {
+  background-color: @body-bg;
+}
+
+body {
+  position: relative;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+}
