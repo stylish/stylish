@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Workspace = exports.actions = exports.initialState = exports.store = undefined;
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -114,7 +118,7 @@ var Workspace = exports.Workspace = (function () {
 
       this.panels.forEach(function (panel) {
         if (process.env.NODE_ENV !== 'test') {
-          launch.call(_this, panel.id, assign(panel.opts, { window: panel.window || DEFAULT_WINDOW }));
+          launch.call(_this, panel.id, assign(panel.opts, { window: (0, _lodash.defaults)(panel.window, DEFAULT_WINDOW) }));
         }
       });
     }
@@ -205,9 +209,13 @@ function launch(panelName) {
     postLoad: function postLoad(electronApp, win) {
       var constrained = w.panelSettings[panelName].constrained;
 
+      win.show();
+
       if (constrained) {
         try {
           win.show();
+
+          win.setBounds((0, _extends3.default)({}, constrained));
         } catch (error) {
           console.log('');
           console.log('Error setting window bounds', constrained);
@@ -269,6 +277,7 @@ function launch(panelName) {
 
   options.window.preload = require.resolve('../client-bootstrap.js');
 
+  options.url = 'http://localhost:8080';
   var proc = (0, _electronifyServer2.default)(options);
 
   proc.on('child-started', function (child) {

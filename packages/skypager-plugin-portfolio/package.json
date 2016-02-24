@@ -1,6 +1,6 @@
 {
   "name": "skypager-plugin-portfolio",
-  "version": "2.4.0",
+  "version": "2.4.5",
   "description": "a skypager project aggregator ",
   "main": "index.js",
   "scripts": {
@@ -23,12 +23,12 @@
   },
   "homepage": "https://github.com/skypager/skypager#readme",
   "dependencies": {
-     "skypager-project": "latest",
-     "lodash": "^4.5.0",
-     "blessed": "latest",
-     "blessed-contrib": "latest"
+    "skypager-project": "latest",
+    "lodash": "^4.5.0",
+    "blessed": "latest",
+    "blessed-contrib": "latest"
   },
   "devDependencies": {
-     "babel-preset-skypager": "latest"
+    "babel-preset-skypager": "latest"
   }
 }

@@ -89,7 +89,7 @@ var Application = exports.Application = (function () {
 			settings: settings,
 			paths: {
 				appData: (0, _path.join)(_electron.app.getPath('userData'), 'data'),
-				appLogs: (0, _path.join)(_electron.app.getPath('userData'), 'logs'),
+				appLogs: project.path('logs', 'electron'),
 				public: project.paths.public || (0, _path.join)(process.env.PWD, 'public'),
 				temp: _electron.app.getPath('temp'),
 				project: project.root || process.env.PWD
@@ -100,10 +100,11 @@ var Application = exports.Application = (function () {
 
 		setupAppHome(options.paths);
 
+		console.log('Streaming Actions', this.paths.appLogs);
 		this.paths.actionStream = (0, _path.join)(this.paths.appLogs, this.id + '-action-stream.js');
 
 		hide({
-			actionLogger: (0, _fs.createWriteStream)(this.paths.actionStream),
+			actionLogger: stream(this.paths.actionStream),
 			store: setupStore()
 		});
 
@@ -173,6 +174,9 @@ var Application = exports.Application = (function () {
 		key: 'logAction',
 		value: function logAction(action) {
 			if (this.argv.debug) {
+				console.log((0, _stringify2.default)(action, null, 2));
+			}
+			if (!this.argv.debug) {
 				console.log((0, _stringify2.default)(action, null, 2));
 			}
 
@@ -317,4 +321,9 @@ function mainWorkspaceConfig(project) {
 			}
 		}
 	};
+}
+
+function stream(path) {
+	var fd = require('fs').openSync(path, 'a+');
+	return (0, _fs.createWriteStream)(path, { fd: fd });
 }
