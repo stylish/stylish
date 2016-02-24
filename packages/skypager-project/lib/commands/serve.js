@@ -19,8 +19,6 @@ var _get = require('lodash/get');
 
 var _get2 = _interopRequireDefault(_get);
 
-var _develop = require('./develop');
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function serve(program, dispatch) {
@@ -67,11 +65,6 @@ function handle(arg) {
     opts = (0, _get2.default)(project, 'settings.servers.deepstream.' + profile) || (0, _get2.default)(project, 'settings.servers.' + profile + '.deepstream') || (0, _get2.default)(project, 'settings.deepstream.' + profile) || (0, _get2.default)(project, 'settings.deepstream');
 
     require('skypager-server').deepstream(opts, context);
-  } else if (rawArg === 'webpack') {
-    opts = (0, _get2.default)(project, 'settings.servers.webpack.' + profile) || (0, _get2.default)(project, 'settings.servers.' + profile + '.webpack') || (0, _get2.default)(project, 'settings.webpack.' + profile) || (0, _get2.default)(project, 'settings.webpack');
-
-    opts.devpack_api = 'v2';
-    (0, _develop.handle)(profile, opts, context);
   } else {
     server({ profile: profile, env: env, dashboard: dashboard }, context);
   }

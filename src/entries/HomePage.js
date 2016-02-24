@@ -2,8 +2,6 @@ import React, { Component, PropTypes as types } from 'react'
 import { stateful } from 'ui/applications'
 import Icon from 'ui/components/Icon'
 
-import style from './HomePage.less'
-
 export class HomePage extends Component {
   static displayName = 'HomePage';
 

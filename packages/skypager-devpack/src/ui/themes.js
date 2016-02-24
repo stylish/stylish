@@ -1,1 +1,1 @@
-module.exports = require.context('./themes', false, /\.js$/)
+module.exports = require.context('../themes', false, /\.js$/)

@@ -1,6 +1,7 @@
 import { join, resolve, dirname } from 'path'
 import pick from 'lodash/pick'
 import mapValues from 'lodash/mapValues'
+import uniq from 'lodash/uniq'
 
 /**
  * This is a low level wrapper around webpack dev server and how we use it to build react / bootstrap / redux
@@ -13,9 +14,12 @@ export function develop (program, dispatch) {
     .command('dev [preset]')
     .allowUnknownOption(true)
     .description('run server for this project')
-    .option('--preset <name>', 'use a preset instead of all of this configuration')
-    .option('--port <port>', 'which port should this server listen on?', 3000)
     .option('--host <hostname>', 'which hostname should this server listen on?', 'localhost')
+    .option('--output-folder <path>', 'relative path to the output folder', 'public')
+    .option('--platform <name>', 'which platform are we building for? electron or web', 'web')
+    .option('--port <port>', 'which port should this server listen on?', 3000)
+    .option('--preset <name>', 'use a preset instead of all of this configuration')
+    .option('--theme <name>', 'the name of the theme to use', 'dashboard')
     .action(dispatch(handle))
 }
 
@@ -24,7 +28,7 @@ export default develop
 export function handle (preset, options = {}, context = {}) {
   let project = context.project
 
-  preset = preset || options.preset
+  preset = preset || options.preset || 'web'
   options.preset = preset
 
   launchServer(
@@ -32,10 +36,6 @@ export function handle (preset, options = {}, context = {}) {
     pick(options, 'host', 'port', 'preset'),
     context
   )
-
-  if (options.ngrok) {
-    launchTunnel(options, context)
-  }
 }
 
 
@@ -64,24 +64,44 @@ export function launchServer (preset, options = {}, context = {}) {
     })
   }
 
-  if (preset) {
-    console.log('Checking for config presets: ' + preset.green)
-
-    let opts = checkForSettings(project,
-      `settings.servers.${ preset }.webpack`,
-      `settings.servers.${ preset }`,
-      `settings.webpack.${ preset }`,
+  if (!preset) {
+    console.log('Must specify a config preset.'.yellow)
+    console.log('Available options:')
+    console.log(
+      available(project,
+        'settings.webpack',
+        'settings.servers'
+      )
     )
-
-    if (opts) {
-     options.devpack_api = 'v2'
-     options = Object.assign(options, opts)
-    }
+    process.exit(1)
   }
+
+  let opts = checkForSettings(project,
+    `settings.webpack.${ preset }`,
+    `settings.servers.${ preset }.webpack`,
+    `settings.servers.${ preset }`
+  )
+
+ if (!opts) {
+    console.log('Missing config. Creating default config in: ' + `settings/build/${ preset }`.green)
+    project.content.settings_files.createFile(
+      `settings/webpack/${ preset }.yml`,
+      yaml(
+        require('skypager-devpack').argsFor(preset, process.env.NODE_ENV || 'development')
+      )
+    )
+  }
+
+
+  options.devpack_api = 'v2'
+  options = Object.assign(options, opts)
 
   require('skypager-devpack').webpack('develop', options, {beforeCompile, onCompile})
 }
 
+function yaml(obj) {
+   return require('js-yaml').dump(obj)
+}
 
 export function launchTunnel(options, context) {
   var server = shell.exec(`ngrok http ${ options.port || 3000 }`, {async: true})
@@ -125,4 +145,16 @@ function checkForSettings(project, ...keys) {
   }
 
   return project.get(key)
+}
+
+function available(project, ...keys) {
+  return uniq(
+    keys.reduce((memo,test) => {
+      return memo.concat(
+        Object.keys(
+          project.get(test) || {}
+        )
+      )
+    },[])
+  ).sort().join(',')
 }

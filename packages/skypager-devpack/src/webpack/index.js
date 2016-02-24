@@ -1,5 +1,6 @@
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
+import { colorize } from '../util'
 
 const DefaultVendorStack = [
   'history',
@@ -29,7 +30,7 @@ const ExternalVendorMappings = {
 }
 
 module.exports = function (argv) {
-  inspect(argv)
+  inspect('Options', argv, argv.debug)
 
 	const md5 = require('md5')
   const path = require('path')
@@ -43,15 +44,12 @@ module.exports = function (argv) {
   const HtmlWebpackPlugin = require('html-webpack-plugin')
   const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
-  const env = process.env.NODE_ENV || 'development'
+  const env = argv.env || argv.environment || process.env.NODE_ENV || 'development'
   const config = new Config()
-  const directory = process.cwd()
+  const directory = argv.root || process.cwd()
 
 	const isDev = (env === 'development')
   const fontsPrefix = argv.fontsPrefix || 'fonts'
-
-  // this assumes the devpack is checked out and in skypager-central/packages/skypager-devpack
-  const babelModulesPath = argv.modulesPath || process.env.SKYPAGER_MODULES_PATH || '../../../node_modules'
 
   const themesModuleRoot = path.dirname(require.resolve('skypager-themes'))
   const devpackModuleRoot = path.join(__dirname, '../..')
@@ -69,9 +67,8 @@ module.exports = function (argv) {
   const platform = argv.platform || 'web'
   const precompiled = argv.precompiled || argv.usePrecompiledTemplate
 
+  let projectThemePath = argv.projectThemePath || join(themesModuleRoot, 'packages/default')
   let entry = {}
-
-  console.log('Is Development?', isDev)
 
   if (argv.entryPoints && argv.devpack_api === 'v2') {
     entry = assign(entry, argv.entryPoints)
@@ -79,10 +76,30 @@ module.exports = function (argv) {
     entry = assign(entry, {
       [argv.entryName || 'app']: [ argv.entry || './src' ],
     })
-
   }
 
   entry = mapValues(entry, (v,k) => typeof v === 'string' ? [v] : v)
+
+  if (!entry.theme && argv.theme) {
+    entry.theme = [
+      argv.theme.match(/\//) ? argv.theme : `themes/${ argv.theme }`
+    ]
+  }
+
+  if (exists(join(directory,'src/theme'))) {
+    projectThemePath = join(directory,'src/theme')
+
+    if (!exists(join(projectThemePath,'variables.less'))) {
+      console.log('Automatically generating a ' + 'variables.less'.green + ' file in ' + 'src/theme'.yellow)
+      console.log('This file will let you override theme variables more easily')
+
+      require('fs').writeFileSync(
+        join(projectThemePath,'variables.less'),
+        '// Prepackaged skypager-themes automatically @import this file.  You can override any of their variables here.',
+        'utf8'
+      )
+    }
+  }
 
   if (isDev) {
     entry = mapValues(entry, (v,k) => {
@@ -91,7 +108,7 @@ module.exports = function (argv) {
     })
   }
 
-  if (argv.noVendor) {
+  if (!argv.noVendor) {
     entry.vendor = buildVendorStack(argv)
   }
 
@@ -170,6 +187,19 @@ module.exports = function (argv) {
     })
 
   config
+    .loader('less-2', {
+      test: /themes.*\.less$/,
+      include:[
+        themesModuleRoot
+      ],
+      exclude:[
+        excludeNodeModulesExceptSkypagers
+      ],
+      loader: isDev ? 'style-loader!css-loader!less-loader'
+                      : ExtractTextPlugin.extract('style-loader', 'css-loader?sourceMap!less')
+
+    })
+
     .loader('less', {
       test: /\.less$/,
       include:[
@@ -180,9 +210,8 @@ module.exports = function (argv) {
         excludeNodeModulesExceptSkypagers,
         themesModuleRoot
       ],
-      loader: 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
-      /*loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
-                      : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')*/
+      loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
+                     : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')
 
     })
 
@@ -194,12 +223,16 @@ module.exports = function (argv) {
     .loader('url-5', { test: /\.(png|jpg)$/,    loader: 'url?limit=8192' })
 		.loader('ejs', {test:/\.ejs/, loader: 'ejs'})
 
+  config
     .plugin('webpack-order', webpack.optimize.OccurenceOrderPlugin)
     .plugin('webpack-noerrors', webpack.NoErrorsPlugin)
 
 
 	let featureFlags = {
 		'__PLATFORM__': JSON.stringify(platform),
+    '__SKYPAGER_THEME_CONFIG__': JSON.stringify(
+      argv.themeConfigPath || join(directory, 'package.json')
+    ),
 		'process.env': {
 			NODE_ENV: JSON.stringify(env)
 		}
@@ -247,44 +280,38 @@ module.exports = function (argv) {
     config.plugin('webpack-hmr', webpack.HotModuleReplacementPlugin)
   }
 
-
-
 	if (argv.target) {
 		config.merge({
 			target: argv.target
 		})
 	}
+
   if (argv.externalVendors || precompiled ) {
     config.merge({
       externals: buildExternals(argv)
     })
   }
 
-  // production
   if (!isDev) {
   	config .merge({ devtool: 'cheap-module-source-map' })
-
 
 		let extractFilename = (platform === 'electron' || argv.noContentHash || argv.contentHash === false) ? '[name].js' : '[name]-[hash].js'
 
 		config
-      /*.plugin('extract-text', ExtractTextPlugin, [extractFilename, {
+      .plugin('extract-text', ExtractTextPlugin, [extractFilename, {
         allChunks: true
-      }])*/
+      }])
 
-      /*.plugin('webpack-uglify', webpack.optimize.UglifyJsPlugin, [{
+      .plugin('webpack-uglify', webpack.optimize.UglifyJsPlugin, [{
         compressor: { warnings: false },
-        compress: {
-          unused: true,
-          dead_code: true
-        }
-      }])*/
+      }])
   }
 
   config.merge({
     resolve:{
       alias: {
-        'dist': (argv.distPath && resolve(argv.distPath)) || path.join(directory, 'dist')
+        'dist': (argv.distPath && resolve(argv.distPath)) || path.join(directory, 'dist'),
+        'project-theme': projectThemePath
       }
     }
   })
@@ -301,6 +328,8 @@ module.exports = function (argv) {
 			}
 		})
 	}
+
+  inspect('Application Entry Points', entry, argv.debug)
 
   return config
 }
@@ -333,12 +362,15 @@ function buildExternals(argv) {
   return ExternalVendorMappings
 }
 
-function inspect(obj) {
+function inspect(note, obj, debuggingEnabled = false) {
+  if (!debuggingEnabled) { return  }
+  console.log("")
+  console.log(note)
+  console.log('------')
+
   console.log(
-    JSON.stringify(
-      omit(obj,'commands', 'options', '_execs', '_allowUnknownOption', '_args', '_name', '_noHelp', 'parent', '_alias', '_description', '_events', '_eventsCount'),
-      null,
-      2
-    )
+    colorize(omit(obj,'commands', 'options', '_execs', '_allowUnknownOption', '_args', '_name', '_noHelp', 'parent', '_alias', '_description', '_events', '_eventsCount'))
   )
+
+  console.log("\n\n\n")
 }

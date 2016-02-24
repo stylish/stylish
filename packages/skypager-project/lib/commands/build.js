@@ -29,16 +29,22 @@ var _util = require('../util');
 
 var _util2 = _interopRequireDefault(_util);
 
+var _uniq = require('lodash/uniq');
+
+var _uniq2 = _interopRequireDefault(_uniq);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function build(program, dispatch) {
-  program.command('build [preset]').description('build a website for this project using our preconfigured webpack bundle').option('--preset <name>', 'use a preset instead of all of this configuration').option('--entry <path>', 'relative path to the entry point', './src').option('--entry-name <name>', 'what to name the entry point script', 'app').option('--entry-only', 'only compiled asssets; do not use html template').option('--platform <name>', 'which platform are we building for? electron or web', 'web').option('--external-vendors', "assume vendor libraries will be available to our script").option('--no-vendor-libraries', "don't include any vendor libraries in the bundle").option('--theme <name>', 'the name of the theme to use', 'dashboard').option('--output-folder <path>', 'relative path to the output folder', 'public').option('--html-filename <filename>', 'what should we name the html file?', 'index.html').option('--html-template-path <path>', 'path to the html template to use').option('--precompiled <name>', 'use a precompiled html template which includes vendor libs, themes, etc').option('--push-state', 'use a 200.html file to support push state').option('--content-hash', 'fingerprint the names of the files as a cache busting mechanism', true).option('--no-content-hash', 'fingerprint the names of the files as a cache busting mechanism', true).option('--dev-tools-path <path>', 'path to the skypager-devpack').option('--webpack-config <path>', 'path to a javascript function which can mutate the webpack config').option('--export-library <name>', 'build this as a umd library').option('--modules-path <path>', 'which modules folder to use for webpacks default? defaults to standard node_modules').option('--dist-path <path>', 'the project exporter or dist path').option('--skip-theme', 'do not include any skypager-theme content').option('--feature-flags <path>', 'path to a script which exports an object to be used for feature flags').option('--bundle', 'watch for content changes in the project and update the distribution bundle').option('--bundle-command', 'the command to run to generate the bundle default: skypager export bundle', 'skypager export bundle').option('--silent', 'suppress any server output').option('--debug', 'show error info from the server').option('--template-inject [target]', 'where to inject the webpack bundle? none, body, head').option('--exclude-chunks [list]', 'chunk names to exclude from the html bundle').option('--chunks [list]', 'chunk names to exclude from the html bundle').option('--save-webpack-stats <path>', 'save the webpack compilation stats output').action(dispatch(handle));
+  program.command('build [preset]').description('build a website for this project using our preconfigured webpack bundle').option('--output-folder <path>', 'relative path to the output folder', 'public').option('--preset <name>', 'use a preset instead of all of this configuration').option('--platform <name>', 'which platform are we building for? electron or web', 'web').option('--theme <name>', 'the name of the theme to use', 'dashboard').action(dispatch(handle));
 }
 
 exports.default = build;
 function handle(preset) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
   var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+  process.env.NODE_ENV = 'production';
 
   if (!isDevpackInstalled()) {
     console.log('The skypager-devpack package is required to use the webpack integration.'.red);
@@ -55,16 +61,6 @@ function handle(preset) {
   preset = preset || options.preset;
   options.preset = preset;
 
-  options.theme = options.theme || project.get('settings.branding.theme') || project.get('settings.style.theme') || project.options.theme || 'marketing';
-
-  process.env.NODE_ENV = 'production';
-
-  var bundleCommand = options.bundleCommand || 'skypager export bundle';
-
-  if (options.bundle) {
-    _shelljs2.default.exec(bundleCommand + ' --clean');
-  }
-
   function beforeCompile(_ref) {
     var config = _ref.config;
     var argv = _ref.argv;
@@ -80,16 +76,24 @@ function handle(preset) {
     });
   }
 
-  if (preset) {
-    console.log('Checking for config presets: ' + preset.green);
-
-    var opts = checkForSettings(project, 'settings.builds.' + preset + '.webpack', 'settings.builds.' + preset, 'settings.webpack.' + preset + '.build', 'settings.webpack.' + preset);
-
-    if (opts) {
-      options.devpack_api = 'v2';
-      options = (0, _assign2.default)(options, opts);
-    }
+  if (!preset) {
+    console.log('Must specify a config preset.'.yellow);
+    console.log('Available options:');
+    console.log(available(project, 'settings.build', 'settings.builds', 'settings.webpack'));
+    process.exit(1);
   }
+
+  console.log('Checking for config presets: ' + preset.green);
+
+  var opts = checkForSettings(project, 'settings.build.' + preset + '.webpack', 'settings.build.' + preset, 'settings.builds.' + preset + '.webpack', 'settings.builds.' + preset, 'settings.webpack.' + preset + '.build', 'settings.webpack.' + preset);
+
+  if (!opts) {
+    console.log('Missing config. Creating default config in: ' + ('settings/build/' + preset).green);
+    project.content.settings_files.createFile('settings/build/' + preset + '.yml', yaml(require('skypager-devpack').argsFor(preset, 'production')));
+  }
+
+  options.devpack_api = 'v2';
+  options = (0, _assign2.default)(options, opts);
 
   require('skypager-devpack').webpack('build', options, { beforeCompile: beforeCompile, onCompile: onCompile });
 }
@@ -122,4 +126,18 @@ function checkForSettings(project) {
   }
 
   return project.get(key);
+}
+
+function available(project) {
+  for (var _len2 = arguments.length, keys = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    keys[_key2 - 1] = arguments[_key2];
+  }
+
+  return (0, _uniq2.default)(keys.reduce(function (memo, test) {
+    return memo.concat((0, _keys2.default)(project.get(test) || {}));
+  }, [])).sort().join(',');
+}
+
+function yaml(obj) {
+  return require('js-yaml').dump(obj);
 }

@@ -3,9 +3,9 @@ development:
   host: localhost
   entryPoints:
     app: ./src/index
+    theme: 'themes/marketing-bold'
 
 production:
   outputFolder: public
   entryPoints:
     app: ./src/index
-    theme: 'skypager-themes?theme=marketing-bold!./settings/themes/dashboard-dark.yml'

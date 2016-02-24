@@ -10,9 +10,9 @@ development:
     deepstream:
       cmd: 'skypager serve deepstream --profile web'
     webpack:
-      cmd: 'skypager serve webpack --profile web' 
+      cmd: 'skypager dev web'
     editor:
-      cmd: 'skypager serve webpack --profile electron' 
+      cmd: 'skypager dev electron'
 
   dashboard:
     panels:

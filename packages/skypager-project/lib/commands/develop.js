@@ -31,6 +31,10 @@ var _mapValues = require('lodash/mapValues');
 
 var _mapValues2 = _interopRequireDefault(_mapValues);
 
+var _uniq = require('lodash/uniq');
+
+var _uniq2 = _interopRequireDefault(_uniq);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -40,7 +44,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Eventually I would rather have several presets which compose these different options together.
 */
 function develop(program, dispatch) {
-  program.command('dev [preset]').allowUnknownOption(true).description('run server for this project').option('--preset <name>', 'use a preset instead of all of this configuration').option('--port <port>', 'which port should this server listen on?', 3000).option('--host <hostname>', 'which hostname should this server listen on?', 'localhost').action(dispatch(handle));
+  program.command('dev [preset]').allowUnknownOption(true).description('run server for this project').option('--host <hostname>', 'which hostname should this server listen on?', 'localhost').option('--output-folder <path>', 'relative path to the output folder', 'public').option('--platform <name>', 'which platform are we building for? electron or web', 'web').option('--port <port>', 'which port should this server listen on?', 3000).option('--preset <name>', 'use a preset instead of all of this configuration').option('--theme <name>', 'the name of the theme to use', 'dashboard').action(dispatch(handle));
 }
 
 exports.default = develop;
@@ -50,14 +54,10 @@ function handle(preset) {
 
   var project = context.project;
 
-  preset = preset || options.preset;
+  preset = preset || options.preset || 'web';
   options.preset = preset;
 
   launchServer(preset, (0, _pick2.default)(options, 'host', 'port', 'preset'), context);
-
-  if (options.ngrok) {
-    launchTunnel(options, context);
-  }
 }
 
 function launchServer(preset) {
@@ -86,18 +86,28 @@ function launchServer(preset) {
     project.debug('skypager:beforeDevCompile', (0, _extends3.default)({}, data));
   }
 
-  if (preset) {
-    console.log('Checking for config presets: ' + preset.green);
-
-    var opts = checkForSettings(project, 'settings.servers.' + preset + '.webpack', 'settings.servers.' + preset, 'settings.webpack.' + preset);
-
-    if (opts) {
-      options.devpack_api = 'v2';
-      options = (0, _assign2.default)(options, opts);
-    }
+  if (!preset) {
+    console.log('Must specify a config preset.'.yellow);
+    console.log('Available options:');
+    console.log(available(project, 'settings.webpack', 'settings.servers'));
+    process.exit(1);
   }
 
+  var opts = checkForSettings(project, 'settings.webpack.' + preset, 'settings.servers.' + preset + '.webpack', 'settings.servers.' + preset);
+
+  if (!opts) {
+    console.log('Missing config. Creating default config in: ' + ('settings/build/' + preset).green);
+    project.content.settings_files.createFile('settings/webpack/' + preset + '.yml', yaml(require('skypager-devpack').argsFor(preset, process.env.NODE_ENV || 'development')));
+  }
+
+  options.devpack_api = 'v2';
+  options = (0, _assign2.default)(options, opts);
+
   require('skypager-devpack').webpack('develop', options, { beforeCompile: beforeCompile, onCompile: onCompile });
+}
+
+function yaml(obj) {
+  return require('js-yaml').dump(obj);
 }
 
 function launchTunnel(options, context) {
@@ -147,4 +157,14 @@ function checkForSettings(project) {
   }
 
   return project.get(key);
+}
+
+function available(project) {
+  for (var _len2 = arguments.length, keys = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    keys[_key2 - 1] = arguments[_key2];
+  }
+
+  return (0, _uniq2.default)(keys.reduce(function (memo, test) {
+    return memo.concat((0, _keys2.default)(project.get(test) || {}));
+  }, [])).sort().join(',');
 }

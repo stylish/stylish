@@ -1,8 +1,9 @@
+import { availableThemes } from './lib'
+
 var querystring = require('querystring')
 
 var styles = [
   "variables",
-
   "mixins",
 
   "normalize",
@@ -63,18 +64,20 @@ module.exports = function (content) {
 
   }
 
-  if (this.query) {
+  if (this.query && this.query.replace) {
     query = Object.assign(query, querystring.parse(this.query.replace(/^\?/,'')))
+  } else {
+    query = {}
   }
 
   var theme = query.theme || config.theme;
 
   var output;
 
-  if (theme) {
-    output = `@import '~skypager-themes/${ theme.replace(/-\w+$/,'') }/${ theme }.less';`
-  } else {
-    output = styles.map(function(style) { return `@import '~skypager-themes/bootstrap/${style}.less';` }).join("\n")
+  if (theme === 'bootstrap' || !availableThemes()[theme]) {
+    output = styles.map(function(style) { return `@import '~skypager-themes/packages/bootstrap/${style}.less';` }).join("\n")
+  } else if (availableThemes()[theme]) {
+    output = `@import '~skypager-themes/packages/${ theme }/index.less';`
   }
 
   return output;

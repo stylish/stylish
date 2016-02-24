@@ -1,5 +1,17 @@
-import setup from 'ui/applications/setup'
+import React from 'react'
+import { render } from 'react-dom'
 
-import project from 'dist/bundle'
+class App extends React.Component {
+  render() {
+    return (
+      <div className='container'>
+        <h1>Hello</h1>
+      </div>
+    )
+  }
+}
 
-setup(project)
+render(
+  <App />,
+  document.getElementById('app')
+)
