@@ -11,24 +11,12 @@ development:
       cmd: 'skypager serve deepstream --profile web'
     webpack:
       cmd: 'skypager dev web'
-    editor:
-      cmd: 'skypager dev electron'
+    bundler:
+      cmd: 'skypager export bundle --watch'
 
   dashboard:
     panels:
       leftPanel: 
-        label: Editor Build
-        type: log
-        left: "1%"
-        top: "1%"
-        height: "68%"
-        width: "50%"
-        process: editor
-        borderStyles:
-          type: line
-          color: yellow
-
-      leftPanelTwo: 
         label: API
         type: log
         left: "1%"

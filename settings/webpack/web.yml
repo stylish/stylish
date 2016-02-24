@@ -1,11 +1,5 @@
-development:
-  port: 3001
-  host: localhost
-  theme: 'marketing-bold'
-  entryPoints:
-    app: ./src/index
-
-production:
-  outputFolder: public
-  entryPoints:
-    app: ./src/index
+port: 3000
+host: localhost
+theme: 'marketing-bold'
+entryPoints:
+  app: ./src/website/index

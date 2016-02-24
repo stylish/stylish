@@ -179,7 +179,7 @@ module.exports = function (argv) {
   });
 
   config.loader('less-2', {
-    test: /theme.*\.less$/,
+    test: /.*\.less$/,
     include: [themesModuleRoot, projectThemePath],
     exclude: [excludeNodeModulesExceptSkypagers],
     loader: isDev ? 'style-loader!css-loader!less-loader' : ExtractTextPlugin.extract('style-loader', 'css-loader?sourceMap!less')
@@ -302,6 +302,10 @@ module.exports = function (argv) {
 function excludeNodeModulesExceptSkypagers(absolutePath) {
   if (absolutePath.match(/node_modules/)) {
     if (absolutePath.match(/skypager/) && absolutePath.match(/src/)) {
+      return false;
+    }
+
+    if (absolutePath.match(/skypager-themes/)) {
       return false;
     }
 

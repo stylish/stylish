@@ -24,7 +24,7 @@ export class HomePage extends Component {
       <div className={style.home}>
         <h1 className={style.brandHeading}>
           <Icon icon={ branding.icon } />
-          <span className={style.brandTitle}>{ branding.brand || 'what up' }</span>
+          <span className={style.brandTitle}>{ branding.brand }</span>
         </h1>
       </div>
     )

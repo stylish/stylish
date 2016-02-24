@@ -1,8 +1,4 @@
-development:
-  outputFolder: public
-  entry: ./src/index
-production:
-  outputFolder: public
-  entryPoints:
-    app: ./src/index
-    theme: 'skypager-themes?theme=marketing-bold!./settings/themes/dashboard-dark.yml'
+theme: marketing-bold
+contentHash: false
+entryPoints:
+  app: ./src/website/index

@@ -188,7 +188,7 @@ module.exports = function (argv) {
 
   config
     .loader('less-2', {
-      test: /theme.*\.less$/,
+      test: /.*\.less$/,
       include:[
         themesModuleRoot,
         projectThemePath
@@ -347,6 +347,10 @@ module.exports = function (argv) {
 function excludeNodeModulesExceptSkypagers(absolutePath) {
   if (absolutePath.match(/node_modules/)){
     if(absolutePath.match(/skypager/) && absolutePath.match(/src/)) {
+      return false
+    }
+
+    if(absolutePath.match(/skypager-themes/)){
       return false
     }
 

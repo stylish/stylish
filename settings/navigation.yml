@@ -3,6 +3,6 @@ navigation:
     - label: Home
       icon: home
       link: '/'
-    - label: About
-      icon: cog
-      link: '/about'
+    - label: Docs
+      icon: open-book
+      link: '/docs'
