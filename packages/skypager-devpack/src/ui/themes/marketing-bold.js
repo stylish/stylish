@@ -1,4 +1,1 @@
-module.exports = function MarketingBold(options = {}) {
-  let { env, directory, theme } = options
-  return `skypager-themes?theme=${ theme || 'marketing-bold' }&env=${ env }!${directory}/package.json`
-}
+require(`skypager-themes?theme=marketing-bold!${ global.__SKYPAGER_THEME_CONFIG__ || './package.json' }`)

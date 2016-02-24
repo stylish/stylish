@@ -29,14 +29,43 @@ var _colors = require('colors');
 
 var _colors2 = _interopRequireDefault(_colors);
 
+var _debounce = require('lodash/debounce');
+
+var _debounce2 = _interopRequireDefault(_debounce);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function exporter(program, dispatch) {
-  program.command('export <exporter>').description('run one of the project exporters').option('--format <format>', 'which format should the output be serialized in', 'json').option('--output <path>', 'where to save the contents').option('--pretty', 'pretty print the output').option('--stdout', 'write output to stdout').option('--benchmark', 'include benchmarking information').option('--clean', 'clean or remove previous versions first').action(dispatch(handle));
+  program.command('export <exporter>').description('run one of the project exporters').option('--format <format>', 'which format should the output be serialized in', 'json').option('--output <path>', 'where to save the contents').option('--pretty', 'pretty print the output').option('--stdout', 'write output to stdout').option('--benchmark', 'include benchmarking information').option('--watch', 'watch files for changes and rerun the exporter').option('--clean', 'clean or remove previous versions first').action(dispatch(handle));
 }
 
 exports.default = exporter;
 function handle(exporterId) {
+  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+  console.log('Running exporter: ' + exporterId.cyan);
+  actuallyHandle(exporterId, options, context);
+
+  if (options.watch) {
+    var files = './{data,docs,settings,src,assets,models,actions,exporters,importers}/**/*.*';
+    var watcher = require('chokidar').watch(files, {
+      usePolling: true,
+      interval: 200,
+      debounce: 1200
+    });
+
+    options.watch = false;
+
+    var onChange = function onChange() {
+      actuallyHandle(exporterId, options, context);
+    };
+
+    watcher.on('change', (0, _debounce2.default)(onChange, 300));
+  }
+}
+
+function actuallyHandle(exporterId) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
   var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
   var project = context.project;

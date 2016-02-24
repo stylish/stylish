@@ -55,7 +55,9 @@ export function handle(preset, options = {}, context = {}) {
     process.exit(1)
   }
 
-  options.preset = preset || options.preset
+  preset = preset || options.preset
+  options.preset = preset
+
   options.theme = options.theme ||
     project.get('settings.branding.theme') ||
     project.get('settings.style.theme') ||
@@ -82,16 +84,20 @@ export function handle(preset, options = {}, context = {}) {
     })
   }
 
-  if (options.preset) {
-    let opts = project.get(`settings.webpack.${ options.preset }.build`) ||
-               project.get(`settings.webpack.${ options.preset }`) ||
-               project.get(`settings.builds.${ options.preset }.webpack`) ||
-               project.get(`settings.builds.${ options.preset }`);
+  if (preset) {
+    console.log('Checking for config presets: ' + preset.green)
 
-               if (opts) {
-                 options.devpack_api = v2
-                 options = assign(options, opts)
-               }
+    let opts = checkForSettings(project,
+      `settings.builds.${ preset }.webpack`,
+      `settings.builds.${ preset }`,
+      `settings.webpack.${ preset }.build`,
+      `settings.webpack.${ preset }`,
+    )
+
+    if (opts) {
+     options.devpack_api = 'v2'
+     options = Object.assign(options, opts)
+    }
   }
 
   require('skypager-devpack').webpack('build', options, {beforeCompile, onCompile})
@@ -104,4 +110,21 @@ function isDevpackInstalled () {
   } catch (error) {
     return false
   }
+}
+
+function checkForSettings(project, ...keys) {
+  let key = keys.find((key) => {
+    console.log('Checking for settings in: ' + key.cyan)
+    let value = project.get(key)
+
+    if (value) {
+      return true
+    }
+  })
+
+  if(key) {
+     console.log('Found ' + key.green)
+  }
+
+  return project.get(key)
 }

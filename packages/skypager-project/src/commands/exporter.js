@@ -5,6 +5,7 @@ import { argv } from 'yargs'
 
 import mkdirp from 'mkdirp'
 import colors from 'colors'
+import debounce from 'lodash/debounce'
 
 export function exporter (program, dispatch) {
   program
@@ -15,6 +16,7 @@ export function exporter (program, dispatch) {
     .option('--pretty', 'pretty print the output')
     .option('--stdout', 'write output to stdout')
     .option('--benchmark', 'include benchmarking information')
+    .option('--watch', 'watch files for changes and rerun the exporter')
     .option('--clean', 'clean or remove previous versions first')
     .action(dispatch(handle))
 }
@@ -22,6 +24,28 @@ export function exporter (program, dispatch) {
 export default exporter
 
 export function handle (exporterId, options = {}, context = {}) {
+  console.log('Running exporter: ' + exporterId.cyan)
+  actuallyHandle(exporterId, options, context)
+
+  if (options.watch) {
+    let files = './{data,docs,settings,src,assets,models,actions,exporters,importers}/**/*.*'
+    let watcher = require('chokidar').watch(files,{
+      usePolling: true,
+      interval: 200,
+      debounce: 1200
+    })
+
+    options.watch = false
+
+    let onChange = () => {
+      actuallyHandle(exporterId, options, context)
+    }
+
+    watcher.on('change', debounce(onChange, 300))
+  }
+}
+
+function actuallyHandle (exporterId, options = {}, context = {}) {
   const { project } = context
   const exporter = project.registries.exporters.lookup(exporterId, false)
 

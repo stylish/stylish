@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _assign = require('babel-runtime/core-js/object/assign');
+
+var _assign2 = _interopRequireDefault(_assign);
+
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -48,7 +52,9 @@ function handle(preset) {
     process.exit(1);
   }
 
-  options.preset = preset || options.preset;
+  preset = preset || options.preset;
+  options.preset = preset;
+
   options.theme = options.theme || project.get('settings.branding.theme') || project.get('settings.style.theme') || project.options.theme || 'marketing';
 
   process.env.NODE_ENV = 'production';
@@ -74,12 +80,14 @@ function handle(preset) {
     });
   }
 
-  if (options.preset) {
-    var opts = project.get('settings.webpack.' + options.preset + '.build') || project.get('settings.webpack.' + options.preset) || project.get('settings.builds.' + options.preset + '.webpack') || project.get('settings.builds.' + options.preset);
+  if (preset) {
+    console.log('Checking for config presets: ' + preset.green);
+
+    var opts = checkForSettings(project, 'settings.builds.' + preset + '.webpack', 'settings.builds.' + preset, 'settings.webpack.' + preset + '.build', 'settings.webpack.' + preset);
 
     if (opts) {
-      options.devpack_api = v2;
-      options = assign(options, opts);
+      options.devpack_api = 'v2';
+      options = (0, _assign2.default)(options, opts);
     }
   }
 
@@ -93,4 +101,25 @@ function isDevpackInstalled() {
   } catch (error) {
     return false;
   }
+}
+
+function checkForSettings(project) {
+  for (var _len = arguments.length, keys = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    keys[_key - 1] = arguments[_key];
+  }
+
+  var key = keys.find(function (key) {
+    console.log('Checking for settings in: ' + key.cyan);
+    var value = project.get(key);
+
+    if (value) {
+      return true;
+    }
+  });
+
+  if (key) {
+    console.log('Found ' + key.green);
+  }
+
+  return project.get(key);
 }

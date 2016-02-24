@@ -29,7 +29,6 @@ const ExternalVendorMappings = {
 }
 
 module.exports = function (argv) {
-
   inspect(argv)
 
 	const md5 = require('md5')
@@ -72,6 +71,8 @@ module.exports = function (argv) {
 
   let entry = {}
 
+  console.log('Is Development?', isDev)
+
   if (argv.entryPoints && argv.devpack_api === 'v2') {
     entry = assign(entry, argv.entryPoints)
   } else {
@@ -89,6 +90,13 @@ module.exports = function (argv) {
        return v
     })
   }
+
+  if (argv.noVendor) {
+    entry.vendor = buildVendorStack(argv)
+  }
+
+  config
+    .plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
 
 	var outputPath = argv.outputFolder ? path.resolve(argv.outputFolder)  : join(directory, 'public')
 
@@ -140,8 +148,10 @@ module.exports = function (argv) {
       devtool: 'eval'
     })
 
+  config
 		.loader('json', {loader: 'json', test:/.json$/})
 
+  config
     .loader('js', {
       test: /\.jsx?$/,
       loader: 'babel',
@@ -159,6 +169,7 @@ module.exports = function (argv) {
       }
     })
 
+  config
     .loader('less', {
       test: /\.less$/,
       include:[
@@ -169,8 +180,9 @@ module.exports = function (argv) {
         excludeNodeModulesExceptSkypagers,
         themesModuleRoot
       ],
-      loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
-                      : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')
+      loader: 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
+      /*loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
+                      : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')*/
 
     })
 
@@ -236,15 +248,6 @@ module.exports = function (argv) {
   }
 
 
-  if ((argv.noVendorLibraries || argv.vendorLibraries === false) && !argv.externalVendors && !precompiled) {
-    config.merge({
-      entry: {
-        vendor: buildVendorStack(argv)
-      }
-		})
-
-    config.plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
-  }
 
 	if (argv.target) {
 		config.merge({
@@ -265,9 +268,9 @@ module.exports = function (argv) {
 		let extractFilename = (platform === 'electron' || argv.noContentHash || argv.contentHash === false) ? '[name].js' : '[name]-[hash].js'
 
 		config
-      .plugin('extract-text', ExtractTextPlugin, [extractFilename, {
+      /*.plugin('extract-text', ExtractTextPlugin, [extractFilename, {
         allChunks: true
-      }])
+      }])*/
 
       /*.plugin('webpack-uglify', webpack.optimize.UglifyJsPlugin, [{
         compressor: { warnings: false },
@@ -299,8 +302,6 @@ module.exports = function (argv) {
 		})
 	}
 
-  console.log('Final Config')
-  console.log(inspect(config.resolve()))
   return config
 }
 

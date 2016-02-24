@@ -3,4 +3,6 @@ development:
   entry: ./src/index
 production:
   outputFolder: public
-  entry: ./src/index
+  entryPoints:
+    app: ./src/index
+    theme: 'skypager-themes?theme=marketing-bold!./settings/themes/dashboard-dark.yml'

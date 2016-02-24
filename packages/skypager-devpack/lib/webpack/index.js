@@ -46,7 +46,6 @@ var ExternalVendorMappings = {
 };
 
 module.exports = function (argv) {
-
   inspect(argv);
 
   var md5 = require('md5');
@@ -81,6 +80,8 @@ module.exports = function (argv) {
 
   var entry = {};
 
+  console.log('Is Development?', isDev);
+
   if (argv.entryPoints && argv.devpack_api === 'v2') {
     entry = assign(entry, argv.entryPoints);
   } else {
@@ -97,6 +98,12 @@ module.exports = function (argv) {
       return v;
     });
   }
+
+  if (argv.noVendor) {
+    entry.vendor = buildVendorStack(argv);
+  }
+
+  config.plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }]);
 
   var outputPath = argv.outputFolder ? path.resolve(argv.outputFolder) : join(directory, 'public');
 
@@ -140,7 +147,11 @@ module.exports = function (argv) {
       modulesDirectories: ['src', 'src/ui', 'dist', 'node_modules']
     },
     devtool: 'eval'
-  }).loader('json', { loader: 'json', test: /.json$/ }).loader('js', {
+  });
+
+  config.loader('json', { loader: 'json', test: /.json$/ });
+
+  config.loader('js', {
     test: /\.jsx?$/,
     loader: 'babel',
     exclude: [path.join(process.env.PWD, 'dist', 'bundle'), excludeNodeModulesExceptSkypagers],
@@ -152,11 +163,15 @@ module.exports = function (argv) {
         }
       }
     }
-  }).loader('less', {
+  });
+
+  config.loader('less', {
     test: /\.less$/,
     include: [join(directory, 'src'), join(devpackModuleRoot, 'src', 'ui')],
     exclude: [excludeNodeModulesExceptSkypagers, themesModuleRoot],
-    loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less' : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')
+    loader: 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
+    /*loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
+                    : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')*/
 
   }).loader('url-1', { test: /\.woff(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff' }).loader('url-2', { test: /\.woff2(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff2' }).loader('url-3', { test: /\.ttf(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream' }).loader('file', { test: /\.eot(\?.*)?$/, loader: 'file?prefix=' + fontsPrefix + '/&name=[path][name].[ext]' }).loader('url-4', { test: /\.svg(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml' }).loader('url-5', { test: /\.(png|jpg)$/, loader: 'url?limit=8192' }).loader('ejs', { test: /\.ejs/, loader: 'ejs' }).plugin('webpack-order', webpack.optimize.OccurenceOrderPlugin).plugin('webpack-noerrors', webpack.NoErrorsPlugin);
 
@@ -209,16 +224,6 @@ module.exports = function (argv) {
     config.plugin('webpack-hmr', webpack.HotModuleReplacementPlugin);
   }
 
-  if ((argv.noVendorLibraries || argv.vendorLibraries === false) && !argv.externalVendors && !precompiled) {
-    config.merge({
-      entry: {
-        vendor: buildVendorStack(argv)
-      }
-    });
-
-    config.plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }]);
-  }
-
   if (argv.target) {
     config.merge({
       target: argv.target
@@ -236,9 +241,10 @@ module.exports = function (argv) {
 
     var extractFilename = platform === 'electron' || argv.noContentHash || argv.contentHash === false ? '[name].js' : '[name]-[hash].js';
 
-    config.plugin('extract-text', ExtractTextPlugin, [extractFilename, {
+    config;
+    /*.plugin('extract-text', ExtractTextPlugin, [extractFilename, {
       allChunks: true
-    }]);
+    }])*/
 
     /*.plugin('webpack-uglify', webpack.optimize.UglifyJsPlugin, [{
       compressor: { warnings: false },
@@ -270,8 +276,6 @@ module.exports = function (argv) {
     });
   }
 
-  console.log('Final Config');
-  console.log(inspect(config.resolve()));
   return config;
 };
 

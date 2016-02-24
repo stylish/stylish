@@ -1,4 +1,1 @@
-module.exports = function MarketingMinimal(options = {}) {
-  let { env, directory, theme } = options
-  return `skypager-themes?theme=${ theme || 'marketing-minimal' }&env=${ env }!${directory}/package.json`
-}
+require(`skypager-themes?theme=marketing-minimal!${ global.__SKYPAGER_THEME_CONFIG__ || './package.json' }`)
