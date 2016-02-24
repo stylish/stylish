@@ -27,14 +27,6 @@ var _deepstream = require('deepstream.io');
 
 var _deepstream2 = _interopRequireDefault(_deepstream);
 
-var _deepstream3 = require('deepstream.io-cache-redis');
-
-var _deepstream4 = _interopRequireDefault(_deepstream3);
-
-var _deepstream5 = require('deepstream.io-msg-redis');
-
-var _deepstream6 = _interopRequireDefault(_deepstream5);
-
 var _util = require('../util.js');
 
 var _permissions = require('./permissions');
@@ -88,12 +80,15 @@ var Deepstream = exports.Deepstream = (function (_Base) {
     _this.set('tcpPort', options.tcpPort || options.port || 6021);
 
     if (options.backend === 'redis') {
-      _this.set('cache', new _deepstream4.default({
+      var RedisCacheConnector = require('../../vendor/deepstream.io-cache-redis/');
+      var RedisMessageConnector = require('../../vendor/deepstream.io-msg-redis/');
+
+      _this.set('cache', new RedisCacheConnector({
         port: cachePort,
         host: cacheHost
       }));
 
-      _this.set('messageConnector', new _deepstream6.default({
+      _this.set('messageConnector', new RedisMessageConnector({
         port: cachePort,
         host: cacheHost
       }));

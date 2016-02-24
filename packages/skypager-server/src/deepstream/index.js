@@ -1,7 +1,5 @@
 import { get, defaults } from 'lodash'
 import Base from 'deepstream.io'
-import RedisCacheConnector from 'deepstream.io-cache-redis'
-import RedisMessageConnector from 'deepstream.io-msg-redis'
 import { colorize } from '../util.js'
 
 import * as permissions from './permissions'
@@ -42,6 +40,9 @@ export class Deepstream extends Base {
     this.set('tcpPort', options.tcpPort || options.port || 6021)
 
     if (options.backend === 'redis') {
+      const RedisCacheConnector = require('../../vendor/deepstream.io-cache-redis/')
+      const RedisMessageConnector = require('../../vendor/deepstream.io-msg-redis/')
+
       this.set('cache', new RedisCacheConnector({
         port: cachePort,
         host: cacheHost
