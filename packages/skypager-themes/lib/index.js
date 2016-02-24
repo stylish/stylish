@@ -1,4 +1,10 @@
-export function availableThemes (project) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.availableThemes = availableThemes;
+function availableThemes(project) {
   return {
     'bootstrap': 'stock twitter bootstrap',
     'dashboard': 'twitter bootstrap pro dashboard theme. (license required)',
@@ -7,7 +13,7 @@ export function availableThemes (project) {
     'marketing-bold': 'twitter bootstrap pro marketing site theme, bold variant. (license required)',
     'marketing-minimal': 'twitter bootstrap pro marketing site theme, minimal variant. (license required)',
     'social-app': 'twitter boostrap pro social app theme. (license required)'
-  }
+  };
 }
 
-export default availableThemes
+exports.default = availableThemes;

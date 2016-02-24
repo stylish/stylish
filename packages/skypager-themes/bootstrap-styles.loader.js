@@ -47,28 +47,24 @@ var styles = [
   "responsive-utilities"
 ];
 
-module.exports = function (content, ...args) {
+module.exports = function (content) {
   this.cacheable(true);
 
   var query = {};
   var config = {};
 
-  if (this.query) {
-    query = Object.assign(query, querystring.parse(this.query.replace(/^\?/,'')))
+  try {
+    config = JSON.parse(content)
+
+    if (config.skypager) {
+      config = config.skypager
+    }
+  } catch(error) {
+
   }
 
-  if (content && query.configPath) {
-    try {
-      if (query.configPath.match(/yml/)) {
-        config = require('js-yaml').load(content)
-      }
-
-      if (query.configPath.match(/json/)) {
-        config = JSON.parse(content)
-      }
-    } catch(error) {
-      this.emitError(`Error parsing config file for skypager-theme : ${ error.message }`)
-    }
+  if (this.query) {
+    query = Object.assign(query, querystring.parse(this.query.replace(/^\?/,'')))
   }
 
   var theme = query.theme || config.theme;
