@@ -1,7 +1,7 @@
 {
   "name": "skypager-server",
   "description": "skypager project server",
-  "version": "2.4.7",
+  "version": "2.5.0",
   "main": "index.js",
   "scripts": {
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
@@ -20,7 +20,7 @@
     "type": "git",
     "url": "https://github.com/architects/skypager-central"
   },
-  "optionalDependencies":{
+  "optionalDependencies": {
     "redis": "2.4.2",
     "hiredis": "0.4.1"
   },

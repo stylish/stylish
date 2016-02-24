@@ -1,6 +1,6 @@
 {
   "name": "skypager-devpack",
-  "version": "2.4.6",
+  "version": "2.5.0",
   "description": "configurable webpack dev server and build tool so you don't have to",
   "main": "index.js",
   "dependencies": {
