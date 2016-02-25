@@ -8,6 +8,7 @@ var _promise = require('babel-runtime/core-js/promise');
 
 var _promise2 = _interopRequireDefault(_promise);
 
+exports.findPackageSync = findPackageSync;
 exports.findPackage = findPackage;
 exports.splitPath = splitPath;
 exports.skypagerBabel = skypagerBabel;
@@ -30,6 +31,25 @@ var _findNodeModules2 = _interopRequireDefault(_findNodeModules);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var join = _path2.default.join;
+
+function findPackageSync(packageName) {
+  var root = arguments.length <= 1 || arguments[1] === undefined ? process.env.PWD : arguments[1];
+
+  var moduleDirectories = (0, _findNodeModules2.default)(root, { relative: false });
+  var directory = moduleDirectories.find(function (p) {
+    var exists = pathExists(join(p, packageName));
+    return exists;
+  });
+
+  if (!directory) {
+    try {
+      var resolvedPath = _path2.default.dirname(require.resolve(packageName));
+      return resolvedPath;
+    } catch (error) {}
+  }
+
+  return _path2.default.resolve(_path2.default.join(directory, packageName));
+}
 
 function findPackage(packageName) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];

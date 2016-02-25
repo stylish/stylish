@@ -1,6 +1,6 @@
 import colors from 'colors'
 import { resolve } from 'path'
-import { existsSync as exists, createReadStream as readSream } from 'fs'
+import { pathExists } from '../util'
 
 export function author (program, dispatch) {
   program
@@ -63,11 +63,11 @@ export function handle(workspace, options = {}, context = {}) {
 
 function isSkypagerElectronInstalled () {
   try {
-    require(
+    return pathExists(
       process.env.SKYPAGER_ELECTRON_ROOT ||
       ($skypager && $skypager.electron) ||
       ($skypager && $skypager['skypager-electron']) ||
-      'skypager-electron'
+      require.resolve('skypager-electron')
     )
   } catch (error) {
      return false

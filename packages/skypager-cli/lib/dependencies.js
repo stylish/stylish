@@ -8,10 +8,6 @@ var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
 
-var _promise = require('babel-runtime/core-js/promise');
-
-var _promise2 = _interopRequireDefault(_promise);
-
 exports.missingSupportPackages = missingSupportPackages;
 exports.missingRequiredPackages = missingRequiredPackages;
 exports.checkAll = checkAll;
@@ -63,29 +59,33 @@ function missingRequiredPackages() {
 }
 
 function checkAll() {
-  var req = keys(requiredPackages).map(function (packageName) {
-    return (0, _util.findPackage)(packageName).then(function (dir) {
-      return requiredPackages[packageName] = process.env[toEnv(packageName)] = dir;
-    });
+  keys(requiredPackages).forEach(function (packageName) {
+    var dir = (0, _util.findPackageSync)(packageName);
+
+    if (dir) {
+      requiredPackages[packageName] = requiredPackages[packageName] || (requiredPackages[packageName] = process.env[toEnv(packageName)] = dir);
+    }
   });
 
-  var sup = keys(supportPackages).map(function (packageName) {
-    return (0, _util.findPackage)(packageName).then(function (dir) {
-      return supportPackages[packageName] = process.env[toEnv(packageName)] = dir;
-    });
+  keys(supportPackages).forEach(function (packageName) {
+    var dir = (0, _util.findPackageSync)(packageName);
+
+    if (dir) {
+      supportPackages[packageName] = supportPackages[packageName] || (supportPackages[packageName] = process.env[toEnv(packageName)] = dir);
+    }
   });
 
-  return _promise2.default.all(req.concat(sup));
+  return getPathsGlobal();
 }
 
 function toEnv(packageName) {
-  return (packageName + '-root').toUpperCase().replace(/\-/, '_');
+  return (packageName + '-root').toUpperCase().replace(/\-/g, '_');
 }
 
 function getPaths() {
   var paths = (0, _assign2.default)({}, requiredPackages, supportPackages);
 
-  return (0, _transform2.default)(paths, function (result, key, value) {
+  return (0, _transform2.default)(paths, function (result, value, key) {
     result[(0, _camelCase2.default)(key.replace(/skypager\-/g, ''))] = value;
   }, paths);
 }

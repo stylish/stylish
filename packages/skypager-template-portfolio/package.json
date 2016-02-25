@@ -19,7 +19,7 @@
     ]
   },
   "dependencies": {
-    "skypager-project": "latest"
+    "skypager": "latest"
   },
   "devDependencies": {
     "babel-preset-skypager": "latest",

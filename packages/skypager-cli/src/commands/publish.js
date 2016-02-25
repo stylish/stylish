@@ -1,3 +1,5 @@
+import { findPackageSync } from '../util'
+
 /**
  * Publish the project to a service such as Surge, or AWS
 */
@@ -18,8 +20,10 @@ export default publish
 export function handle(domain, options = {}, context = {}) {
   let { project } = context
 
-  domain = domain || options.domain || project.options.domain
+  domain = domain || options.domain || project.options.domain || project.get('settings.publishing.domain')
   options.public = options.public || project.paths.public
+
+  options.service = options.service || project.get('settings.publishing.service')
 
   if (options.service === 'skypager') { options.service = 'skypager.io' }
   if (options.service === 'blueprint') { options.service = 'blueprint.io' }
@@ -33,19 +37,30 @@ export function handle(domain, options = {}, context = {}) {
 }
 
 function surgePlatformHandler(domain, options = {}, context = {}) {
-  console.log('TODO: Implement this internally')
-  console.log('Run this:')
-  console.log()
-  console.log(`surge deploy --project ${ options.public } --domain ${ domain } --endpoint ${ options.endpoint }`.yellow)
+  let cmd = `deploy --project ${ options.public } --domain ${ domain } --endpoint ${ options.endpoint }`
+
+  let proc = require('child_process').spawn('surge', cmd.split(' '))
+
+  process.stdin.pipe(proc.stdin)
+  proc.stdout.pipe(process.stdout)
+  proc.stderr.pipe(process.stderr)
 }
 
 function surgeHandler(domain, options = {}, context = {}) {
-  console.log('TODO: Implement this internally')
-  console.log('Run this:')
-  console.log()
-  console.log(`surge deploy --project ${ options.public } --domain ${ options.domain }`)
+  let cmd = (`deploy --project ${ options.public } --domain ${ options.domain }`)
+
+  let proc = require('child_process').spawn('surge', cmd.split(' '))
+
+  process.stdin.pipe(proc.stdin)
+  proc.stdout.pipe(process.stdout)
+  proc.stderr.pipe(process.stderr)
 }
 
 function awsHandler(domain, options = {}) {
   console.log('TODO: Implement this internally')
+}
+
+function abort(msg) {
+   console.log(msg.red)
+   process.exit(1)
 }

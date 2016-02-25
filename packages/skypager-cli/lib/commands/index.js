@@ -3,8 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.commands = undefined;
+exports.MODES = undefined;
 exports.program = program;
+exports.configure = configure;
 
 var _colors = require('colors');
 
@@ -17,8 +18,6 @@ var _yargs = require('yargs');
 var _get = require('lodash/get');
 
 var _get2 = _interopRequireDefault(_get);
-
-var _fs = require('fs');
 
 var _author = require('./author');
 
@@ -78,20 +77,22 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var isDevMode = _yargs.argv.devMode || process.env.SKYPAGER_ENV === 'development';
 
-var currentDirectory = process.env.PWD;
-
-var commands = exports.commands = {
+var commands = {
   author: _author2.default,
   available: _available2.default,
   build: _build2.default,
   console: _repl2.default,
-  create: _create2.default,
   develop: _develop2.default,
-  export: _exporter2.default,
-  import: _importer2.default,
+  exporter: _exporter2.default,
+  init: _init2.default,
+  importer: _importer2.default,
   listen: _listen2.default,
-  publish: _publish2.default
+  publish: _publish2.default,
+  repl: _repl2.default,
+  serve: _serve2.default
 };
+
+var currentDirectory = process.env.PWD;
 
 var requestedCommand = _yargs.argv._[0];
 
@@ -100,9 +101,9 @@ function program() {
 
   var commander = require('commander');
 
-  commander.version(_package2.default.version).option('--debug', 'enable debugging').option('--dev-mode', 'run skypager in dev mode. for local development').option('--env <env>', 'the application environment', process.env.NODE_ENV || 'development').option('--project <path>', 'the folder contains the project you wish to work with');
+  commander.version(_package2.default.version).option('--debug', 'enable debugging').option('--env <env>', 'the application environment', process.env.NODE_ENV || 'development').option('--project <path>', 'the folder contains the project you wish to work with');
 
-  configure(commander);
+  configure(commander, options.mode || 'full');
 
   if (!requestedCommand || commander.commands.map(function (c) {
     return c._name;
@@ -119,19 +120,15 @@ function program() {
 }
 
 exports.default = program;
+var MODES = exports.MODES = {
+  full: ['author', 'build', 'repl', 'develop', 'exporter', 'init', 'importer', 'serve'],
+  setup: ['available', 'repl', 'init']
+};
 
 function configure(commander) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-  var project = loadProject(_yargs.argv.project);
-  var config = project && project.manifest && project.manifest.skypager;
-
-  var context = {
-    commander: commander,
-    project: project,
-    config: config,
-    isCLI: true
-  };
+  var mode = options.mode || 'full';
 
   var dispatch = function dispatch(handlerFn) {
     return function () {
@@ -150,30 +147,28 @@ function configure(commander) {
     };
   };
 
-  if (isDevMode) {
-    (0, _author2.default)(commander, dispatch);
-    (0, _available2.default)(commander, dispatch);
+  var project = undefined;
+
+  if (mode === 'missing_dependencies') {
+    mode = 'init';
+  } else {
+    project = loadProject(_yargs.argv.project || findNearestPackageManifest() || process.env.PWD);
   }
 
-  (0, _build2.default)(commander, dispatch);
+  var config = project && project.manifest && project.manifest.skypager;
 
-  (0, _repl2.default)(commander, dispatch);
+  var context = {
+    commander: commander,
+    project: project,
+    config: config,
+    isCLI: true
+  };
 
-  if (isDevMode) {
-    (0, _create2.default)(commander, dispatch);
-  }
+  var enabled = MODES[mode] || ['repl', 'init'];
 
-  (0, _develop2.default)(commander, dispatch);
-
-  (0, _exporter2.default)(commander, dispatch);
-
-  (0, _init2.default)(commander, dispatch);
-
-  (0, _importer2.default)(commander, dispatch);
-
-  (0, _publish2.default)(commander, dispatch);
-
-  (0, _serve2.default)(commander, dispatch);
+  enabled.forEach(function (subcommand) {
+    commands[subcommand](commander, dispatch);
+  });
 
   // the project can dynamically add its own cli commands from certain actions
   if (project && project.actions) {
@@ -194,13 +189,27 @@ function loadProject(fromPath) {
 
   try {
     (0, _util.skypagerBabel)();
+  } catch (error) {
+    console.log('There was an error running the babel-register command. Make sure you have a .babelrc or that babel-preset-skypager is installed.'.red);
+    process.exit(1);
+  }
+
+  try {
     return (0, _util.loadProjectFromDirectory)(fromPath || process.env.PWD);
   } catch (error) {
     if (!silent && requestedCommand !== 'init' && requestedCommand !== 'help') {
       console.error('Error loading skypager project. Run this from within a project directory.'.red);
-
-      console.log(error.message);
-      console.log(error.stack);
+      console.log(error);
     }
   }
+}
+
+function findNearestPackageManifest() {
+  var loc = require('findup-sync')('package.json');
+
+  if (!loc) {
+    return;
+  }
+
+  return (0, _path.dirname)(loc);
 }

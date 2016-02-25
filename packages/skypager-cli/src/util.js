@@ -4,6 +4,27 @@ import findModules from 'find-node-modules'
 
 const join = path.join
 
+export function findPackageSync (packageName, root = process.env.PWD) {
+  let moduleDirectories = findModules(root, {relative:false})
+  let directory = moduleDirectories.find((p) => {
+    let exists = pathExists(join(p, packageName))
+    return exists
+  })
+
+  if (!directory) {
+    try {
+      let resolvedPath = path.dirname(require.resolve(packageName))
+      return resolvedPath
+    } catch(error) {
+
+    }
+  }
+
+  return path.resolve(
+    path.join(directory, packageName)
+  )
+}
+
 export function findPackage (packageName, options = {}) {
   return new Promise((resolve, reject) => {
     let moduleDirectories = findModules(process.env.PWD, {relative:false})

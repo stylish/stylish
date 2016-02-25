@@ -1,18 +1,11 @@
 import colors from 'colors'
 
-import { join, resolve } from 'path'
+import { dirname, join, resolve } from 'path'
 import { argv } from 'yargs'
 
 import get from 'lodash/get'
 
 const isDevMode = argv.devMode || process.env.SKYPAGER_ENV === 'development'
-
-import {
-  existsSync as exists,
-  readFileSync as readFile,
-  createWriteStream as writeStream,
-  createReadStream as readStream
-} from 'fs'
 
 import author from './author'
 import available from './available'
@@ -31,20 +24,22 @@ import { loadProjectFromDirectory, skypagerBabel } from '../util'
 
 import pkg from '../../package.json'
 
-const currentDirectory = process.env.PWD
-
-export const commands = {
-  author,
-  available,
-  build,
-  console: repl,
-  create,
-  develop,
-  export: exporter,
-  import: importer,
-  listen,
-  publish
+const commands = {
+   author,
+   available,
+   build,
+   console: repl,
+   develop,
+   exporter,
+   init,
+   importer,
+   listen,
+   publish,
+   repl,
+   serve
 }
+
+const currentDirectory = process.env.PWD
 
 let requestedCommand = argv._[0]
 
@@ -54,11 +49,10 @@ export function program (options = {}) {
   commander
     .version(pkg.version)
     .option('--debug', 'enable debugging')
-    .option('--dev-mode', 'run skypager in dev mode. for local development')
     .option('--env <env>', 'the application environment', process.env.NODE_ENV || 'development')
     .option('--project <path>', 'the folder contains the project you wish to work with')
 
-  configure(commander)
+  configure(commander, options.mode || 'full')
 
   if (!requestedCommand || commander.commands.map(c => c._name).indexOf(requestedCommand) < 0) {
     // dont duplicate the output
@@ -72,16 +66,13 @@ export function program (options = {}) {
 
 export default program
 
-function configure (commander, options = {}) {
-  let project = loadProject(argv.project)
-  let config = project && project.manifest && project.manifest.skypager
+export const MODES = {
+  full:['author', 'build', 'repl', 'develop', 'exporter', 'init', 'importer', 'serve'],
+  setup:['available','repl','init']
+}
 
-  let context = {
-    commander,
-    project,
-    config,
-    isCLI: true
-  }
+export function configure (commander, options = {}) {
+  let mode = options.mode || 'full'
 
   const dispatch = (handlerFn) => {
     return (...args) => {
@@ -96,30 +87,32 @@ function configure (commander, options = {}) {
     }
   }
 
-  if (isDevMode) {
-    author(commander, dispatch)
-    available(commander, dispatch)
+  let project
+
+  if (mode === 'missing_dependencies') {
+    mode = 'init'
+  } else {
+    project = loadProject(
+      argv.project ||
+      findNearestPackageManifest() ||
+      process.env.PWD
+    )
   }
 
-  build(commander, dispatch)
+  let config = project && project.manifest && project.manifest.skypager
 
-  repl(commander, dispatch)
-
-  if (isDevMode) {
-    create(commander, dispatch)
+  let context = {
+    commander,
+    project,
+    config,
+    isCLI: true
   }
 
-  develop(commander, dispatch)
+  let enabled = MODES[mode] || ['repl', 'init']
 
-  exporter(commander, dispatch)
-
-  init(commander, dispatch)
-
-  importer(commander, dispatch)
-
-  publish(commander, dispatch)
-
-  serve(commander, dispatch)
+  enabled.forEach(subcommand => {
+    commands[subcommand](commander, dispatch)
+  })
 
   // the project can dynamically add its own cli commands from certain actions
   if (project && project.actions) {
@@ -134,16 +127,29 @@ function configure (commander, options = {}) {
 function loadProject(fromPath, silent = false) {
   try {
     skypagerBabel()
+  } catch(error) {
+    console.log(
+      'There was an error running the babel-register command. Make sure you have a .babelrc or that babel-preset-skypager is installed.'.red
+    )
+    process.exit(1)
+  }
+
+  try {
     return loadProjectFromDirectory(fromPath || process.env.PWD)
   } catch (error) {
     if (!silent && requestedCommand !== 'init' && requestedCommand !== 'help') {
       console.error(
         `Error loading skypager project. Run this from within a project directory.`.red
       )
-
-      console.log(error.message)
-      console.log(error.stack)
+      console.log(error)
     }
   }
 }
 
+function findNearestPackageManifest() {
+  let loc = require('findup-sync')('package.json')
+
+  if (!loc) { return }
+
+  return dirname(loc)
+}

@@ -12,7 +12,7 @@ var _colors2 = _interopRequireDefault(_colors);
 
 var _path = require('path');
 
-var _fs = require('fs');
+var _util = require('../util');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -59,7 +59,7 @@ function handle(workspace) {
 
 function isSkypagerElectronInstalled() {
   try {
-    require(process.env.SKYPAGER_ELECTRON_ROOT || $skypager && $skypager.electron || $skypager && $skypager['skypager-electron'] || 'skypager-electron');
+    return (0, _util.pathExists)(process.env.SKYPAGER_ELECTRON_ROOT || $skypager && $skypager.electron || $skypager && $skypager['skypager-electron'] || require.resolve('skypager-electron'));
   } catch (error) {
     return false;
   }

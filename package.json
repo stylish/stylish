@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "2.8.5",
+  "version": "2.8.9",
   "description": "skypager: cloud publishing framework",
   "skypager": {
     "main": "skypager.js"
@@ -16,7 +16,7 @@
     "skypager-electron": "^2.5.0",
     "skypager-plugin-blueprints": "^2.5.0",
     "skypager-project": "2.7.0",
-    "skypager-server": "^2.8.6",
+    "skypager-server": "^2.8.9",
     "skypager-themes": "^2.5.0"
   },
   "devDependencies": {

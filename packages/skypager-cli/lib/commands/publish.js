@@ -5,6 +5,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.publish = publish;
 exports.handle = handle;
+
+var _util = require('../util');
+
 /**
  * Publish the project to a service such as Surge, or AWS
 */
@@ -18,8 +21,10 @@ function handle(domain) {
   var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
   var project = context.project;
 
-  domain = domain || options.domain || project.options.domain;
+  domain = domain || options.domain || project.options.domain || project.get('settings.publishing.domain');
   options.public = options.public || project.paths.public;
+
+  options.service = options.service || project.get('settings.publishing.service');
 
   if (options.service === 'skypager') {
     options.service = 'skypager.io';
@@ -40,24 +45,35 @@ function surgePlatformHandler(domain) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
   var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
-  console.log('TODO: Implement this internally');
-  console.log('Run this:');
-  console.log();
-  console.log(('surge deploy --project ' + options.public + ' --domain ' + domain + ' --endpoint ' + options.endpoint).yellow);
+  var cmd = 'deploy --project ' + options.public + ' --domain ' + domain + ' --endpoint ' + options.endpoint;
+
+  var proc = require('child_process').spawn('surge', cmd.split(' '));
+
+  process.stdin.pipe(proc.stdin);
+  proc.stdout.pipe(process.stdout);
+  proc.stderr.pipe(process.stderr);
 }
 
 function surgeHandler(domain) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
   var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
-  console.log('TODO: Implement this internally');
-  console.log('Run this:');
-  console.log();
-  console.log('surge deploy --project ' + options.public + ' --domain ' + options.domain);
+  var cmd = 'deploy --project ' + options.public + ' --domain ' + options.domain;
+
+  var proc = require('child_process').spawn('surge', cmd.split(' '));
+
+  process.stdin.pipe(proc.stdin);
+  proc.stdout.pipe(process.stdout);
+  proc.stderr.pipe(process.stderr);
 }
 
 function awsHandler(domain) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   console.log('TODO: Implement this internally');
+}
+
+function abort(msg) {
+  console.log(msg.red);
+  process.exit(1);
 }

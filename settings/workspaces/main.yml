@@ -1,6 +1,6 @@
 panels:
   tools:
-    url: 'http://localhost:3001'
+    path: '/console'
     window:
       left: "0%"
       top: "0%"
@@ -9,7 +9,7 @@ panels:
       frame: false
 
   preview:
-    url: 'http://localhost:3000'
+    path: '/'
     window:
       left: "20%"
       top: "0%"

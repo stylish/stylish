@@ -1,4 +1,4 @@
-import { findPackage } from './util'
+import { findPackageSync } from './util'
 import { join, dirname } from 'path'
 import values from 'lodash/values'
 import omit from 'lodash/values'
@@ -29,29 +29,35 @@ export function missingRequiredPackages() {
 
 
 export function checkAll() {
-  let req = keys(requiredPackages).map(
-    packageName => findPackage(packageName).then(
-      dir => requiredPackages[packageName] = process.env[toEnv(packageName)] = dir
-    )
-  )
+  keys(requiredPackages).forEach(packageName => {
+    let dir = findPackageSync(packageName)
 
-  let sup = keys(supportPackages).map(
-    packageName => findPackage(packageName).then(
-      dir => supportPackages[packageName] = process.env[toEnv(packageName)] = dir
-    )
-  )
+    if (dir) {
+      requiredPackages[packageName] = requiredPackages[packageName] ||
+        (requiredPackages[packageName] = process.env[toEnv(packageName)] = dir)
+    }
+  })
 
-  return Promise.all(req.concat(sup))
+  keys(supportPackages).forEach(packageName => {
+    let dir = findPackageSync(packageName)
+
+    if (dir) {
+      supportPackages[packageName] = supportPackages[packageName] ||
+        (supportPackages[packageName] = process.env[toEnv(packageName)] = dir)
+    }
+  })
+
+  return getPathsGlobal()
 }
 
 function toEnv(packageName) {
-   return `${ packageName }-root`.toUpperCase().replace(/\-/,'_')
+   return `${ packageName }-root`.toUpperCase().replace(/\-/g,'_')
 }
 
 export function getPaths() {
   let paths = Object.assign({}, requiredPackages, supportPackages)
 
-  return transform(paths, (result, key, value) => {
+  return transform(paths, (result, value, key) => {
     result[camelCase(key.replace(/skypager\-/g,''))] = value
   }, paths)
 }
