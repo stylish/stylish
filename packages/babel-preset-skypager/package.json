@@ -1,6 +1,6 @@
 {
   "name": "babel-preset-skypager",
-  "version": "2.2.1",
+  "version": "2.7.2",
   "description": "babel presets for building react apps in es6",
   "main": "index.js",
   "scripts": {

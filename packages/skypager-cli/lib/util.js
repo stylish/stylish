@@ -72,6 +72,8 @@ function skypagerBabel() {
     require('babel-register')({
       presets: [require(path)]
     });
+  }, function (err) {
+    console.log('Missing the babel-preset-skypager project');
   });
 }
 

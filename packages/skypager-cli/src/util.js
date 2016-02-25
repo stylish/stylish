@@ -41,6 +41,8 @@ export function skypagerBabel() {
         require(path)
       ]
     })
+  }, (err) => {
+     console.log('Missing the babel-preset-skypager project')
   })
 }
 
