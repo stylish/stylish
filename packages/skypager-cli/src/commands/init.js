@@ -48,11 +48,18 @@ export function handle (projectName, destination, options = {}, context = {}) {
     )
 
     packageJson.name = projectName
+    packageJson.version = '1.0.0'
 
     require('fs').writeFileSync(
       join(destination, 'package.json'),
       JSON.stringify(packageJson, null, 2),
       'utf8'
+    )
+
+    require('fs').writeFileSync(
+       join(destination, 'skypager.js'),
+       `module.exports = require('${ process.env.SKYPAGER_PROJECT_ROOT || ($skypager && $skypager['skypager-project']) }').load(__filename)\n`,
+       'utf8'
     )
 
   } catch(error) {

@@ -58,8 +58,11 @@ function handle(projectName, destination) {
     var packageJson = require(join(destination, 'package.json'));
 
     packageJson.name = projectName;
+    packageJson.version = '1.0.0';
 
     require('fs').writeFileSync(join(destination, 'package.json'), (0, _stringify2.default)(packageJson, null, 2), 'utf8');
+
+    require('fs').writeFileSync(join(destination, 'skypager.js'), 'module.exports = require(\'' + (process.env.SKYPAGER_PROJECT_ROOT || $skypager && $skypager['skypager-project']) + '\').load(__filename)\n', 'utf8');
   } catch (error) {
     abort('Error modifying package: ' + error.message);
   }

@@ -5,13 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js",
-    "start": "skypager serve web",
-    "postinstall": "skypager build web"
+    "start": "skypager serve web"
   },
   "author": "Jon Soeder <jon@chicago.com>",
   "license": "SEE LICENSE IN License.md",
   "skypager": {
-    "skypager-version": "2.6.0",
+    "main": "skypager.js",
     "presets": [
       "web"
     ],
@@ -19,8 +18,12 @@
       "main"
     ]
   },
-  "devDependencies": {
-    "skypager-project": "^2.7.0",
-    "babel-preset-skypager": "^1.34.0"
+  "dependencies":{
+     "skypager-project": "latest"
+  },
+  "devDependencies":{
+    "babel-preset-skypager": "latest",
+    "mocha": "latest",
+    "should": "latest"
   }
 }
