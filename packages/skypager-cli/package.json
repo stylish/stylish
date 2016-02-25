@@ -1,6 +1,6 @@
 {
   "name": "skypager-cli",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "preferGlobal": "true",
   "bin": {
     "skypager": "./bin/cli.js"
@@ -40,11 +40,12 @@
     "version": "2.6.1"
   },
   "dependencies": {
+    "asar": "^0.10.0",
+    "babel-preset-skypager": "latest",
     "colors": "^1.1.2",
     "commander": "^2.9.0",
     "find-node-modules": "^1.0.1",
     "findup-sync": "^0.3.0",
-    "asar": "^0.10.0",
     "gitignore-parser": "0.0.2",
     "js-yaml": "^3.5.3",
     "lodash": "^4.5.0",
