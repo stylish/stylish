@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "2.5.0",
+  "version": "2.5.2",
   "description": "skypager: cloud publishing framework",
   "skypager": {
     "main": "skypager.js"

@@ -3,6 +3,8 @@ import colors from 'colors'
 import { join, resolve } from 'path'
 import { argv } from 'yargs'
 
+import get from 'lodash/get'
+
 const isDevMode = argv.devMode || process.env.SKYPAGER_ENV === 'development'
 
 import {
@@ -25,7 +27,7 @@ import publish from './publish'
 import repl from './repl'
 import serve from './serve'
 
-import { loadProjectFromDirectory, skypagerBabel, dotpath } from '../util'
+import { loadProjectFromDirectory, skypagerBabel } from '../util'
 
 import pkg from '../../package.json'
 
@@ -122,8 +124,8 @@ function configure (commander, options = {}) {
   // the project can dynamically add its own cli commands from certain actions
   if (project && project.actions) {
     project.actions
-    .filter(action => dotpath.get(action, 'definition.interfaces.cli'))
-    .forEach(action => dotpath.get(action, 'definition.interfaces.cli').call(action, commander, dispatch))
+    .filter(action => get(action, 'definition.interfaces.cli'))
+    .forEach(action => get(action, 'definition.interfaces.cli').call(action, commander, dispatch))
   }
 
   return () => commander.parse(argv)

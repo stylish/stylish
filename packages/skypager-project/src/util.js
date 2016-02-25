@@ -239,10 +239,9 @@ export function carve (dataPath, resultValue, initialValue = {}) {
 }
 
 export function loadManifestFromDirectory (directory) {
-  var path = require('path')
-	var manifest = require(path.join(directory,'package.json')) || {}
-	return manifest
+  return require('findup-sync')('package.json', {cwd: directory})
 }
+
 
 export function isDomain(value) { return value.match(DOMAIN_REGEX) }
 
@@ -261,22 +260,16 @@ export function loadProjectFromDirectory (directory) {
 		)
 	}
 
+  if (manifest.skypager) {
+    return require('../index').load(
+      join(directory,'package.json')
+    )
+  }
+
 	if (exists(path.join(directory, 'skypager.js'))) {
 		return require(
 			path.join(directory, 'skypager.js')
 		)
-	}
-
-	if (exists(path.join(directory, 'index.js'))) {
-		var p = require(
-			 path.join(directory, 'index.js')
-		)
-
-		if (!p.registries && !p.docs) {
-			abort('This project does not seem to have a skypager project')
-		}
-
-		return p
 	}
 }
 
@@ -333,9 +326,45 @@ export function abort(message) {
 }
 
 export function skypagerBabel() {
-  require('babel-register')({
-    presets:[
-      require('babel-preset-skypager')
-    ]
+  findPackage('babel-preset-skypager').then(path => {
+    require('babel-register')({
+      presets:[
+        require(path)
+      ]
+    })
   })
 }
+
+export function pathExists(fp) {
+	var fn = typeof fs.access === 'function' ? fs.accessSync : fs.statSync;
+
+  try {
+     fn(fp)
+     return true
+  } catch(error) {
+    return false
+  }
+}
+
+
+export function findPackage (packageName, options = {}) {
+  const findModules = require('find-node-modules')
+  const path = require('path')
+  const fs = require('fs')
+
+  return new Promise((resolve, reject) => {
+    let moduleDirectories = findModules(process.env.PWD, {relative:false})
+    let directory = moduleDirectories.find((p) => {
+      let exists = pathExists(join(p, packageName))
+      return exists
+    })
+
+    if (!directory) { reject(packageName); }
+
+    let result = path.resolve(path.join(directory, packageName))
+
+    if(result) { resolve(result) }
+  })
+}
+
+

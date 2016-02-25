@@ -17,13 +17,13 @@ development:
   dashboard:
     panels:
       leftPanel: 
-        label: API
+        label: Bundler
         type: log
         left: "1%"
-        top: "70%"
-        height: "29%"
+        top: "1%"
+        height: "10%"
         width: "50%"
-        process: server
+        process: bundler
         borderStyles:
           type: line
           color: magenta

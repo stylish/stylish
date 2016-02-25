@@ -104,6 +104,21 @@
         "byName": {},
         "byBlocks": {}
       }
+    },
+    {
+      "nextFreeModuleId": 3,
+      "modules": {
+        "byIdentifier": {
+          "node_modules/lodash/index.js": 1,
+          "node_modules/webpack/buildin/module.js": 2,
+          "node_modules/html-webpack-plugin/lib/loader.js!node_modules/skypager-devpack/templates/index.html": 0
+        }
+      },
+      "nextFreeChunkId": 1,
+      "chunks": {
+        "byName": {},
+        "byBlocks": {}
+      }
     }
   ],
   "nextFreeModuleId": 903,
@@ -1933,6 +1948,164 @@
           "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/type-custom.less": 100,
           "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/utilities-spacer.less": 101,
           "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/zoom.less": 102
+        }
+      },
+      "nextFreeChunkId": 1,
+      "chunks": {
+        "byName": {},
+        "byBlocks": {}
+      }
+    },
+    {
+      "nextFreeModuleId": 103,
+      "modules": {
+        "byIdentifier": {
+          "node_modules/file-loader/index.js?prefix=fonts/&name=[path][name].[ext]!node_modules/skypager-themes/packages/fonts/toolkit-entypo.eot": 1,
+          "node_modules/css-loader/lib/css-base.js": 2,
+          "node_modules/url-loader/index.js?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff!node_modules/skypager-themes/packages/fonts/toolkit-entypo.woff": 3,
+          "node_modules/url-loader/index.js?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff2!node_modules/skypager-themes/packages/fonts/toolkit-entypo.woff2": 4,
+          "node_modules/url-loader/index.js?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream!node_modules/skypager-themes/packages/fonts/toolkit-entypo.ttf": 5,
+          "node_modules/css-loader/index.js?sourceMap!node_modules/less-loader/index.js!node_modules/skypager-themes/packages/marketing-bold/index.less": 0,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing-bold/variables.less": 6,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/components.less": 7,
+          "node_modules/less-loader/stringify.loader.js!src/theme/variables.less": 8,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/alerts.less": 9,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/badges.less": 10,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/breadcrumbs.less": 11,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/button-groups.less": 12,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/buttons.less": 13,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/carousel.less": 14,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/code.less": 15,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/component-animations.less": 16,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/dropdowns.less": 17,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/forms.less": 18,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/grid.less": 19,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/input-groups.less": 20,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/jumbotron.less": 21,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/labels.less": 22,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/list-group.less": 23,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/media.less": 24,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins.less": 25,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/alerts.less": 26,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/background-variant.less": 27,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/border-radius.less": 28,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/buttons.less": 29,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/center-block.less": 30,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/clearfix.less": 31,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/forms.less": 32,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/gradients.less": 33,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/grid-framework.less": 34,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/grid.less": 35,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/hide-text.less": 36,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/image.less": 37,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/labels.less": 38,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/list-group.less": 39,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/nav-divider.less": 40,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/nav-vertical-align.less": 41,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/opacity.less": 42,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/pagination.less": 43,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/panels.less": 44,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/progress-bar.less": 45,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/reset-filter.less": 46,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/reset-text.less": 47,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/resize.less": 48,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/responsive-visibility.less": 49,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/size.less": 50,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/tab-focus.less": 51,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/table-row.less": 52,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/text-emphasis.less": 53,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/text-overflow.less": 54,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/mixins/vendor-prefixes.less": 55,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/modals.less": 56,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/navbar.less": 57,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/navs.less": 58,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/normalize.less": 59,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/pager.less": 60,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/pagination.less": 61,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/panels.less": 62,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/popovers.less": 63,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/print.less": 64,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/progress-bars.less": 65,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/responsive-embed.less": 66,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/responsive-utilities.less": 67,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/scaffolding.less": 68,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/tables.less": 69,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/thumbnails.less": 70,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/tooltip.less": 71,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/type.less": 72,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/utilities.less": 73,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/variables.less": 74,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/bootstrap/wells.less": 75,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/alerts-custom.less": 76,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/block.less": 77,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/buttons-custom.less": 78,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/buttons-outline.less": 79,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/buttons-radius.less": 80,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/callouts.less": 81,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/carousel-light.less": 82,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/container-custom.less": 83,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/featured-list.less": 84,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/forms-custom.less": 85,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/iconlist.less": 86,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/icons.less": 87,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/mixins.less": 88,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/mixins/buttons-outline.less": 89,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/nav-bordered.less": 90,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/nav-heading.less": 91,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/navbar-transparent.less": 92,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/navbar-utilities.less": 93,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/panels-bold.less": 94,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/pull-quote.less": 95,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/stage.less": 96,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/statcard.less": 97,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/text-inherit.less": 98,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/text-ribbon.less": 99,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/type-custom.less": 100,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/utilities-spacer.less": 101,
+          "node_modules/less-loader/stringify.loader.js!node_modules/skypager-themes/packages/marketing/custom/zoom.less": 102
+        }
+      },
+      "nextFreeChunkId": 1,
+      "chunks": {
+        "byName": {},
+        "byBlocks": {}
+      }
+    },
+    {
+      "nextFreeModuleId": 3,
+      "modules": {
+        "byIdentifier": {
+          "node_modules/css-loader/lib/css-base.js": 1,
+          "node_modules/css-loader/index.js?modules&sourceMap!node_modules/postcss-loader/index.js!node_modules/less-loader/index.js!src/website/entries/HomePage.less": 0,
+          "node_modules/less-loader/stringify.loader.js!src/theme/variables.less": 2
+        }
+      },
+      "nextFreeChunkId": 1,
+      "chunks": {
+        "byName": {},
+        "byBlocks": {}
+      }
+    },
+    {
+      "nextFreeModuleId": 2,
+      "modules": {
+        "byIdentifier": {
+          "node_modules/css-loader/lib/css-base.js": 1,
+          "node_modules/css-loader/index.js?modules&sourceMap!node_modules/postcss-loader/index.js!node_modules/less-loader/index.js!node_modules/skypager-devpack/src/ui/layouts/IconNavLayout.less": 0
+        }
+      },
+      "nextFreeChunkId": 1,
+      "chunks": {
+        "byName": {},
+        "byBlocks": {}
+      }
+    },
+    {
+      "nextFreeModuleId": 2,
+      "modules": {
+        "byIdentifier": {
+          "node_modules/css-loader/lib/css-base.js": 1,
+          "node_modules/css-loader/index.js?modules&sourceMap!node_modules/postcss-loader/index.js!node_modules/less-loader/index.js!node_modules/skypager-devpack/src/ui/components/IconNav.less": 0
         }
       },
       "nextFreeChunkId": 1,

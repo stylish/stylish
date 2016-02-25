@@ -1,0 +1,18 @@
+panels:
+  tools:
+    url: 'http://localhost:3001'
+    window:
+      left: "0%"
+      top: "0%"
+      height: "100%"
+      width: "20%"
+      frame: false
+
+  preview:
+    url: 'http://localhost:3000'
+    window:
+      left: "20%"
+      top: "0%"
+      height: "100%"
+      width: "80%"
+      frame: true
