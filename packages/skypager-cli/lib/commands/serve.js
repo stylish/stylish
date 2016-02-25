@@ -21,6 +21,8 @@ var _get2 = _interopRequireDefault(_get);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var _Object = Object;
+var assign = _Object.assign;
 function serve(program, dispatch) {
   program.command('serve [profile]').description('start the project server').option('--dashboard', 'display a dashboard view of the server processes').option('--profile', 'which configuration profile to use?', 'web').action(dispatch(handle));
 }
@@ -40,12 +42,13 @@ function handle(arg) {
     process.exit(1);
   }
 
-  var _require = require('skypager-server');
+  var _require = require($skypager && $skypager['skypager-server'] || $skypager && $skypager.server || process.env.SKYPAGER_SERVER_ROOT || 'skypager-server');
 
   var server = _require.server;
+  var deepstream = _require.deepstream;
   var defaultSettings = _require.defaultSettings;
 
-  var _require2 = require('skypager-devpack');
+  var _require2 = require($skypager && $skypager['skypager-devpack'] || $skypager && $skypager.devPack || process.env.SKYPAGER_DEVPACK_ROOT || 'skypager-devpack');
 
   var availableProfiles = _require2.availableProfiles;
   var devpack = _require2.devpack;
@@ -64,27 +67,50 @@ function handle(arg) {
   if (rawArg === 'deepstream') {
     opts = (0, _get2.default)(project, 'settings.servers.deepstream.' + profile) || (0, _get2.default)(project, 'settings.servers.' + profile + '.deepstream') || (0, _get2.default)(project, 'settings.deepstream.' + profile) || (0, _get2.default)(project, 'settings.deepstream');
 
-    require('skypager-server').deepstream(opts, context);
+    deepstream(opts, context);
   } else {
     server({ profile: profile, env: env, dashboard: dashboard }, context);
   }
 }
 
-function isDevpackInstalled() {
+function isServerInstalled() {
+  var tryPath = $skypager && $skypager.server || $skypager && $skypager['skypager-server'] || process.env.SKYPAGER_SERVER_ROOT || attempt('skypager-server');
+
+  if (!tryPath) {
+    return false;
+  }
+
   try {
-    require('skypager-devpack');
+    if (tryPath) {
+      require(tryPath);
+    }
     return true;
   } catch (error) {
     return false;
   }
 }
 
-function isServerInstalled() {
+function isDevpackInstalled() {
+  var tryPath = $skypager && $skypager.devPack || $skypager && $skypager['skypager-devpack'] || process.env.SKYPAGER_DEVPACK_ROOT || attempt('skypager-devpack');
+
+  if (!tryPath) {
+    return false;
+  }
+
   try {
-    require('skypager-server');
+    if (tryPath) {
+      require(tryPath);
+    }
     return true;
   } catch (error) {
-    console.log('Error requiring skypager-server', error.message);
+    return false;
+  }
+}
+
+function attempt(packageRequire) {
+  try {
+    return require.resolve(packageRequire);
+  } catch (e) {
     return false;
   }
 }

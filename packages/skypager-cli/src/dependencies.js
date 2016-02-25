@@ -3,9 +3,9 @@ import { join, dirname } from 'path'
 import values from 'lodash/values'
 import omit from 'lodash/values'
 import camelCase from 'lodash/camelCase'
+import transform from 'lodash/transform'
 
 const requiredPackages = {
-  'skypager-cli': process.env.SKYPAGER_CLI_ROOT || dirname(__dirname),
   'skypager-project': process.env.SKYPAGER_PROJECT_ROOT,
   'babel-preset-skypager': process.env.BABEL_PRESET_SKYPAGER_ROOT
 }
@@ -27,9 +27,6 @@ export function missingRequiredPackages() {
   return keys(omit(requiredPackages,'skypager-cli')).filter(key => typeof requiredPackages[key] !== 'undefined')
 }
 
-export function getPaths() {
-  return Object.assign(requiredPackages, supportPackages)
-}
 
 export function checkAll() {
   let req = keys(requiredPackages).map(
@@ -51,18 +48,15 @@ function toEnv(packageName) {
    return `${ packageName }-root`.toUpperCase().replace(/\-/,'_')
 }
 
-checkAll().then(() => {
-  let paths = {}
+export function getPaths() {
+  let paths = Object.assign({}, requiredPackages, supportPackages)
 
-  keys(paths).forEach(packageName => {
-    let key = camelCase(packageName.replace('skypager-',''))
+  return transform(paths, (result, key, value) => {
+    result[camelCase(key.replace(/skypager\-/g,''))] = value
+  }, paths)
+}
 
-    Object.defineProperty(paths, key, {
-      get: function(){
-        return paths[packageName]
-      }
-    })
-  })
+export function getPathsGlobal() {
+   return global.$skypager = global.$skypager || getPaths()
+}
 
-  global.$skypager = paths
-})

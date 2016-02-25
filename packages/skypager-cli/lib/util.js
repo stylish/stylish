@@ -42,6 +42,14 @@ function findPackage(packageName) {
     });
 
     if (!directory) {
+      try {
+        var resolvedPath = _path2.default.dirname(require.resolve(packageName));
+        resolve(resolvedPath);
+        return;
+      } catch (error) {}
+    }
+
+    if (!directory) {
       reject(packageName);
     }
 
@@ -85,6 +93,10 @@ function loadProjectFromDirectory(directory, skypagerProject) {
   skypagerProject = skypagerProject || require('skypager-project');
 
   var manifest = loadManifestFromDirectory(directory);
+
+  if (!manifest) {
+    throw 'Could not load project from ' + directory;
+  }
 
   if (manifest.skypager && manifest.skypager.main) {
     return require(path.join(directory, manifest.skypager.main.replace(/^\.\//, '')));

@@ -95,15 +95,17 @@ function launchServer(preset) {
 
   var opts = checkForSettings(project, 'settings.webpack.' + preset, 'settings.servers.' + preset + '.webpack', 'settings.servers.' + preset);
 
+  devpack = require($skypager && $skypager['skypager-devpack'] || process.env.SKYPAGER_DEVPACK_ROOT || 'skypager-devpack');
+
   if (!opts) {
     console.log('Missing config. Creating default config in: ' + ('settings/build/' + preset).green);
-    project.content.settings_files.createFile('settings/webpack/' + preset + '.yml', yaml(require('skypager-devpack').argsFor(preset, process.env.NODE_ENV || 'development')));
+    project.content.settings_files.createFile('settings/webpack/' + preset + '.yml', yaml(devpack.argsFor(preset, process.env.NODE_ENV || 'development')));
   }
 
   options.devpack_api = 'v2';
   options = (0, _assign2.default)(options, opts);
 
-  require('skypager-devpack').webpack('develop', options, { beforeCompile: beforeCompile, onCompile: onCompile });
+  devpack.webpack('develop', options, { beforeCompile: beforeCompile, onCompile: onCompile });
 }
 
 function yaml(obj) {
@@ -127,8 +129,16 @@ function launchTunnel(options, context) {
 }
 
 function isDevpackInstalled() {
+  var tryPath = $skypager && $skypager.devPack || $skypager && $skypager['skypager-devpack'] || process.env.SKYPAGER_DEVPACK_ROOT || attempt('skypager-devpack');
+
+  if (!tryPath) {
+    return false;
+  }
+
   try {
-    require('skypager-devpack');
+    if (tryPath) {
+      require(tryPath);
+    }
     return true;
   } catch (error) {
     return false;
@@ -137,6 +147,14 @@ function isDevpackInstalled() {
 
 var _Object = Object;
 var assign = _Object.assign;
+
+function attempt(packageRequire) {
+  try {
+    return require.resolve(packageRequire);
+  } catch (e) {
+    return false;
+  }
+}
 
 function checkForSettings(project) {
   for (var _len = arguments.length, keys = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {

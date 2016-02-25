@@ -27,7 +27,12 @@ function handle(workspace) {
   var project = context.project;
 
   var electron = isElectronInstalled();
-  var skypagerElectron = isSkypagerElectronInstalled();
+
+  var skypagerElectron = undefined;
+
+  if (isSkypagerElectronInstalled()) {
+    skypagerElectron = process.env.SKYPAGER_ELECTRON_ROOT || $skypager && $skypager.electron || $skypager && $skypager['skypager-electron'] || require.resolve('skypager-electron');
+  }
 
   if (!electron) {
     abort('make sure electron-prebuilt is available.  You can specify a path manually via the ELECTRON_PREBUILT_PATH env var');
@@ -54,7 +59,7 @@ function handle(workspace) {
 
 function isSkypagerElectronInstalled() {
   try {
-    return require('path').dirname(require.resolve('skypager-electron'));
+    require(process.env.SKYPAGER_ELECTRON_ROOT || $skypager && $skypager.electron || $skypager && $skypager['skypager-electron'] || 'skypager-electron');
   } catch (error) {
     return false;
   }

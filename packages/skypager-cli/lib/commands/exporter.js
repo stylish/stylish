@@ -36,7 +36,7 @@ var _debounce2 = _interopRequireDefault(_debounce);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function exporter(program, dispatch) {
-  program.command('export <exporter>').description('run one of the project exporters').option('--format <format>', 'which format should the output be serialized in', 'json').option('--output <path>', 'where to save the contents').option('--pretty', 'pretty print the output').option('--stdout', 'write output to stdout').option('--benchmark', 'include benchmarking information').option('--watch', 'watch files for changes and rerun the exporter').option('--clean', 'clean or remove previous versions first').action(dispatch(handle));
+  program.command('export <exporter>').allowUnknownOption(true).description('run one of the project exporters').option('--format <format>', 'which format should the output be serialized in', 'json').option('--output <path>', 'where to save the contents').option('--pretty', 'pretty print the output').option('--stdout', 'write output to stdout').option('--benchmark', 'include benchmarking information').option('--watch', 'watch files for changes and rerun the exporter').option('--clean', 'clean or remove previous versions first').action(dispatch(handle));
 }
 
 exports.default = exporter;

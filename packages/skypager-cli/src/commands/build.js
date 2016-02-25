@@ -86,16 +86,39 @@ export function handle(preset, options = {}, context = {}) {
   options.devpack_api = 'v2'
   options = Object.assign(options, opts)
 
-  require('skypager-devpack').webpack('build', options, {beforeCompile, onCompile})
+  let devpack = require(
+    ($skypager && $skypager['skypager-devpack']) ||
+    process.env.SKYPAGER_DEVPACK_ROOT ||
+    'skypager-devpack'
+  )
+
+  devpack.webpack('build', options, {beforeCompile, onCompile})
 }
 
 function isDevpackInstalled () {
+  let tryPath = ($skypager && $skypager.devPack) ||
+    ($skypager && $skypager['skypager-devpack']) ||
+    process.env.SKYPAGER_DEVPACK_ROOT ||
+    attempt('skypager-devpack')
+
+  if (!tryPath) {
+    return false
+  }
+
   try {
-    require('skypager-devpack')
+    if (tryPath) {
+      require(tryPath)
+    }
     return true
   } catch (error) {
     return false
   }
+}
+
+function attempt(packageRequire) {
+  try {
+   return require.resolve(packageRequire)
+  } catch(e){ return false }
 }
 
 function checkForSettings(project, ...keys) {

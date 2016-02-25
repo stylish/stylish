@@ -1,6 +1,8 @@
 import yargs from 'yargs'
 import get from 'lodash/get'
 
+const { assign } = Object
+
 export function serve (program, dispatch) {
   program
     .command('serve [profile]')
@@ -24,8 +26,19 @@ export function handle(arg, options = {}, context = {}) {
      process.exit(1)
   }
 
-  const { server, defaultSettings } = require('skypager-server')
-  const { availableProfiles, devpack } = require('skypager-devpack')
+  const { server, deepstream, defaultSettings } = require(
+    ($skypager && $skypager['skypager-server']) ||
+    ($skypager && $skypager.server) ||
+    process.env.SKYPAGER_SERVER_ROOT ||
+    'skypager-server'
+  )
+
+  const { availableProfiles, devpack } = require(
+    ($skypager && $skypager['skypager-devpack']) ||
+    ($skypager && $skypager.devPack) ||
+    process.env.SKYPAGER_DEVPACK_ROOT ||
+    'skypager-devpack'
+  )
 
   let settings = project.settings
 
@@ -44,28 +57,57 @@ export function handle(arg, options = {}, context = {}) {
            get(project, `settings.deepstream.${ profile }`) ||
            get(project, 'settings.deepstream')
 
-    require('skypager-server').deepstream(opts, context)
+    deepstream(opts, context)
   } else {
     server({profile, env, dashboard}, context)
   }
 }
 
-function isDevpackInstalled () {
-  try {
-    require('skypager-devpack')
-    return true
-  } catch (error) {
-    return false
-  }
-}
-
 function isServerInstalled () {
-  try {
-    require('skypager-server')
-    return true
-  } catch (error) {
-    console.log('Error requiring skypager-server', error.message)
+  let tryPath = ($skypager && $skypager.server) ||
+    ($skypager && $skypager['skypager-server']) ||
+    process.env.SKYPAGER_SERVER_ROOT ||
+    attempt('skypager-server')
+
+  if (!tryPath) {
     return false
   }
 
+  try {
+    if (tryPath) {
+      require(tryPath)
+    }
+    return true
+  } catch (error) {
+    return false
+  }
 }
+
+
+function isDevpackInstalled () {
+  let tryPath = ($skypager && $skypager.devPack) ||
+    ($skypager && $skypager['skypager-devpack']) ||
+    process.env.SKYPAGER_DEVPACK_ROOT ||
+    attempt('skypager-devpack')
+
+  if (!tryPath) {
+    return false
+  }
+
+  try {
+    if (tryPath) {
+      require(tryPath)
+    }
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
+
+function attempt(packageRequire) {
+  try {
+   return require.resolve(packageRequire)
+  } catch(e){ return false }
+}
+

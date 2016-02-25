@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.dotpath = undefined;
 
+var _promise = require('babel-runtime/core-js/promise');
+
+var _promise2 = _interopRequireDefault(_promise);
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -59,6 +63,8 @@ exports.isRegex = isRegex;
 exports.filterQuery = filterQuery;
 exports.abort = abort;
 exports.skypagerBabel = skypagerBabel;
+exports.pathExists = pathExists;
+exports.findPackage = findPackage;
 
 var _path = require('path');
 
@@ -333,9 +339,7 @@ function carve(dataPath, resultValue) {
 }
 
 function loadManifestFromDirectory(directory) {
-  var path = require('path');
-  var manifest = require(path.join(directory, 'package.json')) || {};
-  return manifest;
+  return require('findup-sync')('package.json', { cwd: directory });
 }
 
 function isDomain(value) {
@@ -352,18 +356,12 @@ function loadProjectFromDirectory(directory) {
     return require(path.join(directory, manifest.skypager.main.replace(/^\.\//, '')));
   }
 
-  if (exists(path.join(directory, 'skypager.js'))) {
-    return require(path.join(directory, 'skypager.js'));
+  if (manifest.skypager) {
+    return require('../index').load((0, _path.join)(directory, 'package.json'));
   }
 
-  if (exists(path.join(directory, 'index.js'))) {
-    var p = require(path.join(directory, 'index.js'));
-
-    if (!p.registries && !p.docs) {
-      abort('This project does not seem to have a skypager project');
-    }
-
-    return p;
+  if (exists(path.join(directory, 'skypager.js'))) {
+    return require(path.join(directory, 'skypager.js'));
   }
 }
 
@@ -424,7 +422,46 @@ function abort(message) {
 }
 
 function skypagerBabel() {
-  require('babel-register')({
-    presets: [require('babel-preset-skypager')]
+  findPackage('babel-preset-skypager').then(function (path) {
+    require('babel-register')({
+      presets: [require(path)]
+    });
+  });
+}
+
+function pathExists(fp) {
+  var fn = typeof fs.access === 'function' ? fs.accessSync : fs.statSync;
+
+  try {
+    fn(fp);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function findPackage(packageName) {
+  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+  var findModules = require('find-node-modules');
+  var path = require('path');
+  var fs = require('fs');
+
+  return new _promise2.default(function (resolve, reject) {
+    var moduleDirectories = findModules(process.env.PWD, { relative: false });
+    var directory = moduleDirectories.find(function (p) {
+      var exists = pathExists((0, _path.join)(p, packageName));
+      return exists;
+    });
+
+    if (!directory) {
+      reject(packageName);
+    }
+
+    var result = path.resolve(path.join(directory, packageName));
+
+    if (result) {
+      resolve(result);
+    }
   });
 }

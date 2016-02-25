@@ -10,6 +10,7 @@ import debounce from 'lodash/debounce'
 export function exporter (program, dispatch) {
   program
     .command('export <exporter>')
+    .allowUnknownOption(true)
     .description('run one of the project exporters')
     .option('--format <format>', 'which format should the output be serialized in', 'json')
     .option('--output <path>', 'where to save the contents')

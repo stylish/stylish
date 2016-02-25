@@ -13,12 +13,16 @@ exports.handle = handle;
 
 var _jsYaml = require('js-yaml');
 
+var _util = require('../util');
+
+var _path = require('path');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var VERSION = require('../../package.json').version;
 
 function init(program, dispatch) {
-  program.command('init <projectName> [destination]').description('create a new skypager project').option('--overwrite', 'whether or not to replace a project that exists').option('--destination', '').option('--plugins <list>', 'a comma separated list of plugins to use', list).action(function (projectName, options) {
+  program.command('init <projectName> [destination]').description('create a new skypager project').allowUnknownOption(true).option('--overwrite', 'whether or not to replace a project that exists').option('--destination', '').option('--plugins <list>', 'a comma separated list of plugins to use', list).option('--portfolio', 'this project is a portfolo').action(function (projectName, options) {
     handle(projectName, options);
   });
 }
@@ -32,96 +36,51 @@ function handle(projectName, destination) {
   var resolve = _require.resolve;
   var join = _require.join;
 
-  var _require2 = require('fs');
-
-  var existsSync = _require2.existsSync;
-  var writeFileSync = _require2.writeFileSync;
-
   var mkdir = require('mkdirp').sync;
 
   destination = destination || options.destination || resolve(join(process.env.PWD, projectName));
 
-  if (!existsSync(destination)) {
-    mkdir(destination);
+  if ((0, _util.pathExists)(destination) && !options.overwrite) {
+    abort('path already exists');
   }
 
-  var man = {
-    name: projectName,
-    version: '1.0.0',
-    skypager: {
-      main: 'skypager.js',
-      plugins: options.plugins ? ('' + options.plugins).split(',') : []
-    },
-    devDependencies: {
-      'skypager': '^' + VERSION,
-      'skypager-devpack': '^' + VERSION,
-      'babel-preset-skypager': '^' + VERSION,
-      'babel-runtime': '^6.4.0'
-    }
-  };
+  var source = options.portfolio ? join(__dirname, '../../packages', 'portfolio-template.asar') : join(__dirname, '../../packages', 'project-template.asar');
 
-  if (options.plugins) {
-    plugins.forEach(function (plugin) {
-      man.devDependencies['skypager-plugin-' + plugin] = '*';
-    });
+  console.log('Extracting Template...', source);
+
+  try {
+    require('asar').extractAll(source, destination);
+  } catch (error) {
+    abort('Error extracting template: ' + error.message);
   }
 
-  var folders = ['docs/pages', 'settings', 'src', 'models', 'actions', 'data', 'dist', 'public', 'tmp/cache'];
+  try {
+    var packageJson = require(join(destination, 'package.json'));
 
-  folders.forEach(function (path) {
-    mkdir(join(destination, path));
-  });
+    packageJson.name = projectName;
 
-  function template() {
-    for (var _len = arguments.length, parts = Array(_len), _key = 0; _key < _len; _key++) {
-      parts[_key] = arguments[_key];
-    }
-
-    return function (content) {
-      writeFileSync(join.apply(undefined, [destination].concat(parts)), content.split("\n").map(function (line) {
-        return line.trim();
-      }).join("\n"), 'utf8');
-    };
+    require('fs').writeFileSync(join(destination, 'package.json'), (0, _stringify2.default)(packageJson, null, 2), 'utf8');
+  } catch (error) {
+    abort('Error modifying package: ' + error.message);
   }
 
-  template('package.json')((0, _stringify2.default)(man, null, 2));
+  if (!options.skipInstall) {
+    try {
+      console.log('Running NPM Install. This may take a bit.');
+      var child = require('child_process').spawn('npm', ['install', '--no-progress'], { cwd: destination, stdio: ['inherit'] });
 
-  template('skypager.js')('\n      require(\'skypager/lib/util\').skypagerBabel()\n\n      module.exports = require(\'skypager\').load(__filename, {\n        manifest: require(\'./package.json\')\n      })\n      ', 'utf8');
-
-  template('.babelrc')('{presets:["skypager"]}');
-
-  template('.gitignore')(['logs/**/*.log', 'tmp/cache', '.DS_Store', '.env', 'settings/secrets.yml'].join("\n"));
-  template('.npmignore')(['logs/**/*.log', 'tmp/cache', '.DS_Store', '.env', 'settings/secrets.yml'].join("\n"));
-
-  template('settings/publishing.yml', (0, _jsYaml.dump)({
-    publishing: {
-      service: 'skypager.io'
+      child.stdout.on('data', function (d) {
+        return console.log(d.toString());
+      });
+      child.stderr.on('data', function (d) {
+        return console.log(d.toString());
+      });
+    } catch (error) {
+      abort('Error running npm install: ' + error.message);
     }
-  }));
+  }
 
-  template('settings/integrations.yml', (0, _jsYaml.dump)({
-    dropbox: {
-      token: 'env.DROPBOX_API_TOKEN'
-    },
-    github: {
-      token: 'env.GITHUB_ACCESS_TOKEN'
-    },
-    aws: {
-      secret_access_key: 'env.AWS_SECRET_ACCESS_KEY',
-      access_key_id: 'env.AWS_ACCESS_KEY_ID'
-    },
-    slack: {
-      token: 'env.SLACK_ACCESS_TOKEN'
-    },
-    auth0: {
-      domain: 'env.AUTH0_CLIENT_DOMAIN',
-      clientId: 'env.AUTH0_CLIENT_ID'
-    }
-  }));
-
-  template('docs/outline.md')('---\n      type: outline\n      ---\n\n      ## Sections\n      ### Section A\n      ### Section B\n      ');
-
-  template('docs/pages/cover.md')('---\n      type: page\n      cover: true\n      title: ' + projectName + '\n      ---\n\n      # Project Name\n');
+  console.log('Finished!');
 }
 
 exports.default = init;
@@ -130,4 +89,9 @@ function list(val) {
   return ('' + val).split(',').map(function (val) {
     return val.trim().toLowerCase();
   });
+}
+
+function abort(msg) {
+  console.log(msg).red;
+  process.exit(1);
 }

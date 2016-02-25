@@ -4,22 +4,19 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _defineProperty = require('babel-runtime/core-js/object/define-property');
+var _assign = require('babel-runtime/core-js/object/assign');
 
-var _defineProperty2 = _interopRequireDefault(_defineProperty);
+var _assign2 = _interopRequireDefault(_assign);
 
 var _promise = require('babel-runtime/core-js/promise');
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _assign = require('babel-runtime/core-js/object/assign');
-
-var _assign2 = _interopRequireDefault(_assign);
-
 exports.missingSupportPackages = missingSupportPackages;
 exports.missingRequiredPackages = missingRequiredPackages;
-exports.getPaths = getPaths;
 exports.checkAll = checkAll;
+exports.getPaths = getPaths;
+exports.getPathsGlobal = getPathsGlobal;
 
 var _util = require('./util');
 
@@ -33,10 +30,13 @@ var _camelCase = require('lodash/camelCase');
 
 var _camelCase2 = _interopRequireDefault(_camelCase);
 
+var _transform = require('lodash/transform');
+
+var _transform2 = _interopRequireDefault(_transform);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var requiredPackages = {
-  'skypager-cli': process.env.SKYPAGER_CLI_ROOT || (0, _path.dirname)(__dirname),
   'skypager-project': process.env.SKYPAGER_PROJECT_ROOT,
   'babel-preset-skypager': process.env.BABEL_PRESET_SKYPAGER_ROOT
 };
@@ -62,10 +62,6 @@ function missingRequiredPackages() {
   });
 }
 
-function getPaths() {
-  return (0, _assign2.default)(requiredPackages, supportPackages);
-}
-
 function checkAll() {
   var req = keys(requiredPackages).map(function (packageName) {
     return (0, _util.findPackage)(packageName).then(function (dir) {
@@ -86,18 +82,14 @@ function toEnv(packageName) {
   return (packageName + '-root').toUpperCase().replace(/\-/, '_');
 }
 
-checkAll().then(function () {
-  var paths = {};
+function getPaths() {
+  var paths = (0, _assign2.default)({}, requiredPackages, supportPackages);
 
-  keys(paths).forEach(function (packageName) {
-    var key = (0, _camelCase2.default)(packageName.replace('skypager-', ''));
+  return (0, _transform2.default)(paths, function (result, key, value) {
+    result[(0, _camelCase2.default)(key.replace(/skypager\-/g, ''))] = value;
+  }, paths);
+}
 
-    (0, _defineProperty2.default)(paths, key, {
-      get: function get() {
-        return paths[packageName];
-      }
-    });
-  });
-
-  global.$skypager = paths;
-});
+function getPathsGlobal() {
+  return global.$skypager = global.$skypager || getPaths();
+}

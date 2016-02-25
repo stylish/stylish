@@ -12,6 +12,16 @@ export function findPackage (packageName, options = {}) {
       return exists
     })
 
+    if (!directory) {
+      try {
+        let resolvedPath = path.dirname(require.resolve(packageName))
+        resolve(resolvedPath)
+        return
+      } catch(error) {
+
+      }
+    }
+
     if (!directory) { reject(packageName); }
 
     let result = path.resolve(path.join(directory, packageName))
@@ -53,6 +63,10 @@ export function loadProjectFromDirectory (directory, skypagerProject) {
   skypagerProject = skypagerProject || require('skypager-project')
 
 	var manifest = loadManifestFromDirectory(directory)
+
+  if (!manifest) {
+    throw('Could not load project from ' + directory)
+  }
 
 	if (manifest.skypager && manifest.skypager.main) {
 		return require(

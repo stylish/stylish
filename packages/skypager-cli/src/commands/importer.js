@@ -4,6 +4,7 @@ import { argv } from 'yargs'
 export function importer (program, dispatch) {
   program
     .command('import <importer> [files...]')
+    .allowUnknownOption(true)
     .description('run one of the project importers')
     .action(dispatch(handle))
 }

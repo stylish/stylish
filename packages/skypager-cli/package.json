@@ -3,14 +3,19 @@
   "version": "2.6.0",
   "preferGlobal": "true",
   "bin": {
-    "skypager": "./cli.js"
+    "skypager": "./bin/cli.js"
   },
   "description": "the CLI for the skypager framework",
   "main": "lib/index.js",
   "scripts": {
     "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js",
     "compile": "babel -q -d lib src",
-    "compile:watch": "babel -q -w -d lib src"
+    "postcompile": "npm run package:templates",
+    "prepublish": "npm run compile",
+    "compile:watch": "babel -q -w -d lib src",
+    "package:portfolio:template": "asar pack ../skypager-template-portfolio packages/portfolio-template.asar",
+    "package:project:template": "asar pack ../skypager-template-project packages/project-template.asar",
+    "package:templates": "npm run package:project:template && npm run package:portfolio:template"
   },
   "repository": {
     "type": "git",
@@ -28,13 +33,19 @@
   "devDependencies": {
     "babel-preset-skypager": "^1.34.0",
     "mocha": "^2.4.5",
-    "should": "^8.2.2"
+    "should": "^8.2.2",
+    "skypager-cli": "."
+  },
+  "skypager":{
+    "version": "2.6.1"
   },
   "dependencies": {
     "colors": "^1.1.2",
     "commander": "^2.9.0",
     "find-node-modules": "^1.0.1",
     "findup-sync": "^0.3.0",
+    "asar": "^0.10.0",
+    "gitignore-parser": "0.0.2",
     "js-yaml": "^3.5.3",
     "lodash": "^4.5.0",
     "mkdirp": "^0.5.1",

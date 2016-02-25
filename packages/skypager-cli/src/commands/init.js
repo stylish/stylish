@@ -1,4 +1,6 @@
 import { dump as toYaml } from 'js-yaml'
+import { pathExists } from '../util'
+import { join } from 'path'
 
 const VERSION = require('../../package.json').version
 
@@ -6,9 +8,11 @@ export function init (program, dispatch) {
   program
     .command('init <projectName> [destination]')
     .description('create a new skypager project')
+    .allowUnknownOption(true)
     .option('--overwrite','whether or not to replace a project that exists')
     .option('--destination','')
     .option('--plugins <list>', 'a comma separated list of plugins to use', list)
+    .option('--portfolio', 'this project is a portfolo')
     .action(function(projectName, options) {
       handle(projectName, options)
     })
@@ -16,126 +20,62 @@ export function init (program, dispatch) {
 
 export function handle (projectName, destination, options = {}, context = {}) {
   const { resolve, join } = require('path')
-  const { existsSync, writeFileSync } = require('fs')
   const mkdir = require('mkdirp').sync
 
   destination = destination || options.destination || resolve(join(process.env.PWD, projectName))
 
-  if ( !existsSync(destination) ) {
-    mkdir(destination)
+  if (pathExists(destination) && !options.overwrite) {
+    abort('path already exists')
   }
 
-    let man = {
-      name: projectName,
-      version: '1.0.0',
-      skypager: {
-        main: 'skypager.js',
-        plugins: options.plugins ? `${ options.plugins }`.split(',') : []
-      },
-      devDependencies:{
-        'skypager': `^${ VERSION }`,
-        'skypager-devpack': `^${ VERSION }`,
-        'babel-preset-skypager': `^${ VERSION }`,
-        'babel-runtime': '^6.4.0'
-      }
-    }
+  let source = options.portfolio
+    ? join(__dirname, '../../packages', 'portfolio-template.asar')
+    : join(__dirname, '../../packages', 'project-template.asar')
 
-    if (options.plugins) {
-      plugins.forEach(plugin => {
-        man.devDependencies[`skypager-plugin-${ plugin }`] = '*'
-      })
-    }
+  console.log('Extracting Template...', source)
 
-    const folders = [
-      'docs/pages',
-      'settings',
-      'src',
-      'models',
-      'actions',
-      'data',
-      'dist',
-      'public',
-      'tmp/cache'
-    ]
+  try {
+    require('asar').extractAll(source, destination)
+  } catch(error) {
+    abort(
+      'Error extracting template: ' + error.message
+    )
+  }
 
-    folders.forEach(path => {
-      mkdir(join(destination,path))
-    })
-
-    function template(...parts) {
-      return (content) => {
-        writeFileSync(
-          join(destination, ...parts),
-          content.split("\n").map(line => line.trim()).join("\n"),
-          'utf8'
-        )
-      }
-    }
-
-    template('package.json')(
-      JSON.stringify(man, null, 2),
+  try {
+    let packageJson = require(
+       join(destination, 'package.json')
     )
 
-    template('skypager.js')(`
-      require('skypager/lib/util').skypagerBabel()
+    packageJson.name = projectName
 
-      module.exports = require('skypager').load(__filename, {
-        manifest: require('./package.json')
-      })
-      `,
+    require('fs').writeFileSync(
+      join(destination, 'package.json'),
+      JSON.stringify(packageJson, null, 2),
       'utf8'
     )
 
-    template('.babelrc')('{presets:["skypager"]}')
+  } catch(error) {
+     abort('Error modifying package: ' + error.message)
+  }
 
-    template('.gitignore')(['logs/**/*.log','tmp/cache', '.DS_Store', '.env', 'settings/secrets.yml' ].join("\n"))
-    template('.npmignore')(['logs/**/*.log','tmp/cache', '.DS_Store', '.env', 'settings/secrets.yml' ].join("\n"))
+  if (!options.skipInstall) {
+    try {
+      console.log('Running NPM Install. This may take a bit.')
+      let child = require('child_process').spawn(
+         'npm',
+         ['install', '--no-progress'],
+         { cwd: destination, stdio:['inherit'] }
+      )
 
-    template('settings/publishing.yml', toYaml({
-      publishing: {
-        service: 'skypager.io'
-      }
-    }))
+      child.stdout.on('data', (d) => console.log(d.toString()))
+      child.stderr.on('data', (d) => console.log(d.toString()))
+    } catch(error) {
+      abort('Error running npm install: ' + error.message)
+    }
+  }
 
-    template('settings/integrations.yml', toYaml({
-      dropbox: {
-        token: 'env.DROPBOX_API_TOKEN'
-      },
-      github: {
-        token: 'env.GITHUB_ACCESS_TOKEN'
-      },
-      aws: {
-        secret_access_key: 'env.AWS_SECRET_ACCESS_KEY',
-        access_key_id: 'env.AWS_ACCESS_KEY_ID'
-      },
-      slack: {
-        token: 'env.SLACK_ACCESS_TOKEN'
-      },
-      auth0: {
-        domain: 'env.AUTH0_CLIENT_DOMAIN',
-        clientId: 'env.AUTH0_CLIENT_ID'
-      }
-    }))
-
-
-    template('docs/outline.md')(
-      `---
-      type: outline
-      ---
-
-      ## Sections
-      ### Section A
-      ### Section B
-      `)
-
-    template('docs/pages/cover.md')(
-      `---
-      type: page
-      cover: true
-      title: ${ projectName }
-      ---
-
-      # Project Name\n`)
+  console.log('Finished!')
 }
 
 export default init
@@ -143,4 +83,9 @@ export default init
 
 function list(val) {
   return `${ val }`.split(',').map(val => val.trim().toLowerCase())
+}
+
+function abort(msg) {
+   console.log(msg).red
+   process.exit(1)
 }

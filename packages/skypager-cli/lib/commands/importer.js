@@ -15,7 +15,7 @@ var _yargs = require('yargs');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function importer(program, dispatch) {
-  program.command('import <importer> [files...]').description('run one of the project importers').action(dispatch(handle));
+  program.command('import <importer> [files...]').allowUnknownOption(true).description('run one of the project importers').action(dispatch(handle));
 }
 
 exports.default = importer;

@@ -95,14 +95,32 @@ function handle(preset) {
   options.devpack_api = 'v2';
   options = (0, _assign2.default)(options, opts);
 
-  require('skypager-devpack').webpack('build', options, { beforeCompile: beforeCompile, onCompile: onCompile });
+  var devpack = require($skypager && $skypager['skypager-devpack'] || process.env.SKYPAGER_DEVPACK_ROOT || 'skypager-devpack');
+
+  devpack.webpack('build', options, { beforeCompile: beforeCompile, onCompile: onCompile });
 }
 
 function isDevpackInstalled() {
+  var tryPath = $skypager && $skypager.devPack || $skypager && $skypager['skypager-devpack'] || process.env.SKYPAGER_DEVPACK_ROOT || attempt('skypager-devpack');
+
+  if (!tryPath) {
+    return false;
+  }
+
   try {
-    require('skypager-devpack');
+    if (tryPath) {
+      require(tryPath);
+    }
     return true;
   } catch (error) {
+    return false;
+  }
+}
+
+function attempt(packageRequire) {
+  try {
+    return require.resolve(packageRequire);
+  } catch (e) {
     return false;
   }
 }

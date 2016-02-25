@@ -82,12 +82,18 @@ export function launchServer (preset, options = {}, context = {}) {
     `settings.servers.${ preset }`
   )
 
+  devpack = require(
+    ($skypager && $skypager['skypager-devpack']) ||
+    process.env.SKYPAGER_DEVPACK_ROOT ||
+    'skypager-devpack'
+  )
+
  if (!opts) {
     console.log('Missing config. Creating default config in: ' + `settings/build/${ preset }`.green)
     project.content.settings_files.createFile(
       `settings/webpack/${ preset }.yml`,
       yaml(
-        require('skypager-devpack').argsFor(preset, process.env.NODE_ENV || 'development')
+        devpack.argsFor(preset, process.env.NODE_ENV || 'development')
       )
     )
   }
@@ -96,7 +102,7 @@ export function launchServer (preset, options = {}, context = {}) {
   options.devpack_api = 'v2'
   options = Object.assign(options, opts)
 
-  require('skypager-devpack').webpack('develop', options, {beforeCompile, onCompile})
+  devpack.webpack('develop', options, {beforeCompile, onCompile})
 }
 
 function yaml(obj) {
@@ -120,15 +126,33 @@ export function launchTunnel(options, context) {
 }
 
 function isDevpackInstalled () {
+  let tryPath = ($skypager && $skypager.devPack) ||
+    ($skypager && $skypager['skypager-devpack']) ||
+    process.env.SKYPAGER_DEVPACK_ROOT ||
+    attempt('skypager-devpack')
+
+  if (!tryPath) {
+    return false
+  }
+
   try {
-    require('skypager-devpack')
+    if (tryPath) {
+      require(tryPath)
+    }
     return true
   } catch (error) {
     return false
   }
 }
 
+
 const { assign } = Object
+
+function attempt(packageRequire) {
+  try {
+   return require.resolve(packageRequire)
+  } catch(e){ return false }
+}
 
 function checkForSettings(project, ...keys) {
   let key = keys.find((key) => {

@@ -20,7 +20,15 @@ export function handle(workspace, options = {}, context = {}) {
   let { project } = context
 
   let electron = isElectronInstalled()
-  let skypagerElectron = isSkypagerElectronInstalled()
+
+  let skypagerElectron
+
+  if(isSkypagerElectronInstalled()) {
+    skypagerElectron = process.env.SKYPAGER_ELECTRON_ROOT ||
+      ($skypager && $skypager.electron) ||
+      ($skypager && $skypager['skypager-electron']) ||
+      require.resolve('skypager-electron')
+  }
 
   if (!electron) {
     abort('make sure electron-prebuilt is available.  You can specify a path manually via the ELECTRON_PREBUILT_PATH env var')
@@ -55,7 +63,12 @@ export function handle(workspace, options = {}, context = {}) {
 
 function isSkypagerElectronInstalled () {
   try {
-    return require('path').dirname(require.resolve('skypager-electron'))
+    require(
+      process.env.SKYPAGER_ELECTRON_ROOT ||
+      ($skypager && $skypager.electron) ||
+      ($skypager && $skypager['skypager-electron']) ||
+      'skypager-electron'
+    )
   } catch (error) {
      return false
   }
