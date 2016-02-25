@@ -59,22 +59,6 @@ export function handle (projectName, destination, options = {}, context = {}) {
      abort('Error modifying package: ' + error.message)
   }
 
-  if (!options.skipInstall) {
-    try {
-      console.log('Running NPM Install. This may take a bit.')
-      let child = require('child_process').spawn(
-         'npm',
-         ['install', '--no-progress'],
-         { cwd: destination, stdio:['inherit'] }
-      )
-
-      child.stdout.on('data', (d) => console.log(d.toString()))
-      child.stderr.on('data', (d) => console.log(d.toString()))
-    } catch(error) {
-      abort('Error running npm install: ' + error.message)
-    }
-  }
-
   console.log('Finished!')
 }
 

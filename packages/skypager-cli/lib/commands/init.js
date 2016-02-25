@@ -64,22 +64,6 @@ function handle(projectName, destination) {
     abort('Error modifying package: ' + error.message);
   }
 
-  if (!options.skipInstall) {
-    try {
-      console.log('Running NPM Install. This may take a bit.');
-      var child = require('child_process').spawn('npm', ['install', '--no-progress'], { cwd: destination, stdio: ['inherit'] });
-
-      child.stdout.on('data', function (d) {
-        return console.log(d.toString());
-      });
-      child.stderr.on('data', function (d) {
-        return console.log(d.toString());
-      });
-    } catch (error) {
-      abort('Error running npm install: ' + error.message);
-    }
-  }
-
   console.log('Finished!');
 }
 
