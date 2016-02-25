@@ -6,9 +6,11 @@ const { assign } = Object
 export function serve (program, dispatch) {
   program
     .command('serve [profile]')
+    .allowUnknownOption(true)
     .description('start the project server')
     .option('--dashboard', 'display a dashboard view of the server processes')
     .option('--profile', 'which configuration profile to use?', 'web')
+    .option('--port <port>', 'which port to listen on?')
     .action(dispatch(handle))
 }
 

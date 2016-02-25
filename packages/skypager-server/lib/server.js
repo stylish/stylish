@@ -78,6 +78,8 @@ var Server = exports.Server = (function () {
       return (cfg.name = name) && cfg;
     }));
 
+    this.config.port = params.port || argv.port;
+
     server.paths = {
       logs: project.path('logs', 'server'),
       public: project.paths.public
@@ -133,7 +135,7 @@ var Server = exports.Server = (function () {
       }
 
       if (this.dashboard && this.config.dashboard) {
-        (0, _dashboard2.default)(this, this.config.dashboard);
+        (0, _dashboard2.default)(this, project.get('settings.dashboard.' + this.config.dashboard));
       }
     }
   }, {
@@ -143,19 +145,17 @@ var Server = exports.Server = (function () {
 
       var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
+      var port = this.config.port || process.env.PORT || argv.port;
+
       (0, _lodash.defaultsDeep)(options, {
-        port: this.config.port || 8080,
-        host: this.config.host || '0.0.0.0'
+        port: port
       });
 
       var app = (0, _express.express)(this, options);
 
-      var host = options.host;
-      var port = options.port;
-
       this.log('info', 'express app starting', options);
 
-      app.listen(port, host, function (err) {
+      app.listen(port || options.port, function (err) {
         if (err) {
           _this.log('error', 'error launching espress', {
             err: err

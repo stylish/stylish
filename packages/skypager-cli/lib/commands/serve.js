@@ -24,7 +24,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var _Object = Object;
 var assign = _Object.assign;
 function serve(program, dispatch) {
-  program.command('serve [profile]').description('start the project server').option('--dashboard', 'display a dashboard view of the server processes').option('--profile', 'which configuration profile to use?', 'web').action(dispatch(handle));
+  program.command('serve [profile]').allowUnknownOption(true).description('start the project server').option('--dashboard', 'display a dashboard view of the server processes').option('--profile', 'which configuration profile to use?', 'web').option('--port <port>', 'which port to listen on?').action(dispatch(handle));
 }
 
 exports.default = serve;

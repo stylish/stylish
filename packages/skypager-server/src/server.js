@@ -33,6 +33,8 @@ export class Server {
     defineProp(server, 'config', defaults({}, config, {processes:{}}))
     defineProp(server, 'processes', mapValues(config.processes, (cfg, name) => (cfg.name = name) && cfg))
 
+    this.config.port = params.port || argv.port
+
     server.paths = {
       logs: project.path('logs', 'server'),
       public: project.paths.public
@@ -92,23 +94,22 @@ export class Server {
     }
 
     if (this.dashboard && this.config.dashboard) {
-      dashboard(this, this.config.dashboard)
+      dashboard(this, project.get(`settings.dashboard.${ this.config.dashboard }`))
     }
   }
 
   listen (options = {}) {
+    let port = this.config.port || process.env.PORT || argv.port
+
     defaults(options, {
-      port: this.config.port || 8080,
-      host: this.config.host || '0.0.0.0'
+      port
     })
 
     let app = express(this, options)
 
-    let {host, port} = options
-
     this.log('info', 'express app starting', options)
 
-    app.listen(port, host, (err) => {
+    app.listen(port || options.port, (err) => {
       if(err) {
         this.log('error', 'error launching espress', {
           err
