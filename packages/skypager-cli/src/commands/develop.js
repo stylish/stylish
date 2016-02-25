@@ -82,7 +82,7 @@ export function launchServer (preset, options = {}, context = {}) {
     `settings.servers.${ preset }`
   )
 
-  devpack = require(
+  const devpack = require(
     ($skypager && $skypager['skypager-devpack']) ||
     process.env.SKYPAGER_DEVPACK_ROOT ||
     'skypager-devpack'

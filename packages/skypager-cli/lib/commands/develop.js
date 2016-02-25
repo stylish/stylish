@@ -95,7 +95,7 @@ function launchServer(preset) {
 
   var opts = checkForSettings(project, 'settings.webpack.' + preset, 'settings.servers.' + preset + '.webpack', 'settings.servers.' + preset);
 
-  devpack = require($skypager && $skypager['skypager-devpack'] || process.env.SKYPAGER_DEVPACK_ROOT || 'skypager-devpack');
+  var devpack = require($skypager && $skypager['skypager-devpack'] || process.env.SKYPAGER_DEVPACK_ROOT || 'skypager-devpack');
 
   if (!opts) {
     console.log('Missing config. Creating default config in: ' + ('settings/build/' + preset).green);
