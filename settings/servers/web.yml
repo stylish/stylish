@@ -1,53 +1,52 @@
-development:
-  port: 8080
+port: '<%= process.env.PORT || 8080 %>'
+host: 0.0.0.0
+
+deepstream:
   host: 0.0.0.0
+  port: 9020
 
+processes:
   deepstream:
-    host: 0.0.0.0
-    port: 9020
+    cmd: 'skypager serve deepstream --profile web'
+  webpack:
+    cmd: 'skypager dev web'
+  bundler:
+    cmd: 'skypager export bundle --watch'
 
-  processes:
-    deepstream:
-      cmd: 'skypager serve deepstream --profile web'
-    webpack:
-      cmd: 'skypager dev web'
-    bundler:
-      cmd: 'skypager export bundle --watch'
+dashboard:
+  panels:
+    leftPanel: 
+      label: Bundler
+      type: log
+      left: "1%"
+      top: "1%"
+      height: "10%"
+      width: "50%"
+      process: bundler
+      borderStyles:
+        type: line
+        color: magenta
 
-  dashboard:
-    panels:
-      leftPanel: 
-        label: Bundler
-        type: log
-        left: "1%"
-        top: "1%"
-        height: "10%"
-        width: "50%"
-        process: bundler
-        borderStyles:
-          type: line
-          color: magenta
+    rightTop:
+      type: log
+      left: "51%"
+      width: "48%"
+      top: "1%"
+      height: "68%"
+      process: webpack
+      label: Frontend Build
+      borderStyles:
+        type: line
+        color: green
 
-      rightTop:
-        type: log
-        left: "51%"
-        width: "48%"
-        top: "1%"
-        height: "68%"
-        process: webpack
-        label: Frontend Build
-        borderStyles:
-          type: line
-          color: green
-
-      rightBottom:
-        type: log
-        left: "51%"
-        width: "48%"
-        height: "29%"
-        top: "70%"
-        label: Deepstream Server
-        process: deepstream
-        borderStyles:
-          type: line
-          color: cyan
+    rightBottom:
+      type: log
+      left: "51%"
+      width: "48%"
+      height: "29%"
+      top: "70%"
+      label: Deepstream Server
+      process: deepstream
+      borderStyles:
+        type: line
+        color: cyan
