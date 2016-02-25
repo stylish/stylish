@@ -81,7 +81,8 @@ var Server = exports.Server = (function () {
       return (cfg.name = name) && cfg;
     }));
 
-    this.config.port = params.port || argv.port;
+    this.config.port = params.port || argv.port || process.env.SKYPAGER_SERVER_PORT;
+    this.config.host = params.host || argv.host || process.env.SKYPAGER_SERVER_HOST || '0.0.0.0';
 
     server.paths = {
       logs: project.path('logs', 'server'),
@@ -149,14 +150,15 @@ var Server = exports.Server = (function () {
       var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
       (0, _lodash.defaultsDeep)(options, {
-        port: this.config.port
+        port: this.config.port,
+        host: this.config.host
       });
 
       var app = (0, _express.express)(this, options);
 
       this.log('info', 'express app starting', options);
 
-      app.listen(port || options.port, options.host || this.config.host, function (err) {
+      app.listen(options.port, options.host, function (err) {
         if (err) {
           _this.log('error', 'error launching espress', {
             err: err
