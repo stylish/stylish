@@ -1,7 +1,7 @@
 {
   "name": "skypager-plugin-blueprints",
   "description": "skypager blueprint plugin",
-  "version": "2.5.0",
+  "version": "2.9.0",
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
