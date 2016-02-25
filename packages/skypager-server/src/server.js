@@ -19,8 +19,11 @@ export class Server {
 
     let server = this
 
+    argv = argv || {}
+    defaults(argv, require('yargs').argv)
+
     this.dashboard = dashboard
-    this.debug = argv && argv.debug || require('yargs').argv.debug
+    this.debug = argv && argv.debug || require('yargs').argv.debug || process.env.DEBUG_SERVER_STDOUT
 
     defaults(server, {
       env,
@@ -57,7 +60,7 @@ export class Server {
       get transports() {
         let t = []
 
-        if(!this.dashboard) {
+        if(!this.dashboard || process.env.DEBUG_SERVER_STDOUT) {
           t.push(
             new winston.transports.Console({
               level: 'debug',
@@ -99,17 +102,15 @@ export class Server {
   }
 
   listen (options = {}) {
-    let port = this.config.port || process.env.PORT || argv.port
-
     defaults(options, {
-      port
+      port: this.config.port
     })
 
     let app = express(this, options)
 
     this.log('info', 'express app starting', options)
 
-    app.listen(port || options.port, (err) => {
+    app.listen(port || options.port, options.host || this.config.host, (err) => {
       if(err) {
         this.log('error', 'error launching espress', {
           err

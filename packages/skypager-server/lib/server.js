@@ -62,8 +62,11 @@ var Server = exports.Server = (function () {
 
     var server = this;
 
+    argv = argv || {};
+    (0, _lodash.defaultsDeep)(argv, require('yargs').argv);
+
     this.dashboard = dashboard;
-    this.debug = argv && argv.debug || require('yargs').argv.debug;
+    this.debug = argv && argv.debug || require('yargs').argv.debug || process.env.DEBUG_SERVER_STDOUT;
 
     (0, _lodash.defaultsDeep)(server, {
       env: env,
@@ -102,7 +105,7 @@ var Server = exports.Server = (function () {
       get transports() {
         var t = [];
 
-        if (!this.dashboard) {
+        if (!this.dashboard || process.env.DEBUG_SERVER_STDOUT) {
           t.push(new _winston2.default.transports.Console({
             level: 'debug',
             colorize: true
@@ -145,17 +148,15 @@ var Server = exports.Server = (function () {
 
       var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-      var port = this.config.port || process.env.PORT || argv.port;
-
       (0, _lodash.defaultsDeep)(options, {
-        port: port
+        port: this.config.port
       });
 
       var app = (0, _express.express)(this, options);
 
       this.log('info', 'express app starting', options);
 
-      app.listen(port || options.port, function (err) {
+      app.listen(port || options.port, options.host || this.config.host, function (err) {
         if (err) {
           _this.log('error', 'error launching espress', {
             err: err
