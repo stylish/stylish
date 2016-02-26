@@ -139,7 +139,12 @@ var Server = exports.Server = (function () {
       }
 
       if (this.dashboard && this.config.dashboard) {
-        (0, _dashboard2.default)(this, project.get('settings.dashboard.' + this.config.dashboard));
+        var dashboardConfig = this.project.get('settings.dashboards.' + this.config.dashboard);
+
+        if (!dashboardConfig) {
+          console.log('Available Dashboard Configs:', this.project.settings.dashboards);
+          throw 'Invalid dashboard config specified: ' + this.config.dashboard;
+        } else (0, _dashboard2.default)(this, dashboardConfig);
       }
     }
   }, {
