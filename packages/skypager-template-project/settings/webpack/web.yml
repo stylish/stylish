@@ -1,5 +1,5 @@
 port: 3000
 host: localhost
-theme: dashboard
+theme: 'marketing-bold'
 entryPoints:
-  app: ./src/app.js
+  app: ./src/website/index

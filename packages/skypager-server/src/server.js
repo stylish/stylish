@@ -99,7 +99,14 @@ export class Server {
     }
 
     if (this.dashboard && this.config.dashboard) {
-      dashboard(this, project.get(`settings.dashboard.${ this.config.dashboard }`))
+      let dashboardConfig = this.project.get(`settings.dashboards.${ this.config.dashboard }`)
+
+      if (!dashboardConfig) {
+        console.log('Available Dashboard Configs:', this.project.settings.dashboards)
+        throw('Invalid dashboard config specified: ' + this.config.dashboard)
+      }
+
+      else dashboard(this, dashboardConfig)
     }
   }
 

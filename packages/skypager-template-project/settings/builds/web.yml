@@ -1,4 +1,4 @@
-theme: dashboard
+theme: marketing-bold
 contentHash: false
 entryPoints:
-  app: ./src/app.js
+  app: ./src/website/index
