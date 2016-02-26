@@ -38,11 +38,29 @@ execute(function(params, context) {
   })
   */
 
-  console.log('Total of :' + packages.length + ' packages ')
+  console.log('Total of:' + packages.length + ' packages ')
   console.log('Running ' + params.command.cyan + ' ')
 
+  var args = params.command.split(' ')
+  var cmd = args.shift()
+  var dirname = require('path').dirname
+
   packages.forEach(function(pkg){
-    var child = shell.exec(params.command, {async: true})
+    var child = require('child_process').spawn(cmd, args, {
+      cwd: dirname(pkg.paths.absolute)
+    })
+
+    child.stdout.on('data', function(data) {
+      console.log('[' + pkg.data.name.yellow + ']: ' + data.toString())
+    })
+
+    child.stderr.on('data', function(data) {
+      console.log('Error: ' + data.toString())
+    })
+
+    child.on('end', function(){
+      console.log('Finished ' + pkg.data.name)
+    })
 
     child.on('error', function(){
        console.log('Error in ' + pkg.data.name)

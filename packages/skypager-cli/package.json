@@ -10,7 +10,6 @@
   "scripts": {
     "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js",
     "compile": "babel -q -d lib src",
-    "prepublish": "npm run package:templates",
     "compile:watch": "babel -q -w -d lib src",
     "package:portfolio:template": "asar pack ../skypager-template-portfolio packages/portfolio-template.asar",
     "package:project:template": "asar pack ../skypager-template-project packages/project-template.asar",

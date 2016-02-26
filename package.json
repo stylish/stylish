@@ -11,7 +11,7 @@
     "babel-preset-skypager": "^2.7.3",
     "pad": "^1.0.0",
     "progress": "^1.1.8",
-    "skypager-cli": "file:./packages/skypager-cli",
+    "skypager-cli": "^2.10.0",
     "skypager-devpack": "^2.8.0",
     "skypager-electron": "^2.5.0",
     "skypager-plugin-blueprints": "^2.5.0",
