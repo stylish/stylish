@@ -448,6 +448,14 @@ class Project {
     })
   }
 
+  get copy () {
+    return this.content.copy.query((s) => true).condense({
+      key: 'idpath',
+      prop: 'data'
+    })
+  }
+
+
   streamFile(path, type = 'readable', mode) {
     let fd = require('fs').openSync(path, 'a+')
     let stream
@@ -530,6 +538,7 @@ function paths () {
     build: join(this.root, 'dist'),
     public: join(this.root, 'public'),
     settings: join(this.root, 'settings'),
+    copy: join(this.root, 'copy'),
     join: function (...args) {
       return join(project.root, ...args)
     }
@@ -563,7 +572,7 @@ function buildContentCollectionsManually () {
   const project = this
   const paths = project.paths
 
-  let { Asset, DataSource, Document, Image, Script, Stylesheet, ProjectManifest, SettingsFile, Vector } = Assets
+  let { Asset, DataSource, Document, CopyFile, Image, Script, Stylesheet, ProjectManifest, SettingsFile, Vector } = Assets
 
   return {
     assets: Asset.createCollection(this, false),
@@ -588,6 +597,12 @@ function buildContentCollectionsManually () {
       assetClass: ProjectManifest,
       pattern: '*/package.json',
       exclude: '**/node_modules'
+    }),
+
+    copy: new Collection({
+      root: this.paths.copy,
+      project: this,
+      assetClass: CopyFile
     }),
 
     settings_files: new Collection({

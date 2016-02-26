@@ -1,3 +1,5 @@
+const IncludeCollections = ['data_sources','documents', 'settings_files', 'copy_files'];
+
 export function BrowserBundle (options = {}) {
   let project = options.project = this
 
@@ -58,7 +60,7 @@ export function AssetExporter (options = {}, callback) {
   }
 }
 
-const IncludeExporters = ['entities','settings', 'copy','project']
+const IncludeExporters = ['assets', 'entities', 'project', 'models', 'settings', 'copy' ]
 
 export function ProjectExporter (options = {}, callback) {
   let project = options.project
@@ -80,6 +82,20 @@ export function ProjectExporter (options = {}, callback) {
     `bundle.copy = require('./copy-export.json');`,
     `bundle.content = {}`,
   ]
+
+   IncludeCollections.forEach(key => {
+    lines.push(`var _${ key } = bundle.content.${ key } = {};`)
+
+    if (!project.content[key]) {
+      console.error('No such content colection', key, Object.keys(project.content))
+      throw('No such content collection ' + key)
+    }
+
+    project.content[key].forEach(asset => {
+      let { requirePath } = AssetExporter.call(project, { asset, options, key })
+      lines.push(`_${ key }['${ asset.id }'] = require('./${requirePath}');`)
+    })
+  })
 
   lines.push(`module.exports = require('skypager-project/lib/bundle').create(bundle)`)
 

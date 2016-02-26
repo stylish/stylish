@@ -3,6 +3,7 @@ import { values, flatten } from '../util'
 import Asset from './asset'
 import DataSource from './data_source'
 import Document from './document'
+import CopyFile from './copy_file'
 import Image from './image'
 import ProjectManifest from './project_manifest'
 import Script from './script'
@@ -20,6 +21,7 @@ module.exports = {
   Asset,
   DataSource,
   Document,
+  CopyFile,
   Image,
   ProjectManifest,
   Script,

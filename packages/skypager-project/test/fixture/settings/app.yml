@@ -1,2 +1,2 @@
-app:
-  env: '<%= process.env.NODE_ENV %>'
+env: '<%= process.env.NODE_ENV %>'
+locale: 'it'
