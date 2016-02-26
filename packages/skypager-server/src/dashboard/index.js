@@ -14,6 +14,8 @@ import mapValues from 'lodash/mapValues'
 import values from 'lodash/values'
 
 function dashboard(server, options) {
+  const project = server.project
+
   const screen = blessed.screen({
     autoPadding: true,
     smartCSR: true,
@@ -28,6 +30,8 @@ function dashboard(server, options) {
 
   server.panels = renderPanels(screen, options)
 
+  console.log('Options Panels', options.panels)
+
   mapValues(options.panels, (panel, key) => {
     if (panel.type === 'log' && panel.process) {
       let panelOutput = server.logPath(`${panel.process}.${server.env}.log`)
@@ -37,6 +41,7 @@ function dashboard(server, options) {
 
       streamer(panelOutput, logPanel.add.bind(logPanel))
     }
+
   })
 
   const logger = new (winston.Logger)({

@@ -449,7 +449,7 @@ class Project {
   }
 
   get copy () {
-    return this.content.copy.query((s) => true).condense({
+    return this.content.copy_files.query((s) => true).condense({
       key: 'idpath',
       prop: 'data'
     })
@@ -599,7 +599,7 @@ function buildContentCollectionsManually () {
       exclude: '**/node_modules'
     }),
 
-    copy: new Collection({
+    copy_files: new Collection({
       root: this.paths.copy,
       project: this,
       assetClass: CopyFile

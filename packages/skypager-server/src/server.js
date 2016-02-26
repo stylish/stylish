@@ -23,7 +23,7 @@ export class Server {
     argv = argv || {}
     defaults(argv, require('yargs').argv)
 
-    this.dashboard = dashboard
+    this.dashboard = params.dashboard
     this.debug = argv && argv.debug || require('yargs').argv.debug || process.env.DEBUG_SERVER_STDOUT
 
     defaults(server, {
@@ -45,7 +45,7 @@ export class Server {
       public: project.paths.public
     }
 
-    if (env === 'development') {
+    if (env === 'development' && argv.clearLogs) {
       rimraf.sync(server.paths.logs, {})
     }
 
@@ -98,7 +98,7 @@ export class Server {
       )
     }
 
-    if (this.dashboard && this.config.dashboard) {
+    if (!this.dashboard && this.config.dashboard) {
       let dashboardConfig = this.project.get(`settings.dashboards.${ this.config.dashboard }`)
 
       if (!dashboardConfig) {

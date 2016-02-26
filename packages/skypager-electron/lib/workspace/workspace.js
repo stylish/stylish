@@ -241,43 +241,10 @@ function launch(panelName) {
     }
   }));
 
-  if (options.command && options.command.match(/skypager dev/)) {
-    (function () {
-      var watcher = _chokidar2.default.watch(process.env.PWD, {
-        persistent: true,
-        depth: 1
-      });
-
-      watcher.on('raw', function (action, path) {
-        if (path && path.match(/webpack-stats/)) {
-          w.dispatch({
-            type: 'WEBPACK_DEV_SERVER_READY',
-            payload: {
-              panelName: panelName,
-              workspaceId: w.id
-            }
-          });
-
-          watcher.close();
-
-          w.application.eachBrowserWindow(function (browserWindow) {
-            browserWindow.show();
-            browserWindow.reload();
-          });
-        }
-      });
-
-      process.on('exit', function (code) {
-        if (!watcher && watcher.closed) {
-          watcher.close();
-        }
-      });
-    })();
-  }
-
   options.window.preload = require.resolve('../client-bootstrap.js');
 
-  options.url = 'http://localhost:8080';
+  options.url = options.url || w.panelSettings[panelName].url || '';
+
   var proc = (0, _electronifyServer2.default)(options);
 
   proc.on('child-started', function (child) {

@@ -54,17 +54,19 @@ exports.access = access;
 exports.copyProp = copyProp;
 exports.noConflict = noConflict;
 exports.carve = carve;
-exports.loadManifestFromDirectory = loadManifestFromDirectory;
 exports.isDomain = isDomain;
-exports.loadProjectFromDirectory = loadProjectFromDirectory;
 exports.isPromise = isPromise;
 exports.isArray = isArray;
 exports.isRegex = isRegex;
 exports.filterQuery = filterQuery;
 exports.abort = abort;
+exports.findPackageSync = findPackageSync;
+exports.findPackage = findPackage;
+exports.splitPath = splitPath;
 exports.skypagerBabel = skypagerBabel;
 exports.pathExists = pathExists;
-exports.findPackage = findPackage;
+exports.loadProjectFromDirectory = loadProjectFromDirectory;
+exports.loadManifestFromDirectory = loadManifestFromDirectory;
 
 var _path = require('path');
 
@@ -338,31 +340,8 @@ function carve(dataPath, resultValue) {
   return initialValue;
 }
 
-function loadManifestFromDirectory(directory) {
-  return require('findup-sync')('package.json', { cwd: directory });
-}
-
 function isDomain(value) {
   return value.match(DOMAIN_REGEX);
-}
-
-function loadProjectFromDirectory(directory) {
-  var exists = require('fs').existsSync;
-  var path = require('path');
-
-  var manifest = loadManifestFromDirectory(directory);
-
-  if (manifest.skypager && manifest.skypager.main) {
-    return require(path.join(directory, manifest.skypager.main.replace(/^\.\//, '')));
-  }
-
-  if (manifest.skypager) {
-    return require('../index').load((0, _path.join)(directory, 'package.json'));
-  }
-
-  if (exists(path.join(directory, 'skypager.js'))) {
-    return require(path.join(directory, 'skypager.js'));
-  }
 }
 
 function isPromise(obj) {
@@ -421,31 +400,33 @@ function abort(message) {
   process.exit(1);
 }
 
-function skypagerBabel() {
-  findPackage('babel-preset-skypager').then(function (path) {
-    require('babel-register')({
-      presets: [require(path)]
-    });
+function findPackageSync(packageName) {
+  var root = arguments.length <= 1 || arguments[1] === undefined ? process.env.PWD : arguments[1];
+
+  var findModules = require('find-node-modules');
+  var path = require('path');
+
+  var moduleDirectories = findModules(root, { relative: false });
+
+  var directory = moduleDirectories.find(function (p) {
+    var exists = pathExists((0, _path.join)(p, packageName));
+    return exists;
   });
-}
 
-function pathExists(fp) {
-  var fn = typeof fs.access === 'function' ? fs.accessSync : fs.statSync;
-
-  try {
-    fn(fp);
-    return true;
-  } catch (error) {
-    return false;
+  if (!directory) {
+    try {
+      var resolvedPath = path.dirname(require.resolve(packageName));
+      return resolvedPath;
+    } catch (error) {
+      console.log('Error looking up package', packageName, error.message);
+    }
   }
+
+  return directory && path.resolve(path.join(directory, packageName));
 }
 
 function findPackage(packageName) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-  var findModules = require('find-node-modules');
-  var path = require('path');
-  var fs = require('fs');
 
   return new _promise2.default(function (resolve, reject) {
     var moduleDirectories = findModules(process.env.PWD, { relative: false });
@@ -453,6 +434,14 @@ function findPackage(packageName) {
       var exists = pathExists((0, _path.join)(p, packageName));
       return exists;
     });
+
+    if (!directory) {
+      try {
+        var resolvedPath = path.dirname(require.resolve(packageName));
+        resolve(resolvedPath);
+        return;
+      } catch (error) {}
+    }
 
     if (!directory) {
       reject(packageName);
@@ -464,4 +453,76 @@ function findPackage(packageName) {
       resolve(result);
     }
   });
+}
+
+function splitPath() {
+  var p = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+
+  return path.resolve(p).split(path.sep);
+}
+
+function skypagerBabel() {
+  var presets = findPackageSync('babel-preset-skypager');
+
+  try {
+    presets ? require('babel-register')({ presets: presets }) : require('babel-register');
+  } catch (error) {
+    abort('Error loading the babel-register library. Do you have the babel-preset-skypager package?');
+  }
+}
+
+function pathExists(fp) {
+  var fs = require('fs');
+  var fn = typeof fs.access === 'function' ? fs.accessSync : fs.statSync;
+
+  try {
+    fn(fp);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function loadProjectFromDirectory(directory, skypagerProject) {
+  var exists = pathExists;
+  var path = require('path');
+
+  global.$skypager = global.$skypager || {};
+
+  try {
+    skypagerProject = skypagerProject || $skypager && $skypager['skypager-project'] && require($skypager['skypager-project']);
+    skypagerProject = skypagerProject || require('skypager-project');
+  } catch (error) {
+    console.log('There was an error attempting to load the ' + 'skypager-project'.magenta + ' package.');
+    console.log('Usually this means it is not installed or can not be found relative to the current directory');
+    console.log();
+    console.log('The exact error message we received is: '.yellow);
+    console.log(error.message);
+    console.log('stack trace: '.yellow);
+    console.log(error.stack);
+    process.exit(1);
+    return;
+  }
+
+  var manifest = loadManifestFromDirectory(directory);
+
+  if (!manifest) {
+    throw 'Could not load project from ' + directory;
+  }
+
+  if (manifest.skypager && manifest.skypager.main) {
+    return require(path.join(directory, manifest.skypager.main.replace(/^\.\//, '')));
+  }
+
+  if (manifest.skypager) {
+    return skypagerProject.load((0, _path.join)(directory, 'package.json'));
+  }
+
+  if (exists(path.join(directory, 'skypager.js'))) {
+    return require(path.join(directory, 'skypager.js'));
+  }
+}
+
+function loadManifestFromDirectory(directory) {
+  return require('findup-sync')('package.json', { cwd: directory });
 }

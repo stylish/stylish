@@ -24,11 +24,11 @@ function logger(project) {
   var env = project.env;
 
   var _transports = [new _winston.transports.File({
-    name: 'project.' + env,
-    filename: project.path('logs', 'project.' + env + '.log')
+    name: 'project',
+    filename: project.path('logs', 'project.log')
   })];
 
-  if (options.debug || process.env.SKYPAGER_LOGGER === 'stdout') {
+  if (options.debug || process.env.SKYPAGER_DEBUG_STDOUT === 'stdout') {
     _transports.unshift(new _winston.transports.Console({ colorize: true }));
   }
 
@@ -36,6 +36,7 @@ function logger(project) {
     enumerable: false,
     configurable: false,
     value: new _winston.Logger({
+      level: 'debug',
       transports: _transports
     })
   });

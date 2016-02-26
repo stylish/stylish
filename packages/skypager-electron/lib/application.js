@@ -33,6 +33,10 @@ var _fs = require('fs');
 
 var _redux = require('redux');
 
+var _winston = require('winston');
+
+var _winston2 = _interopRequireDefault(_winston);
+
 var _reduxThunk = require('redux-thunk');
 
 var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
@@ -79,6 +83,8 @@ var Application = exports.Application = (function () {
 			throw 'Please ensure your project has settings data. data/settings/workspaces.yml for example.';
 		}
 
+		this.project = project;
+
 		var settings = project.settings;
 
 		options = (0, _defaultsDeep2.default)(options, {
@@ -91,7 +97,7 @@ var Application = exports.Application = (function () {
 				appData: (0, _path.join)(_electron.app.getPath('userData'), 'data'),
 				appLogs: project.path('logs', 'electron'),
 				public: project.paths.public || (0, _path.join)(process.env.PWD, 'public'),
-				temp: _electron.app.getPath('temp'),
+				temp: project.path('tmpdir', 'electron'),
 				project: project.root || process.env.PWD
 			}
 		});
@@ -100,11 +106,16 @@ var Application = exports.Application = (function () {
 
 		setupAppHome(options.paths);
 
-		console.log('Streaming Actions', this.paths.appLogs);
-		this.paths.actionStream = (0, _path.join)(this.paths.appLogs, this.id + '-action-stream.js');
+		this.paths.actionStream = (0, _path.join)(this.paths.appLogs, this.id + '-actions.json');
 
 		hide({
-			actionLogger: stream(this.paths.actionStream),
+			actionLogger: new _winston2.default.Logger({
+				level: 'debug',
+				transports: [new _winston2.default.transports.File({
+					filename: this.paths.actionStream,
+					json: true
+				})]
+			}),
 			store: setupStore()
 		});
 
@@ -145,6 +156,8 @@ var Application = exports.Application = (function () {
 				win.webContents.send('skypager:message', 'application:dispatch', action);
 			});
 
+			this.logAction(action);
+
 			return this.store.dispatch(action);
 		}
 	}, {
@@ -152,7 +165,7 @@ var Application = exports.Application = (function () {
 		value: function boot() {
 			this.store.subscribe(this.onStateChange.bind(this));
 
-			this.workspace = this.createWorkspace(this.argv.workspace);
+			this.workspace = this.createWorkspace(this.argv.workspace && this.project.settings.workspaces[this.argv.workspace] ? this.argv.workspace : 'main');
 
 			if (this.workspace) {
 				this.workspace.boot();
@@ -173,14 +186,7 @@ var Application = exports.Application = (function () {
 	}, {
 		key: 'logAction',
 		value: function logAction(action) {
-			if (this.argv.debug) {
-				console.log((0, _stringify2.default)(action, null, 2));
-			}
-			if (!this.argv.debug) {
-				console.log((0, _stringify2.default)(action, null, 2));
-			}
-
-			this.actionLogger.write('dispatch(' + (0, _stringify2.default)(action) + ');\n\n');
+			this.actionLogger.log('debug', action);
 		}
 	}, {
 		key: 'onStateChange',
@@ -239,10 +245,7 @@ var Application = exports.Application = (function () {
 	}, {
 		key: 'workspaceSettings',
 		get: function get() {
-			var workspaces = this.settings.workspaces || {};
-			workspaces.main = workspaces.main || mainWorkspaceConfig(this);
-
-			return workspaces;
+			return this.settings.workspaces;
 		}
 	}]);
 	return Application;

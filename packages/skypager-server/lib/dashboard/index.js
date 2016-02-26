@@ -39,6 +39,8 @@ var keys = _Object.keys;
 var assign = _Object.assign;
 
 function dashboard(server, options) {
+  var project = server.project;
+
   var screen = _blessed2.default.screen({
     autoPadding: true,
     smartCSR: true,
@@ -52,6 +54,8 @@ function dashboard(server, options) {
   });
 
   server.panels = renderPanels(screen, options);
+
+  console.log('Options Panels', options.panels);
 
   (0, _mapValues2.default)(options.panels, function (panel, key) {
     if (panel.type === 'log' && panel.process) {

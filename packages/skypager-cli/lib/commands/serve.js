@@ -24,7 +24,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var _Object = Object;
 var assign = _Object.assign;
 function serve(program, dispatch) {
-  program.command('serve [profile]').allowUnknownOption(true).description('start the project server').option('--dashboard', 'display a dashboard view of the server processes').option('--profile', 'which configuration profile to use?', 'web').option('--port <port>', 'which port to listen on?').action(dispatch(handle));
+  program.command('serve [profile]').allowUnknownOption(true).description('start the project server').option('--no-dashboard', 'disable the dashboard view on the CLI').option('--profile', 'which configuration profile to use?', 'web').option('--port <port>', 'which port to listen on?').action(dispatch(handle));
 }
 
 exports.default = serve;
@@ -58,7 +58,7 @@ function handle(arg) {
   var serverSettings = settings.server || defaultSettings;
   var profile = arg || options.profile || (0, _keys2.default)(serverSettings)[0] || 'web';
   var env = options.env || process.env.NODE_ENV || 'development';
-  var dashboard = options.dashboard || false;
+  var dashboard = !options.noDashboard && !options.dashboard === false;
   var rawArg = _yargs2.default.argv._[1];
 
   var opts = {};

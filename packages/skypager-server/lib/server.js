@@ -65,7 +65,7 @@ var Server = exports.Server = (function () {
     argv = argv || {};
     (0, _lodash.defaultsDeep)(argv, require('yargs').argv);
 
-    this.dashboard = dashboard;
+    this.dashboard = params.dashboard;
     this.debug = argv && argv.debug || require('yargs').argv.debug || process.env.DEBUG_SERVER_STDOUT;
 
     (0, _lodash.defaultsDeep)(server, {
@@ -89,7 +89,7 @@ var Server = exports.Server = (function () {
       public: project.paths.public
     };
 
-    if (env === 'development') {
+    if (env === 'development' && argv.clearLogs) {
       _rimraf2.default.sync(server.paths.logs, {});
     }
 
@@ -138,7 +138,7 @@ var Server = exports.Server = (function () {
         }).listen(this.config.webstream.port || 5000);
       }
 
-      if (this.dashboard && this.config.dashboard) {
+      if (!this.dashboard && this.config.dashboard) {
         var dashboardConfig = this.project.get('settings.dashboards.' + this.config.dashboard);
 
         if (!dashboardConfig) {

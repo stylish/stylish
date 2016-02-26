@@ -692,6 +692,16 @@ var Project = (function () {
         prop: 'data'
       });
     }
+  }, {
+    key: 'copy',
+    get: function get() {
+      return this.content.copy_files.query(function (s) {
+        return true;
+      }).condense({
+        key: 'idpath',
+        prop: 'data'
+      });
+    }
   }]);
   return Project;
 })();
@@ -726,6 +736,7 @@ function paths() {
     build: (0, _path.join)(this.root, 'dist'),
     public: (0, _path.join)(this.root, 'public'),
     settings: (0, _path.join)(this.root, 'settings'),
+    copy: (0, _path.join)(this.root, 'copy'),
     join: function join() {
       for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
         args[_key6] = arguments[_key6];
@@ -769,6 +780,7 @@ function buildContentCollectionsManually() {
   var Asset = Assets.Asset;
   var DataSource = Assets.DataSource;
   var Document = Assets.Document;
+  var CopyFile = Assets.CopyFile;
   var Image = Assets.Image;
   var Script = Assets.Script;
   var Stylesheet = Assets.Stylesheet;
@@ -799,6 +811,12 @@ function buildContentCollectionsManually() {
       assetClass: ProjectManifest,
       pattern: '*/package.json',
       exclude: '**/node_modules'
+    }),
+
+    copy_files: new _collection2.default({
+      root: this.paths.copy,
+      project: this,
+      assetClass: CopyFile
     }),
 
     settings_files: new _collection2.default({

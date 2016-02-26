@@ -182,41 +182,10 @@ function launch (panelName, params = {}) {
     }
   }))
 
-  if (options.command && options.command.match(/skypager dev/)) {
-    let watcher = chokidar.watch(process.env.PWD, {
-      persistent: true,
-      depth: 1
-    })
-
-    watcher.on('raw', (action, path) => {
-      if (path && path.match(/webpack-stats/)){
-        w.dispatch({
-          type: 'WEBPACK_DEV_SERVER_READY',
-          payload: {
-            panelName,
-            workspaceId: w.id
-          }
-        })
-
-				watcher.close()
-
-        w.application.eachBrowserWindow((browserWindow) => {
-           browserWindow.show()
-           browserWindow.reload()
-        })
-      }
-    })
-
-    process.on('exit', (code) => {
-      if(!watcher && watcher.closed) {
-        watcher.close()
-      }
-    })
-  }
-
   options.window.preload = require.resolve('../client-bootstrap.js')
 
-  options.url = 'http://localhost:8080'
+  options.url = options.url || w.panelSettings[panelName].url || ''
+
   let proc = electronify(options)
 
   proc.on('child-started', (child) => {

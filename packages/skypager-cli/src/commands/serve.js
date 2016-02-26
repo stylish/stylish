@@ -8,7 +8,7 @@ export function serve (program, dispatch) {
     .command('serve [profile]')
     .allowUnknownOption(true)
     .description('start the project server')
-    .option('--dashboard', 'display a dashboard view of the server processes')
+    .option('--no-dashboard', 'disable the dashboard view on the CLI')
     .option('--profile', 'which configuration profile to use?', 'web')
     .option('--port <port>', 'which port to listen on?')
     .action(dispatch(handle))
@@ -47,7 +47,7 @@ export function handle(arg, options = {}, context = {}) {
   let serverSettings = settings.server || defaultSettings
   let profile = arg || options.profile || Object.keys(serverSettings)[0] || 'web'
   let env = options.env || process.env.NODE_ENV || 'development'
-  let dashboard = options.dashboard || false
+  let dashboard = !options.noDashboard && !options.dashboard === false
   let rawArg = yargs.argv._[1]
 
   let opts = {}

@@ -13,7 +13,8 @@ const DefaultVendorStack = [
   'redux',
   'redux-thunk',
   'redux-actions',
-  'redux-simple-router'
+  'redux-simple-router',
+  'radium'
 ]
 
 const ExternalVendorMappings = {
@@ -26,7 +27,8 @@ const ExternalVendorMappings = {
   'redux-actions': 'ReduxActions',
   'redux-thunk': 'ReduxThunk',
   'redux-simple-router': 'ReduxSimpleRouter',
-  'history': 'History'
+  'history': 'History',
+  'radium': 'Radium'
 }
 
 module.exports = function (argv) {

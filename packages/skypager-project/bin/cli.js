@@ -1,22 +1,8 @@
 #!/usr/bin/env node
 
-var yargs = require('yargs'),
-    argv = yargs.argv
+var join = require('path').join
+var cliPath = require('../lib/util').findPackageSync('skypager-cli')
 
-var launch
-
-if (process.env.SKYPAGER_ENV == 'development') {
-  require('babel-register')({
-    presets:[
-      require('babel-preset-skypager')
-    ]
-  })
-
-	process.env.SKYPAGER_ENV = 'development'
-  launch = require('../src/commands').program()
-} else {
-	process.env.SKYPAGER_ENV = 'release'
-  launch = require('../lib/commands').program()
-}
-
-launch()
+require(
+  join(cliPath, 'bin', 'cli.js')
+)

@@ -32,7 +32,7 @@ var _util = require('../util');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var DefaultVendorStack = ['history', 'jquery', 'react', 'react-dom', 'react-redux', 'react-router', 'react-bootstrap', 'redux', 'redux-thunk', 'redux-actions', 'redux-simple-router'];
+var DefaultVendorStack = ['history', 'jquery', 'react', 'react-dom', 'react-redux', 'react-router', 'react-bootstrap', 'redux', 'redux-thunk', 'redux-actions', 'redux-simple-router', 'radium'];
 
 var ExternalVendorMappings = {
   'jquery': 'jQuery',
@@ -44,7 +44,8 @@ var ExternalVendorMappings = {
   'redux-actions': 'ReduxActions',
   'redux-thunk': 'ReduxThunk',
   'redux-simple-router': 'ReduxSimpleRouter',
-  'history': 'History'
+  'history': 'History',
+  'radium': 'Radium'
 };
 
 module.exports = function (argv) {

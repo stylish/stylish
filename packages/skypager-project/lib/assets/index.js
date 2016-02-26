@@ -18,6 +18,10 @@ var _document = require('./document');
 
 var _document2 = _interopRequireDefault(_document);
 
+var _copy_file = require('./copy_file');
+
+var _copy_file2 = _interopRequireDefault(_copy_file);
+
 var _image = require('./image');
 
 var _image2 = _interopRequireDefault(_image);
@@ -56,6 +60,7 @@ module.exports = {
   Asset: _asset2.default,
   DataSource: _data_source2.default,
   Document: _document2.default,
+  CopyFile: _copy_file2.default,
   Image: _image2.default,
   ProjectManifest: _project_manifest2.default,
   Script: _script2.default,

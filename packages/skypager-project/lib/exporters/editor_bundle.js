@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
 var _stringify = require('babel-runtime/core-js/json/stringify');
 
 var _stringify2 = _interopRequireDefault(_stringify);
@@ -17,6 +21,8 @@ exports.AssetExporter = AssetExporter;
 exports.ProjectExporter = ProjectExporter;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var IncludeCollections = ['data_sources', 'documents', 'settings_files', 'copy_files'];
 
 function BrowserBundle() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -81,7 +87,7 @@ function AssetExporter() {
   };
 }
 
-var IncludeExporters = ['entities', 'settings', 'copy', 'project'];
+var IncludeExporters = ['assets', 'entities', 'project', 'models', 'settings', 'copy'];
 
 function ProjectExporter() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -96,6 +102,23 @@ function ProjectExporter() {
   }
 
   var lines = [contextPolyfill(), 'var bundle = module.exports = {};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.assets = require(\'./assets-export.json\');', 'bundle.models = require(\'./models-export.json\');', 'bundle.settings = require(\'./settings-export.json\');', 'bundle.copy = require(\'./copy-export.json\');', 'bundle.content = {}'];
+
+  IncludeCollections.forEach(function (key) {
+    lines.push('var _' + key + ' = bundle.content.' + key + ' = {};');
+
+    if (!project.content[key]) {
+      console.error('No such content colection', key, (0, _keys2.default)(project.content));
+      throw 'No such content collection ' + key;
+    }
+
+    project.content[key].forEach(function (asset) {
+      var _AssetExporter$call = AssetExporter.call(project, { asset: asset, options: options, key: key });
+
+      var requirePath = _AssetExporter$call.requirePath;
+
+      lines.push('_' + key + '[\'' + asset.id + '\'] = require(\'./' + requirePath + '\');');
+    });
+  });
 
   lines.push('module.exports = require(\'skypager-project/lib/bundle\').create(bundle)');
 

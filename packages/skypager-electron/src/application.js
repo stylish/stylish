@@ -2,6 +2,7 @@ import { hideProperties } from './util'
 import { join, resolve } from 'path'
 import { writeFileSync as write, createWriteStream as createStream } from 'fs'
 import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
+import winston from 'winston'
 
 import thunk from 'redux-thunk'
 
@@ -22,6 +23,8 @@ export class Application {
 			throw('Please ensure your project has settings data. data/settings/workspaces.yml for example.')
 		}
 
+		this.project = project
+
 		let settings = project.settings
 
 		options = defaults(options, {
@@ -34,7 +37,7 @@ export class Application {
 				appData: join(app.getPath('userData'), 'data'),
 				appLogs: project.path('logs','electron'),
 				public: (project.paths.public) || join(process.env.PWD, 'public'),
-				temp: app.getPath('temp'),
+				temp: project.path('tmpdir', 'electron'),
 				project: project.root || process.env.PWD
 			}
 		})
@@ -43,13 +46,18 @@ export class Application {
 
 		setupAppHome(options.paths)
 
-		console.log('Streaming Actions', this.paths.appLogs)
-		this.paths.actionStream = join(this.paths.appLogs, `${ this.id }-action-stream.js`)
+		this.paths.actionStream = join(this.paths.appLogs, `${ this.id }-actions.json`)
 
 		hide({
-			actionLogger: stream(
-				this.paths.actionStream
-			),
+			actionLogger: new (winston.Logger)({
+				level: 'debug',
+				transports:[
+					new (winston.transports.File)({
+						filename: this.paths.actionStream,
+						json: true
+					})
+				]
+			}),
 			store: setupStore()
 		})
 
@@ -105,13 +113,17 @@ export class Application {
 			win.webContents.send('skypager:message', 'application:dispatch', action)
 		})
 
+		this.logAction(action)
+
 		return this.store.dispatch(action)
 	}
 
 	boot () {
 		this.store.subscribe(this.onStateChange.bind(this))
 
-		this.workspace = this.createWorkspace(this.argv.workspace)
+		this.workspace = this.createWorkspace(
+			this.argv.workspace && this.project.settings.workspaces[this.argv.workspace] ? this.argv.workspace : 'main'
+		)
 
 		if (this.workspace) {
 			this.workspace.boot()
@@ -127,11 +139,8 @@ export class Application {
 	}
 
 	logAction (action) {
-		if (this.argv.debug) { console.log(JSON.stringify(action, null, 2)) }
-		if (!this.argv.debug) { console.log(JSON.stringify(action, null, 2)) }
-
-		this.actionLogger.write(
-			`dispatch(${JSON.stringify(action)});\n\n`
+		this.actionLogger.log('debug',
+			action
 		)
 	}
 
@@ -167,10 +176,7 @@ export class Application {
 	}
 
 	get workspaceSettings() {
-		let workspaces = this.settings.workspaces || {}
-		workspaces.main = workspaces.main || mainWorkspaceConfig(this)
-
-		return workspaces
+		return this.settings.workspaces
 	}
 }
 

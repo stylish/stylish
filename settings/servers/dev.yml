@@ -2,20 +2,20 @@ dashboard: dev
 processes:
   test_1:
     cmd: 'npm run test:watch'
-    cwd: './packages/skypager-cli'
+    cwd: '<%= process.env.PWD + "/packages/skypager-cli" %>'
   test_2:
     cmd: 'npm run test:watch'
-    cwd: './packages/skypager-project'
+    cwd: '<%= process.env.PWD + "/packages/skypager-project" %>'
 
   compiler_1:
     cmd: 'npm run compile:watch'
-    cwd: './packages/skypager-cli'
+    cwd: '<%= process.env.PWD + "/packages/skypager-cli" %>'
   compiler_2:
     cmd: 'npm run compile:watch'
-    cwd: './packages/skypager-project'
+    cwd: '<%= process.env.PWD + "/packages/skypager-project" %>'
   compiler_3:
     cmd: 'npm run compile:watch'
-    cwd: './packages/skypager-server'
+    cwd: '<%= process.env.PWD + "/packages/skypager-server" %>'
   compiler_4:
     cmd: 'npm run compile:watch'
-    cwd: './packages/skypager-devpack'
+    cwd: '<%= process.env.PWD + "/packages/skypager-devpack" %>'

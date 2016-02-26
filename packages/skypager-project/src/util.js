@@ -238,40 +238,8 @@ export function carve (dataPath, resultValue, initialValue = {}) {
   return initialValue
 }
 
-export function loadManifestFromDirectory (directory) {
-  return require('findup-sync')('package.json', {cwd: directory})
-}
-
 
 export function isDomain(value) { return value.match(DOMAIN_REGEX) }
-
-export function loadProjectFromDirectory (directory) {
-  var exists = require('fs').existsSync
-  var path = require('path')
-
-	var manifest = loadManifestFromDirectory(directory)
-
-	if (manifest.skypager && manifest.skypager.main) {
-		return require(
-			path.join(
-				directory,
-				manifest.skypager.main.replace(/^\.\//, '')
-			)
-		)
-	}
-
-  if (manifest.skypager) {
-    return require('../index').load(
-      join(directory,'package.json')
-    )
-  }
-
-	if (exists(path.join(directory, 'skypager.js'))) {
-		return require(
-			path.join(directory, 'skypager.js')
-		)
-	}
-}
 
 export function isPromise (obj) {
   return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function'
@@ -325,17 +293,72 @@ export function abort(message) {
    process.exit(1)
 }
 
-export function skypagerBabel() {
-  findPackage('babel-preset-skypager').then(path => {
-    require('babel-register')({
-      presets:[
-        require(path)
-      ]
+export function findPackageSync (packageName, root = process.env.PWD) {
+  const findModules = require('find-node-modules')
+  var path = require('path')
+
+  let moduleDirectories = findModules(root, {relative:false})
+
+  let directory = moduleDirectories.find((p) => {
+    let exists = pathExists(join(p, packageName))
+    return exists
+  })
+
+  if (!directory) {
+    try {
+      let resolvedPath = path.dirname(require.resolve(packageName))
+      return resolvedPath
+    } catch(error) {
+      console.log('Error looking up package', packageName, error.message)
+    }
+  }
+
+  return directory && path.resolve( path.join(directory, packageName))
+}
+
+export function findPackage (packageName, options = {}) {
+  return new Promise((resolve, reject) => {
+    let moduleDirectories = findModules(process.env.PWD, {relative:false})
+    let directory = moduleDirectories.find((p) => {
+      let exists = pathExists(join(p, packageName))
+      return exists
     })
+
+    if (!directory) {
+      try {
+        let resolvedPath = path.dirname(require.resolve(packageName))
+        resolve(resolvedPath)
+        return
+      } catch(error) {
+
+      }
+    }
+
+    if (!directory) { reject(packageName); }
+
+    let result = path.resolve(path.join(directory, packageName))
+
+    if(result) { resolve(result) }
   })
 }
 
+export function splitPath(p = '') {
+   return path.resolve(p).split(path.sep)
+}
+
+export function skypagerBabel() {
+  let presets = findPackageSync('babel-preset-skypager')
+
+  try {
+    presets ? require('babel-register')({presets}) : require('babel-register')
+  } catch(error) {
+    abort('Error loading the babel-register library. Do you have the babel-preset-skypager package?')
+  }
+}
+
+
 export function pathExists(fp) {
+  const fs = require('fs')
 	var fn = typeof fs.access === 'function' ? fs.accessSync : fs.statSync;
 
   try {
@@ -346,25 +369,57 @@ export function pathExists(fp) {
   }
 }
 
+export function loadProjectFromDirectory (directory, skypagerProject) {
+  var exists = pathExists
+  var path = require('path')
 
-export function findPackage (packageName, options = {}) {
-  const findModules = require('find-node-modules')
-  const path = require('path')
-  const fs = require('fs')
+  global.$skypager = global.$skypager || {}
 
-  return new Promise((resolve, reject) => {
-    let moduleDirectories = findModules(process.env.PWD, {relative:false})
-    let directory = moduleDirectories.find((p) => {
-      let exists = pathExists(join(p, packageName))
-      return exists
-    })
+  try {
+    skypagerProject = skypagerProject || ($skypager && $skypager['skypager-project'] && require($skypager['skypager-project']))
+    skypagerProject = skypagerProject ||  require('skypager-project')
+  } catch(error) {
+    console.log('There was an error attempting to load the ' + 'skypager-project'.magenta + ' package.')
+    console.log('Usually this means it is not installed or can not be found relative to the current directory')
+    console.log()
+    console.log('The exact error message we received is: '.yellow)
+    console.log(error.message)
+    console.log('stack trace: '.yellow)
+    console.log(error.stack)
+    process.exit(1)
+    return
+  }
 
-    if (!directory) { reject(packageName); }
+	var manifest = loadManifestFromDirectory(directory)
 
-    let result = path.resolve(path.join(directory, packageName))
+  if (!manifest) {
+    throw('Could not load project from ' + directory)
+  }
 
-    if(result) { resolve(result) }
-  })
+	if (manifest.skypager && manifest.skypager.main) {
+		return require(
+			path.join(
+				directory,
+				manifest.skypager.main.replace(/^\.\//, '')
+			)
+		)
+	}
+
+  if (manifest.skypager) {
+    return skypagerProject.load(
+      join(directory,'package.json')
+    )
+  }
+
+	if (exists(path.join(directory, 'skypager.js'))) {
+		return require(
+			path.join(directory, 'skypager.js')
+		)
+	}
 }
 
+
+export function loadManifestFromDirectory (directory) {
+  return require('findup-sync')('package.json', {cwd: directory})
+}
 

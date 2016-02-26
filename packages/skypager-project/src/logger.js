@@ -10,12 +10,12 @@ export function logger(project, options = {}) {
 
   let _transports = [
     new transports.File({
-      name: `project.${ env }`,
-      filename: project.path('logs', `project.${env}.log`)
+      name: `project`,
+      filename: project.path('logs', `project.log`)
     })
   ]
 
-  if (options.debug || process.env.SKYPAGER_LOGGER==='stdout') {
+  if (options.debug || process.env.SKYPAGER_DEBUG_STDOUT ==='stdout') {
     _transports.unshift( new transports.Console({ colorize: true }))
   }
 
@@ -23,6 +23,7 @@ export function logger(project, options = {}) {
     enumerable: false,
     configurable: false,
     value: new Logger({
+      level: 'debug',
       transports: _transports
     })
   })

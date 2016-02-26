@@ -9,8 +9,9 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js",
-    "compile": "babel -q -d lib src",
-    "postcompile": "npm run package:templates",
+    "test:watch": "mocha -r 'babel-register' -r 'should' --watch test/**/*-spec.js",
+    "compile": "babel -d lib src",
+    "precompile": "npm run package:templates",
     "compile:watch": "babel -q -w -d lib src",
     "package:portfolio:template": "asar pack ../skypager-template-portfolio packages/portfolio-template.asar",
     "package:project:template": "asar pack ../skypager-template-project packages/project-template.asar",
