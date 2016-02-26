@@ -1,7 +1,7 @@
 {
   "name": "skypager-server",
   "description": "skypager project server",
-  "version": "2.9.1",
+  "version": "2.9.2",
   "main": "index.js",
   "scripts": {
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
@@ -9,7 +9,7 @@
     "test": "SKYPAGER_ENV=test NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
     "pretest:watch": "SKYPAGER_ENV=development npm run test:bundle",
     "test:watch": "SKYPAGER_ENV=development NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
-    "prepublish": "npn run test && npm run compile"
+    "prepublish": "npm run compile"
   },
   "skypager": {
     "main": "skypager.js"
