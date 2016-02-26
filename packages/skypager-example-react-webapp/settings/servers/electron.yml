@@ -1,0 +1,15 @@
+deepstream:
+  host: 0.0.0.0
+  port: 9030
+
+processes:
+  deepstream:
+    cmd: 'skypager serve deepstream --profile electron'
+  webpack:
+    cmd: 'skypager dev electron'
+  bundler:
+    cmd: 'skypager export bundle --watch'
+  electron:
+    cmd: 'skypager author electron --debug'
+
+dashboard: electron

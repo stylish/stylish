@@ -1,0 +1,22 @@
+development:
+  waitForWebpack: true
+  baseUrl: 'http://localhost:3010'
+
+  panels:
+    tools:
+      url: 'http://localhost:3010/tools'
+      window:
+        left: "0%"
+        top: "0%"
+        height: "100%"
+        width: "20%"
+        frame: false
+
+    preview:
+      url: 'http://localhost:3010/preview'
+      window:
+        left: "25%"
+        top: "5%"
+        height: "90%"
+        width: "75%"
+        frame: true
