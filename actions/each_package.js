@@ -45,6 +45,12 @@ execute(function(params, context) {
   var cmd = args.shift()
   var dirname = require('path').dirname
 
+  if (cmd === 'npm' && args[0] === 'run') {
+    packages = packages.filter(pkg =>
+      args[1] && pkg.data && pkg.data.scripts && pkg.data.scripts[ args[1] ]
+    )
+  }
+
   packages.forEach(function(pkg){
     var child = require('child_process').spawn(cmd, args, {
       cwd: dirname(pkg.paths.absolute)
