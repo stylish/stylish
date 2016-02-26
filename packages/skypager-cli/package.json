@@ -30,17 +30,15 @@
   },
   "homepage": "https://github.com/skypager/skypager#readme",
   "devDependencies": {
-    "babel-preset-skypager": "^1.34.0",
     "mocha": "^2.4.5",
-    "should": "^8.2.2",
-    "skypager-cli": "."
+    "should": "^8.2.2"
   },
   "skypager": {
     "version": "2.6.1"
   },
   "dependencies": {
     "asar": "^0.10.0",
-    "babel-preset-skypager": "latest",
+    "babel-preset-skypager": "^2.7.0",
     "colors": "^1.1.2",
     "commander": "^2.9.0",
     "find-node-modules": "^1.0.1",

@@ -32,6 +32,9 @@ function handle(workspace) {
 
   if (isSkypagerElectronInstalled()) {
     skypagerElectron = process.env.SKYPAGER_ELECTRON_ROOT || $skypager && $skypager.electron || $skypager && $skypager['skypager-electron'] || require.resolve('skypager-electron');
+    console.log('INSTALLED)');
+  } else {
+    console.log('NOT INSTALLED');
   }
 
   if (!electron) {

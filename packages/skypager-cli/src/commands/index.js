@@ -89,14 +89,20 @@ export function configure (commander, options = {}) {
 
   let project
 
+  let projectFile = (
+    argv.project ||
+    findNearestPackageManifest() ||
+    process.env.PWD
+  )
+
   if (mode === 'missing_dependencies') {
     mode = 'init'
   } else {
-    project = loadProject(
-      argv.project ||
-      findNearestPackageManifest() ||
-      process.env.PWD
-    )
+    try {
+      project = loadProject(projectFile)
+    } catch(error) {
+      console.log('Error loading project', error.message)
+    }
   }
 
   let config = project && project.manifest && project.manifest.skypager
@@ -138,10 +144,8 @@ function loadProject(fromPath, silent = false) {
     return loadProjectFromDirectory(fromPath || process.env.PWD)
   } catch (error) {
     if (!silent && requestedCommand !== 'init' && requestedCommand !== 'help') {
-      console.error(
-        `Error loading skypager project. Run this from within a project directory.`.red
-      )
-      console.log(error)
+      console.error(`Error loading skypager project.`.red)
+      console.log(`Attempted to load from ${ fromPath.yellow }. Run this from within a project directory and make sure the ${ 'skypager-project'.magenta } is installed.`)
     }
   }
 }

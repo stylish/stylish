@@ -30,7 +30,13 @@ export function missingRequiredPackages() {
 
 export function checkAll() {
   keys(requiredPackages).forEach(packageName => {
-    let dir = findPackageSync(packageName)
+    let dir
+
+    try {
+      dir = findPackageSync(packageName)
+    } catch(error) {
+      console.log('Error finding Required Package ' + packageName, error)
+    }
 
     if (dir) {
       requiredPackages[packageName] = requiredPackages[packageName] ||

@@ -60,7 +60,13 @@ function missingRequiredPackages() {
 
 function checkAll() {
   keys(requiredPackages).forEach(function (packageName) {
-    var dir = (0, _util.findPackageSync)(packageName);
+    var dir = undefined;
+
+    try {
+      dir = (0, _util.findPackageSync)(packageName);
+    } catch (error) {
+      console.log('Error finding Required Package ' + packageName, error);
+    }
 
     if (dir) {
       requiredPackages[packageName] = requiredPackages[packageName] || (requiredPackages[packageName] = process.env[toEnv(packageName)] = dir);

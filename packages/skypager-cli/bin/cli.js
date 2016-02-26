@@ -1,21 +1,16 @@
 #!/usr/bin/env node
 
 var join = require('path').join
-
-require('../lib/dependencies').checkAll()
-
-$skypager['skypager-cli'] = $skypager.cli = require('../lib/util').findPackageSync('skypager-cli') || join(__dirname, '..')
+var findPackage = require('../lib/util').findPackageSync
 
 if (process.env.SKYPAGER_ENV === 'development') {
-  require('babel-register')
+  require('babel-register')({
+    presets:[
+      findPackage('babel-preset-skypager')
+    ]
+  })
 
-  require(
-    join($skypager.cli, 'src')
-  ).cli()
+  require('../src/index').cli()
 } else {
-  require('babel-register')
-
-  require(
-    join($skypager.cli, 'lib')
-  ).cli()
+  require('../lib/index').cli()
 }

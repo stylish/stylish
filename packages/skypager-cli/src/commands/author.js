@@ -28,6 +28,9 @@ export function handle(workspace, options = {}, context = {}) {
       ($skypager && $skypager.electron) ||
       ($skypager && $skypager['skypager-electron']) ||
       require.resolve('skypager-electron')
+    console.log('INSTALLED)')
+  } else {
+    console.log('NOT INSTALLED')
   }
 
   if (!electron) {

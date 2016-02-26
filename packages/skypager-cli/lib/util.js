@@ -36,6 +36,7 @@ function findPackageSync(packageName) {
   var root = arguments.length <= 1 || arguments[1] === undefined ? process.env.PWD : arguments[1];
 
   var moduleDirectories = (0, _findNodeModules2.default)(root, { relative: false });
+
   var directory = moduleDirectories.find(function (p) {
     var exists = pathExists(join(p, packageName));
     return exists;
@@ -45,10 +46,12 @@ function findPackageSync(packageName) {
     try {
       var resolvedPath = _path2.default.dirname(require.resolve(packageName));
       return resolvedPath;
-    } catch (error) {}
+    } catch (error) {
+      console.log('Error looking up package', packageName, error.message);
+    }
   }
 
-  return _path2.default.resolve(_path2.default.join(directory, packageName));
+  return directory && _path2.default.resolve(_path2.default.join(directory, packageName));
 }
 
 function findPackage(packageName) {
@@ -88,13 +91,13 @@ function splitPath() {
 }
 
 function skypagerBabel() {
-  findPackage('babel-preset-skypager').then(function (path) {
-    require('babel-register')({
-      presets: [require(path)]
-    });
-  }, function (err) {
-    console.log('Missing the babel-preset-skypager project');
-  });
+  var presets = findPackageSync('babel-preset-skypager');
+
+  try {
+    presets ? require('babel-register')({ presets: presets }) : require('babel-register');
+  } catch (error) {
+    abort('Error loading the babel-register library. Do you have the babel-preset-skypager package?');
+  }
 }
 
 function pathExists(fp) {
@@ -109,10 +112,23 @@ function pathExists(fp) {
 }
 
 function loadProjectFromDirectory(directory, skypagerProject) {
-  var exists = require('fs').existsSync;
+  var exists = require('path-exists');
   var path = require('path');
 
-  skypagerProject = skypagerProject || require('skypager-project');
+  try {
+    skypagerProject = skypagerProject || $skypager && $skypager['skypager-project'] && require($skypager['skypager-project']);
+    skypagerProject = skypagerProject || require('skypager-project');
+  } catch (error) {
+    console.log('There was an error attempting to load the ' + 'skypager-project'.magenta + ' package.');
+    console.log('Usually this means it is not installed or can not be found relative to the current directory');
+    console.log();
+    console.log('The exact error message we received is: '.yellow);
+    console.log(error.message);
+    console.log('stack trace: '.yellow);
+    console.log(error.stack);
+    process.exit(1);
+    return;
+  }
 
   var manifest = loadManifestFromDirectory(directory);
 

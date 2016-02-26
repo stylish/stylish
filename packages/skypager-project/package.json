@@ -18,7 +18,7 @@
     "lint:fix": "npm run lint -- --fix",
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
     "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
-    "prepublish": "npn run test && npm run compile"
+    "prepublish": "npm run test && npm run compile"
   },
   "repository": {
     "type": "git",
