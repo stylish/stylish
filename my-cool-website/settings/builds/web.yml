@@ -1,4 +1,0 @@
-theme: dashboard
-contentHash: false
-entryPoints:
-  app: ./src/app.js

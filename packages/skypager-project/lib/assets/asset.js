@@ -325,7 +325,7 @@ var Asset = (function () {
   }, {
     key: 'dirname',
     get: function get() {
-      return (0, _path.dirname)(this.uri);
+      return (0, _path.dirname)(this.paths.absolute);
     }
   }, {
     key: 'extension',

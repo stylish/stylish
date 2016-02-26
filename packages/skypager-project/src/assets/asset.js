@@ -167,7 +167,7 @@ class Asset {
   }
 
   get dirname () {
-    return dirname(this.uri)
+    return dirname(this.paths.absolute)
   }
 
   get extension () {
