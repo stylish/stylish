@@ -30,6 +30,7 @@
   "author": "Jonathan Soeder <jon@chicago.com",
   "license": "SEE LICENSE IN License.md",
   "scripts": {
-    "start": "skypager serve web"
+    "start": "skypager serve web",
+    "preversion": "lerna publish && git add -A && git commit -m 'bumping version' && npm version"
   }
 }
