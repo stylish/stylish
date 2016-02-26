@@ -18,8 +18,7 @@
     "lint:fix": "npm run lint -- --fix",
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
     "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
-    "preversion": "SKYPAGER_ENV=test NODE_ENV=test npm run pretest && mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
-    "version": "npm run compile && git add -A lib"
+    "prepublish": "npn run test && npm run compile"
   },
   "repository": {
     "type": "git",

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js",
-    "start": "skypager serve web"
+    "start": "skypager serve web",
+    "deploy": "skypager publish web"
   },
   "author": "Jon Soeder <jon@chicago.com>",
   "license": "SEE LICENSE IN License.md",

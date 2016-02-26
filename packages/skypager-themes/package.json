@@ -15,7 +15,8 @@
     "test": "exit 0",
     "build:clean": "rm -rf lib dist",
     "build": "npm run build:clean && npm run test && npm run compile",
-    "compile": "NODE_ENV=production babel -q -d lib src"
+    "compile": "babel -q -d lib src",
+    "prepublish": "npm run compile && git add . -A"
   },
   "author": "Jonathan Soeder <jon@chicago.com>",
   "license": "UNLICENSED",
