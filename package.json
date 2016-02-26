@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "2.10.3",
+  "version": "2.11.0",
   "description": "skypager: cloud publishing framework",
   "skypager": {
     "main": "skypager.js"
@@ -10,7 +10,7 @@
     "async": "^1.5.2",
     "pad": "^1.0.0",
     "progress": "^1.1.8",
-    "skypager-cli": "^2.10.3",
+    "skypager-cli": "^2.11.0",
     "babel-preset-skypager": "^2.7.3",
     "skypager-cli": "^2.10.2",
     "skypager-devpack": "^2.10.2",
@@ -18,7 +18,7 @@
     "skypager-plugin-blueprints": "^2.9.0",
     "skypager-plugin-integrations": "^2.9.0",
     "skypager-project": "^2.10.3",
-    "skypager-server": "^2.9.2",
+    "skypager-server": "^2.1.0",
     "skypager-themes": "^2.9.1"
   },
   "devDependencies": {
