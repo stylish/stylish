@@ -12,11 +12,8 @@
   "license": "SEE LICENSE IN License.md",
   "skypager": {
     "main": "skypager.js",
-    "presets": [
-      "web"
-    ],
-    "workspaces": [
-      "main"
+    "provides":[ 
+      "project-template"
     ]
   },
   "dependencies": {

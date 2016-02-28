@@ -50,10 +50,10 @@ panels:
   comp3:
     left: "1%"
     type: 'log'
-    top: "50%"
+    top: "65%"
     width: "30%"
     height: "30%"
-    process: 'compiler_3'
+    process: 'compiler_4'
     label: 'Server Build'
     borderStyles:
       type: line

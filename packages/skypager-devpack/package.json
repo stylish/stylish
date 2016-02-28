@@ -57,6 +57,12 @@
     "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
     "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js"
   },
+
+  "skypager": {
+    "main": "skypager.js",
+    "provides":["support", "devtools"]
+  },
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/skypager/superdevpack.git"

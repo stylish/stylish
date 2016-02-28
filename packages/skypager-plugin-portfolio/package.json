@@ -22,6 +22,19 @@
     "url": "https://github.com/skypager/skypager/issues"
   },
   "homepage": "https://github.com/skypager/skypager#readme",
+  "skypager": {
+    "main": "skypager.js",
+    "provides":[
+      "plugin",
+      "plugin:integrations",
+      "actions",
+      "models",
+      "settings",
+      "importers",
+      "exporters"
+    ]
+  },
+
   "dependencies": {
     "skypager-project": "latest",
     "lodash": "^4.5.0",

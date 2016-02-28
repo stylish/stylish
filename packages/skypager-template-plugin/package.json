@@ -1,7 +1,7 @@
 {
-  "name": "skypager-ui",
+  "name": "skypager-plugin-template",
   "version": "2.5.0",
-  "description": "a collection of layouts and ui components compatible with skypager-themes, based on react and react-bootstrap",
+  "description": "a skypager plugin template",
   "main": "index.js",
   "scripts": {
     "test": "exit 0"
@@ -23,8 +23,7 @@
     "lodash": "^4.5.0",
   },
   "peerDependencies":{
-    "skypager-project": "latest",
-    "skypager-devpack": "latest"
+    "skypager-project": "latest"
   },
   "devDependencies": {
     "babel-preset-skypager": "latest"
@@ -32,9 +31,7 @@
   "skypager":{
      "main": "skypager.js",
      "provides":[
-       "ui:layouts",
-       "ui:components",
-       "devtools"
+       "project-template"
      ]
   }
 }

@@ -35,7 +35,8 @@
     "should": "^8.2.2"
   },
   "skypager": {
-    "version": "2.6.1"
+    "main": "skypager.js",
+    "provides":["core", "devtools"]
   },
   "dependencies": {
     "asar": "^0.10.0",

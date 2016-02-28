@@ -22,7 +22,9 @@
     "url": "https://github.com/skypager/skypager-electron"
   },
   "skypager": {
-    "main": "skypager.js"
+    "main": "skypager.js",
+    "provides":["support","devtools"],
+    "platforms":["electron"]
   },
   "dependencies": {
     "child-process-promise": "^1.1.0",

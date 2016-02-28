@@ -12,7 +12,11 @@
     "prepublish": "npm run compile"
   },
   "skypager": {
-    "main": "skypager.js"
+    "main": "skypager.js",
+    "provides":[
+      "support",
+      "devtools"
+    ]
   },
   "license": "UNLICENSED",
   "repository": {

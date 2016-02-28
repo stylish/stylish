@@ -34,7 +34,10 @@
   },
   "homepage": "https://github.com/architects/skypager#readme",
   "skypager": {
-    "main": "test/fixture/index.js"
+    "main": "test/fixture/index.js",
+    "provides":[
+       "required"
+    ]
   },
   "dependencies": {
     "babel-polyfill": "^6.3.13",

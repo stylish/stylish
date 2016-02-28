@@ -12,12 +12,7 @@
   "license": "SEE LICENSE IN License.md",
   "skypager": {
     "main": "skypager.js",
-    "presets": [
-      "web"
-    ],
-    "workspaces": [
-      "main"
-    ]
+    "provides":["webapp"]
   },
   "devDependencies": {
     "skypager-project": "latest",

@@ -12,12 +12,19 @@
   },
   "skypager": {
     "main": "skypager.js",
-    "paths": {
-      "models": "src/models"
-    }
+    "provides":[
+      "plugin",
+      "plugin:integrations",
+      "actions",
+      "models",
+      "settings",
+      "importers",
+      "exporters"
+    ]
   },
   "devDependencies": {
     "mocha": "^2.3.4",
+    "should": "^8.0.0",
     "babel-preset-skypager": "^2.2.1"
   }
 }

@@ -10,14 +10,11 @@
   },
   "author": "Jon Soeder <jon@chicago.com>",
   "license": "SEE LICENSE IN License.md",
-  "skypager": {
-    "main": "skypager.js",
-    "presets": [
-      "web"
-    ],
-    "workspaces": [
-      "main"
-    ]
+  "skypager":{
+     "main": "skypager.js",
+     "provides":[
+       "project-template"
+     ]
   },
   "devDependencies": {
     "skypager-project": "latest",

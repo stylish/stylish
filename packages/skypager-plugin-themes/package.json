@@ -1,7 +1,7 @@
 {
-  "name": "skypager-plugin-portfolio",
+  "name": "skypager-plugin-themes",
   "version": "2.5.0",
-  "description": "a skypager project aggregator ",
+  "description": "a plugin for projects which provide themes",
   "main": "index.js",
   "scripts": {
     "test": "exit 0"
@@ -11,10 +11,7 @@
     "url": "git+https://github.com/skypager/skypager.git"
   },
   "keywords": [
-    "skypager",
-    "project",
-    "portfolio",
-    "manager"
+    "skypager"
   ],
   "author": "Jonathan Soeder <jon@chicago.com>",
   "license": "UNLICENSED",
@@ -22,12 +19,6 @@
     "url": "https://github.com/skypager/skypager/issues"
   },
   "homepage": "https://github.com/skypager/skypager#readme",
-  "dependencies": {
-    "skypager-project": "latest",
-    "lodash": "^4.5.0",
-    "blessed": "latest",
-    "blessed-contrib": "latest"
-  },
   "devDependencies": {
     "babel-preset-skypager": "latest"
   }
