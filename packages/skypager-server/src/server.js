@@ -75,7 +75,7 @@ export class Server {
           new winston.transports.File({
             name: 'server-log',
             filename: join(server.paths.logs, `server.${env}.log`),
-            level: this.debug ? 'debug' : 'info',
+            level: this.debug ? 'debug' : 'debug',
             colorize: true
           })
         )
@@ -118,7 +118,7 @@ export class Server {
 
     let app = express(this, options)
 
-    this.log('info', 'express app starting', options)
+    this.log('debug', 'express app starting', options)
 
     app.listen(options.port, options.host, (err) => {
       if(err) {
@@ -176,7 +176,7 @@ export class Server {
       this.log('error', 'uncaught exception: shutting down...')
 
       values(this._processes).forEach(proc => {
-        this.log('info', 'killing child process', proc && proc.pid)
+        this.log('debug', 'killing child process', proc && proc.pid)
 
         if(proc) {
           proc.kill()
@@ -187,17 +187,17 @@ export class Server {
     })
 
     process.on('exit', () => {
-      this.log('info', 'shutting down...')
+      this.log('debug', 'shutting down...')
 
       values(this._processes).forEach(proc => {
-        this.log('info', 'killing child process', proc && proc.pid)
+        this.log('debug', 'killing child process', proc && proc.pid)
         if(proc) {
           proc.kill()
         }
       })
     })
 
-    this.log('info', 'server started: ' + process.pid, this.processes)
+    this.log('debug', 'server started: ' + process.pid, this.processes)
 
     process.title = 'skypager-server'
   }

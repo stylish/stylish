@@ -35,14 +35,11 @@ export function express(server, options = {}) {
     )
   }
 
-  app.use(
-    _express.static(server.paths.public)
-  )
 
   if (config.api) {
     setupExpressAPI(
       app,
-      defaults({}, config.api,{ }),
+      config.api || {},
       server
     )
   }
@@ -54,6 +51,10 @@ export function express(server, options = {}) {
        server
      )
   }
+
+  app.use(
+    _express.static(server.paths.public)
+  )
 
   return app
 }
@@ -102,6 +103,10 @@ function setupDeepstreamProxy(app, { path='/engine.io', host, port, proto='http'
   )
 }
 
-function setupExpressApi(){
-
+function setupExpressApi(app, config = {}, server){
+  app.post('/test/action', (req, res) => {
+    res.json({
+      ok: true
+    })
+  })
 }

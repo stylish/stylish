@@ -116,7 +116,7 @@ var Server = exports.Server = (function () {
         t.push(new _winston2.default.transports.File({
           name: 'server-log',
           filename: (0, _path.join)(server.paths.logs, 'server.' + env + '.log'),
-          level: this.debug ? 'debug' : 'info',
+          level: this.debug ? 'debug' : 'debug',
           colorize: true
         }));
 
@@ -161,7 +161,7 @@ var Server = exports.Server = (function () {
 
       var app = (0, _express.express)(this, options);
 
-      this.log('info', 'express app starting', options);
+      this.log('debug', 'express app starting', options);
 
       app.listen(options.port, options.host, function (err) {
         if (err) {
@@ -215,7 +215,7 @@ var Server = exports.Server = (function () {
         _this2.log('error', 'uncaught exception: shutting down...');
 
         (0, _lodash.values)(_this2._processes).forEach(function (proc) {
-          _this2.log('info', 'killing child process', proc && proc.pid);
+          _this2.log('debug', 'killing child process', proc && proc.pid);
 
           if (proc) {
             proc.kill();
@@ -226,17 +226,17 @@ var Server = exports.Server = (function () {
       });
 
       process.on('exit', function () {
-        _this2.log('info', 'shutting down...');
+        _this2.log('debug', 'shutting down...');
 
         (0, _lodash.values)(_this2._processes).forEach(function (proc) {
-          _this2.log('info', 'killing child process', proc && proc.pid);
+          _this2.log('debug', 'killing child process', proc && proc.pid);
           if (proc) {
             proc.kill();
           }
         });
       });
 
-      this.log('info', 'server started: ' + process.pid, this.processes);
+      this.log('debug', 'server started: ' + process.pid, this.processes);
 
       process.title = 'skypager-server';
     }

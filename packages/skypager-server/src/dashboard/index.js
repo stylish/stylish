@@ -30,7 +30,7 @@ function dashboard(server, options) {
 
   server.panels = renderPanels(screen, options)
 
-  console.log('Options Panels', options.panels)
+  project.debug('launching dashboard with panels', options)
 
   mapValues(options.panels, (panel, key) => {
     if (panel.type === 'log' && panel.process) {

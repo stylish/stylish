@@ -52,15 +52,15 @@ function express(server) {
     }), server);
   }
 
-  app.use(_express3.default.static(server.paths.public));
-
   if (config.api) {
-    setupExpressAPI(app, (0, _defaults2.default)({}, config.api, {}), server);
+    setupExpressAPI(app, config.api || {}, server);
   }
 
   if (config.webpack) {
     setupWebpackProxy(app, config.webpack, server);
   }
+
+  app.use(_express3.default.static(server.paths.public));
 
   return app;
 }
@@ -128,4 +128,13 @@ function setupDeepstreamProxy(app, _ref3, server) {
   }));
 }
 
-function setupExpressApi() {}
+function setupExpressApi(app) {
+  var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var server = arguments[2];
+
+  app.post('/test/action', function (req, res) {
+    res.json({
+      ok: true
+    });
+  });
+}

@@ -55,7 +55,7 @@ function dashboard(server, options) {
 
   server.panels = renderPanels(screen, options);
 
-  console.log('Options Panels', options.panels);
+  project.debug('launching dashboard with panels', options);
 
   (0, _mapValues2.default)(options.panels, function (panel, key) {
     if (panel.type === 'log' && panel.process) {
