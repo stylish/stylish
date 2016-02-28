@@ -1,6 +1,6 @@
 {
   "name": "skypager-project",
-  "version": "2.12.0",
+  "version": "2.13.0",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
   "bin": {
@@ -35,8 +35,8 @@
   "homepage": "https://github.com/architects/skypager#readme",
   "skypager": {
     "main": "test/fixture/index.js",
-    "provides":[
-       "required"
+    "provides": [
+      "required"
     ]
   },
   "dependencies": {

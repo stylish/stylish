@@ -1,6 +1,6 @@
 {
   "name": "skypager-plugin-themes",
-  "version": "2.5.0",
+  "version": "2.13.0",
   "description": "a plugin for projects which provide themes",
   "main": "index.js",
   "scripts": {

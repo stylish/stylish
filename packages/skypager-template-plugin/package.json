@@ -1,6 +1,6 @@
 {
   "name": "skypager-plugin-template",
-  "version": "2.5.0",
+  "version": "2.13.0",
   "description": "a skypager plugin template",
   "main": "index.js",
   "scripts": {
@@ -20,18 +20,18 @@
   },
   "homepage": "https://github.com/skypager/skypager#readme",
   "dependencies": {
-    "lodash": "^4.5.0",
+    "lodash": "^4.5.0"
   },
-  "peerDependencies":{
+  "peerDependencies": {
     "skypager-project": "latest"
   },
   "devDependencies": {
     "babel-preset-skypager": "latest"
   },
-  "skypager":{
-     "main": "skypager.js",
-     "provides":[
-       "project-template"
-     ]
+  "skypager": {
+    "main": "skypager.js",
+    "provides": [
+      "project-template"
+    ]
   }
 }

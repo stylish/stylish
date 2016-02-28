@@ -1,6 +1,6 @@
 {
   "name": "skypager-plugin-portfolio",
-  "version": "2.5.0",
+  "version": "2.13.0",
   "description": "a skypager project aggregator ",
   "main": "index.js",
   "scripts": {
@@ -24,7 +24,7 @@
   "homepage": "https://github.com/skypager/skypager#readme",
   "skypager": {
     "main": "skypager.js",
-    "provides":[
+    "provides": [
       "plugin",
       "plugin:integrations",
       "actions",
@@ -34,7 +34,6 @@
       "exporters"
     ]
   },
-
   "dependencies": {
     "skypager-project": "latest",
     "lodash": "^4.5.0",
