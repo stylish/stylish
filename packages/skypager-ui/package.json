@@ -1,0 +1,11 @@
+{
+  "name": "skypager-ui",
+  "version": "2.10.0",
+  "description": "skypager ui components",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
