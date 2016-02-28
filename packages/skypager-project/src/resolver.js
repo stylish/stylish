@@ -1,12 +1,33 @@
-import { singularize, keys, assign } from './util'
+/**
+ * The resolver is responsible for mapping short hand aliases and reference
+ * used throughout our assets, and especially documents, to the appropriate
+ * helpers or assets within the project.
+ *
+ * Documents are resolved to a modelClass first by analyzing the parent folder
+ * they belong to, then their YAML frontmatter by looking for a type property.
+ *
+ * In certain cases where neither of the above are convenient, regex patterns can
+ * be defined which will map a path to the appropriate model.
+ */
+import { defaults, singularize } from './util'
+
+const { keys, assign } = Object
 
 module.exports = function createResolver () {
   let project = this
-	    let options = project.options.resolver || project.options || {}
+  let options = project.options.resolver || project.settings.resolver || project.options || {}
 
-	    let asset 	= (options.assetResolver || assetResolver).bind(project)
-	    let link 		= (options.linkResolver || linkResolver).bind(project)
-	    let model 	= (options.modelResolver || modelResolver).bind(project)
+  defaults(options, {
+    modelPatterns: {}
+  })
+
+  if (project.get('settings.resolver.modelPatterns')) {
+    options.modelPatterns = assign(options.modelPatterns, project.get('settings.resolver.modelPatterns'))
+  }
+
+  let asset 	= (options.assetResolver || assetResolver).bind(project)
+  let link 		= (options.linkResolver || linkResolver).bind(project)
+  let model 	= (options.modelResolver || modelResolver).bind(project)
 
   let patterns = {
     models: addInterface({}),
@@ -14,13 +35,12 @@ module.exports = function createResolver () {
     assets: addInterface({})
   }
 
-  if (options.modelPatterns) {
-    Object.keys(options.modelPatterns).forEach((result, pattern) => {
+  keys(options.modelPatterns)
+    .forEach((result, pattern) => {
       if (pattern = options.modelPatterns[result]) {
         patterns.models.add(pattern, result)
       }
     })
-  }
 
   return {
     asset,
@@ -36,6 +56,10 @@ function addInterface (cache) {
     items: {},
 
     add (pattern, result) {
+      if (typeof pattern === 'string') {
+        pattern = new RegExp(pattern)
+      }
+
       assign(cache.items, {
         get [result] () {
           return pattern
@@ -86,7 +110,9 @@ function modelResolver (subject, options = {}) {
   if (typeof (subject) !== 'string' && subject.uri) {
     if (subject && subject.type) { guesses.push(subject.type) }
     if (subject && subject.groupName) { guesses.push(subject.groupName) }
+    guesses.push(subject.dirname)
     guesses.push(subject.uri)
+    guesses.push(subject.parentdir)
   }
 
   let found
@@ -109,12 +135,12 @@ function modelResolver (subject, options = {}) {
 * determines the values to be used for href in markdown link tags. generally depends on hosting environment.
 */
 function linkResolver (original, options = {}) {
-	    return original
+  return original
 }
 
 /**
 * determines the value to be used for asset urls. generally depends on the hosting environment
 */
 function assetResolver (original, options = {}) {
-	    return original
+  return original
 }

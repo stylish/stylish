@@ -10,6 +10,8 @@ const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
 
 const { defineProperties } = Object
 
+const { singularize, pluralize } = util
+
 import pick from 'lodash/pick'
 
 class Asset {
@@ -42,7 +44,19 @@ class Asset {
     this.lazy('parsed', () => this.parse(this.raw))
     this.lazy('indexed', () => this.index(this.parsed, this))
     this.lazy('transformed', () => this.transform(this.indexed, this))
+    this.lazy('data', this.getData, true)
+  }
 
+  getData() {
+    return this.frontmatter || {}
+  }
+
+  get metadata() {
+    return this.frontmatter
+  }
+
+  get frontmatter() {
+    return {}
   }
 
   generateId() {
@@ -127,6 +141,14 @@ class Asset {
     return this.transformer && this.transformer(this.indexed, this)
   }
 
+  get modelClass () {
+    return this.project.resolve.model(this)
+  }
+
+  get modelDefiniton () {
+    return this.modelClass && this.modelClass.definition
+  }
+
   get cacheKey () {
     return [this.id, this.fingerprint.substr(0, 6)].join('-')
   }
@@ -152,6 +174,15 @@ class Asset {
   }
 
   contentDidChange (asset) {
+
+  }
+
+  get type() {
+    return singularize(this.paths.relative.split('/')[0])
+  }
+
+  get groupName() {
+    return pluralize(this.paths.relative.split('/')[0])
   }
 
   get assetClass () {
@@ -259,14 +290,6 @@ class Asset {
       assetClass,
       ...options
     })
-  }
-
-  static get groupName () {
-    return util.pluralize(this.typeAlias)
-  }
-
-  static get typeAlias () {
-    return util.singularize(util.tabelize(this.name))
   }
 }
 

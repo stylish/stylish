@@ -1,4 +1,4 @@
-var PROJECT_MODELS = ['changelog','community_plugin','example','inspiration','testcase']
+var PROJECT_MODELS = ['changelog','community_plugin','example','inspiration','testcase','layout','entry_point']
 
 function resolve(model){ return require.resolve('./' + model) }
 

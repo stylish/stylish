@@ -86,14 +86,6 @@ class Document extends Asset {
     return this.modelClass && this.modelClass.definition
   }
 
-  get metadata() {
-      return this.frontmatter
-  }
-
-  get data () {
-      return this.frontmatter || {}
-  }
-
   get relatedData () {
     let relData = { }
 
@@ -127,8 +119,7 @@ class Document extends Asset {
       return this.frontmatter.type
     }
 
-    let relativePath = this.paths.relative
-    if (relativePath.match('/')) { return singularize(relativePath.split('/')[0]) }
+    return singularize(this.paths.relative.split('/')[0] || 'document')
   }
 
   get groupName () {
@@ -136,8 +127,7 @@ class Document extends Asset {
       return this.frontmatter.group
     }
 
-    let relativePath = this.paths.relative
-    if (relativePath.match('/')) { return pluralize(relativePath.split('/')[0]) }
+    return pluralize(this.paths.relative.split('/')[0] || 'document')
   }
 
 
