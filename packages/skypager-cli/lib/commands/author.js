@@ -14,6 +14,8 @@ var _path = require('path');
 
 var _util = require('../util');
 
+var _yargs = require('yargs');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function author(program, dispatch) {
@@ -32,10 +34,7 @@ function handle(workspace) {
 
   if (isSkypagerElectronInstalled()) {
     skypagerElectron = process.env.SKYPAGER_ELECTRON_ROOT || $skypager && $skypager.electron || $skypager && $skypager['skypager-electron'] || require.resolve('skypager-electron');
-    console.log('INSTALLED)');
-  } else {
-    console.log('NOT INSTALLED');
-  }
+  } else {}
 
   if (!electron) {
     abort('make sure electron-prebuilt is available.  You can specify a path manually via the ELECTRON_PREBUILT_PATH env var');
@@ -56,6 +55,9 @@ function handle(workspace) {
   }
 
   var proc = require('child_process').spawn(electron, [skypagerElectron].concat(authorArgs), {
+    env: assign(process.env, {
+      ELECTRON_ENABLE_LOGGING: true
+    }),
     stdio: [process.stdin, process.stdout, process.stderr]
   });
 }

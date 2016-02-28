@@ -1,6 +1,7 @@
 import colors from 'colors'
 import { resolve } from 'path'
 import { pathExists } from '../util'
+import { argv } from 'yargs'
 
 export function author (program, dispatch) {
   program
@@ -28,9 +29,7 @@ export function handle(workspace, options = {}, context = {}) {
       ($skypager && $skypager.electron) ||
       ($skypager && $skypager['skypager-electron']) ||
       require.resolve('skypager-electron')
-    console.log('INSTALLED)')
   } else {
-    console.log('NOT INSTALLED')
   }
 
   if (!electron) {
@@ -55,6 +54,9 @@ export function handle(workspace, options = {}, context = {}) {
     electron,
     [ skypagerElectron ].concat(authorArgs),
     {
+      env: assign(process.env,{
+        ELECTRON_ENABLE_LOGGING: true,
+      }),
       stdio:[
         process.stdin,
         process.stdout,
