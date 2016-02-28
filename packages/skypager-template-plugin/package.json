@@ -1,5 +1,5 @@
 {
-  "name": "skypager-plugin-template",
+  "name": "skypager-template-plugin",
   "version": "2.13.0",
   "description": "a skypager plugin template",
   "main": "index.js",
