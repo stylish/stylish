@@ -13,7 +13,7 @@ development:
         frame: false
 
     preview:
-      url: 'http://localhost:3010/preview'
+      url: 'http://localhost:3000/'
       window:
         left: "25%"
         top: "5%"

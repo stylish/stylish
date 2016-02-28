@@ -5,12 +5,25 @@ panels:
     top: "1%"
     left: "1%"
     width: "48%"
-    height: "98%"
+    height: "48%"
     script: electron/dashboard
     process: webpack
     borderStyles:
       color: magenta
       type: line
+
+  devserver_2:
+    type: log
+    label: Build
+    top: "50%"
+    left: "1%"
+    width: "48%"
+    height: "48%"
+    process: webpack_2
+    borderStyles:
+      color: green
+      type: line
+
   center:
     type: log
     label: Actions
@@ -18,8 +31,7 @@ panels:
     left: "51%"
     width: "48%"
     height: "98%"
-    script: electron/dashboard
-    process: electron
+    process: project_log
     borderStyles:
       color: cyan
       type: line

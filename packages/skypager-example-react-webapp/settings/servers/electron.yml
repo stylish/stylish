@@ -7,9 +7,13 @@ processes:
     cmd: 'skypager serve deepstream --profile electron'
   webpack:
     cmd: 'skypager dev electron'
+  webpack_2:
+    cmd: 'skypager dev web'
   bundler:
     cmd: 'skypager export bundle --watch'
   electron:
     cmd: 'skypager author electron --debug'
+  project_log:
+    cmd: 'tail -f log/project.log'
 
 dashboard: electron
