@@ -22,13 +22,15 @@
     "url": "https://github.com/skypager/skypager-electron"
   },
   "skypager": {
-    "entry": "author-app/index.js"
+    "main": "skypager.js"
   },
   "dependencies": {
     "child-process-promise": "^1.1.0",
     "electron-packager": "^5.2.1",
     "electron-prebuilt": "^0.36.7",
     "electron-rebuild": "^1.1.1",
+    "event-stream": "^3.3.2",
+    "lodash": "^4.5.0",
     "openport": "0.0.4",
     "winston": "^2.2.0"
   },

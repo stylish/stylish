@@ -37,6 +37,10 @@ var _winston = require('winston');
 
 var _winston2 = _interopRequireDefault(_winston);
 
+var _eventStream = require('event-stream');
+
+var _eventStream2 = _interopRequireDefault(_eventStream);
+
 var _reduxThunk = require('redux-thunk');
 
 var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
@@ -83,8 +87,6 @@ var Application = exports.Application = (function () {
 			throw 'Please ensure your project has settings data. data/settings/workspaces.yml for example.';
 		}
 
-		this.project = project;
-
 		var settings = project.settings;
 
 		options = (0, _defaultsDeep2.default)(options, {
@@ -106,17 +108,17 @@ var Application = exports.Application = (function () {
 
 		setupAppHome(options.paths);
 
-		this.paths.actionStream = (0, _path.join)(this.paths.appLogs, this.id + '-actions.json');
+		this.paths.actionLog = (0, _path.join)(this.paths.appLogs, this.id + '-actions.json');
 
 		hide({
-			actionLogger: new _winston2.default.Logger({
+			store: setupStore(),
+			logger: new _winston2.default.Logger({
 				level: 'debug',
 				transports: [new _winston2.default.transports.File({
-					filename: this.paths.actionStream,
+					filename: this.paths.actionLog,
 					json: true
 				})]
-			}),
-			store: setupStore()
+			})
 		});
 
 		if (!this.settings.workspaces) {
@@ -132,9 +134,18 @@ var Application = exports.Application = (function () {
 				}
 			});
 		}
+
+		this.setupProjectStream();
 	}
 
 	(0, _createClass3.default)(Application, [{
+		key: 'setupProjectStream',
+		value: function setupProjectStream() {
+			(0, _fs.createReadStream)(this.project.path('logs', 'project.log')).pipe(_eventStream2.default.split()).pipe(_eventStream2.default.parse()).pipe(_eventStream2.default.map(function (obj, cb) {
+				cb(null, obj);
+			}));
+		}
+	}, {
 		key: 'sendMessage',
 		value: function sendMessage(panel, message, payload) {
 			var win = this.browserWindows[panel];
@@ -156,13 +167,12 @@ var Application = exports.Application = (function () {
 				win.webContents.send('skypager:message', 'application:dispatch', action);
 			});
 
-			this.logAction(action);
-
+			this.project.log('debug', action);
 			return this.store.dispatch(action);
 		}
 	}, {
 		key: 'boot',
-		value: function boot() {
+		value: function boot(app) {
 			this.store.subscribe(this.onStateChange.bind(this));
 
 			this.workspace = this.createWorkspace(this.argv.workspace && this.project.settings.workspaces[this.argv.workspace] ? this.argv.workspace : 'main');
@@ -184,14 +194,18 @@ var Application = exports.Application = (function () {
 			return Workspace.provision(this, options);
 		}
 	}, {
-		key: 'logAction',
-		value: function logAction(action) {
-			this.actionLogger.log('debug', action);
+		key: 'restoreFocus',
+		value: function restoreFocus() {
+			this.eachBrowserWindow(function (win) {
+				win.isMinimized() ? win.restore() : null;
+			});
 		}
 	}, {
 		key: 'onStateChange',
 		value: function onStateChange() {
 			this.snapshotState();
+
+			// this makes it available to the renderer processes via require('remote').getGlobal()
 			global.SkypagerElectronAppState = (0, _stringify2.default)(this.state);
 
 			_electron.BrowserWindow.getAllWindows().forEach(function (win) {
@@ -201,9 +215,7 @@ var Application = exports.Application = (function () {
 	}, {
 		key: 'snapshotState',
 		value: function snapshotState() {
-			if (this.paths && this.paths.appData) {
-				(0, _fs.writeFileSync)((0, _path.join)(this.paths.appData, this.id + '-electron-state.json'), (0, _stringify2.default)(this.state, null, 2), 'utf8');
-			}
+			(0, _fs.writeFileSync)((0, _path.join)(this.project.path('tmpdir'), this.id + '-electron-state.json'), (0, _stringify2.default)(this.state, null, 2), 'utf8');
 		}
 	}, {
 		key: 'primaryDisplay',
@@ -324,9 +336,4 @@ function mainWorkspaceConfig(project) {
 			}
 		}
 	};
-}
-
-function stream(path) {
-	var fd = require('fs').openSync(path, 'a+');
-	return (0, _fs.createWriteStream)(path, { fd: fd });
 }

@@ -1,8 +1,9 @@
 import { hideProperties } from './util'
 import { join, resolve } from 'path'
-import { writeFileSync as write, createWriteStream as createStream } from 'fs'
+import { writeFileSync as write, createReadStream as stream } from 'fs'
 import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
 import winston from 'winston'
+import es from 'event-stream'
 
 import thunk from 'redux-thunk'
 
@@ -22,8 +23,6 @@ export class Application {
 		if (!project || !project.settings) {
 			throw('Please ensure your project has settings data. data/settings/workspaces.yml for example.')
 		}
-
-		this.project = project
 
 		let settings = project.settings
 
@@ -46,19 +45,19 @@ export class Application {
 
 		setupAppHome(options.paths)
 
-		this.paths.actionStream = join(this.paths.appLogs, `${ this.id }-actions.json`)
+		this.paths.actionLog = join(this.paths.appLogs, `${ this.id }-actions.json`)
 
 		hide({
-			actionLogger: new (winston.Logger)({
+			store: setupStore(),
+			logger: new (winston.Logger)({
 				level: 'debug',
 				transports:[
 					new (winston.transports.File)({
-						filename: this.paths.actionStream,
+						filename: this.paths.actionLog,
 						json: true
 					})
 				]
 			}),
-			store: setupStore()
 		})
 
 		if (!this.settings.workspaces) {
@@ -74,7 +73,18 @@ export class Application {
 				}
 			})
 		}
+
+		this.setupProjectStream()
   }
+
+	setupProjectStream() {
+		stream(this.project.path('logs','project.log'))
+		.pipe(es.split())
+		.pipe(es.parse())
+		.pipe(es.map((obj, cb) => {
+			cb(null, obj)
+		}))
+	}
 
 	sendMessage(panel, message, payload) {
 		let win = this.browserWindows[panel]
@@ -113,12 +123,11 @@ export class Application {
 			win.webContents.send('skypager:message', 'application:dispatch', action)
 		})
 
-		this.logAction(action)
-
+		this.project.log('debug', action)
 		return this.store.dispatch(action)
 	}
 
-	boot () {
+	boot (app) {
 		this.store.subscribe(this.onStateChange.bind(this))
 
 		this.workspace = this.createWorkspace(
@@ -138,14 +147,16 @@ export class Application {
 		return Workspace.provision(this, options)
 	}
 
-	logAction (action) {
-		this.actionLogger.log('debug',
-			action
-		)
+	restoreFocus() {
+		this.eachBrowserWindow(win => {
+			win.isMinimized() ? win.restore() : null
+		})
 	}
 
 	onStateChange() {
 		this.snapshotState()
+
+		// this makes it available to the renderer processes via require('remote').getGlobal()
 		global.SkypagerElectronAppState = JSON.stringify(this.state)
 
 		BrowserWindow.getAllWindows().forEach(win => {
@@ -154,13 +165,11 @@ export class Application {
 	}
 
 	snapshotState () {
-		if (this.paths && this.paths.appData) {
-			write(
-				join(this.paths.appData, `${ this.id }-electron-state.json`),
-				JSON.stringify(this.state, null, 2),
-				'utf8'
-			)
-		}
+		write(
+			join(this.project.path('tmpdir'), `${ this.id }-electron-state.json`),
+			JSON.stringify(this.state, null, 2),
+			'utf8'
+		)
 	}
 
 	get state () {
@@ -255,9 +264,4 @@ function mainWorkspaceConfig (project) {
 			}
 		}
 	}
-}
-
-function stream(path) {
-	let fd = require('fs').openSync(path, 'a+')
-	return createStream(path, {fd})
 }
