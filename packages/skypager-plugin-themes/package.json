@@ -1,0 +1,34 @@
+{
+  "name": "skypager-plugin-portfolio",
+  "version": "2.5.0",
+  "description": "a skypager project aggregator ",
+  "main": "index.js",
+  "scripts": {
+    "test": "exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skypager/skypager.git"
+  },
+  "keywords": [
+    "skypager",
+    "project",
+    "portfolio",
+    "manager"
+  ],
+  "author": "Jonathan Soeder <jon@chicago.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/skypager/skypager/issues"
+  },
+  "homepage": "https://github.com/skypager/skypager#readme",
+  "dependencies": {
+    "skypager-project": "latest",
+    "lodash": "^4.5.0",
+    "blessed": "latest",
+    "blessed-contrib": "latest"
+  },
+  "devDependencies": {
+    "babel-preset-skypager": "latest"
+  }
+}
