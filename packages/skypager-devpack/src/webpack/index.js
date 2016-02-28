@@ -1,5 +1,6 @@
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
+import defaults from 'lodash/defaults'
 import { colorize } from '../util'
 
 const DefaultVendorStack = [
@@ -31,8 +32,14 @@ const ExternalVendorMappings = {
   'radium': 'Radium'
 }
 
-module.exports = function (argv) {
-  inspect('Options', argv, argv.debug)
+module.exports = function (externalOptions = {}) {
+
+  let options = defaults(
+    omit(require('yargs').argv, '_', '$'),
+    externalOptions
+  )
+
+  inspect('Options', options, options.debug)
 
 	const md5 = require('md5')
   const path = require('path')
@@ -46,12 +53,12 @@ module.exports = function (argv) {
   const HtmlWebpackPlugin = require('html-webpack-plugin')
   const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
-  const env = argv.env || argv.environment || process.env.NODE_ENV || 'development'
+  const env = options.env || options.environment || process.env.NODE_ENV || 'development'
   const config = new Config()
-  const directory = argv.root || process.cwd()
+  const directory = options.root || process.cwd()
 
 	const isDev = (env === 'development')
-  const fontsPrefix = argv.fontsPrefix || 'fonts'
+  const fontsPrefix = options.fontsPrefix || 'fonts'
 
   const themesModuleRoot = path.dirname(require.resolve('skypager-themes'))
   const devpackModuleRoot = path.join(__dirname, '../..')
@@ -66,25 +73,25 @@ module.exports = function (argv) {
     join(devpackModuleRoot, 'node_modules')
   ]
 
-  const platform = argv.platform || 'web'
-  const precompiled = argv.precompiled || argv.usePrecompiledTemplate
+  const platform = options.platform || 'web'
+  const precompiled = options.precompiled || options.usePrecompiledTemplate
 
-  let projectThemePath = argv.projectThemePath || join(themesModuleRoot, 'packages/default')
+  let projectThemePath = options.projectThemePath || join(themesModuleRoot, 'packages/default')
   let entry = {}
 
-  if (argv.entryPoints && argv.devpack_api === 'v2') {
-    entry = assign(entry, argv.entryPoints)
+  if (options.entryPoints && options.devpack_api === 'v2') {
+    entry = assign(entry, options.entryPoints)
   } else {
     entry = assign(entry, {
-      [argv.entryName || 'app']: [ argv.entry || './src' ],
+      [options.entryName || 'app']: [ options.entry || './src' ],
     })
   }
 
   entry = mapValues(entry, (v,k) => typeof v === 'string' ? [v] : v)
 
-  if (!entry.theme && argv.theme) {
+  if (!entry.theme && options.theme) {
     entry.theme = [
-      argv.theme.match(/\//) ? argv.theme : `themes/${ argv.theme }`
+      options.theme.match(/\//) ? options.theme : `themes/${ options.theme }`
     ]
   }
 
@@ -110,14 +117,14 @@ module.exports = function (argv) {
     })
   }
 
-  if (!argv.noVendor) {
-    entry.vendor = buildVendorStack(argv)
+  if (!options.noVendor) {
+    entry.vendor = buildVendorStack(options)
   }
 
   config
     .plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
 
-	var outputPath = argv.outputFolder ? path.resolve(argv.outputFolder)  : join(directory, 'public')
+	var outputPath = options.outputFolder ? path.resolve(options.outputFolder)  : join(directory, 'public')
 
   var templatePath = join(devpackModuleRoot, 'templates', 'index.html')
 
@@ -132,13 +139,13 @@ module.exports = function (argv) {
     }
   }
 
-  if (argv.htmlTemplatePath) {
-    templatePath = path.resolve(argv.htmlTemplatePath)
+  if (options.htmlTemplatePath) {
+    templatePath = path.resolve(options.htmlTemplatePath)
   }
 
-  var htmlFilename = argv.htmlFilename || argv.outputFile || 'index.html'
+  var htmlFilename = options.htmlFilename || options.outputFile || 'index.html'
 
-  if (env === 'production' && platform === 'web' && !argv.htmlFilename && argv.pushState) {
+  if (env === 'production' && platform === 'web' && !options.htmlFilename && options.pushState) {
     htmlFilename = '200.html'
   }
 
@@ -147,16 +154,16 @@ module.exports = function (argv) {
       entry: entry,
       output: {
         path: outputPath,
-        filename: (argv.noContentHash || argv.contentHash === false || isDev ? '[name].js' : '[name]-[hash].js'),
+        filename: (options.noContentHash || options.contentHash === false || isDev ? '[name].js' : '[name]-[hash].js'),
         publicPath: (!isDev && platform === 'electron') ? '' : '/',
-        contentBase: argv.contentBase || join(directory, 'src')
+        contentBase: options.contentBase || join(directory, 'src')
       },
       resolveLoader: {
         root: modulesDirectories
       },
       resolve: {
 				root: modulesDirectories,
-        fallback: argv.moduleFallback || devpackModuleRoot,
+        fallback: options.moduleFallback || devpackModuleRoot,
 				modulesDirectories:[
 					'src',
           'src/ui',
@@ -235,17 +242,17 @@ module.exports = function (argv) {
 	let featureFlags = {
 		'__PLATFORM__': JSON.stringify(platform),
     '__SKYPAGER_THEME_CONFIG__': JSON.stringify(
-      argv.themeConfigPath || join(directory, 'package.json')
+      options.themeConfigPath || join(directory, 'package.json')
     ),
 		'process.env': {
 			NODE_ENV: JSON.stringify(env)
 		}
 	}
 
-	if (argv.featureFlags) {
-		if (exists(resolve(argv.featureFlags))) {
+	if (options.featureFlags) {
+		if (exists(resolve(options.featureFlags))) {
 			try {
-				var extras = require(argv.featureFlags)
+				var extras = require(options.featureFlags)
 				if (typeof extras === 'object') {
 					featureFlags = Object.keys(extras).reduce((memo,key)=>{
 						memo[`__${ key.toUpperCase() }__`] = JSON.stringify(extras[key])
@@ -260,18 +267,18 @@ module.exports = function (argv) {
 
 	config.plugin('webpack-define', webpack.DefinePlugin, [featureFlags])
 
-	let staticAssets = argv.staticAssets || {}
+	let staticAssets = options.staticAssets || {}
 
 	let bodyScripts = staticAssets.bodyScripts || []
 	let staticStyles = staticAssets.staticStyles || []
 	let headerScripts = staticAssets.headerScripts || []
 	let googleFont = staticAssets.googleFont || `http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic`
 
-	if (!argv.entryOnly && !argv.exportLibrary) {
+	if (!options.entryOnly && !options.exportLibrary) {
 		config.plugin('webpack-html', HtmlWebpackPlugin, [{
 			template: `${ templatePath }`,
 			hash: false,
-			inject: argv.templateInject === 'none' ? false : (argv.templateInject || 'body'),
+			inject: options.templateInject === 'none' ? false : (options.templateInject || 'body'),
 			filename: htmlFilename,
 			bodyScripts,
 			headerScripts,
@@ -286,22 +293,22 @@ module.exports = function (argv) {
       .plugin('webpack-noerrors', webpack.NoErrorsPlugin)
   }
 
-	if (argv.target) {
+	if (options.target) {
 		config.merge({
-			target: argv.target
+			target: options.target
 		})
 	}
 
-  if (argv.externalVendors || precompiled ) {
+  if (options.externalVendors || precompiled ) {
     config.merge({
-      externals: buildExternals(argv)
+      externals: buildExternals(options)
     })
   }
 
   if (!isDev) {
   	config .merge({ devtool: 'cheap-module-source-map' })
 
-		let extractFilename = (platform === 'electron' || argv.noContentHash || argv.contentHash === false)
+		let extractFilename = (platform === 'electron' || options.noContentHash || options.contentHash === false)
       ? '[name].css'
       : '[name]-[contenthash].css'
 
@@ -322,7 +329,7 @@ module.exports = function (argv) {
   config.merge({
     resolve:{
       alias: {
-        'dist': (argv.distPath && resolve(argv.distPath)) || path.join(directory, 'dist'),
+        'dist': (options.distPath && resolve(options.distPath)) || path.join(directory, 'dist'),
         'project-theme': projectThemePath
       }
     }
@@ -332,16 +339,16 @@ module.exports = function (argv) {
     recordsPath: join(directory, 'tmp', 'records')
   })
 
-	if (argv.exportLibrary) {
+	if (options.exportLibrary) {
 		config.merge({
 			output: {
-				library: argv.exportLibrary,
+				library: options.exportLibrary,
 				libraryTarget: 'umd'
 			}
 		})
 	}
 
-  inspect('Application Entry Points', entry, argv.debug)
+  inspect('Application Entry Points', entry, options.debug)
 
   return config
 }
@@ -362,17 +369,17 @@ function excludeNodeModulesExceptSkypagers(absolutePath) {
   return false
 }
 
-function buildVendorStack(argv) {
-  if (argv.vendor && typeof argv.vendor === 'object') {
-    return argv.vendor
+function buildVendorStack(options) {
+  if (options.vendor && typeof options.vendor === 'object') {
+    return Object.keys(options.vendor)
   }
 
   return DefaultVendorStack
 }
 
-function buildExternals(argv) {
-  if (argv.externalVendors && typeof argv.externalVendors === 'object') {
-    return argv.externalVendors
+function buildExternals(options) {
+  if (options.vendor && typeof options.vendor === 'object') {
+    return Object.keys(options.vendor)
   }
 
   return ExternalVendorMappings

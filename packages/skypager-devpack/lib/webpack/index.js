@@ -28,6 +28,10 @@ var _omit = require('lodash/omit');
 
 var _omit2 = _interopRequireDefault(_omit);
 
+var _defaults = require('lodash/defaults');
+
+var _defaults2 = _interopRequireDefault(_defaults);
+
 var _util = require('../util');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -48,8 +52,12 @@ var ExternalVendorMappings = {
   'radium': 'Radium'
 };
 
-module.exports = function (argv) {
-  inspect('Options', argv, argv.debug);
+module.exports = function () {
+  var externalOptions = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+  var options = (0, _defaults2.default)((0, _omit2.default)(require('yargs').argv, '_', '$'), externalOptions);
+
+  inspect('Options', options, options.debug);
 
   var md5 = require('md5');
   var path = require('path');
@@ -63,36 +71,36 @@ module.exports = function (argv) {
   var HtmlWebpackPlugin = require('html-webpack-plugin');
   var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-  var env = argv.env || argv.environment || process.env.NODE_ENV || 'development';
+  var env = options.env || options.environment || process.env.NODE_ENV || 'development';
   var config = new Config();
-  var directory = argv.root || process.cwd();
+  var directory = options.root || process.cwd();
 
   var isDev = env === 'development';
-  var fontsPrefix = argv.fontsPrefix || 'fonts';
+  var fontsPrefix = options.fontsPrefix || 'fonts';
 
   var themesModuleRoot = path.dirname(require.resolve('skypager-themes'));
   var devpackModuleRoot = path.join(__dirname, '../..');
 
   var modulesDirectories = [directory, join(directory, 'src'), devpackModuleRoot, join(devpackModuleRoot, 'src'), themesModuleRoot, join(directory, 'node_modules'), join(devpackModuleRoot, 'node_modules')];
 
-  var platform = argv.platform || 'web';
-  var precompiled = argv.precompiled || argv.usePrecompiledTemplate;
+  var platform = options.platform || 'web';
+  var precompiled = options.precompiled || options.usePrecompiledTemplate;
 
-  var projectThemePath = argv.projectThemePath || join(themesModuleRoot, 'packages/default');
+  var projectThemePath = options.projectThemePath || join(themesModuleRoot, 'packages/default');
   var entry = {};
 
-  if (argv.entryPoints && argv.devpack_api === 'v2') {
-    entry = assign(entry, argv.entryPoints);
+  if (options.entryPoints && options.devpack_api === 'v2') {
+    entry = assign(entry, options.entryPoints);
   } else {
-    entry = assign(entry, (0, _defineProperty3.default)({}, argv.entryName || 'app', [argv.entry || './src']));
+    entry = assign(entry, (0, _defineProperty3.default)({}, options.entryName || 'app', [options.entry || './src']));
   }
 
   entry = (0, _mapValues2.default)(entry, function (v, k) {
     return typeof v === 'string' ? [v] : v;
   });
 
-  if (!entry.theme && argv.theme) {
-    entry.theme = [argv.theme.match(/\//) ? argv.theme : 'themes/' + argv.theme];
+  if (!entry.theme && options.theme) {
+    entry.theme = [options.theme.match(/\//) ? options.theme : 'themes/' + options.theme];
   }
 
   if (exists(join(directory, 'src/theme'))) {
@@ -113,13 +121,13 @@ module.exports = function (argv) {
     });
   }
 
-  if (!argv.noVendor) {
-    entry.vendor = buildVendorStack(argv);
+  if (!options.noVendor) {
+    entry.vendor = buildVendorStack(options);
   }
 
   config.plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }]);
 
-  var outputPath = argv.outputFolder ? path.resolve(argv.outputFolder) : join(directory, 'public');
+  var outputPath = options.outputFolder ? path.resolve(options.outputFolder) : join(directory, 'public');
 
   var templatePath = join(devpackModuleRoot, 'templates', 'index.html');
 
@@ -134,13 +142,13 @@ module.exports = function (argv) {
     }
   }
 
-  if (argv.htmlTemplatePath) {
-    templatePath = path.resolve(argv.htmlTemplatePath);
+  if (options.htmlTemplatePath) {
+    templatePath = path.resolve(options.htmlTemplatePath);
   }
 
-  var htmlFilename = argv.htmlFilename || argv.outputFile || 'index.html';
+  var htmlFilename = options.htmlFilename || options.outputFile || 'index.html';
 
-  if (env === 'production' && platform === 'web' && !argv.htmlFilename && argv.pushState) {
+  if (env === 'production' && platform === 'web' && !options.htmlFilename && options.pushState) {
     htmlFilename = '200.html';
   }
 
@@ -148,16 +156,16 @@ module.exports = function (argv) {
     entry: entry,
     output: {
       path: outputPath,
-      filename: argv.noContentHash || argv.contentHash === false || isDev ? '[name].js' : '[name]-[hash].js',
+      filename: options.noContentHash || options.contentHash === false || isDev ? '[name].js' : '[name]-[hash].js',
       publicPath: !isDev && platform === 'electron' ? '' : '/',
-      contentBase: argv.contentBase || join(directory, 'src')
+      contentBase: options.contentBase || join(directory, 'src')
     },
     resolveLoader: {
       root: modulesDirectories
     },
     resolve: {
       root: modulesDirectories,
-      fallback: argv.moduleFallback || devpackModuleRoot,
+      fallback: options.moduleFallback || devpackModuleRoot,
       modulesDirectories: ['src', 'src/ui', 'dist', 'node_modules']
     },
     devtool: 'eval'
@@ -197,16 +205,16 @@ module.exports = function (argv) {
 
   var featureFlags = {
     '__PLATFORM__': (0, _stringify2.default)(platform),
-    '__SKYPAGER_THEME_CONFIG__': (0, _stringify2.default)(argv.themeConfigPath || join(directory, 'package.json')),
+    '__SKYPAGER_THEME_CONFIG__': (0, _stringify2.default)(options.themeConfigPath || join(directory, 'package.json')),
     'process.env': {
       NODE_ENV: (0, _stringify2.default)(env)
     }
   };
 
-  if (argv.featureFlags) {
-    if (exists(resolve(argv.featureFlags))) {
+  if (options.featureFlags) {
+    if (exists(resolve(options.featureFlags))) {
       try {
-        var extras = require(argv.featureFlags);
+        var extras = require(options.featureFlags);
         if ((typeof extras === 'undefined' ? 'undefined' : (0, _typeof3.default)(extras)) === 'object') {
           featureFlags = (0, _keys2.default)(extras).reduce(function (memo, key) {
             memo['__' + key.toUpperCase() + '__'] = (0, _stringify2.default)(extras[key]);
@@ -221,18 +229,18 @@ module.exports = function (argv) {
 
   config.plugin('webpack-define', webpack.DefinePlugin, [featureFlags]);
 
-  var staticAssets = argv.staticAssets || {};
+  var staticAssets = options.staticAssets || {};
 
   var bodyScripts = staticAssets.bodyScripts || [];
   var staticStyles = staticAssets.staticStyles || [];
   var headerScripts = staticAssets.headerScripts || [];
   var googleFont = staticAssets.googleFont || 'http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic';
 
-  if (!argv.entryOnly && !argv.exportLibrary) {
+  if (!options.entryOnly && !options.exportLibrary) {
     config.plugin('webpack-html', HtmlWebpackPlugin, [{
       template: '' + templatePath,
       hash: false,
-      inject: argv.templateInject === 'none' ? false : argv.templateInject || 'body',
+      inject: options.templateInject === 'none' ? false : options.templateInject || 'body',
       filename: htmlFilename,
       bodyScripts: bodyScripts,
       headerScripts: headerScripts,
@@ -245,22 +253,22 @@ module.exports = function (argv) {
     config.plugin('webpack-hmr', webpack.HotModuleReplacementPlugin).plugin('webpack-noerrors', webpack.NoErrorsPlugin);
   }
 
-  if (argv.target) {
+  if (options.target) {
     config.merge({
-      target: argv.target
+      target: options.target
     });
   }
 
-  if (argv.externalVendors || precompiled) {
+  if (options.externalVendors || precompiled) {
     config.merge({
-      externals: buildExternals(argv)
+      externals: buildExternals(options)
     });
   }
 
   if (!isDev) {
     config.merge({ devtool: 'cheap-module-source-map' });
 
-    var extractFilename = platform === 'electron' || argv.noContentHash || argv.contentHash === false ? '[name].css' : '[name]-[contenthash].css';
+    var extractFilename = platform === 'electron' || options.noContentHash || options.contentHash === false ? '[name].css' : '[name]-[contenthash].css';
 
     config.plugin('extract-text', ExtractTextPlugin, [extractFilename, {
       allChunks: true
@@ -276,7 +284,7 @@ module.exports = function (argv) {
   config.merge({
     resolve: {
       alias: {
-        'dist': argv.distPath && resolve(argv.distPath) || path.join(directory, 'dist'),
+        'dist': options.distPath && resolve(options.distPath) || path.join(directory, 'dist'),
         'project-theme': projectThemePath
       }
     }
@@ -286,16 +294,16 @@ module.exports = function (argv) {
     recordsPath: join(directory, 'tmp', 'records')
   });
 
-  if (argv.exportLibrary) {
+  if (options.exportLibrary) {
     config.merge({
       output: {
-        library: argv.exportLibrary,
+        library: options.exportLibrary,
         libraryTarget: 'umd'
       }
     });
   }
 
-  inspect('Application Entry Points', entry, argv.debug);
+  inspect('Application Entry Points', entry, options.debug);
 
   return config;
 };
@@ -316,17 +324,17 @@ function excludeNodeModulesExceptSkypagers(absolutePath) {
   return false;
 }
 
-function buildVendorStack(argv) {
-  if (argv.vendor && (0, _typeof3.default)(argv.vendor) === 'object') {
-    return argv.vendor;
+function buildVendorStack(options) {
+  if (options.vendor && (0, _typeof3.default)(options.vendor) === 'object') {
+    return (0, _keys2.default)(options.vendor);
   }
 
   return DefaultVendorStack;
 }
 
-function buildExternals(argv) {
-  if (argv.externalVendors && (0, _typeof3.default)(argv.externalVendors) === 'object') {
-    return argv.externalVendors;
+function buildExternals(options) {
+  if (options.vendor && (0, _typeof3.default)(options.vendor) === 'object') {
+    return (0, _keys2.default)(options.vendor);
   }
 
   return ExternalVendorMappings;

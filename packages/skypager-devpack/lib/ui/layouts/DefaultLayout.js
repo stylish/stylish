@@ -33,6 +33,10 @@ var _FluidLayout = require('ui/layouts/FluidLayout');
 
 var _FluidLayout2 = _interopRequireDefault(_FluidLayout);
 
+var _BasicFluidLayout = require('ui/layouts/BasicFluidLayout');
+
+var _BasicFluidLayout2 = _interopRequireDefault(_BasicFluidLayout);
+
 var _IconNavLayout = require('ui/layouts/IconNavLayout');
 
 var _IconNavLayout2 = _interopRequireDefault(_IconNavLayout);
@@ -50,7 +54,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var layouts = {
   fluid: _FluidLayout2.default,
   iconNav: _IconNavLayout2.default,
-  icon: _IconNavLayout2.default
+  icon: _IconNavLayout2.default,
+  basicFluid: _BasicFluidLayout2.default
 };
 
 var DefaultLayout = exports.DefaultLayout = (function (_Component) {
