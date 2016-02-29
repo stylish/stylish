@@ -51,6 +51,8 @@ var GLOB = '**/*.{' + EXTENSIONS.join(',') + '}';
 
 var _Object = Object;
 var defineProperties = _Object.defineProperties;
+var singularize = util.singularize;
+var pluralize = util.pluralize;
 
 var Asset = (function () {
   (0, _createClass3.default)(Asset, null, [{
@@ -104,9 +106,15 @@ var Asset = (function () {
     this.lazy('transformed', function () {
       return _this.transform(_this.indexed, _this);
     });
+    this.lazy('data', this.getData, true);
   }
 
   (0, _createClass3.default)(Asset, [{
+    key: 'getData',
+    value: function getData() {
+      return this.frontmatter || {};
+    }
+  }, {
     key: 'generateId',
     value: function generateId() {
       return this.paths.relative.replace(this.extension, '');
@@ -288,6 +296,16 @@ var Asset = (function () {
       return require('fs-promise').writeFile(this.paths.absolute, this.raw, 'utf8');
     }
   }, {
+    key: 'metadata',
+    get: function get() {
+      return this.frontmatter;
+    }
+  }, {
+    key: 'frontmatter',
+    get: function get() {
+      return {};
+    }
+  }, {
     key: 'fingerprint',
     get: function get() {
       return this.raw && (0, _md2.default)(this.raw);
@@ -298,6 +316,16 @@ var Asset = (function () {
       return this.id.replace(/-/g, '_').replace(/\//g, '.');
     }
   }, {
+    key: 'modelClass',
+    get: function get() {
+      return this.project.resolve.model(this);
+    }
+  }, {
+    key: 'modelDefiniton',
+    get: function get() {
+      return this.modelClass && this.modelClass.definition;
+    }
+  }, {
     key: 'cacheKey',
     get: function get() {
       return [this.id, this.fingerprint.substr(0, 6)].join('-');
@@ -306,6 +334,16 @@ var Asset = (function () {
     key: 'cacheFilename',
     get: function get() {
       return [this.cacheKey, this.extension].join('');
+    }
+  }, {
+    key: 'type',
+    get: function get() {
+      return singularize(this.paths.relative.split('/')[0]);
+    }
+  }, {
+    key: 'groupName',
+    get: function get() {
+      return pluralize(this.paths.relative.split('/')[0]);
     }
   }, {
     key: 'assetClass',
@@ -383,16 +421,6 @@ var Asset = (function () {
         project: project,
         assetClass: assetClass
       }, options));
-    }
-  }, {
-    key: 'groupName',
-    get: function get() {
-      return util.pluralize(this.typeAlias);
-    }
-  }, {
-    key: 'typeAlias',
-    get: function get() {
-      return util.singularize(util.tabelize(this.name));
     }
   }]);
   return Asset;

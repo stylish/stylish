@@ -1,20 +1,43 @@
 'use strict';
 
-var _defineEnumerableProperties2 = require('babel-runtime/helpers/defineEnumerableProperties');
-
-var _defineEnumerableProperties3 = _interopRequireDefault(_defineEnumerableProperties2);
-
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
+
+var _defineEnumerableProperties2 = require('babel-runtime/helpers/defineEnumerableProperties');
+
+var _defineEnumerableProperties3 = _interopRequireDefault(_defineEnumerableProperties2);
 
 var _util = require('./util');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var _Object = Object; /**
+                       * The resolver is responsible for mapping short hand aliases and reference
+                       * used throughout our assets, and especially documents, to the appropriate
+                       * helpers or assets within the project.
+                       *
+                       * Documents are resolved to a modelClass first by analyzing the parent folder
+                       * they belong to, then their YAML frontmatter by looking for a type property.
+                       *
+                       * In certain cases where neither of the above are convenient, regex patterns can
+                       * be defined which will map a path to the appropriate model.
+                       */
+
+var keys = _Object.keys;
+var assign = _Object.assign;
+
 module.exports = function createResolver() {
   var project = this;
-  var options = project.options.resolver || project.options || {};
+  var options = project.options.resolver || project.settings.resolver || project.options || {};
+
+  (0, _util.defaults)(options, {
+    modelPatterns: {}
+  });
+
+  if (project.get('settings.resolver.modelPatterns')) {
+    options.modelPatterns = assign(options.modelPatterns, project.get('settings.resolver.modelPatterns'));
+  }
 
   var asset = (options.assetResolver || assetResolver).bind(project);
   var link = (options.linkResolver || linkResolver).bind(project);
@@ -26,13 +49,11 @@ module.exports = function createResolver() {
     assets: addInterface({})
   };
 
-  if (options.modelPatterns) {
-    (0, _keys2.default)(options.modelPatterns).forEach(function (result, pattern) {
-      if (pattern = options.modelPatterns[result]) {
-        patterns.models.add(pattern, result);
-      }
-    });
-  }
+  keys(options.modelPatterns).forEach(function (result, pattern) {
+    if (pattern = options.modelPatterns[result]) {
+      patterns.models.add(pattern, result);
+    }
+  });
 
   return {
     asset: asset,
@@ -44,13 +65,17 @@ module.exports = function createResolver() {
 };
 
 function addInterface(cache) {
-  (0, _util.assign)(cache, {
+  assign(cache, {
     items: {},
 
     add: function add(pattern, result) {
       var _assign, _mutatorMap;
 
-      (0, _util.assign)(cache.items, (_assign = {}, _mutatorMap = {}, _mutatorMap[result] = _mutatorMap[result] || {}, _mutatorMap[result].get = function () {
+      if (typeof pattern === 'string') {
+        pattern = new RegExp(pattern);
+      }
+
+      assign(cache.items, (_assign = {}, _mutatorMap = {}, _mutatorMap[result] = _mutatorMap[result] || {}, _mutatorMap[result].get = function () {
         return pattern;
       }, (0, _defineEnumerableProperties3.default)(_assign, _mutatorMap), _assign));
     }
@@ -102,7 +127,9 @@ function modelResolver(subject) {
     if (subject && subject.groupName) {
       guesses.push(subject.groupName);
     }
+    guesses.push(subject.dirname);
     guesses.push(subject.uri);
+    guesses.push(subject.parentdir);
   }
 
   var found = undefined;

@@ -158,16 +158,6 @@ var Document = (function (_Asset) {
       return this.modelClass && this.modelClass.definition;
     }
   }, {
-    key: 'metadata',
-    get: function get() {
-      return this.frontmatter;
-    }
-  }, {
-    key: 'data',
-    get: function get() {
-      return this.frontmatter || {};
-    }
-  }, {
     key: 'relatedData',
     get: function get() {
       var _this2 = this;
@@ -206,10 +196,7 @@ var Document = (function (_Asset) {
         return this.frontmatter.type;
       }
 
-      var relativePath = this.paths.relative;
-      if (relativePath.match('/')) {
-        return (0, _util.singularize)(relativePath.split('/')[0]);
-      }
+      return (0, _util.singularize)(this.paths.relative.split('/')[0] || 'document');
     }
   }, {
     key: 'groupName',
@@ -218,10 +205,7 @@ var Document = (function (_Asset) {
         return this.frontmatter.group;
       }
 
-      var relativePath = this.paths.relative;
-      if (relativePath.match('/')) {
-        return (0, _util.pluralize)(relativePath.split('/')[0]);
-      }
+      return (0, _util.pluralize)(this.paths.relative.split('/')[0] || 'document');
     }
   }, {
     key: 'frontmatter',
