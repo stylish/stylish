@@ -1,4 +1,4 @@
-const skypager = require('skypager')
+const skypager = require('skypager-project')
 
 skypager.loadPlugin(require.resolve('../index'))
 
