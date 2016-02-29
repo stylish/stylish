@@ -27,7 +27,5 @@ development:
 
 test:
   applicationId: '<%= process.env.GITHUB_CLIENT_ID || "test-github-application-id" %>'
-  applicationSecret: '<%= process.env.GITHUB_CLIENT_SECRET || "test-github-application-secret" %>'
+  applicationSecret: '<%= env.GITHUB_APPLICATION_SECRET %>'
   accessToken: '<%= process.env.GITHUB_ACCESS_TOKEN || "test-github-access-token" %>'
-  accessibleVars:
-    - GITHUB_CLIENT_ID

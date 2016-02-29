@@ -33,7 +33,9 @@ function vault(project) {
 
       if (project.settings.security) {
         if (project.settings.security.environment) {
-          allowAccessToEnvVars.push.apply(allowAccessToEnvVars, (0, _toConsumableArray3.default)(project.settings.security.environment.accessibleVars));
+          var e = project.settings.security.environment;
+
+          allowAccessToEnvVars.push.apply(allowAccessToEnvVars, (0, _toConsumableArray3.default)(e.whitelist || e.accessibleVars || {}));
         }
       }
 

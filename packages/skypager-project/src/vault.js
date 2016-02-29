@@ -18,8 +18,10 @@ export function vault (project) {
 
       if (project.settings.security) {
         if (project.settings.security.environment) {
+          let e = project.settings.security.environment
+
           allowAccessToEnvVars.push(
-            ...(project.settings.security.environment.accessibleVars)
+            ...(e.whitelist || e.accessibleVars || {})
           )
         }
       }

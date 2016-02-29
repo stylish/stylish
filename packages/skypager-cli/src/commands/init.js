@@ -12,7 +12,7 @@ export function init (program, dispatch) {
     .option('--overwrite','whether or not to replace a project that exists')
     .option('--destination','')
     .option('--plugins <list>', 'a comma separated list of plugins to use', list)
-    .option('--portfolio', 'this project is a portfolo')
+    .option('--type', 'project, plugin, portfolio', 'project')
     .action(function(projectName, options) {
       handle(projectName, options)
     })
@@ -28,11 +28,8 @@ export function handle (projectName, destination, options = {}, context = {}) {
     abort('path already exists')
   }
 
-  let source = options.portfolio
-    ? join(__dirname, '../../packages', 'portfolio-template.asar')
-    : join(__dirname, '../../packages', 'project-template.asar')
-
-  console.log('Extracting Template...', source)
+  let type = options.type || 'project'
+  let source = join(__dirname, '../../packages', `${ type }-template.asar`),
 
   try {
     require('asar').extractAll(source, destination)
