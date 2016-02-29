@@ -23,6 +23,8 @@ function logger(project) {
 
   var env = project.env;
 
+  project.ensurePath('logs');
+
   var _transports = [new _winston.transports.File({
     name: 'project',
     filename: project.path('logs', 'project.log')

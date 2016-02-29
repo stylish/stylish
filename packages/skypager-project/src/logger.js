@@ -8,6 +8,8 @@ export function logger(project, options = {}) {
 
   let env = project.env
 
+  project.ensurePath('logs')
+
   let _transports = [
     new transports.File({
       name: `project`,
