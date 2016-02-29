@@ -12,7 +12,7 @@
   "license": "SEE LICENSE IN License.md",
   "skypager": {
     "main": "index.js",
-    "plugin": ["integrations"]
+    "plugins": ["integrations"]
   },
   "devDependencies": {
     "skypager-project": "latest",

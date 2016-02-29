@@ -1,0 +1,33 @@
+# 12 factor compliant. dont put secrets in here.
+production:
+  # can be accessed from the server via:
+  #
+  #   project.get('settings.github.clientId')
+  #
+  #   or:
+  #
+  #   project.settings.github.clientId
+  #
+  # can only be accessed via the client if whitelisted.
+  #
+  clientId: '<%= process.env.GITHUB_CLIENT_ID %>'
+  clientSecret: '<%= process.env.GITHUB_CLIENT_SECRET %>'
+  accessToken: '<%= process.env.GITHUB_ACCESS_TOKEN %>'
+
+  # it is ok to share this with the public
+  accessibleVars:
+    - GITHUB_CLIENT_ID
+
+development:
+  applicationId: '<%= process.env.GITHUB_CLIENT_ID || "use-a-develeopment-one-todo" %>'
+  applicationSecret: '<%= process.env.GITHUB_CLIENT_SECRET || "todo" %>'
+  accessToken: '<%= process.env.GITHUB_ACCESS_TOKEN %>'
+  accessibleVars:
+    - GITHUB_CLIENT_ID
+
+test:
+  applicationId: '<%= process.env.GITHUB_CLIENT_ID || "test-github-application-id" %>'
+  applicationSecret: '<%= process.env.GITHUB_CLIENT_SECRET || "test-github-application-secret" %>'
+  accessToken: '<%= process.env.GITHUB_ACCESS_TOKEN || "test-github-access-token" %>'
+  accessibleVars:
+    - GITHUB_CLIENT_ID
