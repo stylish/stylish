@@ -1,0 +1,3 @@
+defaultLayout: icon
+entryPoints:
+  index: HomePage

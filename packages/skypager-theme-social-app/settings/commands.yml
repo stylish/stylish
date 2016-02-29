@@ -1,0 +1,9 @@
+defaults:
+  serve:
+    profile: web
+
+  dev:
+    profile: web
+
+  build:
+    profile: web

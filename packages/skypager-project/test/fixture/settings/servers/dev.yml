@@ -1,0 +1,21 @@
+test:
+  env: test
+  processes:
+    compiler:
+      cmd: npm run compile:watch
+    testrunner:
+      cmd: npm run test:watch
+    docs:
+      cmd: skypager dev
+      cwd: '<%= process.env.PWD %>/../skypager-docs'
+
+development:
+  env: development
+  processes:
+    compiler:
+      cmd: npm run compile:watch
+    testrunner:
+      cmd: npm run test:watch
+    docs:
+      cmd: skypager dev
+      cwd: '<%= process.env.PWD %>/../skypager-docs'

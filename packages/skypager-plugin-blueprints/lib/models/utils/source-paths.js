@@ -1,5 +1,11 @@
 'use strict';
 
+var _assign = require('babel-runtime/core-js/object/assign');
+
+var _assign2 = _interopRequireDefault(_assign);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 module.exports = sourcePathReader;
 
 function sourcePathReader(options, context) {
@@ -12,7 +18,7 @@ function sourcePathReader(options, context) {
 
   var join = require('path').join;
 
-  Object.assign(doc, {
+  (0, _assign2.default)(doc, {
     readManifest: function readManifest() {
       if (doc.sourcePath && doc.sourcePath.length > 0 && existsSync(doc.manifestPath)) {
         return JSON.parse(readFileSync(doc.manifestPath).toString());

@@ -1,0 +1,39 @@
+server:
+  local:
+    development:
+      dashboard:
+        panels:
+          right:
+            type: log
+            label: Skypager Compiler
+            process: skypager_compiler
+            left: "51%"
+            top: "1%"
+            width: "49%"
+            height: "20%"
+            borderStyles:
+              style: line
+              color: white
+          left:
+            label: Skypager Test Suite
+            type: log
+            process: skypager_tests
+            left: "1%"
+            top: "1%"
+            width: "49%"
+            height: "98%"
+            borderStyles:
+              style: line
+              color: green
+
+      processes:
+        skypager_compiler:
+          cmd: 'npm run compile:watch'
+          cwd: '<%= process.env.HOME %>/Skypager/packages/skypager'
+          env:
+            PWD: '<%= process.env.HOME %>/Skypager/packages/skypager'
+        skypager_tests:
+          cmd: 'npm run test:watch'
+          cwd: '<%= process.env.HOME %>/Skypager/packages/skypager'
+          env:
+            PWD: '<%= process.env.HOME %>/Skypager/packages/skypager'

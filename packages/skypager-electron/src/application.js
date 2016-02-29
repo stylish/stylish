@@ -1,7 +1,9 @@
 import { hideProperties } from './util'
 import { join, resolve } from 'path'
-import { writeFileSync as write, createWriteStream as createStream } from 'fs'
+import { writeFileSync as write, createReadStream as stream } from 'fs'
 import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
+import winston from 'winston'
+import es from 'event-stream'
 
 import thunk from 'redux-thunk'
 
@@ -12,31 +14,30 @@ import * as Workspace from './workspace/workspace'
 
 import { screen, app, BrowserWindow, ipcMain as ipc } from 'electron'
 
-
 const { defineProperty, keys, assign } = Object
 
 export class Application {
   constructor (project, options = {}) {
 		let hide = this.hide = (...args) => hideProperties.call(this, this, ...args)
 
-		if (!project || !project.data || !project.data.at('settings')) {
+		if (!project || !project.settings) {
 			throw('Please ensure your project has settings data. data/settings/workspaces.yml for example.')
 		}
 
-		let settings = project.data.at('settings').data
+		let settings = project.settings
 
 		options = defaults(options, {
 			id: project.name,
 			argv: { workspace: 'main' },
 			command: '',
 			env: 'development',
-			settings: settings || { workspaces: {} },
+			settings,
 			paths:{
 				appData: join(app.getPath('userData'), 'data'),
-				appLogs: join(app.getPath('userData'), 'logs'),
-				public: (project && project.paths && project.paths.public) || join(process.env.PWD, 'public'),
-				temp: app.getPath('temp'),
-				project: (project && project.root) || process.env.PWD
+				appLogs: project.path('logs','electron'),
+				public: (project.paths.public) || join(process.env.PWD, 'public'),
+				temp: project.path('tmpdir', 'electron'),
+				project: project.root || process.env.PWD
 			}
 		})
 
@@ -44,15 +45,46 @@ export class Application {
 
 		setupAppHome(options.paths)
 
-		this.paths.actionStream = join(this.paths.appLogs, `${ this.id }-action-stream.js`)
+		this.paths.actionLog = join(this.paths.appLogs, `${ this.id }-actions.json`)
 
 		hide({
-			actionLogger: createStream(
-				this.paths.actionStream
-			),
-			store: setupStore()
+			store: setupStore(),
+			logger: new (winston.Logger)({
+				level: 'debug',
+				transports:[
+					new (winston.transports.File)({
+						filename: this.paths.actionLog,
+						json: true
+					})
+				]
+			}),
 		})
+
+		if (!this.settings.workspaces) {
+			defaults(this.settings, {
+				workspaces:{
+					main:{
+						panels:{
+							main:{
+								path: 'index.html'
+							}
+						}
+					}
+				}
+			})
+		}
+
+		this.setupProjectStream()
   }
+
+	setupProjectStream() {
+		stream(this.project.path('logs','project.log'))
+		.pipe(es.split())
+		.pipe(es.parse())
+		.pipe(es.map((obj, cb) => {
+			cb(null, obj)
+		}))
+	}
 
 	sendMessage(panel, message, payload) {
 		let win = this.browserWindows[panel]
@@ -91,13 +123,16 @@ export class Application {
 			win.webContents.send('skypager:message', 'application:dispatch', action)
 		})
 
+		this.project.log('debug', action)
 		return this.store.dispatch(action)
 	}
 
-	boot () {
+	boot (app) {
 		this.store.subscribe(this.onStateChange.bind(this))
 
-		this.workspace = this.createWorkspace(this.argv.workspace)
+		this.workspace = this.createWorkspace(
+			this.argv.workspace && this.project.settings.workspaces[this.argv.workspace] ? this.argv.workspace : 'main'
+		)
 
 		if (this.workspace) {
 			this.workspace.boot()
@@ -112,16 +147,16 @@ export class Application {
 		return Workspace.provision(this, options)
 	}
 
-	logAction (action) {
-		if (this.argv.debug) { console.log(JSON.stringify(action, null, 2)) }
-
-		this.actionLogger.write(
-			`dispatch(${JSON.stringify(action)});\n\n`
-		)
+	restoreFocus() {
+		this.eachBrowserWindow(win => {
+			win.isMinimized() ? win.restore() : null
+		})
 	}
 
 	onStateChange() {
 		this.snapshotState()
+
+		// this makes it available to the renderer processes via require('remote').getGlobal()
 		global.SkypagerElectronAppState = JSON.stringify(this.state)
 
 		BrowserWindow.getAllWindows().forEach(win => {
@@ -130,13 +165,11 @@ export class Application {
 	}
 
 	snapshotState () {
-		if (this.paths && this.paths.appData) {
-			write(
-				join(this.paths.appData, `${ this.id }-electron-state.json`),
-				JSON.stringify(this.state, null, 2),
-				'utf8'
-			)
-		}
+		write(
+			join(this.project.path('tmpdir'), `${ this.id }-electron-state.json`),
+			JSON.stringify(this.state, null, 2),
+			'utf8'
+		)
 	}
 
 	get state () {
@@ -152,11 +185,7 @@ export class Application {
 	}
 
 	get workspaceSettings() {
-		let { workspaces } = this.settings
-
-		workspaces.main = workspaces.main || mainWorkspaceConfig(this)
-
-		return workspaces
+		return this.settings.workspaces
 	}
 }
 
@@ -236,4 +265,3 @@ function mainWorkspaceConfig (project) {
 		}
 	}
 }
-

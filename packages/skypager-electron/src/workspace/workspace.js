@@ -1,7 +1,7 @@
 import { join, resolve } from 'path'
 import { handleActions as reducer, createAction as action } from 'redux-actions'
 import { hideProperties } from '../util'
-import { compact, pick, isNumber, isString } from 'lodash'
+import { defaults, compact, pick, isNumber, isString } from 'lodash'
 import { constrain } from '../util/constrain'
 import chokidar from 'chokidar'
 import electronify from './electronify-server'
@@ -82,7 +82,7 @@ export class Workspace {
 	launchPanels () {
     this.panels.forEach(panel => {
       if (process.env.NODE_ENV !== 'test') {
-        launch.call(this, panel.id, assign(panel.opts, {window: (panel.window || DEFAULT_WINDOW)}))
+        launch.call(this, panel.id, assign(panel.opts, {window: defaults(panel.window, DEFAULT_WINDOW)}))
       }
     })
 	}
@@ -144,10 +144,22 @@ function launch (panelName, params = {}) {
 		},
 
 		postLoad: function(electronApp, win) {
-      if (w.panelSettings[panelName].constrained) {
-        win.setBounds({
-          ...(w.panelSettings[panelName].constrained)
-        })
+      let constrained = w.panelSettings[panelName].constrained
+
+      win.show()
+
+      if (constrained) {
+        try {
+          win.show()
+
+          win.setBounds({
+            ...constrained
+          })
+        } catch (error) {
+          console.log('')
+          console.log('Error setting window bounds', constrained)
+          console.log(error.message.red)
+        }
       }
 
 			w.dispatch(
@@ -170,39 +182,9 @@ function launch (panelName, params = {}) {
     }
   }))
 
-  if (options.command && options.command.match(/skypager dev/)) {
-    let watcher = chokidar.watch(process.env.PWD, {
-      persistent: true,
-      depth: 1
-    })
-
-    watcher.on('raw', (action, path) => {
-      if (path && path.match(/webpack-stats/)){
-        w.dispatch({
-          type: 'WEBPACK_DEV_SERVER_READY',
-          payload: {
-            panelName,
-            workspaceId: w.id
-          }
-        })
-
-				watcher.close()
-
-        w.application.eachBrowserWindow((browserWindow) => {
-           browserWindow.show()
-           browserWindow.reload()
-        })
-      }
-    })
-
-    process.on('exit', (code) => {
-      if(!watcher && watcher.closed) {
-        watcher.close()
-      }
-    })
-  }
-
   options.window.preload = require.resolve('../client-bootstrap.js')
+
+  options.url = options.url || w.panelSettings[panelName].url || ''
 
   let proc = electronify(options)
 

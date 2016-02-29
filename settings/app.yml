@@ -1,4 +1,4 @@
 app:
-  layout: MainLayout
+  defaultLayout: icon
   entryPoints:
     index: HomePage

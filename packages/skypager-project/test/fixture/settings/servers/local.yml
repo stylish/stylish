@@ -1,0 +1,41 @@
+api:
+  host: localhost
+  port: 9090
+
+dashboard:
+  panels:
+    left:
+      type: log
+      height: 99%
+      width: 49%
+      left: 1%
+      top: 1%
+      label: Test Runner
+      process: test_runner
+      borderStyles:
+        type: line
+        color: magenta
+
+    right:
+      type: log
+      height: 49%
+      width: 49%
+      left: 51%
+      top: 1%
+      label: Babel Compiler
+      process: compiler
+      borderStyles:
+        type: line
+        color: cyan
+    rightBottom:
+      type: terminal
+      height: 49%
+      left: 51%
+      top: 51%
+      label: Shell
+
+processes:
+  compiler:
+    cmd: npm run compile:watch
+  testrunner:
+    cmd: npm run test:watch

@@ -1,0 +1,12 @@
+unsafe: 'env.USER'
+whatever: '<%= Object.keys(global) %>'
+insecure: '<%= process.env.USER %> is cool'
+nobueno: '<%= env.USER %> is cool'
+safe: 'env.HOME'
+ok: 'env.PWD'
+bueno: '<%= process.env.HOME %>'
+keys: '<%= Object.keys(process.env) %>'
+accessibleVars:
+  - HOME
+  - PWD
+  - WHATEVER

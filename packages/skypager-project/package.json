@@ -1,0 +1,95 @@
+{
+  "name": "skypager-project",
+  "version": "2.13.0",
+  "description": "skypager.io core framework project and helpers",
+  "main": "index.js",
+  "bin": {
+    "skypager-cli": "./bin/cli.js"
+  },
+  "scripts": {
+    "test:bundle:export": "./bin/cli.js export bundle --clean",
+    "test:bundle:compile": "./bin/cli.js build --webpack-config test/webpack.bundle.config.js > /dev/null",
+    "test:bundle": "npm run test:bundle:export && npm run test:bundle:compile",
+    "_pretest": "SKYPAGER_ENV=development npm run test:bundle",
+    "test": "SKYPAGER_ENV=test NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "_pretest:watch": "SKYPAGER_ENV=development npm run test:bundle",
+    "test:watch": "SKYPAGER_ENV=development NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
+    "lint": "eslint src/**/*",
+    "lint:fix": "npm run lint -- --fix",
+    "compile": "SKYPAGER_ENV=release babel -q -d lib src",
+    "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
+    "prepublish": "npm run test && npm run compile"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/architects/skypager"
+  },
+  "keywords": [
+    "skypager"
+  ],
+  "author": "Jonathan Soeder",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/architects/skypager/issues"
+  },
+  "homepage": "https://github.com/architects/skypager#readme",
+  "skypager": {
+    "main": "test/fixture/index.js",
+    "provides": [
+      "required"
+    ]
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.3.13",
+    "babel-register": "^6.3.13",
+    "babel-runtime": "^6.3.13",
+    "cheerio": "^0.19.0",
+    "chokidar-cli": "^1.2.0",
+    "colors": "^1.1.2",
+    "css": "^2.2.1",
+    "eyes": "^0.1.8",
+    "find-node-modules": "^1.0.1",
+    "findup-sync": "^0.3.0",
+    "fs-promise": "^0.3.1",
+    "git-rev": "^0.2.1",
+    "glob": "^6.0.1",
+    "i": "^0.3.3",
+    "js-yaml": "^3.4.5",
+    "lodash": "^4.5.0",
+    "md5": "^2.0.0",
+    "mdast": "^2.2.2",
+    "mdast-html": "^1.2.1",
+    "mdast-normalize-headings": "^0.2.0",
+    "mdast-squeeze-paragraphs": "^1.1.0",
+    "mdast-yaml": "^1.0.0",
+    "minimatch": "^3.0.0",
+    "mkdirp": "^0.5.1",
+    "node-emoji": "^1.0.4",
+    "path-exists": "^2.1.0",
+    "path-match": "^1.2.3",
+    "path-to-regexp": "^1.2.1",
+    "pkginfo": "^0.3.1",
+    "read": "^1.0.7",
+    "request": "^2.67.0",
+    "rimraf": "^2.5.1",
+    "shelljs": "^0.6.0",
+    "should": "^7.1.1",
+    "unist-util-visit": "^1.0.0",
+    "url": "^0.11.0",
+    "utile": "^0.3.0",
+    "winston": "^2.1.1",
+    "yargs": "^3.31.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.4.0",
+    "babel-eslint": "^5.0.0-beta4",
+    "babel-preset-skypager": "^1.34.0",
+    "colors": "^1.1.2",
+    "eslint": "^1.10.3",
+    "eslint-config-standard": "^4.4.0",
+    "eslint-loader": "^1.1.1",
+    "eslint-plugin-babel": "^3.0.0",
+    "eslint-plugin-standard": "^1.3.1",
+    "mocha": "^2.3.4"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@architects/skypager-theme-social-app",
+  "private":"true",
+  "version": "2.12.0",
+  "description": "a theme for social applications",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js",
+    "start": "skypager serve web",
+    "prepublish": ""
+  },
+  "author": "Jon Soeder <jon@chicago.com>",
+  "license": "SEE LICENSE IN License.md",
+  "skypager": {
+    "main": "skypager.js"
+  },
+  "devDependencies": {
+    "skypager-project": "latest",
+    "babel-preset-skypager": "latest",
+    "mocha": "latest",
+    "should": "latest"
+  }
+}

@@ -1,0 +1,6 @@
+port: 3010
+host: localhost
+theme: 'dashboard-dark'
+platform: electron
+entryPoints:
+  app: ./src/editor/index

@@ -1,0 +1,4 @@
+root: '<%= project.path("documents") %>'
+assetClass: 'Document'
+pattern: '**/*spec.md'
+autoLoad: true

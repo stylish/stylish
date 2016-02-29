@@ -1,28 +1,38 @@
-require('babel-register')({
-  presets:[
-    require.resolve('babel-preset-es2015'),
-    require.resolve('babel-preset-react')
-  ],
-  plugins:[
-    require.resolve('babel-plugin-add-module-exports')
-  ]
-})
-
 var yargs = require('yargs'),
-    pick = require('lodash/object/pick'),
     colors = require('colors'),
-    loadProject = require('skypager/lib/util').loadProjectFromDirectory,
-    skypagerMain = require('./src/boot').enter({
+    argv = yargs.argv;
+
+var loader;
+
+if (process.argv && process.argv[0] && process.argv[0].match(/Electron/i)) {
+  bootApp()
+}
+
+function bootApp() {
+  if (argv.devMode || process.env.SKYPAGER_ENV == 'dev') {
+    require('babel-register')({
+      presets:['skypager']
+    })
+
+    loader = require('./src/boot')
+  } else {
+    loader = require('./lib/boot')
+  }
+
+  var skypagerMain = loader.enter({
       project: yargs.argv.project || process.env.PWD,
-      argv: yargs.argv,
-      command: yargs.argv._
+      argv: argv,
+      command: argv._
     });
 
-if (yargs.argv.interactive) {
-  var server = require('repl').start({
-    prompt: 'skypager-'.magenta + 'electron'.yellow + ' ' + ':'.white + '> '
-  })
+  if (yargs.argv.interactive) {
+    var server = require('repl').start({
+      prompt: 'skypager-'.magenta + 'electron'.yellow + ' ' + ':'.white + '> ',
+      input: process.stdin,
+      output: process.stdout
+    })
 
-  server.context.project = skypagerMain.project
-  server.context.app = skypagerMain
+    server.context.project = skypagerMain.project
+    server.context.app = skypagerMain
+  }
 }

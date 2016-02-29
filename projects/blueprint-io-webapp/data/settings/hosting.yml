@@ -1,4 +1,0 @@
-hosting:
-  type:  blueprint-platform
-  endpoint: surge.blueprint.io
-  domain: demo-webapp.blueprint.io

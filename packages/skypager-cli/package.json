@@ -1,0 +1,59 @@
+{
+  "name": "skypager-cli",
+  "version": "2.13.0",
+  "preferGlobal": "true",
+  "bin": {
+    "skypager": "./bin/cli.js"
+  },
+  "description": "the CLI for the skypager framework",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js",
+    "test:watch": "mocha -r 'babel-register' -r 'should' --watch test/**/*-spec.js",
+    "compile": "babel -d lib src",
+    "precompile": "npm run package:templates",
+    "compile:watch": "babel -q -w -d lib src",
+    "package:portfolio:template": "asar pack ../skypager-template-portfolio packages/portfolio-template.asar",
+    "package:project:template": "asar pack ../skypager-template-project packages/project-template.asar",
+    "package:templates": "npm run package:project:template && npm run package:portfolio:template"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skypager/skypager.git"
+  },
+  "keywords": [
+    "skypager"
+  ],
+  "author": "jonathan soeder <jon@chicago.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/skypager/skypager/issues"
+  },
+  "homepage": "https://github.com/skypager/skypager#readme",
+  "devDependencies": {
+    "mocha": "^2.4.5",
+    "should": "^8.2.2"
+  },
+  "skypager": {
+    "main": "skypager.js",
+    "provides": [
+      "core",
+      "devtools"
+    ]
+  },
+  "dependencies": {
+    "asar": "^0.10.0",
+    "babel-preset-skypager": "^2.7.0",
+    "colors": "^1.1.2",
+    "commander": "^2.9.0",
+    "find-node-modules": "^1.0.1",
+    "findup-sync": "^0.3.0",
+    "gitignore-parser": "0.0.2",
+    "js-yaml": "^3.5.3",
+    "lodash": "^4.5.0",
+    "mkdirp": "^0.5.1",
+    "path-exists": "^2.1.0",
+    "shelljs": "^0.6.0",
+    "yargs": "^4.2.0"
+  }
+}
