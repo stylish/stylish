@@ -9,4 +9,10 @@ function LoadsActions (actions) {
     require('./packages/each.js'),
     { uri: resolve('./packages/each.js'), id: 'packages/each' }
   )
+
+  load(
+    require('./settings/generate.js'),
+    { uri: resolve('./settings/generate.js'), id: 'settings/generate' }
+  )
+
 }
