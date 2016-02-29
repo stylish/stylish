@@ -1,0 +1,4 @@
+app:
+  defaultLayout: icon
+  entryPoints:
+    index: HomePage

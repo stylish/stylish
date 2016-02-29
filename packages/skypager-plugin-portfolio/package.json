@@ -1,32 +1,20 @@
 {
   "name": "skypager-plugin-portfolio",
-  "version": "2.13.0",
-  "description": "a skypager project aggregator ",
+  "description": "skypager portfolio plugin",
+  "version": "2.13.1",
   "main": "index.js",
   "scripts": {
-    "test": "exit 0"
+    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "test:watch": "NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
+    "build:clean": "rm -rf lib",
+    "build": "npm run build:clean && npm run test && npm run compile",
+    "compile": "NODE_ENV=production babel -q -d lib src"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/skypager/skypager.git"
-  },
-  "keywords": [
-    "skypager",
-    "project",
-    "portfolio",
-    "manager"
-  ],
-  "author": "Jonathan Soeder <jon@chicago.com>",
-  "license": "UNLICENSED",
-  "bugs": {
-    "url": "https://github.com/skypager/skypager/issues"
-  },
-  "homepage": "https://github.com/skypager/skypager#readme",
   "skypager": {
     "main": "skypager.js",
     "provides": [
       "plugin",
-      "plugin:integrations",
+      "plugin:portfolio",
       "actions",
       "models",
       "settings",
@@ -34,13 +22,9 @@
       "exporters"
     ]
   },
-  "dependencies": {
-    "skypager-project": "latest",
-    "lodash": "^4.5.0",
-    "blessed": "latest",
-    "blessed-contrib": "latest"
-  },
   "devDependencies": {
-    "babel-preset-skypager": "latest"
+    "mocha": "^2.3.4",
+    "should": "^8.0.0",
+    "babel-preset-skypager": "^2.2.1"
   }
 }
