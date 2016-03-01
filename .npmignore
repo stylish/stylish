@@ -1,9 +1,10 @@
+.env
 projects/
 experiments/
-.env
 legacy/
-settings/*.yml
+settings/**/*.yml
 data/
 docs/
 log/
 public/
+packages/
