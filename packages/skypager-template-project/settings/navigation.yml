@@ -1,8 +1,12 @@
-navigation:
-  links:
-    - label: Home
-      icon: home
-      link: '/'
-    - label: Docs
-      icon: open-book
-      link: '/docs'
+links:
+  - label: Home
+    icon: home
+    link: '/'
+
+  - label:
+    icon: rocket
+    label: About
+
+  - label: Docs
+    icon: open-book
+    link: '/docs'

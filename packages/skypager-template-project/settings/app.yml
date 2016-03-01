@@ -1,4 +1,9 @@
+environments:
+  - development
+  - production
+  - test
+
 locale: en
-defaultLayout: icon
-entryPoints:
-  index: HomePage
+
+apps:
+  - web

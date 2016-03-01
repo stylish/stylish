@@ -1,2 +1,12 @@
-# Welcome to your Skypager Project
+---
+type: outline
+---
+
+# Skypager Project
+
+## Sections
+
+### About
+
+### Documentation
 

@@ -2,7 +2,7 @@ import React, { Component, PropTypes as types } from 'react'
 import { stateful } from 'ui/applications'
 import Icon from 'ui/components/Icon'
 
-import style from './HomePage.less';
+import styles from './styles.less';
 
 export class HomePage extends Component {
   static displayName = 'HomePage';
@@ -21,10 +21,10 @@ export class HomePage extends Component {
     const { branding } = settings
 
     return (
-      <div className={style.home}>
-        <h1 className={style.brandHeading}>
+      <div className={styles.home}>
+        <h1 className={styles.brandHeading}>
           <Icon icon={ branding.icon } />
-          <span className={style.brandTitle}>{ branding.brand }</span>
+          <span className={styles.brandTitle}>{ branding.brand }</span>
         </h1>
       </div>
     )
