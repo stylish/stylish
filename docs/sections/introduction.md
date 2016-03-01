@@ -1,5 +1,1 @@
----
-type: page
----
-
 # Introduction
