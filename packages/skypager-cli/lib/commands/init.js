@@ -22,7 +22,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var VERSION = require('../../package.json').version;
 
 function init(program, dispatch) {
-  program.command('init <projectName> [destination]').description('create a new skypager project').allowUnknownOption(true).option('--overwrite', 'whether or not to replace a project that exists').option('--destination', '').option('--plugins <list>', 'a comma separated list of plugins to use', list).option('--portfolio', 'this project is a portfolo').action(function (projectName, options) {
+  program.command('init <projectName> [destination]').description('create a new skypager project').allowUnknownOption(true).option('--overwrite', 'whether or not to replace a project that exists').option('--destination', '').option('--plugins <list>', 'a comma separated list of plugins to use', list).option('--type', 'project, plugin, portfolio', 'project').action(function (projectName, options) {
     handle(projectName, options);
   });
 }
@@ -44,9 +44,8 @@ function handle(projectName, destination) {
     abort('path already exists');
   }
 
-  var source = options.portfolio ? join(__dirname, '../../packages', 'portfolio-template.asar') : join(__dirname, '../../packages', 'project-template.asar');
-
-  console.log('Extracting Template...', source);
+  var type = options.type || 'project';
+  var source = join(__dirname, '../../packages', type + '-template.asar');
 
   try {
     require('asar').extractAll(source, destination);
@@ -62,7 +61,7 @@ function handle(projectName, destination) {
 
     require('fs').writeFileSync(join(destination, 'package.json'), (0, _stringify2.default)(packageJson, null, 2), 'utf8');
 
-    require('fs').writeFileSync(join(destination, 'skypager.js'), 'module.exports = require(\'' + (process.env.SKYPAGER_PROJECT_ROOT || $skypager && $skypager['skypager-project']) + '\').load(__filename)\n', 'utf8');
+    require('fs').writeFileSync(join(destination, 'skypager.js'), 'module.exports = require(\'skypager-project\').load(__filename)\n', 'utf8');
   } catch (error) {
     abort('Error modifying package: ' + error.message);
   }

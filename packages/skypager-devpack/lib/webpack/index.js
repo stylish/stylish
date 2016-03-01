@@ -36,6 +36,13 @@ var _util = require('../util');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * THIS SCRIPT IS A MESS.
+ *
+ * I need to break this down into separate chunks and document the options
+ *
+ */
+
 var DefaultVendorStack = ['history', 'jquery', 'react', 'react-dom', 'react-redux', 'react-router', 'react-bootstrap', 'redux', 'redux-thunk', 'redux-actions', 'redux-simple-router', 'radium'];
 
 var ExternalVendorMappings = {
@@ -123,9 +130,9 @@ module.exports = function () {
 
   if (!options.noVendor) {
     entry.vendor = buildVendorStack(options);
-  }
 
-  config.plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }]);
+    config.plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }]);
+  }
 
   var outputPath = options.outputFolder ? path.resolve(options.outputFolder) : join(directory, 'public');
 

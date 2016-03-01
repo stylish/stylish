@@ -35,8 +35,13 @@ module.exports = function createResolver() {
     modelPatterns: {}
   });
 
+  // legacy
   if (project.get('settings.resolver.modelPatterns')) {
     options.modelPatterns = assign(options.modelPatterns, project.get('settings.resolver.modelPatterns'));
+  }
+
+  if (project.get('settings.resolver.models')) {
+    options.modelPatterns = assign(options.modelPatterns, project.get('settings.resolver.models'));
   }
 
   var asset = (options.assetResolver || assetResolver).bind(project);

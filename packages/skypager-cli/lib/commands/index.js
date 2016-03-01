@@ -4,6 +4,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.MODES = undefined;
+
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
 exports.program = program;
 exports.configure = configure;
 
@@ -98,6 +103,12 @@ var requestedCommand = _yargs.argv._[0];
 
 function program() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+  if ($skypager && _yargs.argv.debugPaths) {
+    console.log((0, _stringify2.default)($skypager, null, 2));
+
+    process.exit(0);
+  }
 
   var commander = require('commander');
 
