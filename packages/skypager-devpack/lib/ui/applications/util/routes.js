@@ -34,23 +34,23 @@ function routes(component) {
   }
 
   var _options = options;
-  var entryPoints = _options.entryPoints;
+  var screens = _options.screens;
 
   var root = { path: "/", component: component, childRoutes: [] };
 
-  if (entryPoints['/']) {
-    entryPoints.index = entryPoints['/'];
-    delete entryPoints['/'];
+  if (screens['/']) {
+    screens.index = screens['/'];
+    delete screens['/'];
   }
 
-  if (entryPoints.index) {
-    root.indexRoute = entryPoints.index.component ? entryPoints.index.component : { component: entryPoints.index };
+  if (screens.index) {
+    root.indexRoute = screens.index.component ? screens.index.component : { component: screens.index };
   }
 
-  var childRoutes = keys(entryPoints).filter(function (key) {
+  var childRoutes = keys(screens).filter(function (key) {
     return key !== 'index';
   }).map(function (path, i) {
-    return buildRoute(path, entryPoints[path], i);
+    return buildRoute(path, screens[path], i);
   });
 
   (_root$childRoutes = root.childRoutes).push.apply(_root$childRoutes, (0, _toConsumableArray3.default)(childRoutes));

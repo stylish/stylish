@@ -2,6 +2,10 @@
  * Consumes a Skypager Bundle Export and provides
  * a Project like interface.  It also can generate a Skypager.Application
 */
+
+import defaults from 'lodash/defaultsDeep'
+import isString from 'lodash/isString'
+
 module.exports =
 
 class Bundle {
@@ -27,25 +31,29 @@ class Bundle {
     this.content = bundle.content
     this.model = bundle.models
     this.settings = bundle.settings
+    this.copy = bundle.copy
 
     //this.assetsContent = this.content.assets
     this.settingsContent = this.content.settings
     this.docs = this.content.documents
     this.data = this.content.data_sources
 
-    //this.scripts = this.content.scripts
-    //this.stylesheets = this.content.stylesheets
-    //this.packages = this.content.packages
-    //this.projects = this.content.projects
+    this.scripts = this.content.scripts
+    this.stylesheets = this.content.stylesheets
+    this.packages = this.content.packages
+    this.projects = this.content.projects
 
     this.entityNames = keys(this.entities || {})
 
-    //this.requireContexts = bundle.requireContexts
+    this.requireContexts = bundle.requireContexts
 
     // naming irregularities
     assign(this, {
       get settingsFiles() {
-        return bundle.content.settings
+        return bundle.content.settings_files
+      },
+      get copyFiles() {
+        return bundle.content.copy_files
       },
       get data() {
         return bundle.content.data_sources
@@ -90,28 +98,27 @@ class Bundle {
   }
 
   requireEntryPoint (id) {
-    throw('This feature is deprecated', id)
     return this.require('script', `entries/${ id }`)
   }
 
   requireLayout (id) {
-    throw('This feature is deprecated', id)
     return this.require('script', `layouts/${ id }`)
   }
 
   requireComponent (id) {
-    throw('This feature is deprecated', id)
     return this.require('script', `components/${ id }`)
   }
 
   requireStyleSheet (id) {
-    throw('This feature is deprecated', id)
     return this.require('stylesheet', id)
   }
 
   require(assetType, assetId) {
-    throw('This feature is deprecated', id)
-    let key = this[`${assetType}s`][assetId].paths.relative
+    let file = this[`${assetType}s`][assetId] ||
+               this[`${assetType}s`][`${assetId}/index`] ||
+               this[`${assetType}s`][`${assetId}/${ assetId }`]
+
+    let key = file.paths.relative
     let asset = this.requireContexts[`${assetType}s`]( './' + key )
 
     if (!asset) {
@@ -146,9 +153,9 @@ class Bundle {
     let settings = project.settings || {}
     let app = settings.app || {}
 
-    props.entryPoints = assign({}, app.entryPoints || {}, props.entryPoints || {})
+    props.screens = assign({}, app.screens || {}, props.screens || {})
 
-    let entryPaths = keys(props.entryPoints)
+    let entryPaths = keys(props.screens)
 
     /*
       if (entryPaths.length < 1) {
@@ -156,29 +163,13 @@ class Bundle {
     }*/
 
     entryPaths.forEach(path => {
-      let cfg = props.entryPoints[path]
+      let cfg = props.screens[path]
 
-      if (typeof cfg === 'string') {
-        cfg = props.entryPoints[path] = {
-          component: project.requireEntryPoint(
-            cfg.replace(/^entries\//,'')
-          )
-        }
+      if (isString(cfg)) {
+        entryPaths[cfg] = project.requireEntryPoint(
+          cfg
+        )
       }
-
-      if (typeof cfg === 'object' && typeof cfg.component === 'string') {
-         cfg.component = project.requireEntryPoint(cfg.component.replace(/^entries\//,''))
-      } else if (typeof cfg === 'object' && cfg.index && typeof cfg.index === 'string') {
-         cfg.component = project.requireEntryPoint(cfg.index.replace(/^entries\//,''))
-      } else if (typeof cfg === 'object' && cfg.index && typeof cfg.index === 'object' && typeof cfg.index.component === 'string') {
-         cfg.component = project.requireEntryPoint(cfg.index.component.replace(/^entries\//,''))
-      } else if (typeof cfg === 'function') {
-        cfg = {
-          component: cfg
-        }
-      }
-
-
     })
 
     return props
@@ -191,14 +182,14 @@ class Bundle {
 
     props.layout = props.layout || app.layout
 
-    if (typeof props.layout === 'string') {
-       props.layout = this.requireLayout(props.layout)
-    }
-
     if (typeof props.layout === 'object') {
       if (typeof props.layout.component === 'string') {
         props.layout.component = this.requireLayout(props.layout.component)
       }
+    }
+
+    if (typeof props.layout === 'string') {
+       props.layout = this.requireLayout(props.layout)
     }
 
     return props

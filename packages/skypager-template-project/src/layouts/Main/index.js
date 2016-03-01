@@ -1,8 +1,8 @@
 import React, { Component, PropTypes as types } from 'react'
 import { stateful } from 'ui/applications'
 
-export class MainLayout extends Component {
-  static displayName = 'MainLayout';
+export class Main extends Component {
+  static displayName = 'Main';
 
   render () {
     return (
@@ -13,4 +13,4 @@ export class MainLayout extends Component {
   }
 }
 
-export default stateful(MainLayout, 'settings')
+export default stateful(Main, 'settings')

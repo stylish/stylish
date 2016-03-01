@@ -10,23 +10,23 @@ export function routes(component, options = {}) {
     component = "div"
   }
 
-  const { entryPoints } = options
+  const { screens } = options
   const root = { path: "/", component, childRoutes:[] }
 
-  if (entryPoints['/']) {
-    entryPoints.index = entryPoints['/']
-    delete(entryPoints['/'])
+  if (screens['/']) {
+    screens.index = screens['/']
+    delete(screens['/'])
   }
 
-  if (entryPoints.index) {
-    root.indexRoute = entryPoints.index.component
-      ? entryPoints.index.component
-      : { component: entryPoints.index }
+  if (screens.index) {
+    root.indexRoute = screens.index.component
+      ? screens.index.component
+      : { component: screens.index }
   }
 
-  let childRoutes = keys(entryPoints)
+  let childRoutes = keys(screens)
                     .filter(key => key !== 'index')
-                    .map((path, i) => buildRoute(path, entryPoints[path], i))
+                    .map((path, i) => buildRoute(path, screens[path], i))
 
   root.childRoutes.push(...childRoutes)
 

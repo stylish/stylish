@@ -119,7 +119,7 @@ var Application = exports.Application = (function (_Component) {
 
       var client = props.client;
       var layout = props.layout;
-      var entryPoints = props.entryPoints;
+      var screens = props.screens;
       var middlewares = props.middlewares;
       var reducers = props.reducers;
       var initialState = props.initialState;
@@ -129,7 +129,7 @@ var Application = exports.Application = (function (_Component) {
         app.reloadBundle(project);
       }
 
-      app = (0, _reactDom.render)(_react2.default.createElement(Application, { entryPoints: entryPoints,
+      app = (0, _reactDom.render)(_react2.default.createElement(Application, { screens: screens,
         initialState: initialState,
         layout: layout,
         project: project,
@@ -156,14 +156,14 @@ var Application = exports.Application = (function (_Component) {
 
     var _this$props = _this.props;
     var layout = _this$props.layout;
-    var entryPoints = _this$props.entryPoints;
+    var screens = _this$props.screens;
     var _this$props2 = _this.props;
     var reducers = _this$props2.reducers;
     var middlewares = _this$props2.middlewares;
     var initialState = _this$props2.initialState;
     var project = _this$props2.project;
 
-    _this.routes = (0, _routes.routes)(layout, { entryPoints: entryPoints });
+    _this.routes = (0, _routes.routes)(layout, { screens: screens });
 
     //console.log('Application Creating', props, context)
 
@@ -232,7 +232,7 @@ Application.propTypes = {
   layout: _react.PropTypes.func,
 
   // entry point configuration
-  entryPoints: _react.PropTypes.object,
+  screens: _react.PropTypes.object,
 
   // an array of redux middlewares to inject into the store
   middlewares: _react.PropTypes.array,

@@ -12,12 +12,21 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
+var _defaultsDeep = require('lodash/defaultsDeep');
+
+var _defaultsDeep2 = _interopRequireDefault(_defaultsDeep);
+
+var _isString = require('lodash/isString');
+
+var _isString2 = _interopRequireDefault(_isString);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Consumes a Skypager Bundle Export and provides
  * a Project like interface.  It also can generate a Skypager.Application
 */
+
 module.exports = (function () {
   (0, _createClass3.default)(Bundle, null, [{
     key: 'create',
@@ -51,25 +60,29 @@ module.exports = (function () {
     this.content = bundle.content;
     this.model = bundle.models;
     this.settings = bundle.settings;
+    this.copy = bundle.copy;
 
     //this.assetsContent = this.content.assets
     this.settingsContent = this.content.settings;
     this.docs = this.content.documents;
     this.data = this.content.data_sources;
 
-    //this.scripts = this.content.scripts
-    //this.stylesheets = this.content.stylesheets
-    //this.packages = this.content.packages
-    //this.projects = this.content.projects
+    this.scripts = this.content.scripts;
+    this.stylesheets = this.content.stylesheets;
+    this.packages = this.content.packages;
+    this.projects = this.content.projects;
 
     this.entityNames = keys(this.entities || {});
 
-    //this.requireContexts = bundle.requireContexts
+    this.requireContexts = bundle.requireContexts;
 
     // naming irregularities
     assign(this, {
       get settingsFiles() {
-        return bundle.content.settings;
+        return bundle.content.settings_files;
+      },
+      get copyFiles() {
+        return bundle.content.copy_files;
       },
       get data() {
         return bundle.content.data_sources;
@@ -118,32 +131,29 @@ module.exports = (function () {
   }, {
     key: 'requireEntryPoint',
     value: function requireEntryPoint(id) {
-      throw ('This feature is deprecated', id);
       return this.require('script', 'entries/' + id);
     }
   }, {
     key: 'requireLayout',
     value: function requireLayout(id) {
-      throw ('This feature is deprecated', id);
       return this.require('script', 'layouts/' + id);
     }
   }, {
     key: 'requireComponent',
     value: function requireComponent(id) {
-      throw ('This feature is deprecated', id);
       return this.require('script', 'components/' + id);
     }
   }, {
     key: 'requireStyleSheet',
     value: function requireStyleSheet(id) {
-      throw ('This feature is deprecated', id);
       return this.require('stylesheet', id);
     }
   }, {
     key: 'require',
     value: function require(assetType, assetId) {
-      throw ('This feature is deprecated', id);
-      var key = this[assetType + 's'][assetId].paths.relative;
+      var file = this[assetType + 's'][assetId] || this[assetType + 's'][assetId + '/index'] || this[assetType + 's'][assetId + '/' + assetId];
+
+      var key = file.paths.relative;
       var asset = this.requireContexts[assetType + 's']('./' + key);
 
       if (!asset) {
@@ -183,9 +193,9 @@ module.exports = (function () {
       var settings = project.settings || {};
       var app = settings.app || {};
 
-      props.entryPoints = assign({}, app.entryPoints || {}, props.entryPoints || {});
+      props.screens = assign({}, app.screens || {}, props.screens || {});
 
-      var entryPaths = keys(props.entryPoints);
+      var entryPaths = keys(props.screens);
 
       /*
         if (entryPaths.length < 1) {
@@ -193,24 +203,10 @@ module.exports = (function () {
       }*/
 
       entryPaths.forEach(function (path) {
-        var cfg = props.entryPoints[path];
+        var cfg = props.screens[path];
 
-        if (typeof cfg === 'string') {
-          cfg = props.entryPoints[path] = {
-            component: project.requireEntryPoint(cfg.replace(/^entries\//, ''))
-          };
-        }
-
-        if ((typeof cfg === 'undefined' ? 'undefined' : (0, _typeof3.default)(cfg)) === 'object' && typeof cfg.component === 'string') {
-          cfg.component = project.requireEntryPoint(cfg.component.replace(/^entries\//, ''));
-        } else if ((typeof cfg === 'undefined' ? 'undefined' : (0, _typeof3.default)(cfg)) === 'object' && cfg.index && typeof cfg.index === 'string') {
-          cfg.component = project.requireEntryPoint(cfg.index.replace(/^entries\//, ''));
-        } else if ((typeof cfg === 'undefined' ? 'undefined' : (0, _typeof3.default)(cfg)) === 'object' && cfg.index && (0, _typeof3.default)(cfg.index) === 'object' && typeof cfg.index.component === 'string') {
-          cfg.component = project.requireEntryPoint(cfg.index.component.replace(/^entries\//, ''));
-        } else if (typeof cfg === 'function') {
-          cfg = {
-            component: cfg
-          };
+        if ((0, _isString2.default)(cfg)) {
+          entryPaths[cfg] = project.requireEntryPoint(cfg);
         }
       });
 
@@ -227,14 +223,14 @@ module.exports = (function () {
 
       props.layout = props.layout || app.layout;
 
-      if (typeof props.layout === 'string') {
-        props.layout = this.requireLayout(props.layout);
-      }
-
       if ((0, _typeof3.default)(props.layout) === 'object') {
         if (typeof props.layout.component === 'string') {
           props.layout.component = this.requireLayout(props.layout.component);
         }
+      }
+
+      if (typeof props.layout === 'string') {
+        props.layout = this.requireLayout(props.layout);
       }
 
       return props;

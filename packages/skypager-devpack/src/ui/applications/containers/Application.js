@@ -39,11 +39,13 @@ export class Application extends Component {
       throw('Must supply a skypager project bundle to launch this application')
     }
 
+    /*
     if (project) {
       if (!options.setup && !project.settings.app) {
         return require('ui/applications/setup').setup(project)
       }
     }
+    */
 
     if (options.layout && typeof options.layout === 'function') {
        options.layout = stateful(options.layout, 'settings', 'settings.navigation', 'settings.branding')
@@ -68,7 +70,7 @@ export class Application extends Component {
     layout: types.func,
 
     // entry point configuration
-    entryPoints: types.object,
+    screens: types.object,
 
     // an array of redux middlewares to inject into the store
     middlewares: types.array,
@@ -106,7 +108,7 @@ export class Application extends Component {
     let {
       client,
       layout,
-      entryPoints,
+      screens,
       middlewares,
       reducers,
       initialState
@@ -118,7 +120,7 @@ export class Application extends Component {
     }
 
     app = render(
-      <Application entryPoints={entryPoints}
+      <Application screens={screens}
                          initialState={initialState}
                          layout={layout}
                          project={project}
@@ -137,10 +139,10 @@ export class Application extends Component {
   constructor (props = {}, context = {}) {
     super(props, context)
 
-    let { layout, entryPoints } = this.props
+    let { layout, screens } = this.props
     let { reducers, middlewares, initialState, project } = this.props
 
-    this.routes = buildRoutes(layout, { entryPoints })
+    this.routes = buildRoutes(layout, { screens })
 
     //console.log('Application Creating', props, context)
 

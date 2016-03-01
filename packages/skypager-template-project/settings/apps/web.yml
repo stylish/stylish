@@ -1,6 +1,0 @@
-locale: en
-theme: marketing-bold
-layout: web/layouts/MainLayout
-entryPoints:
-  index: web/entries/Home
-  documentation: web/entries/Documentation

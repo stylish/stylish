@@ -58,7 +58,7 @@ export function AssetExporter (options = {}, callback) {
   }
 }
 
-const IncludeExporters = ['entities','settings', 'copy','project']
+const IncludeExporters = ['entities','settings', 'copy','project','models']
 
 export function ProjectExporter (options = {}, callback) {
   let project = options.project
@@ -74,12 +74,43 @@ export function ProjectExporter (options = {}, callback) {
     `var bundle = module.exports = {};`,
     `bundle.project = require('./project-export.json');`,
     `bundle.entities = require('./entities-export.json');`,
-    `bundle.assets = require('./assets-export.json');`,
     `bundle.models = require('./models-export.json');`,
     `bundle.settings = require('./settings-export.json');`,
     `bundle.copy = require('./copy-export.json');`,
-    `bundle.content = {}`,
+
+    `bundle.requireContexts = {
+      scripts: require.context('${ project.scripts.paths.absolute }', true, /\.js$/i),
+      stylesheets: require.context('${ project.stylesheets.paths.absolute }', true, /\..*ss$/i)
+    };`,
+
+    `bundle.content = {}`
   ]
+
+   const IncludeCollections = [
+     'documents',
+     'data_sources',
+     'copy_files',
+     'settings_files',
+     'scripts',
+     'stylesheets',
+     'packages',
+     'projects'
+   ]
+
+   IncludeCollections.forEach(key => {
+    lines.push(`var _${ key } = bundle.content.${ key } = {};`)
+
+    if (!project.content[key]) {
+      console.error('No such content colection', key, Object.keys(project.content))
+      throw('No such content collection ' + key)
+    }
+
+    project.content[key].forEach(asset => {
+      let { requirePath } = AssetExporter.call(project, { asset, options, key })
+      lines.push(`_${ key }['${ asset.id }'] = require('./${requirePath}');`)
+    })
+  })
+
 
   lines.push(`module.exports = require('skypager-project/lib/bundle').create(bundle)`)
 

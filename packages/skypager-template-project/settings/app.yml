@@ -5,5 +5,7 @@ environments:
 
 locale: en
 
-apps:
-  - web
+layout: Main
+
+screens:
+  index: Home
