@@ -17,7 +17,10 @@ cli(function (program, dispatch){
   return program
 })
 
-execute(function(params, context) {
+execute(function(group, params, context) {
+  group = group || params.group
+  params.group = group
+
   var project = context.project
   var shell = require('shelljs')
 
@@ -28,7 +31,7 @@ execute(function(params, context) {
 
   var include, exclude, group
 
-  switch(params.group) {
+  switch(group) {
     case 'project', 'projects':
       include = params.include ? project.projects.glob(params.include) : project.projects.query()
       exclude = params.exclude ? project.projects.glob(params.exclude) : []

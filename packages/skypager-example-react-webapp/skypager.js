@@ -1,1 +1,1 @@
-module.exports = require('../skypager').load(__filename)
+module.exports = require('skypager-project').load(__filename)

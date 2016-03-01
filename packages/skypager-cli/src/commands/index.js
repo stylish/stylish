@@ -44,6 +44,14 @@ const currentDirectory = process.env.PWD
 let requestedCommand = argv._[0]
 
 export function program (options = {}) {
+  if ($skypager && argv.debugPaths) {
+    console.log(
+      JSON.stringify($skypager, null, 2)
+    )
+
+    process.exit(0)
+  }
+
   const commander = require('commander')
 
   commander
@@ -60,6 +68,7 @@ export function program (options = {}) {
      commander.outputHelp()
     }
   }
+
 
   return () => commander.parse(process.argv)
 }

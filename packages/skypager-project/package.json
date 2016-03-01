@@ -1,6 +1,6 @@
 {
   "name": "skypager-project",
-  "version": "2.13.1",
+  "version": "2.14.1",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
   "bin": {
@@ -17,8 +17,7 @@
     "lint": "eslint src/**/*",
     "lint:fix": "npm run lint -- --fix",
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
-    "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
-    "prepublish": "npm run test && npm run compile"
+    "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src"
   },
   "repository": {
     "type": "git",
@@ -40,6 +39,7 @@
     ]
   },
   "dependencies": {
+    "babel-core": "6.5.2",
     "babel-polyfill": "^6.3.13",
     "babel-register": "^6.3.13",
     "babel-runtime": "^6.3.13",
@@ -69,6 +69,8 @@
     "path-match": "^1.2.3",
     "path-to-regexp": "^1.2.1",
     "pkginfo": "^0.3.1",
+    "react": "^0.14.7",
+    "react-dom": "^0.14.7",
     "read": "^1.0.7",
     "request": "^2.67.0",
     "rimraf": "^2.5.1",

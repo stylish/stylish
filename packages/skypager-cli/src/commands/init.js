@@ -29,7 +29,7 @@ export function handle (projectName, destination, options = {}, context = {}) {
   }
 
   let type = options.type || 'project'
-  let source = join(__dirname, '../../packages', `${ type }-template.asar`),
+  let source = join(__dirname, '../../packages', `${ type }-template.asar`)
 
   try {
     require('asar').extractAll(source, destination)
@@ -55,7 +55,7 @@ export function handle (projectName, destination, options = {}, context = {}) {
 
     require('fs').writeFileSync(
        join(destination, 'skypager.js'),
-       `module.exports = require('${ process.env.SKYPAGER_PROJECT_ROOT || ($skypager && $skypager['skypager-project']) }').load(__filename)\n`,
+       `module.exports = require('skypager-project').load(__filename)\n`,
        'utf8'
     )
 

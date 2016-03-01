@@ -1,6 +1,6 @@
 {
   "name": "skypager-cli",
-  "version": "2.13.1",
+  "version": "2.13.4",
   "preferGlobal": "true",
   "bin": {
     "skypager": "./bin/cli.js"
@@ -11,11 +11,12 @@
     "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js",
     "test:watch": "mocha -r 'babel-register' -r 'should' --watch test/**/*-spec.js",
     "compile": "babel -d lib src",
-    "precompile": "npm run package:templates",
+    "prepublish": "npm run package:templates",
     "compile:watch": "babel -q -w -d lib src",
+    "clean:templates": "rimraf -f ../skypager-template-*/node_modules ../skypager-template-*/tmp/* ../skypager-template-*/log/*.*",
     "package:portfolio:template": "asar pack ../skypager-template-portfolio packages/portfolio-template.asar",
     "package:project:template": "asar pack ../skypager-template-project packages/project-template.asar",
-    "package:templates": "npm run package:project:template && npm run package:portfolio:template"
+    "package:templates": "npm run clean:templates package:project:template && npm run package:portfolio:template"
   },
   "repository": {
     "type": "git",

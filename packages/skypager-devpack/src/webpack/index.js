@@ -1,3 +1,9 @@
+/**
+ * THIS SCRIPT IS A MESS.
+ *
+ * I need to break this down into separate chunks and document the options
+ *
+ */
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import defaults from 'lodash/defaults'
@@ -119,10 +125,11 @@ module.exports = function (externalOptions = {}) {
 
   if (!options.noVendor) {
     entry.vendor = buildVendorStack(options)
+
+    config
+      .plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
   }
 
-  config
-    .plugin('common-chunks', webpack.optimize.CommonsChunkPlugin, [{ names: ['vendor'] }])
 
 	var outputPath = options.outputFolder ? path.resolve(options.outputFolder)  : join(directory, 'public')
 
