@@ -10,6 +10,8 @@ export function routes(component, options = {}) {
     component = "div"
   }
 
+  console.log('Building Routes', component, options)
+
   const { screens } = options
   const root = { path: "/", component, childRoutes:[] }
 
@@ -30,12 +32,18 @@ export function routes(component, options = {}) {
 
   root.childRoutes.push(...childRoutes)
 
+  console.log('Route Before', root)
+
   let result = create(root)
+
+  console.log('Route After', result)
 
   return result
 }
 
 function buildRoute(path, config = {}, index = 0) {
+  console.log('Build Route', path, config, index)
+
   let component = config.component
   let route = { path, component }
 

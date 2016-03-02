@@ -13,7 +13,6 @@ let _curr
 function current () { return tracker[_curr] }
 function clearDefinition () { _curr = null; delete tracker[_curr] }
 
-
 export class ActionDefinition {
   constructor (actionName) {
     this.name = actionName

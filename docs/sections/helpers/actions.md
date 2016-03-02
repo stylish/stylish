@@ -1,3 +1,7 @@
+---
+status: stable
+---
+
 # Actions
 
 Actions are functions that can be exposed via an interface.  Their purpose is to provide a way for outside systems to interact with the project, or to facilitate using the project content or data to interact with the outside world.  The Skypager framework provides its own core actions, Plugins can provide actions, and each Project can define its own set of actions as well.
@@ -8,7 +12,9 @@ Actions can be as simple as a single function which gets exported by a module.
 
 ```js
 module.exports = function MyAction(params = {}, context = {}) {
+  let { project } = context
 
+  // DO SOMETHING
 }
 ```
 
