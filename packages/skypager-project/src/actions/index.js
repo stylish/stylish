@@ -1,9 +1,5 @@
 module.exports = function ActionsLoader (actions) {
   actions.load(
-    require('./projects/scaffold'), {uri: require.resolve('./projects/scaffold') }
-  )
-
-  actions.load(
     require('./specs/run_suite'), {uri: require.resolve('./specs/run_suite') }
   )
 
