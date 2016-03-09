@@ -1,7 +1,7 @@
 import Skypager from '../index'
 import Collection from '../collection'
 
-import { extname, dirname, join } from 'path'
+import { extname, dirname, join, basename } from 'path'
 import md5 from 'md5'
 import * as util from '../util'
 
@@ -15,6 +15,10 @@ const { singularize, pluralize } = util
 import pick from 'lodash/pick'
 
 class Asset {
+  static EXTENSIONS = EXTENSIONS;
+
+  static GLOB = GLOB;
+
   static decorateCollection (collection) {
     if (this.collectionInterface) {
       defineProperties(collection, this.collectionInterface(collection))
@@ -182,7 +186,9 @@ class Asset {
   }
 
   get groupName() {
-    return pluralize(this.paths.relative.split('/')[0])
+    return this.id == 'index'
+      ? this.collection.name
+      : pluralize(this.paths.relative.split('/')[0])
   }
 
   get assetClass () {
@@ -190,7 +196,26 @@ class Asset {
   }
 
   get assetGroup () {
-    return util.tabelize(this.assetClass.name)
+    return util.tableize(this.assetClass.name)
+  }
+
+  get assetFamily() {
+    return this.categoryFolder
+  }
+  /**
+   * If an asset belongs to a folder like components, layouts, etc.
+   * then the categoryFolder would be components
+   *
+   * @return {String}
+   */
+  get categoryFolder () {
+    if (this.id === 'index' || this.dirname === 'src') {
+      return this.assetGroup
+    }
+
+    return this.isIndex
+      ? util.tableize(basename(dirname(this.dirname)))
+      : util.tableize(basename(this.dirname))
   }
 
   get parentdir () {
@@ -203,6 +228,14 @@ class Asset {
 
   get extension () {
     return extname(this.uri)
+  }
+
+  get isIndex () {
+     return !!this.uri.match(/index\.\w+$/)
+  }
+
+  get depth () {
+    return this.id.split('/').length
   }
 
   get paths () {
@@ -293,11 +326,20 @@ class Asset {
   }
 }
 
-Asset.EXTENSIONS = EXTENSIONS
-Asset.GLOB = GLOB
-
 function relationshipProxy (asset) {
-  const groups = ['assets', 'data_sources', 'documents', 'images', 'scripts', 'stylesheets', 'vectors']
+  const groups = [
+    'assets',
+    'data_sources',
+    'documents',
+    'images',
+    'scripts',
+    'packages',
+    'projects',
+    'settings_files',
+    'copy_files',
+    'stylesheets',
+    'vectors'
+  ]
 
   let i = {
     get count(){

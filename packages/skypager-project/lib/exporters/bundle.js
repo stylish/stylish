@@ -20,7 +20,15 @@ exports.BrowserBundle = BrowserBundle;
 exports.AssetExporter = AssetExporter;
 exports.ProjectExporter = ProjectExporter;
 
+var _pick = require('lodash/pick');
+
+var _pick2 = _interopRequireDefault(_pick);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var IncludeData = ['data_sources', 'settings_files', 'copy_files'];
+var IncludeExporters = ['entities', 'settings', 'copy', 'project', 'models'];
+var AssetFields = ['id', 'assetGroup', 'categoryFolder', 'fingerprint', 'paths'];
 
 function BrowserBundle() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -56,14 +64,9 @@ function AssetExporter() {
     return { requirePath }
   }*/
 
-  var output = {
-    id: asset.id,
-    paths: asset.paths,
-    assetGroup: asset.assetGroup,
-    fingerprint: asset.fingerprint
-  };
+  var output = (0, _pick2.default)(asset, AssetFields);
 
-  if (asset.assetGroup === 'data_sources') {
+  if (IncludeData.indexOf(asset.assetGroup) >= 0) {
     output = (0, _assign2.default)(output, {
       data: asset.data
     });
@@ -85,8 +88,6 @@ function AssetExporter() {
   };
 }
 
-var IncludeExporters = ['entities', 'settings', 'copy', 'project', 'models'];
-
 function ProjectExporter() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
   var callback = arguments[1];
@@ -99,7 +100,7 @@ function ProjectExporter() {
     });
   }
 
-  var lines = [contextPolyfill(), 'var bundle = module.exports = {};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.models = require(\'./models-export.json\');', 'bundle.settings = require(\'./settings-export.json\');', 'bundle.copy = require(\'./copy-export.json\');', 'bundle.requireContexts = {\n      scripts: require.context(\'' + project.scripts.paths.absolute + '\', true, /.js$/i),\n      stylesheets: require.context(\'' + project.stylesheets.paths.absolute + '\', true, /..*ss$/i)\n    };', 'bundle.content = {}'];
+  var lines = [contextPolyfill(), 'console.log("Generating Bundle")', 'var bundle = module.exports = {bundleApi:2};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.models = require(\'./models-export.json\');', 'bundle.settings = require(\'./settings-export.json\');', 'bundle.copy = require(\'./copy-export.json\');', 'bundle.requireContexts = {\n      scripts: require.context(\'' + project.scripts.paths.absolute + '\', true, /.js$/i),\n      stylesheets: require.context(\'' + project.stylesheets.paths.absolute + '\', true, /..*ss$/i)\n    };', 'bundle.content = {}'];
 
   var IncludeCollections = ['documents', 'data_sources', 'copy_files', 'settings_files', 'scripts', 'stylesheets', 'packages', 'projects'];
 
@@ -120,7 +121,7 @@ function ProjectExporter() {
     });
   });
 
-  lines.push('module.exports = require(\'skypager-project/lib/bundle\').create(bundle)');
+  lines.push('module.exports = bundle');
 
   return write(project.path('build', 'bundle', 'index.js'), lines.join("\n"));
 }

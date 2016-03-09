@@ -6,7 +6,11 @@ const { clone, defaults, pick, result, noConflict } = util
 const EXTENSIONS = ['js', 'json', 'yaml', 'yml', 'csv']
 const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
 
-class DataSource extends Asset {
+export class DataSource extends Asset {
+  static EXTENSIONS = EXTENSIONS;
+
+  static GLOB = GLOB;
+
   constructor (uri, options = {}) {
     super(uri, options)
 
@@ -102,10 +106,7 @@ class DataSource extends Asset {
   }
 }
 
-DataSource.EXTENSIONS = EXTENSIONS
-DataSource.GLOB = GLOB
-
-exports = module.exports = DataSource
+export default DataSource
 
 function handleScript (datasource, load) {
   let locals = {

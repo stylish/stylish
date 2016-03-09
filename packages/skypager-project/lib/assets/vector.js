@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Vector = undefined;
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -24,7 +29,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // can parse / index / transform with xml
 
-var Vector = (function (_Asset) {
+var Vector = exports.Vector = (function (_Asset) {
   (0, _inherits3.default)(Vector, _Asset);
 
   function Vector() {
@@ -37,5 +42,4 @@ var Vector = (function (_Asset) {
 
 Vector.EXTENSIONS = ['svg'];
 Vector.GLOB = '**/*.svg';
-
-exports = module.exports = Vector;
+exports.default = Vector;

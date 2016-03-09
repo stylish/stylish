@@ -14,7 +14,7 @@ import vault from './vault'
 import { resolve, dirname, join, basename, extname } from 'path'
 
 import mapValues from 'lodash/mapValues'
-import defaults from 'lodash/defaults'
+import defaults from 'lodash/defaultsDeep'
 import pick from 'lodash/pick'
 
 const hide = util.hide.getter
@@ -30,6 +30,20 @@ const HOOKS = [
   'registriesDidLoad'
 ]
 
+const DefaultOptions = {
+  type: 'project',
+  env: process.env.NODE_ENV || 'development',
+  importer: {
+    type: 'disk',
+    autoLoad: {
+      documents: true,
+      data_sources: true,
+      settings_files: true,
+      copy_files: true
+    }
+  }
+}
+
 class Project {
   constructor (uri, options = {}) {
     uri.should.be.a.String()
@@ -41,7 +55,7 @@ class Project {
 
     project.uri = uri
     project.root = dirname(uri)
-    project.type = options.type || 'project'
+    project.type = options.type
 
     project.hidden('options', () => options)
 
@@ -57,12 +71,11 @@ class Project {
 
     project.hidden('paths', paths.bind(project))
 
-    project.env = options.env || process.env.NODE_ENV || 'development'
+    project.env = options.env
 
     logger(project, options)
 
     project.hidden('registries', registries.call(project), false)
-
 
     const plugins = [ ]
     util.hide.getter(project, 'enabledPlugins', () => plugins)
@@ -85,19 +98,13 @@ class Project {
 
     project.emit('contentDidInitialize')
 
-    if (options.autoImport !== false) {
+
+    if (options.autoImport !== false && options.autoLoad !== false) {
       project.debug('running autoimport', options.autoLoad)
 
       project.emit('projectWillAutoImport')
 
-      runImporter.call(project, {
-        type: (options.importerType || 'disk'),
-        autoLoad: options.autoLoad || {
-          documents: true,
-          assets: true,
-          vectors: true
-        }
-      })
+      runImporter.call(project, options.importer)
 
       project.emit('projectDidAutoImport')
     }
@@ -118,7 +125,7 @@ class Project {
             project,
             assetClass,
             name,
-            ...(pick(cfg,'exclude','pattern', 'autoLoad'))
+            ...(pick(cfg,'exclude','include', 'autoLoad'))
           })
         })
       )
@@ -226,12 +233,15 @@ class Project {
       return this.content.data_sources.query(params)
     }
 
-    if (['assets','scripts','stylesheets','images','vectors'].indexOf(source) >= 0) {
+    if (this.content[source]) {
       return this.content[source].query(params)
     }
 
     if (this.modelGroups.indexOf(source) > 0) {
-      return util.filterQuery(util.values(this.entities[source]), params)
+      return util.filterQuery(
+        util.values(this.entities[source]),
+        params
+      )
     }
   }
 
@@ -479,9 +489,11 @@ class Project {
     return stream
   }
 
-  exists(path) {
+  exists(...args) {
     try {
-      return require('fs').existsSync(path)
+      return require('path-exists').sync(
+        this.paths.join(...args)
+      )
     } catch(error) {
        return false
     }
@@ -559,10 +571,16 @@ function content () {
 function runImporter (options = {}) {
   let project = this
   let collections = project.collections
-  let { autoLoad, importer } = options
+  let { autoLoad, type } = options
 
   project.logger.profile('import starting')
-  let result = project.importers.run(importer || 'disk', { project: this, collections: this.content, autoLoad })
+
+  let result = project.importers.run(type || 'disk', {
+    project: this,
+    collections: this.content,
+    autoLoad
+  })
+
   project.logger.profile('import finishing')
 
   return result
@@ -572,22 +590,26 @@ function buildContentCollectionsManually () {
   const project = this
   const paths = project.paths
 
-  let { Asset, DataSource, Document, CopyFile, Image, Script, Stylesheet, ProjectManifest, SettingsFile, Vector } = Assets
+  let {
+    Asset, DataSource, Document,
+    CopyFile, Image, Script, Stylesheet,
+    ProjectManifest, SettingsFile, Vector
+  } = Assets
 
   return {
-    assets: Asset.createCollection(this, false),
-    data_sources: DataSource.createCollection(this, false),
-    documents: Document.createCollection(this, false),
-    images: Image.createCollection(this, false),
-    scripts: Script.createCollection(this, false),
-    stylesheets: Stylesheet.createCollection(this, false),
-    vectors: Vector.createCollection(this, false),
+    assets: Asset.createCollection(this, {root: this.paths.assets}),
+    data_sources: DataSource.createCollection(this, {root: this.paths.data_sources}),
+    documents: Document.createCollection(this, {root: this.paths.documents}),
+    images: Image.createCollection(this, {root: this.paths.images}),
+    scripts: Script.createCollection(this, {root: this.paths.scripts}),
+    stylesheets: Stylesheet.createCollection(this, {root: this.paths.stylesheets}),
+    vectors: Vector.createCollection(this, {root: this.paths.vectors}),
 
     packages: new Collection({
       root: this.paths.packages,
       project: this,
       assetClass: ProjectManifest,
-      pattern: '*/package.json',
+      include: '*/package.json',
       exclude: '**/node_modules'
     }),
 
@@ -595,7 +617,7 @@ function buildContentCollectionsManually () {
       root: this.paths.projects,
       project: this,
       assetClass: ProjectManifest,
-      pattern: '*/package.json',
+      include: '*/package.json',
       exclude: '**/node_modules'
     }),
 
@@ -676,5 +698,5 @@ function normalizeOptions (options = {}) {
     options = Object.assign(options, options.manifest.skypager)
   }
 
-  return options
+  return defaults(options, DefaultOptions)
 }

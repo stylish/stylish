@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Stylesheet = exports.GLOB = exports.EXTENSIONS = undefined;
+exports.Stylesheet = undefined;
 
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
@@ -31,8 +31,8 @@ var _asset2 = _interopRequireDefault(_asset);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var EXTENSIONS = exports.EXTENSIONS = ['css', 'less', 'scss', 'sass'];
-var GLOB = exports.GLOB = '**/*.{' + EXTENSIONS.join(',') + '}';
+var EXTENSIONS = ['css', 'less', 'scss', 'sass'];
+var GLOB = '**/*.{' + EXTENSIONS.join(',') + '}';
 
 /**
 * Ideas:
@@ -67,4 +67,6 @@ var Stylesheet = exports.Stylesheet = (function (_Asset) {
   return Stylesheet;
 })(_asset2.default);
 
+Stylesheet.EXTENSIONS = EXTENSIONS;
+Stylesheet.GLOB = GLOB;
 exports.default = Stylesheet;

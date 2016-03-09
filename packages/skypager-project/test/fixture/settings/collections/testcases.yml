@@ -1,4 +1,4 @@
 root: '<%= project.path("documents") %>'
 assetClass: 'Document'
-pattern: '**/*spec.md'
+include: '**/*spec.md'
 autoLoad: true

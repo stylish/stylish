@@ -1,3 +1,9 @@
+import pick from 'lodash/pick'
+
+const IncludeData = ['data_sources','settings_files','copy_files']
+const IncludeExporters = ['entities','settings', 'copy','project','models']
+const AssetFields = ['id','assetGroup', 'categoryFolder', 'fingerprint', 'paths']
+
 export function BrowserBundle (options = {}) {
   let project = options.project = this
 
@@ -29,14 +35,9 @@ export function AssetExporter (options = {}, callback) {
     return { requirePath }
   }*/
 
-  let output = {
-    id: asset.id,
-    paths: asset.paths,
-    assetGroup: asset.assetGroup,
-    fingerprint: asset.fingerprint
-  }
+  let output = pick(asset, AssetFields)
 
-  if (asset.assetGroup === 'data_sources') {
+  if (IncludeData.indexOf(asset.assetGroup) >= 0) {
     output = Object.assign(output, {
       data: asset.data
     })
@@ -58,7 +59,6 @@ export function AssetExporter (options = {}, callback) {
   }
 }
 
-const IncludeExporters = ['entities','settings', 'copy','project','models']
 
 export function ProjectExporter (options = {}, callback) {
   let project = options.project
@@ -71,7 +71,8 @@ export function ProjectExporter (options = {}, callback) {
 
   let lines = [
     contextPolyfill(),
-    `var bundle = module.exports = {};`,
+    `console.log("Generating Bundle")`,
+    `var bundle = module.exports = {bundleApi:2};`,
     `bundle.project = require('./project-export.json');`,
     `bundle.entities = require('./entities-export.json');`,
     `bundle.models = require('./models-export.json');`,
@@ -111,8 +112,7 @@ export function ProjectExporter (options = {}, callback) {
     })
   })
 
-
-  lines.push(`module.exports = require('skypager-project/lib/bundle').create(bundle)`)
+  lines.push(`module.exports = bundle`)
 
   return write(
     project.path('build','bundle','index.js'), lines.join("\n")

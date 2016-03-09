@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Script = exports.GLOB = exports.EXTENSIONS = undefined;
+exports.Script = undefined;
 
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
@@ -35,8 +35,8 @@ var _docblock2 = _interopRequireDefault(_docblock);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var EXTENSIONS = exports.EXTENSIONS = ['js', 'jsx', 'cjsx', 'coffee', 'es6'];
-var GLOB = exports.GLOB = '**/*.{' + EXTENSIONS.join(',') + '}';
+var EXTENSIONS = ['js', 'jsx', 'cjsx', 'coffee', 'es6'];
+var GLOB = '**/*.{' + EXTENSIONS.join(',') + '}';
 
 // can parse, index, transform js with babel
 
@@ -58,6 +58,17 @@ var Script = exports.Script = (function (_Asset) {
       return this.frontmatter || {};
     }
   }, {
+    key: 'generateId',
+    value: function generateId() {
+      var base = '' + this.paths.relative.replace(this.extension, '');
+
+      if (base.match(/\/index$/)) {
+        base = base.replace(/\/index$/, '');
+      }
+
+      return base;
+    }
+  }, {
     key: 'frontmatter',
     get: function get() {
       try {
@@ -70,4 +81,6 @@ var Script = exports.Script = (function (_Asset) {
   return Script;
 })(_asset2.default);
 
+Script.EXTENSIONS = EXTENSIONS;
+Script.GLOB = GLOB;
 exports.default = Script;

@@ -74,9 +74,9 @@ var _mapValues = require('lodash/mapValues');
 
 var _mapValues2 = _interopRequireDefault(_mapValues);
 
-var _defaults = require('lodash/defaults');
+var _defaultsDeep = require('lodash/defaultsDeep');
 
-var _defaults2 = _interopRequireDefault(_defaults);
+var _defaultsDeep2 = _interopRequireDefault(_defaultsDeep);
 
 var _pick = require('lodash/pick');
 
@@ -90,6 +90,20 @@ var hide = util.hide.getter;
 var lazy = util.lazy;
 
 var HOOKS = ['contentWillInitialize', 'contentDidInitialize', 'projectWillAutoImport', 'projectDidAutoImport', 'willBuildEntities', 'didBuildEntities', 'registriesDidLoad'];
+
+var DefaultOptions = {
+  type: 'project',
+  env: process.env.NODE_ENV || 'development',
+  importer: {
+    type: 'disk',
+    autoLoad: {
+      documents: true,
+      data_sources: true,
+      settings_files: true,
+      copy_files: true
+    }
+  }
+};
 
 var Project = (function () {
   function Project(uri) {
@@ -107,7 +121,7 @@ var Project = (function () {
 
     project.uri = uri;
     project.root = (0, _path.dirname)(uri);
-    project.type = options.type || 'project';
+    project.type = options.type;
 
     project.hidden('options', function () {
       return options;
@@ -125,7 +139,7 @@ var Project = (function () {
 
     project.hidden('paths', paths.bind(project));
 
-    project.env = options.env || process.env.NODE_ENV || 'development';
+    project.env = options.env;
 
     (0, _logger2.default)(project, options);
 
@@ -154,25 +168,18 @@ var Project = (function () {
 
     project.emit('contentDidInitialize');
 
-    if (options.autoImport !== false) {
+    if (options.autoImport !== false && options.autoLoad !== false) {
       project.debug('running autoimport', options.autoLoad);
 
       project.emit('projectWillAutoImport');
 
-      runImporter.call(project, {
-        type: options.importerType || 'disk',
-        autoLoad: options.autoLoad || {
-          documents: true,
-          assets: true,
-          vectors: true
-        }
-      });
+      runImporter.call(project, options.importer);
 
       project.emit('projectDidAutoImport');
     }
 
     if (project.settings.collections) {
-      (0, _defaults2.default)(project.content, (0, _mapValues2.default)(project.settings.collections, function (cfg, name) {
+      (0, _defaultsDeep2.default)(project.content, (0, _mapValues2.default)(project.settings.collections, function (cfg, name) {
         var assetClass = Assets[cfg.assetClass];
 
         if (!assetClass) {
@@ -184,7 +191,7 @@ var Project = (function () {
           project: project,
           assetClass: assetClass,
           name: name
-        }, (0, _pick2.default)(cfg, 'exclude', 'pattern', 'autoLoad')));
+        }, (0, _pick2.default)(cfg, 'exclude', 'include', 'autoLoad')));
       }));
     }
 
@@ -251,7 +258,7 @@ var Project = (function () {
         return this.content.data_sources.query(params);
       }
 
-      if (['assets', 'scripts', 'stylesheets', 'images', 'vectors'].indexOf(source) >= 0) {
+      if (this.content[source]) {
         return this.content[source].query(params);
       }
 
@@ -426,9 +433,11 @@ var Project = (function () {
     }
   }, {
     key: 'exists',
-    value: function exists(path) {
+    value: function exists() {
       try {
-        return require('fs').existsSync(path);
+        var _paths2;
+
+        return require('path-exists').sync((_paths2 = this.paths).join.apply(_paths2, arguments));
       } catch (error) {
         return false;
       }
@@ -764,10 +773,16 @@ function runImporter() {
   var project = this;
   var collections = project.collections;
   var autoLoad = options.autoLoad;
-  var importer = options.importer;
+  var type = options.type;
 
   project.logger.profile('import starting');
-  var result = project.importers.run(importer || 'disk', { project: this, collections: this.content, autoLoad: autoLoad });
+
+  var result = project.importers.run(type || 'disk', {
+    project: this,
+    collections: this.content,
+    autoLoad: autoLoad
+  });
+
   project.logger.profile('import finishing');
 
   return result;
@@ -789,19 +804,19 @@ function buildContentCollectionsManually() {
   var Vector = Assets.Vector;
 
   return {
-    assets: Asset.createCollection(this, false),
-    data_sources: DataSource.createCollection(this, false),
-    documents: Document.createCollection(this, false),
-    images: Image.createCollection(this, false),
-    scripts: Script.createCollection(this, false),
-    stylesheets: Stylesheet.createCollection(this, false),
-    vectors: Vector.createCollection(this, false),
+    assets: Asset.createCollection(this, { root: this.paths.assets }),
+    data_sources: DataSource.createCollection(this, { root: this.paths.data_sources }),
+    documents: Document.createCollection(this, { root: this.paths.documents }),
+    images: Image.createCollection(this, { root: this.paths.images }),
+    scripts: Script.createCollection(this, { root: this.paths.scripts }),
+    stylesheets: Stylesheet.createCollection(this, { root: this.paths.stylesheets }),
+    vectors: Vector.createCollection(this, { root: this.paths.vectors }),
 
     packages: new _collection2.default({
       root: this.paths.packages,
       project: this,
       assetClass: ProjectManifest,
-      pattern: '*/package.json',
+      include: '*/package.json',
       exclude: '**/node_modules'
     }),
 
@@ -809,7 +824,7 @@ function buildContentCollectionsManually() {
       root: this.paths.projects,
       project: this,
       assetClass: ProjectManifest,
-      pattern: '*/package.json',
+      include: '*/package.json',
       exclude: '**/node_modules'
     }),
 
@@ -898,5 +913,5 @@ function normalizeOptions() {
     options = (0, _assign2.default)(options, options.manifest.skypager);
   }
 
-  return options;
+  return (0, _defaultsDeep2.default)(options, DefaultOptions);
 }

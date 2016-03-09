@@ -1,11 +1,14 @@
 import Asset from './asset'
 import docblock from '../utils/docblock'
 
-export const EXTENSIONS = ['js', 'jsx', 'cjsx', 'coffee', 'es6']
-export const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
+const EXTENSIONS = ['js', 'jsx', 'cjsx', 'coffee', 'es6']
+const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
 
 // can parse, index, transform js with babel
 export class Script extends Asset {
+  static EXTENSIONS = EXTENSIONS;
+  static GLOB = GLOB;
+
   getData () {
     if ((!this.raw || this.raw.length === 0)) {
       this.runImporter('disk', {asset: this, sync: true})
@@ -20,6 +23,16 @@ export class Script extends Asset {
     } catch(error) {
       return {}
     }
+  }
+
+  generateId() {
+     let base = `${this.paths.relative.replace(this.extension, '')}`
+
+     if (base.match(/\/index$/)) {
+       base = base.replace(/\/index$/,'')
+     }
+
+     return base
   }
 }
 

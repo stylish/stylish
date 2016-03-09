@@ -1,7 +1,7 @@
 import Asset from './asset'
 
-export const EXTENSIONS = ['css', 'less', 'scss', 'sass']
-export const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
+const EXTENSIONS = ['css', 'less', 'scss', 'sass']
+const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
 
 /**
 * Ideas:
@@ -9,6 +9,9 @@ export const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
 * Parse a stylesheet to learn about the rules it exposes
 */
 export class Stylesheet extends Asset {
+  static EXTENSIONS = EXTENSIONS;
+  static GLOB = GLOB;
+
   get imports() {
     return ['TODO: list which dependencies it imports']
   }

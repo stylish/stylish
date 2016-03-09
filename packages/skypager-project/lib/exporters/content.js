@@ -33,7 +33,6 @@ function CollectionBundle() {
       };
 
       if (asset.assetClass.name == 'DataSource') {
-        delete entry.raw;
         entry.data = asset.data;
       }
     } catch (e) {

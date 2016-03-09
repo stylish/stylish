@@ -4,13 +4,13 @@ var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
-var _extends2 = require('babel-runtime/helpers/extends');
+var _keys = require('babel-runtime/core-js/object/keys');
 
-var _extends3 = _interopRequireDefault(_extends2);
+var _keys2 = _interopRequireDefault(_keys);
 
-var _promise = require('babel-runtime/core-js/promise');
+var _assign = require('babel-runtime/core-js/object/assign');
 
-var _promise2 = _interopRequireDefault(_promise);
+var _assign2 = _interopRequireDefault(_assign);
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -53,8 +53,22 @@ var Collection = (function () {
     var assetClass = options.assetClass;
 
     var collection = this;
-
     collection.root = root;
+
+    if (typeof options.exclude === 'string') {
+      options.exclude = [options.exclude];
+    }
+
+    if (typeof options.include === 'string') {
+      options.include = [options.include];
+    }
+
+    (0, _util.defaults)(options, {
+      autoLoad: false,
+      include: [assetClass.GLOB],
+      exclude: ['**/node_modules'],
+      name: (0, _path.basename)(root)
+    });
 
     collection.name = options.name || (0, _path.basename)(root);
 
@@ -62,6 +76,8 @@ var Collection = (function () {
     collection.hidden('AssetClass', function () {
       return assetClass;
     });
+
+    (0, _assign2.default)(this, {}, (0, _lodash.pick)(options, 'include', 'exclude', 'name', 'autoLoad'));
 
     var assets = {};
     var index = {};
@@ -73,12 +89,6 @@ var Collection = (function () {
     });
     collection.hidden('index', function () {
       return index;
-    });
-    collection.hidden('assetPattern', function () {
-      return options.pattern || assetClass.GLOB;
-    });
-    collection.hidden('excludePattern', function () {
-      return options.ignore || '**/node_modules';
     });
 
     _util.hide.property(collection, 'expandDotPaths', function () {
@@ -101,15 +111,10 @@ var Collection = (function () {
 
   (0, _createClass3.default)(Collection, [{
     key: 'loadAssetsFromDisk',
-    value: function loadAssetsFromDisk(paths) {
+    value: function loadAssetsFromDisk() {
       var _this = this;
 
-      if (!paths) {
-        paths = require('glob').sync(this.assetPattern, {
-          cwd: this.root,
-          ignore: [this.excludePattern]
-        });
-      }
+      var paths = arguments.length <= 0 || arguments[0] === undefined ? this.filesInRoot : arguments[0];
 
       this._willLoadAssets(paths);
 
@@ -123,24 +128,20 @@ var Collection = (function () {
   }, {
     key: 'globFiles',
     value: function globFiles() {
-      var _this2 = this;
+      var patterns = this.include;
 
-      var pattern = arguments.length <= 0 || arguments[0] === undefined ? this.assetPattern : arguments[0];
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      if (this.project.exists('.skypagerignore')) {
+        patterns = patterns.concat(require('gitignore-globs')(this.project.join('.skypagerignore'), {
+          negate: true
+        }));
+      }
 
-      var glob = require('glob');
+      patterns = patterns.concat(this.exclude.map(function (p) {
+        return '!' + p;
+      }));
 
-      options.exclude = options.exclude || [this.excludePattern];
-
-      return new _promise2.default(function (resolve, reject) {
-        glob(pattern, (0, _extends3.default)({ cwd: _this2.root }, options), function (err, files) {
-          if (err) {
-            reject(err);
-            return;
-          } else {
-            resolve(files);
-          }
-        });
+      return require('glob-all').sync(patterns, {
+        cwd: this.root
       });
     }
   }, {
@@ -154,12 +155,12 @@ var Collection = (function () {
   }, {
     key: 'relatedGlob',
     value: function relatedGlob(target) {
-      var _this3 = this;
+      var _this2 = this;
 
       var patterns = [target.id + '.{' + this.AssetClass.EXTENSIONS.join(',') + '}', target.id + '/**/*.{' + this.AssetClass.EXTENSIONS.join(',') + '}'];
 
       return patterns.reduce(function (m, a) {
-        return m.concat(_this3.glob(a));
+        return m.concat(_this2.glob(a));
       }, []);
     }
   }, {
@@ -228,6 +229,13 @@ var Collection = (function () {
       }
 
       return _lodash.invoke.apply(undefined, [this.all].concat(args));
+    }
+  }, {
+    key: 'pluck',
+    value: function pluck(prop) {
+      return this.all.map(function (asset) {
+        return (0, _lodash.get)(asset, prop);
+      });
     }
   }, {
     key: 'query',
@@ -322,6 +330,26 @@ var Collection = (function () {
     key: '_willLoadAssets',
     value: function _willLoadAssets(paths) {}
   }, {
+    key: 'categories',
+    get: function get() {
+      this.pluck('categoryFolder').unique();
+    }
+  }, {
+    key: 'idsByCategory',
+    get: function get() {
+      var grouped = this.groupBy('categoryFolder');
+
+      return (0, _keys2.default)(grouped).reduce(function (memo, group) {
+        memo[group] = grouped[group].pluck('id');
+        return memo;
+      }, {});
+    }
+  }, {
+    key: 'indexes',
+    get: function get() {
+      return keys(this.index);
+    }
+  }, {
     key: 'assetType',
     get: function get() {
       return this.AssetClass.typeAlias;
@@ -330,6 +358,11 @@ var Collection = (function () {
     key: 'assetGroupName',
     get: function get() {
       return this.AssetClass.groupName;
+    }
+  }, {
+    key: 'filesInRoot',
+    get: function get() {
+      return this.globFiles();
     }
   }, {
     key: 'paths',
@@ -358,10 +391,10 @@ var Collection = (function () {
   }, {
     key: 'subfolderPaths',
     get: function get() {
-      var _this4 = this;
+      var _this3 = this;
 
       return this.assetPaths.map(function (p) {
-        return (0, _path.relative)(_this4.root, (0, _path.dirname)(p));
+        return (0, _path.relative)(_this3.root, (0, _path.dirname)(p));
       }).unique().filter(function (i) {
         return i.length > 0;
       }).sort(function (a, b) {
@@ -372,11 +405,6 @@ var Collection = (function () {
     key: 'all',
     get: function get() {
       return (0, _util.values)(this.assets);
-    }
-  }, {
-    key: 'indexes',
-    get: function get() {
-      return keys(this.index);
     }
   }, {
     key: 'available',
@@ -469,6 +497,17 @@ function wrapCollection(collection, array) {
       return array.map(function (asset) {
         return asset.pick.apply(asset, args);
       });
+    }
+  });
+
+  defineProperty(array, 'groupBy', {
+    enumerable: false,
+    value: function value() {
+      for (var _len11 = arguments.length, args = Array(_len11), _key11 = 0; _key11 < _len11; _key11++) {
+        args[_key11] = arguments[_key11];
+      }
+
+      return _lodash.groupBy.apply(undefined, [array].concat(args));
     }
   });
 

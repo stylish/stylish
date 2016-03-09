@@ -1,7 +1,7 @@
-import {filterQuery as query, hide, hidden, lazy, tabelize, values} from './util'
+import {defaults, filterQuery as query, hide, hidden, lazy, tabelize, values} from './util'
 import {relative, basename, dirname, extname, resolve, join} from 'path'
 import minimatch from 'minimatch'
-import { invokeMap, mapValues, transform, groupBy, invoke, pick, set as carve } from 'lodash'
+import { get, invokeMap, mapValues, transform, groupBy, invoke, pick, set as carve } from 'lodash'
 
 /**
  * The Skypager.Collection is a wrapper around local file folders
@@ -17,15 +17,30 @@ import { invokeMap, mapValues, transform, groupBy, invoke, pick, set as carve } 
 class Collection {
   constructor (options = {}) {
     let { root, project, assetClass } = options
-
     let collection = this
-
     collection.root = root
+
+    if (typeof options.exclude === 'string') {
+      options.exclude = [options.exclude]
+    }
+
+    if (typeof options.include === 'string') {
+      options.include = [options.include]
+    }
+
+    defaults(options, {
+      autoLoad: false,
+      include: [ assetClass.GLOB ],
+      exclude: [ '**/node_modules' ],
+      name: basename(root)
+    })
 
     collection.name = options.name || basename(root)
 
     collection.hidden('project', project)
     collection.hidden('AssetClass', () => assetClass)
+
+    Object.assign(this, {}, pick(options, 'include', 'exclude', 'name', 'autoLoad'))
 
     const assets = { }
     const index = { }
@@ -34,8 +49,6 @@ class Collection {
 
     collection.hidden('assets', () => assets )
     collection.hidden('index', () => index )
-    collection.hidden('assetPattern', () => options.pattern || assetClass.GLOB)
-    collection.hidden('excludePattern', () => options.ignore || '**/node_modules')
 
     hide.property(collection, 'expandDotPaths', () => buildAtInterface(collection, true))
 
@@ -51,14 +64,7 @@ class Collection {
     }
   }
 
-  loadAssetsFromDisk (paths) {
-    if (!paths) {
-      paths = require('glob').sync(this.assetPattern, {
-        cwd: this.root,
-        ignore: [this.excludePattern]
-      })
-    }
-
+  loadAssetsFromDisk (paths = this.filesInRoot){
     this._willLoadAssets(paths)
 
     paths.forEach(rel => {
@@ -69,6 +75,24 @@ class Collection {
     this._didLoadAssets(paths, false)
   }
 
+  get categories() {
+    this.pluck('categoryFolder').unique()
+  }
+
+  get idsByCategory() {
+    let grouped = this.groupBy('categoryFolder')
+
+    return Object.keys(grouped)
+    .reduce((memo, group) => {
+      memo[group] = grouped[group].pluck('id')
+      return memo
+    }, {})
+  }
+
+  get indexes() {
+    return this.filter(asset => asset.isIndex())
+  }
+
   get assetType () {
     return this.AssetClass.typeAlias
   }
@@ -77,20 +101,27 @@ class Collection {
     return this.AssetClass.groupName
   }
 
-  globFiles(pattern = this.assetPattern, options = {}) {
-    let glob = require('glob')
+  get filesInRoot() {
+    return this.globFiles()
+  }
 
-    options.exclude = options.exclude || [this.excludePattern]
+  globFiles() {
+    let patterns = this.include
 
-    return new Promise((resolve, reject) => {
-      glob(pattern, {cwd: this.root, ...options }, (err, files) => {
-        if (err) {
-          reject(err)
-          return
-        } else {
-           resolve(files)
-        }
-      })
+    if (this.project.exists('.skypagerignore')) {
+      patterns = patterns.concat(
+        require('gitignore-globs')(this.project.join('.skypagerignore'), {
+          negate: true
+        })
+      )
+    }
+
+    patterns = patterns.concat(
+      this.exclude.map(p => '!' + p)
+    )
+
+    return require('glob-all').sync(patterns,{
+      cwd: this.root
     })
   }
 
@@ -175,6 +206,10 @@ class Collection {
 
   get available () {
     return keys(this.assets)
+  }
+
+  pluck(prop) {
+    return this.all.map(asset => get(asset, prop))
   }
 
   query(params = {}, options = {}) {
@@ -297,6 +332,13 @@ function wrapCollection(collection, array) {
     enumerable: false,
     value: function(...args) {
       return array.map(asset => asset.pick(...args))
+    }
+  })
+
+  defineProperty(array, 'groupBy', {
+    enumerable: false,
+    value: function(...args) {
+      return groupBy(array, ...args)
     }
   })
 

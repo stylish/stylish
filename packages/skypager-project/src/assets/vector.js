@@ -1,12 +1,9 @@
 import Asset from './asset'
 
 // can parse / index / transform with xml
-class Vector extends Asset {
-
+export class Vector extends Asset {
+  static EXTENSIONS = ['svg'];
+  static GLOB = '**/*.svg';
 }
 
-Vector.EXTENSIONS = ['svg']
-Vector.GLOB = '**/*.svg'
-
-
-exports = module.exports = Vector
+export default Vector

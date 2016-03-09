@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.DataSource = undefined;
+
 var _typeof2 = require('babel-runtime/helpers/typeof');
 
 var _typeof3 = _interopRequireDefault(_typeof2);
@@ -53,7 +58,7 @@ var noConflict = util.noConflict;
 var EXTENSIONS = ['js', 'json', 'yaml', 'yml', 'csv'];
 var GLOB = '**/*.{' + EXTENSIONS.join(',') + '}';
 
-var DataSource = (function (_Asset) {
+var DataSource = exports.DataSource = (function (_Asset) {
   (0, _inherits3.default)(DataSource, _Asset);
 
   function DataSource(uri) {
@@ -184,8 +189,7 @@ var DataSource = (function (_Asset) {
 
 DataSource.EXTENSIONS = EXTENSIONS;
 DataSource.GLOB = GLOB;
-
-exports = module.exports = DataSource;
+exports.default = DataSource;
 
 function handleScript(datasource, load) {
   var locals = {

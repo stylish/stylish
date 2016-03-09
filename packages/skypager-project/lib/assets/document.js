@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Document = undefined;
+
 var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
@@ -63,7 +68,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var EXTENSIONS = ['md', 'markdown', 'markd'];
 var GLOB = '**/*.{' + EXTENSIONS.join(',') + '}';
 
-var Document = (function (_Asset) {
+var Document = exports.Document = (function (_Asset) {
   (0, _inherits3.default)(Document, _Asset);
 
   function Document(uri) {
@@ -266,7 +271,6 @@ var Document = (function (_Asset) {
   return Document;
 })(_asset2.default);
 
-Document.GLOB = GLOB;
 Document.EXTENSIONS = EXTENSIONS;
-
-exports = module.exports = Document;
+Document.GLOB = GLOB;
+exports.default = Document;

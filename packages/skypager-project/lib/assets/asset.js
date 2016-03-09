@@ -343,7 +343,7 @@ var Asset = (function () {
   }, {
     key: 'groupName',
     get: function get() {
-      return pluralize(this.paths.relative.split('/')[0]);
+      return this.id == 'index' ? this.collection.name : pluralize(this.paths.relative.split('/')[0]);
     }
   }, {
     key: 'assetClass',
@@ -353,7 +353,28 @@ var Asset = (function () {
   }, {
     key: 'assetGroup',
     get: function get() {
-      return util.tabelize(this.assetClass.name);
+      return util.tableize(this.assetClass.name);
+    }
+  }, {
+    key: 'assetFamily',
+    get: function get() {
+      return this.categoryFolder;
+    }
+    /**
+     * If an asset belongs to a folder like components, layouts, etc.
+     * then the categoryFolder would be components
+     *
+     * @return {String}
+     */
+
+  }, {
+    key: 'categoryFolder',
+    get: function get() {
+      if (this.id === 'index' || this.dirname === 'src') {
+        return this.assetGroup;
+      }
+
+      return this.isIndex ? util.tableize((0, _path.basename)((0, _path.dirname)(this.dirname))) : util.tableize((0, _path.basename)(this.dirname));
     }
   }, {
     key: 'parentdir',
@@ -369,6 +390,16 @@ var Asset = (function () {
     key: 'extension',
     get: function get() {
       return (0, _path.extname)(this.uri);
+    }
+  }, {
+    key: 'isIndex',
+    get: function get() {
+      return !!this.uri.match(/index\.\w+$/);
+    }
+  }, {
+    key: 'depth',
+    get: function get() {
+      return this.id.split('/').length;
     }
   }, {
     key: 'paths',
@@ -430,7 +461,7 @@ Asset.EXTENSIONS = EXTENSIONS;
 Asset.GLOB = GLOB;
 
 function relationshipProxy(asset) {
-  var groups = ['assets', 'data_sources', 'documents', 'images', 'scripts', 'stylesheets', 'vectors'];
+  var groups = ['assets', 'data_sources', 'documents', 'images', 'scripts', 'packages', 'projects', 'settings_files', 'copy_files', 'stylesheets', 'vectors'];
 
   var i = {
     get count() {

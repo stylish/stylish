@@ -14,7 +14,11 @@ import cache from './document/cache'
 const EXTENSIONS = ['md', 'markdown', 'markd']
 const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
 
-class Document extends Asset {
+export class Document extends Asset {
+  static EXTENSIONS = EXTENSIONS;
+
+  static GLOB = GLOB;
+
   constructor (uri, options = {}) {
     super(uri, options)
 
@@ -177,7 +181,4 @@ class Document extends Asset {
   }
 }
 
-Document.GLOB = GLOB
-Document.EXTENSIONS = EXTENSIONS
-
-exports = module.exports = Document
+export default Document

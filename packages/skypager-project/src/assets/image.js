@@ -3,11 +3,9 @@ import Asset from './asset'
 const EXTENSIONS = ['jpg', 'gif', 'svg', 'png']
 const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
 
-class Image extends Asset {
-
+export class Image extends Asset {
+  static EXTENSIONS = EXTENSIONS;
+  static GLOB = GLOB;
 }
 
-Image.EXTENSIONS = EXTENSIONS
-Image.GLOB = GLOB
-
-exports = module.exports = Image
+export default Image

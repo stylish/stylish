@@ -27,7 +27,6 @@ function CollectionBundle(options = {}){
       }
 
       if (asset.assetClass.name == 'DataSource') {
-        delete(entry.raw)
         entry.data = asset.data
       }
 
