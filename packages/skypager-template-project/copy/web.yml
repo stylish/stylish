@@ -2,3 +2,5 @@ en:
   main:
     title: 'Skypager.io'
     subtitle: 'Web Portfolio Management Applications'
+  home:
+    welcome: Welcome to Skypager.io

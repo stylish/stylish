@@ -1,8 +1,9 @@
-import { Application } from 'ui/applications'
+import Project from 'ui/applications/project'
 
-import project from 'dist/bundle'
-
-Application.create({
-  project
+Project.launchApplication().then(app => {
+  global.$app = app
+  console.log(
+    `Welcome to Skypager. Launching app: ${ app.name }`,
+    $app
+  )
 })
-

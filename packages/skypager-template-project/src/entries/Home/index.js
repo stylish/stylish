@@ -1,9 +1,11 @@
-import React, { Component, PropTypes as types } from 'react'
+export const Home = {
+  isIndex: true,
 
-export function Home(props, context) {
-  return (
-    <div>Home</div>
-  )
+  getComponent(location, cb) {
+    require.ensure([], function(require) {
+      cb(null, require('./components/Home'))
+    })
+  }
 }
 
 export default Home
