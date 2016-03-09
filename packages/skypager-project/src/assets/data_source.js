@@ -3,6 +3,7 @@ import * as util from '../util'
 
 import get from 'lodash/get'
 import set from 'lodash/set'
+import isEmpty from 'lodash/isEmpty'
 import defaults from 'lodash/defaultsDeep'
 
 const { clone, pick, result, noConflict } = util
@@ -57,7 +58,7 @@ export class DataSource extends Asset {
 
   saveSync (options = {}) {
     if (this.raw || this.raw.length === 0) {
-      if (!options.allowEmpty) {
+      if (!options.allowEmpty && isEmpty(this.data)) {
         return false
       }
     }
@@ -79,7 +80,7 @@ export class DataSource extends Asset {
 
   save (options = {}) {
     if (this.raw || this.raw.length === 0) {
-      if (!options.allowEmpty) {
+      if (!options.allowEmpty && isEmpty(this.data)) {
         return false
       }
     }

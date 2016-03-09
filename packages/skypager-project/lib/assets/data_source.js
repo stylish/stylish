@@ -53,6 +53,10 @@ var _set2 = require('lodash/set');
 
 var _set3 = _interopRequireDefault(_set2);
 
+var _isEmpty = require('lodash/isEmpty');
+
+var _isEmpty2 = _interopRequireDefault(_isEmpty);
+
 var _defaultsDeep = require('lodash/defaultsDeep');
 
 var _defaultsDeep2 = _interopRequireDefault(_defaultsDeep);
@@ -158,7 +162,7 @@ var DataSource = exports.DataSource = (function (_Asset) {
       var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
       if (this.raw || this.raw.length === 0) {
-        if (!options.allowEmpty) {
+        if (!options.allowEmpty && (0, _isEmpty2.default)(this.data)) {
           return false;
         }
       }
@@ -177,7 +181,7 @@ var DataSource = exports.DataSource = (function (_Asset) {
       var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
       if (this.raw || this.raw.length === 0) {
-        if (!options.allowEmpty) {
+        if (!options.allowEmpty && (0, _isEmpty2.default)(this.data)) {
           return false;
         }
       }
