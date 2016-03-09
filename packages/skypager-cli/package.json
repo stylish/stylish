@@ -1,6 +1,6 @@
 {
   "name": "skypager-cli",
-  "version": "2.17.0",
+  "version": "2.18.0",
   "preferGlobal": "true",
   "bin": {
     "skypager": "./bin/cli.js"
@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "asar": "^0.10.0",
-    "babel-preset-skypager": "^2.7.0",
+    "babel-preset-skypager": "^2.18.0",
     "colors": "^1.1.2",
     "commander": "^2.9.0",
     "find-node-modules": "^1.0.1",

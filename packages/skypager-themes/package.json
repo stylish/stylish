@@ -1,7 +1,7 @@
 {
   "name": "skypager-themes",
   "description": "manage a library of themes to use with skypager projects. variables for the themes can be configured via an external yaml file.",
-  "version": "2.13.0",
+  "version": "2.18.0",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -37,6 +37,6 @@
     "file-loader": "^0.8.5"
   },
   "devDependencies": {
-    "babel-preset-skypager": "^2.2.1"
+    "babel-preset-skypager": "^2.18.0"
   }
 }
