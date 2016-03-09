@@ -1,7 +1,6 @@
 describe( 'The Integrations Plugin Loader', () => {
   it( 'Registers the integrations plugin with the skypager registry', () => {
     const { skypager } = require('./index')
-
     skypager.plugins.available.should.containEql('integrations')
   })
 

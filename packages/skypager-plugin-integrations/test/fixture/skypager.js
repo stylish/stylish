@@ -1,7 +1,7 @@
-var skypager = require('../../../skypager-project')
-var plugin = require('../../lib/index')
-var join = require('path').join
+module.exports = function(skypager) {
+  if (!skypager) {
+    skypager = require('../../../skypager-project')
+  }
 
-skypager.loadPlugin(plugin)
-
-module.exports = skypager.load(__filename)
+  return skypager.load(__filename)
+}
