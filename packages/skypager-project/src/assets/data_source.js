@@ -1,7 +1,11 @@
 import Asset from './asset'
 import * as util from '../util'
 
-const { clone, defaults, pick, result, noConflict } = util
+import get from 'lodash/get'
+import set from 'lodash/set'
+import defaults from 'lodash/defaultsDeep'
+
+const { clone, pick, result, noConflict } = util
 
 const EXTENSIONS = ['js', 'json', 'yaml', 'yml', 'csv']
 const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
@@ -29,6 +33,14 @@ export class DataSource extends Asset {
 
   pick(...args) {
     return pick(this.data, ...args)
+  }
+
+  get(...args) {
+     return get(this.data, ...args)
+  }
+
+  set(...args) {
+     return set(this.data, ...args)
   }
 
   result(...args) {

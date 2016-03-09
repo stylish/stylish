@@ -45,12 +45,23 @@ var _util = require('../util');
 
 var util = _interopRequireWildcard(_util);
 
+var _get2 = require('lodash/get');
+
+var _get3 = _interopRequireDefault(_get2);
+
+var _set2 = require('lodash/set');
+
+var _set3 = _interopRequireDefault(_set2);
+
+var _defaultsDeep = require('lodash/defaultsDeep');
+
+var _defaultsDeep2 = _interopRequireDefault(_defaultsDeep);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var clone = util.clone;
-var _defaults = util.defaults;
 var _pick = util.pick;
 var _result = util.result;
 var noConflict = util.noConflict;
@@ -94,7 +105,7 @@ var DataSource = exports.DataSource = (function (_Asset) {
         args[_key] = arguments[_key];
       }
 
-      return _defaults.apply(undefined, [this.data].concat(args));
+      return _defaultsDeep2.default.apply(undefined, [this.data].concat(args));
     }
   }, {
     key: 'pick',
@@ -106,10 +117,28 @@ var DataSource = exports.DataSource = (function (_Asset) {
       return _pick.apply(undefined, [this.data].concat(args));
     }
   }, {
-    key: 'result',
-    value: function result() {
+    key: 'get',
+    value: function get() {
       for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
         args[_key3] = arguments[_key3];
+      }
+
+      return _get3.default.apply(undefined, [this.data].concat(args));
+    }
+  }, {
+    key: 'set',
+    value: function set() {
+      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
+      }
+
+      return _set3.default.apply(undefined, [this.data].concat(args));
+    }
+  }, {
+    key: 'result',
+    value: function result() {
+      for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+        args[_key5] = arguments[_key5];
       }
 
       return _result.apply(undefined, [this.data].concat(args));
