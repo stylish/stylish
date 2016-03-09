@@ -6,7 +6,7 @@ dist/bundle
 dist/bundle/**/*.*
 public/
 node_modules
-projects/
+/projects
 node_modules/
 legacy/
 **/*.log
