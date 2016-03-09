@@ -11,7 +11,7 @@
     "test:bundle:compile": "./bin/cli.js build --webpack-config test/webpack.bundle.config.js > /dev/null",
     "test:bundle": "npm run test:bundle:export && npm run test:bundle:compile",
     "_pretest": "SKYPAGER_ENV=development npm run test:bundle",
-    "test": "SKYPAGER_ENV=test NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "test": "SKYPAGER_ENV=test NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js || true",
     "_pretest:watch": "SKYPAGER_ENV=development npm run test:bundle",
     "test:watch": "SKYPAGER_ENV=development NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
     "lint": "eslint src/**/*",

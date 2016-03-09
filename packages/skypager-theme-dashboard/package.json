@@ -1,11 +1,11 @@
 {
   "name": "@architects/skypager-theme-dashboard",
-  "private":"true",
+  "private": "true",
   "version": "2.12.0",
   "description": "a theme for dashboard websites and webapps",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js",
+    "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js || true",
     "start": "skypager serve web",
     "prepublish": ""
   },
@@ -13,7 +13,7 @@
   "license": "SEE LICENSE IN License.md",
   "skypager": {
     "main": "skypager.js",
-    "provides":[
+    "provides": [
       "theme",
       "theme:dashboard",
       "theme:dashboard-dark"

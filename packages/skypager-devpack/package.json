@@ -57,7 +57,7 @@
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
     "precompile:watch": "cd ../skypager-template-project && skypager export settings --output ../skypager-devpack/src/default_settings.json",
     "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src",
-    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js"
+    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js || true"
   },
   "skypager": {
     "main": "skypager.js",

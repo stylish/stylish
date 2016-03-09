@@ -16,7 +16,7 @@
     ]
   },
   "scripts": {
-    "test": "exit 0",
+    "test": "exit 0 || true",
     "build:clean": "rm -rf lib dist",
     "build": "npm run build:clean && npm run test && npm run compile",
     "compile": "babel -q -d lib src",

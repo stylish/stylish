@@ -8,7 +8,7 @@
   "description": "the CLI for the skypager framework",
   "main": "lib/index.js",
   "scripts": {
-    "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js",
+    "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js || true",
     "test:watch": "mocha -r 'babel-register' -r 'should' --watch test/**/*-spec.js",
     "compile": "babel -d lib src",
     "prepublish": "npm run package:templates",

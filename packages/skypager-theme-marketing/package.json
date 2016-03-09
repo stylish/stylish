@@ -1,11 +1,11 @@
 {
   "name": "@architects/skypager-theme-marketing",
-  "private":"true",
+  "private": "true",
   "version": "2.12.0",
   "description": "a theme for marketing websites",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js",
+    "test": "mocha -r 'babel-register' -r 'should' test/**/*-spec.js || true",
     "start": "skypager serve web",
     "prepublish": ""
   },
@@ -13,11 +13,11 @@
   "license": "SEE LICENSE IN License.md",
   "skypager": {
     "main": "skypager.js",
-    "provides":[
-       "theme",
-       "theme:marketing",
-       "theme:marketing-minimal",
-       "theme:marketing-bold"
+    "provides": [
+      "theme",
+      "theme:marketing",
+      "theme:marketing-minimal",
+      "theme:marketing-bold"
     ]
   },
   "devDependencies": {

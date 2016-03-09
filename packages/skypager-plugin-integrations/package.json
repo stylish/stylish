@@ -4,7 +4,7 @@
   "version": "2.16.2",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js",
+    "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js || true",
     "test:watch": "NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/index.js test/**/*-spec.js",
     "build:clean": "rm -rf lib",
     "build": "npm run build:clean && npm run test && npm run compile",
