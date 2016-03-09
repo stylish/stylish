@@ -172,11 +172,13 @@ var ActionDefinition = exports.ActionDefinition = (function () {
               }
             }, {
               abort: function abort(message) {
+                var _report$errors;
+
                 for (var _len3 = arguments.length, r = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
                   r[_key3 - 1] = arguments[_key3];
                 }
 
-                report.error.apply(report, [message].concat((0, _toConsumableArray3.default)(r)));
+                (_report$errors = report.errors).push.apply(_report$errors, [message].concat((0, _toConsumableArray3.default)(r)));
                 process.exit(1);
               },
               error: function error(message) {

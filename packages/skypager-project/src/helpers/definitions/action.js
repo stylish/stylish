@@ -84,7 +84,7 @@ export class ActionDefinition {
             }
           }, {
               abort(message, ...r) {
-                report.error(message, ...r)
+                report.errors.push(message, ...r)
                 process.exit(1)
               },
               error(message, ...r) {
