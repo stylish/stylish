@@ -1,9 +1,10 @@
-import Project from 'ui/applications/project'
+import { Application } from 'ui/applications'
+import ProjectLoader from 'project/loader'
 
-Project.launchApplication().then(app => {
-  global.$app = app
-  console.log(
-    `Welcome to Skypager. Launching app: ${ app.name }`,
-    $app
-  )
+const project = ProjectLoader(
+  require('dist/bundle')
+)
+
+Application.create({
+  project
 })

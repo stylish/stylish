@@ -55,7 +55,8 @@ var layouts = {
   fluid: _FluidLayout2.default,
   iconNav: _IconNavLayout2.default,
   icon: _IconNavLayout2.default,
-  basicFluid: _BasicFluidLayout2.default
+  basicFluid: _BasicFluidLayout2.default,
+  basic: _BasicFluidLayout2.default
 };
 
 var DefaultLayout = exports.DefaultLayout = (function (_Component) {
@@ -70,9 +71,8 @@ var DefaultLayout = exports.DefaultLayout = (function (_Component) {
     key: 'render',
     value: function render() {
       var settings = this.props.settings;
-      var app = settings.app;
 
-      var layoutComponent = app && app.defaultLayout ? layouts[app.defaultLayout] || _IconNavLayout2.default : _IconNavLayout2.default;
+      var layoutComponent = settings.layout && layouts[settings.layout] ? layouts[settings.layout] : _BasicFluidLayout2.default;
 
       return _react2.default.createElement(layoutComponent, {
         settings: settings

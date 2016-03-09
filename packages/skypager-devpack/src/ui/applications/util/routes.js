@@ -1,16 +1,28 @@
 import isEmpty from 'lodash/isEmpty'
+import mapValues from 'lodash/mapValues'
 
 import { createRoutes as create } from 'react-router'
 
 export default routes
 
-export function routes(component, options = {}) {
+export function routes(component, {screens, project}) {
+  return create({
+    component: require('layouts/Main').default,
+    path: '/',
+    indexRoute: {
+      component: require('entries/Home').default,
+    },
+    childRoutes:[
+      require('entries/Documentation').default
+    ]
+  })
+}
+
+export function oldRoutes(component, options = {}) {
   if (typeof component === 'object' && !options) {
     options = component
     component = "div"
   }
-
-  console.log('Building Routes', component, options)
 
   const { screens } = options
   const root = { path: "/", component, childRoutes:[] }

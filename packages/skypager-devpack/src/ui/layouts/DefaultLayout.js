@@ -11,7 +11,8 @@ const layouts = {
   fluid: FluidLayout,
   iconNav: IconNavLayout,
   icon: IconNavLayout,
-  basicFluid: BasicFluidLayout
+  basicFluid: BasicFluidLayout,
+  basic: BasicFluidLayout
 }
 
 export class DefaultLayout extends Component {
@@ -19,11 +20,10 @@ export class DefaultLayout extends Component {
 
   render () {
     const { settings } = this.props
-    const { app } = settings
 
-    const layoutComponent = app && app.defaultLayout
-      ? layouts[app.defaultLayout] || IconNavLayout
-      : IconNavLayout
+    const layoutComponent = settings.layout && layouts[settings.layout]
+      ? layouts[settings.layout]
+      : BasicFluidLayout
 
     return React.createElement(
       layoutComponent,

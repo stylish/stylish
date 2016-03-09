@@ -1,5 +1,7 @@
-var skypager = require('skypager')
+var skypager = require('skypager-project')
 
-module.exports = skypager.load(__filename, {
+var project = skypager.load(__filename, {
   manifest: require('./package.json')
 })
+
+module.exports = project

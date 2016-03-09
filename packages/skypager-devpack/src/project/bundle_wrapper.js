@@ -2,11 +2,21 @@
  * Consumes a Skypager Bundle Export and provides
  * a Project like interface.  It also can generate a Skypager.Application
 */
+
+import isString from 'lodash/isString'
+import isObject from 'lodash/isObject'
+import omit from 'lodash/omit'
+import defaults from 'lodash/defaultsDeep'
+
+import DefaultSettings from './default_settings'
+
+const default_settings = DefaultSettings({version:'v1'})
+
 module.exports =
 
-class EditorBundle {
+class BundleWrapper {
   static create(...args) {
-    return new Bundle(...args)
+    return new BundleWrapper(...args)
   }
 
   constructor (bundle, options = {}) {
@@ -21,31 +31,47 @@ class EditorBundle {
     let content = bundle.content || {}
     let contentCollections = keys(content)
 
-    this.assets = bundle.assets
-    this.project = bundle.project
+    this.assets   = bundle.assets
+    this.project  = bundle.project
     this.entities = bundle.entities
-    this.content = bundle.content
-    this.model = bundle.models
-    this.settings = bundle.settings
+    this.content  = bundle.content
+    this.model    = bundle.models
+
+    let settings = defaults(
+      bundle.settings,
+      default_settings
+    )
+
+    let currentApp = settings.app.current || settings.app.available[0] || default_settings.app.current || 'web'
+    let app = settings.apps[currentApp] || default_settings.apps[currentApp] || default_settings.apps.web
+
+    this.settings = app
+
+    this.copy = (bundle.copy && bundle.copy[currentApp])
+      ? bundle.copy[currentApp]
+      : bundle.copy
 
     //this.assetsContent = this.content.assets
     this.settingsContent = this.content.settings
     this.docs = this.content.documents
     this.data = this.content.data_sources
 
-    //this.scripts = this.content.scripts
-    //this.stylesheets = this.content.stylesheets
-    //this.packages = this.content.packages
-    //this.projects = this.content.projects
+    this.scripts = this.content.scripts
+    this.stylesheets = this.content.stylesheets
+    this.packages = this.content.packages
+    this.projects = this.content.projects
 
     this.entityNames = keys(this.entities || {})
 
-    //this.requireContexts = bundle.requireContexts
+    this.requireContexts = bundle.requireContexts
 
     // naming irregularities
     assign(this, {
       get settingsFiles() {
-        return bundle.content.settings
+        return bundle.content.settings_files
+      },
+      get copyFiles() {
+        return bundle.content.copy_files
       },
       get data() {
         return bundle.content.data_sources
@@ -55,10 +81,18 @@ class EditorBundle {
     if (options.subscribe) {
       this.setupSubscription(options.subscribe)
     }
+
+
   }
 
   createApp(appClass, options = {}) {
-    return appClass.create(buildApp(options))
+    appClass = appClass || require('ui/applications').Application
+
+    return appClass.create(
+      this.buildApp(
+        options
+      )
+    )
   }
 
   buildApp (options = {}) {
@@ -66,8 +100,8 @@ class EditorBundle {
 
     this.buildStateMachine(
       this.buildLayout(
-        this.buildEntryPoints(
-          assign({}, options)
+        this.buildScreens(
+          options
         )
       )
     )
@@ -90,28 +124,40 @@ class EditorBundle {
   }
 
   requireEntryPoint (id) {
-    throw('This feature is deprecated', id)
     return this.require('script', `entries/${ id }`)
   }
 
   requireLayout (id) {
-    throw('This feature is deprecated', id)
-    return this.require('script', `layouts/${ id }`)
+    let result
+
+    try {
+      result = this.require('script', `layouts/${ id }`)
+    } catch(e) { }
+
+    if (result) { return result }
+
+    console.log('Dynamic Layouts', require('ui/layouts').keys())
   }
 
   requireComponent (id) {
-    throw('This feature is deprecated', id)
     return this.require('script', `components/${ id }`)
   }
 
   requireStyleSheet (id) {
-    throw('This feature is deprecated', id)
     return this.require('stylesheet', id)
   }
 
   require(assetType, assetId) {
-    throw('This feature is deprecated', id)
-    let key = this[`${assetType}s`][assetId].paths.relative
+    let file = this[`${assetType}s`][assetId] ||
+               this[`${assetType}s`][`${assetId}/index`] ||
+               this[`${assetType}s`][`${assetId}/${ assetId }`];
+
+    if(!file) {
+      console.error('Error requiring asset from require contexts', assetId, assetType)
+      throw('Error loading asset from the require context')
+    }
+
+    let key = file.paths.relative
     let asset = this.requireContexts[`${assetType}s`]( './' + key )
 
     if (!asset) {
@@ -135,70 +181,38 @@ class EditorBundle {
       content: project.content,
       entities: project.entities,
       models: project.models,
-      settings: project.settings
+      settings: this.settings,
+      copy: this.copy
     })
 
     return props
   }
 
-  buildEntryPoints (props = {}) {
-    let project = props.project = this
-    let settings = project.settings || {}
-    let app = settings.app || {}
-
-    props.entryPoints = assign({}, app.entryPoints || {}, props.entryPoints || {})
-
-    let entryPaths = keys(props.entryPoints)
-
-    /*
-      if (entryPaths.length < 1) {
-      throw('Invalid Application Settings; missing an entry point')
-    }*/
-
-    entryPaths.forEach(path => {
-      let cfg = props.entryPoints[path]
-
-      if (typeof cfg === 'string') {
-        cfg = props.entryPoints[path] = {
-          component: project.requireEntryPoint(
-            cfg.replace(/^entries\//,'')
-          )
-        }
-      }
-
-      if (typeof cfg === 'object' && typeof cfg.component === 'string') {
-         cfg.component = project.requireEntryPoint(cfg.component.replace(/^entries\//,''))
-      } else if (typeof cfg === 'object' && cfg.index && typeof cfg.index === 'string') {
-         cfg.component = project.requireEntryPoint(cfg.index.replace(/^entries\//,''))
-      } else if (typeof cfg === 'object' && cfg.index && typeof cfg.index === 'object' && typeof cfg.index.component === 'string') {
-         cfg.component = project.requireEntryPoint(cfg.index.component.replace(/^entries\//,''))
-      } else if (typeof cfg === 'function') {
-        cfg = {
-          component: cfg
-        }
-      }
-
-
-    })
-
-    return props
+  buildScreens (props = {}) {
+    let { project } = props.project
   }
 
   buildLayout (props = {}) {
-    let project = props.project = this
-    let settings = project.settings || {}
-    let app = settings.app || {}
+    let settings = this.settings
 
-    props.layout = props.layout || app.layout
+    props.layout = props.layout || settings.layout
 
-    if (typeof props.layout === 'string') {
-       props.layout = this.requireLayout(props.layout)
+    if (isString(props.layout)) {
+      try {
+        props.layout = this.requireLayout(props.layout)
+      } catch(error) {
+         console.log(`Error looking up string based layout`, props.layout)
+      }
     }
 
-    if (typeof props.layout === 'object') {
-      if (typeof props.layout.component === 'string') {
-        props.layout.component = this.requireLayout(props.layout.component)
-      }
+    if (!props.layout) {
+       props.layout = require('../ui/layouts/DefaultLayout').default
+    }
+
+    if (!props.layout) {
+      console.warn(
+        'Could not auto generate a layout component'
+      )
     }
 
     return props
@@ -290,6 +304,17 @@ const ProjectReducers = {
     return state
   },
 
+
+  copy (state = {}, action = {}) {
+    let { payload, type } = action
+
+    if (type === 'REFRESH_COPY') {
+      return assign(state, payload)
+    }
+
+    return state
+  },
+
   entities (state = {}, action = {}) {
     let { payload, type } = action
 
@@ -303,7 +328,7 @@ const ProjectReducers = {
   models (state = {}, action = {}) {
     let { payload, type } = action
 
-    if (type === 'REFRSH_MODELS') {
+    if (type === 'REFRESH_MODELS') {
       return assign(state, payload)
     }
 

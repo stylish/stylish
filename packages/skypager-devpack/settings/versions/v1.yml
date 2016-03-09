@@ -1,0 +1,38 @@
+app:
+  current: 'web'
+
+  available:
+    - web
+
+  platforms:
+    - web
+
+  environments:
+    - development
+    - production
+    - test
+
+   # see docs.skypager.io/content-management/internationalization-and-copy-management
+  locale: en
+
+  availableLocales:
+    - en
+
+apps:
+  web:
+    # see docs.skypager.io/base-web-applications/frameworks
+    vendor: default
+
+    # see docs.skypager.io/base-web-applications/themes
+    theme: dashboard-dark
+
+    # see docs.skypager.io/base-web-applications/platforms
+    platform: web
+
+    # see docs.skypager.io/base-web-applications/screen-definitions
+    layout: Main
+
+    screens:
+      default: Home,
+      index: Home,
+      documentation: Documentation
