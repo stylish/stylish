@@ -43,7 +43,8 @@ class Asset {
     this.hidden('collection', () => options.collection)
 
     this.id = this.generateId()
-    this.slug = this.id.replace(/\//g,'__')
+
+    this.hidden('slug', () => this.id.replace(/\//g,'__'))
 
     this.lazy('parsed', () => this.parse(this.raw))
     this.lazy('indexed', () => this.index(this.parsed, this))
@@ -213,9 +214,16 @@ class Asset {
       return this.assetGroup
     }
 
-    return this.isIndex
+    let result = this.isIndex
       ? util.tableize(basename(dirname(this.dirname)))
       : util.tableize(basename(this.dirname))
+
+    switch(result) {
+      case 'srcs':
+        return 'scripts'
+      default:
+        return result
+    }
   }
 
   get parentdir () {

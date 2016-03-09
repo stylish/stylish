@@ -109,20 +109,26 @@ class Collection {
     let patterns = this.include
 
     if (this.project.exists('.skypagerignore')) {
-      patterns = patterns.concat(
+      /*patterns = patterns.concat(
         require('gitignore-globs')(this.project.join('.skypagerignore'), {
           negate: true
         })
-      )
+      )*/
+    } else {
+
     }
 
-    patterns = patterns.concat(
+    /*patterns = patterns.concat(
       this.exclude.map(p => '!' + p)
-    )
+    )*/
 
-    return require('glob-all').sync(patterns,{
+    patterns.push('node_modules/')
+
+    let results = require('glob-all').sync(patterns,{
       cwd: this.root
     })
+
+    return results
   }
 
   get paths() {
@@ -240,16 +246,20 @@ class Collection {
   }
 
   add (asset, autoLoad = false, expandDotPath = false) {
-    this.index[asset.paths.relative] = asset.id
-    this.index[asset.paths.absolute] = asset.id
-    this.index[asset.id] = asset.id
-    this.assets[asset.id] = asset
+    try {
+      this.index[asset.paths.relative] = asset.id
+      this.index[asset.paths.absolute] = asset.id
+      this.index[asset.id] = asset.id
+      this.assets[asset.id] = asset
 
-    if (autoLoad) { asset.runImporter() }
+      if (autoLoad) { asset.runImporter() }
 
-    // expand the dot path when a collection is already loaded and a new asset is added
-    if (expandDotPath) {
-      carve(this.at, asset.idPath, asset)
+      // expand the dot path when a collection is already loaded and a new asset is added
+      if (expandDotPath) {
+        //carve(this.at, asset.idPath, asset)
+      }
+    } catch(error) {
+       console.log('Error adding asset', error.message)
     }
   }
 
@@ -259,7 +269,7 @@ class Collection {
 
   _didLoadAssets (paths, expand) {
     if (expand) {
-      this.expandDotPaths()
+      //this.expandDotPaths()
     }
   }
 

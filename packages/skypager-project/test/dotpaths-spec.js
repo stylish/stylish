@@ -26,7 +26,7 @@ describe("Access Via Dot Paths", function(){
     })
   })
 
-  it("lets me access collection content via a dot path interface", function(){
+  xit("lets me access collection content via a dot path interface", function(){
     doc.should.have.property('idPath', 'assets.data_source_spec')
     project.docs.at.should.be.a.Function()
     project.docs.at.should.have.property('assets')

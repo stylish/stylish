@@ -95,7 +95,10 @@ var Asset = (function () {
     });
 
     this.id = this.generateId();
-    this.slug = this.id.replace(/\//g, '__');
+
+    this.hidden('slug', function () {
+      return _this.id.replace(/\//g, '__');
+    });
 
     this.lazy('parsed', function () {
       return _this.parse(_this.raw);
@@ -374,7 +377,14 @@ var Asset = (function () {
         return this.assetGroup;
       }
 
-      return this.isIndex ? util.tableize((0, _path.basename)((0, _path.dirname)(this.dirname))) : util.tableize((0, _path.basename)(this.dirname));
+      var result = this.isIndex ? util.tableize((0, _path.basename)((0, _path.dirname)(this.dirname))) : util.tableize((0, _path.basename)(this.dirname));
+
+      switch (result) {
+        case 'srcs':
+          return 'scripts';
+        default:
+          return result;
+      }
     }
   }, {
     key: 'parentdir',
