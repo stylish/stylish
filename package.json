@@ -34,6 +34,7 @@
   "license": "SEE LICENSE IN License.md",
   "scripts": {
     "start": "skypager serve web",
+    "test": "skypager each package --command 'npm run test'",
     "preversion": "lerna publish && git add -A && git commit -m 'bumping version' && npm version"
   }
 }
