@@ -1,7 +1,7 @@
 {
   "name": "skypager-server",
   "description": "skypager project server",
-  "version": "2.13.0",
+  "version": "2.16.2",
   "main": "index.js",
   "scripts": {
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
