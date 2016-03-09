@@ -1,5 +1,15 @@
-locale: en
-theme: marketing-bold
-layout: web/layouts/MainLayout
-entryPoints:
-  index: web/entries/Home
+# see docs.skypager.io/base-web-applications/frameworks
+framework: devpack/react
+
+# see docs.skypager.io/base-web-applications/themes
+theme: dashboard-dark
+
+# see docs.skypager.io/base-web-applications/platforms
+platform: web
+
+# see docs.skypager.io/base-web-applications/screen-definitions
+layout: Main
+screens:
+  default: Home,
+  index: Home,
+  documentation: Documentation

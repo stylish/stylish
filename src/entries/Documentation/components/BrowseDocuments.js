@@ -1,16 +1,17 @@
 import React, { Component, PropTypes as type } from 'react'
 import { stateful } from 'ui/applications'
 
-export class HomePage extends Component {
-  static displayName = 'HomePage';
+export class BrowseDocuments extends Component {
+  static displayName = 'BrowseDocuments';
 
   static propTypes = {};
 
   render() {
     return (
-      <div ><h1>welcome home</h1></div>
+      <div>
+      </div>
     )
   }
 }
 
-export default stateful(HomePage, 'settings')
+export default stateful(BrowseDocuments, 'settings')
