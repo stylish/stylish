@@ -9,6 +9,7 @@ export class BrowseDocuments extends Component {
   render() {
     return (
       <div>
+        <h3>Documentation</h3>
       </div>
     )
   }

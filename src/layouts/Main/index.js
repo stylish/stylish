@@ -5,7 +5,7 @@ import { stateful } from 'ui/applications'
 import HTMLSafe from 'ui/components/HTMLSafe'
 import SiteHeader from 'components/SiteHeader'
 
-import styles from 'styles/main.less'
+import styles from './styles.less'
 
 export class Main extends Component {
   static displayName = 'Main';
@@ -29,36 +29,8 @@ export class Main extends Component {
   render () {
     return (
       <div className={styles.main}>
-        <SiteHeader />
-        <div className={styles.inner}>
-          {this.props.sidebar ? this.renderWithSidebar() : this.renderWithoutSidebar()}
-        </div>
+        { Children.only(this.props.children) }
       </div>
-    )
-  }
-
-  renderWithoutSidebar() {
-    const { children } = this.props
-
-    return (
-      Children.only(children)
-    )
-  }
-
-  renderWithSidebar() {
-    const { sidebar, children, outlines, pages } = this.props
-
-    return (
-      <Grid>
-        <Row>
-          <Col ref='sidebar' xs={3}>
-            {sidebar}
-          </Col>
-          <Col ref='children' xs={9}>
-            { children }
-          </Col>
-        </Row>
-      </Grid>
     )
   }
 }

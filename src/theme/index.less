@@ -1,5 +1,24 @@
 @import "./variables.less";
 
-#app h1 {
-  color: @brand-primary;
+body, html {
+  height: 100%;
+}
+
+:global(#app) {
+  height: 100%;
+  width: 100%;
+}
+
+:global(.skypager-document) {
+  h1 {
+    font-size: 1.6em;
+  }
+
+  h2 {
+    font-size: 1.4em;
+  }
+
+  h3 {
+    font-size: 1.2em;
+  }
 }

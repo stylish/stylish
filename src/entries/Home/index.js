@@ -27,9 +27,10 @@ export class Home extends Component {
     const { icon, brand } = branding
 
     return (
-      <div>
-        <HTMLSafe html={pages.cover.html} />
-        <Link to="documentation">View the Docs</Link>
+      <div className='block text-center block-inverse'>
+        <h1 className='block-title'>{ brand }</h1>
+        <h4 className='text-muted'>What up?</h4>
+        <Link to='documentation' className='btn btn-primary m-t'>View the Docs</Link>
       </div>
     )
   }
