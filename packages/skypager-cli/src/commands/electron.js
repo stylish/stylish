@@ -3,19 +3,19 @@ import { resolve } from 'path'
 import { pathExists } from '../util'
 import { argv } from 'yargs'
 
-export function author (program, dispatch) {
+export function electron (program, dispatch) {
   program
-    .command('author [workspace]')
+    .command('electron [workspace]')
     .option('--main <require>', 'require this script in the electron main process')
     .option('--workspace <name>', 'use a different workspace', 'main')
     .option('--interactive', 'run an interactive REPL')
     .option('--dont-boot', 'dont boot the electron app (DEV HELPER)')
     .option('--stream-actions', 'debug the action stream')
-    .description('run an author workspace app')
+    .description('run an electron workspace app')
     .action(dispatch(handle))
 }
 
-export default author
+export default electron
 
 export function handle(workspace, options = {}, context = {}) {
   let { project } = context
@@ -93,3 +93,5 @@ function abort (msg, ...rest) {
   console.log(...rest)
   process.exit(1)
 }
+
+const { assign } = Object

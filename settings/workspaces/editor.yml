@@ -1,0 +1,28 @@
+baseUrl: '<%= "file://" + project.path("build", "app") %>'
+
+initialStage: launch
+
+stages:
+  launch:
+    - launch
+  portfolios:
+    - portfolios
+
+panels:
+  launch:
+    url: "file://<%= project.path('build','app') %>/launch/index.html"
+    window:
+      centered: true
+      height: 480
+      width: 480
+      frame: false
+      resizable: false
+      resizeable: false
+      movable: false
+
+  portfolios:
+    url: "file://<%= project.path('build','app') %>/portfolios/index.html"
+    window:
+      centered: true
+      height: "75%"
+      width: "75%"

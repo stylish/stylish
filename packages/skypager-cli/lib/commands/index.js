@@ -24,9 +24,9 @@ var _get = require('lodash/get');
 
 var _get2 = _interopRequireDefault(_get);
 
-var _author = require('./author');
+var _electron = require('./electron');
 
-var _author2 = _interopRequireDefault(_author);
+var _electron2 = _interopRequireDefault(_electron);
 
 var _available = require('./available');
 
@@ -83,7 +83,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var isDevMode = _yargs.argv.devMode || process.env.SKYPAGER_ENV === 'development';
 
 var commands = {
-  author: _author2.default,
+  electron: _electron2.default,
   available: _available2.default,
   build: _build2.default,
   console: _repl2.default,
@@ -132,7 +132,7 @@ function program() {
 
 exports.default = program;
 var MODES = exports.MODES = {
-  full: ['author', 'build', 'repl', 'develop', 'exporter', 'init', 'importer', 'serve'],
+  full: ['electron', 'build', 'repl', 'develop', 'exporter', 'init', 'importer', 'serve'],
   setup: ['available', 'repl', 'init']
 };
 

@@ -1,0 +1,6 @@
+local: "Dropbox"
+syncFolders:
+  assets:
+    remote: "Architects.io Shared Assets/Skypager/assets"
+    project: assets
+    readOnly: true

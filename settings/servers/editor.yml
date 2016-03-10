@@ -1,0 +1,12 @@
+development:
+  launch:
+    cmd: skypager dev launch
+  portfolios:
+    cmd: skypager dev portfolios
+
+production:
+  processes:
+    launch:
+      cmd: 'skypager build launch'
+    portfolios:
+      cmd: 'skypager build portfolios'

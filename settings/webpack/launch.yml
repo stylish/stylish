@@ -1,0 +1,5 @@
+port: 1378
+host: localhost
+theme: false
+entryPoints:
+  launch: ./src/editor/launch.js

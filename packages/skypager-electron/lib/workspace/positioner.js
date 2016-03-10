@@ -13,7 +13,7 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-var _defaults = require('lodash/object/defaults');
+var _defaults = require('lodash/defaults');
 
 var _defaults2 = _interopRequireDefault(_defaults);
 

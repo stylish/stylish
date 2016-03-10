@@ -1,0 +1,7 @@
+theme: false
+contentHash: false
+outputFolder: dist/app/launch
+platform: electron
+htmlTemplatePath: ./src/editor/templates/basic.html
+entryPoints:
+  launch: ./src/editor/launch.js

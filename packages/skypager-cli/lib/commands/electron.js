@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.author = author;
+exports.electron = electron;
 exports.handle = handle;
 
 var _colors = require('colors');
@@ -18,11 +18,11 @@ var _yargs = require('yargs');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function author(program, dispatch) {
-  program.command('author [workspace]').option('--main <require>', 'require this script in the electron main process').option('--workspace <name>', 'use a different workspace', 'main').option('--interactive', 'run an interactive REPL').option('--dont-boot', 'dont boot the electron app (DEV HELPER)').option('--stream-actions', 'debug the action stream').description('run an author workspace app').action(dispatch(handle));
+function electron(program, dispatch) {
+  program.command('electron [workspace]').option('--main <require>', 'require this script in the electron main process').option('--workspace <name>', 'use a different workspace', 'main').option('--interactive', 'run an interactive REPL').option('--dont-boot', 'dont boot the electron app (DEV HELPER)').option('--stream-actions', 'debug the action stream').description('run an electron workspace app').action(dispatch(handle));
 }
 
-exports.default = author;
+exports.default = electron;
 function handle(workspace) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
   var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];

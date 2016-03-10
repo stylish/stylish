@@ -82,22 +82,54 @@ var Workspace = exports.Workspace = (function () {
       application: application,
       attributes: attributes,
       publicPath: application.paths.public,
-      baseUrl: options.baseUrl || attributes.baseUrl || application.settings && application.settings.baseUrl,
+      baseUrl: options.baseUrl || attributes.baseUrl || 'file://' + application.paths.public,
       env: options.env || application.env || 'development'
     });
 
     this.command = attributes.command;
-    this.panelSettings = this.attributes.panels || defaultPanels;
+
+    this.panelSettings = (0, _lodash.mapValues)(this.attributes.panels || defaultPanels, function (panel, id) {
+      panel.id = id;
+      panel.window = panel.window || DEFAULT_WINDOW;
+
+      return panel;
+    });
+
+    this.stages = this.attributes.stages || {};
+    this.currentStage = this.attributes.initialStage;
   }
 
   (0, _createClass3.default)(Workspace, [{
     key: 'boot',
     value: function boot() {
-      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+      var stage = arguments.length <= 0 || arguments[0] === undefined ? this.currentStage : arguments[0];
 
       buildElectronifyOptions(this);
 
-      this.launchPanels();
+      var panels = undefined;
+
+      if (!(0, _lodash.isEmpty)(this.stages) && stage) {
+        panels = this.stages[stage];
+      }
+
+      if (!stage) {
+        panels = this.panelNames;
+      }
+
+      this.currentStage = stage;
+
+      return this.launchPanels(panels);
+    }
+  }, {
+    key: 'launchPanels',
+    value: function launchPanels() {
+      var _this = this;
+
+      var panels = arguments.length <= 0 || arguments[0] === undefined ? this.panelNames : arguments[0];
+
+      panels.forEach(function (panelId) {
+        return _this.launch(panelId);
+      });
     }
   }, {
     key: 'dispatch',
@@ -112,15 +144,13 @@ var Workspace = exports.Workspace = (function () {
       return this.application.dispatch(action);
     }
   }, {
-    key: 'launchPanels',
-    value: function launchPanels() {
-      var _this = this;
+    key: 'launch',
+    value: function launch(panelId) {
+      if (!this.panelSettings[panelId]) {
+        throw 'error launching panel; No such panel: ' + panelId;
+      }
 
-      this.panels.forEach(function (panel) {
-        if (process.env.NODE_ENV !== 'test') {
-          launch.call(_this, panel.id, assign(panel.opts, { window: (0, _lodash.defaults)(panel.window, DEFAULT_WINDOW) }));
-        }
-      });
+      return _launch.call(this, panelId, this.panelSettings[panelId]);
     }
   }, {
     key: 'id',
@@ -137,13 +167,7 @@ var Workspace = exports.Workspace = (function () {
   }, {
     key: 'panels',
     get: function get() {
-      var _this2 = this;
-
-      return this.panelNames.map(function (panelName) {
-        var panel = _this2.panelSettings[panelName];
-        panel.id = panel.id || panelName;
-        return panel;
-      });
+      return (0, _lodash.values)(this.panelSettings);
     }
   }, {
     key: 'panelNames',
@@ -182,7 +206,7 @@ function buildElectronifyOptions(workspace) {
   });
 }
 
-function launch(panelName) {
+function _launch(panelName) {
   var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   var w = this;
@@ -207,7 +231,8 @@ function launch(panelName) {
     },
 
     postLoad: function postLoad(electronApp, win) {
-      var constrained = w.panelSettings[panelName].constrained;
+      var opts = w.panelSettings[panelName];
+      var constrained = opts.constrained;
 
       win.show();
 
@@ -215,7 +240,11 @@ function launch(panelName) {
         try {
           win.show();
 
-          win.setBounds((0, _extends3.default)({}, constrained));
+          if (opts.window && opts.window.centered) {
+            win.setSize(constrained.width, constrained.height);
+          } else {
+            win.setBounds((0, _extends3.default)({}, constrained));
+          }
         } catch (error) {
           console.log('');
           console.log('Error setting window bounds', constrained);
@@ -244,6 +273,11 @@ function launch(panelName) {
   options.window.preload = require.resolve('../client-bootstrap.js');
 
   options.url = options.url || w.panelSettings[panelName].url || '';
+
+  if (options.window.center || options.window.centered) {
+    delete options.x;
+    delete options.y;
+  }
 
   var proc = (0, _electronifyServer2.default)(options);
 

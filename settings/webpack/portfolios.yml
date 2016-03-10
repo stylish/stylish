@@ -1,0 +1,5 @@
+port: 1379
+host: localhost
+theme: dashboard-dark
+entryPoints:
+  launch: ./src/editor/portfolios/index.js

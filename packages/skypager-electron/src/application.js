@@ -7,8 +7,8 @@ import es from 'event-stream'
 
 import thunk from 'redux-thunk'
 
-import defaults from 'lodash/object/defaultsDeep'
-import pick from 'lodash/object/pick'
+import defaults from 'lodash/defaultsDeep'
+import pick from 'lodash/pick'
 
 import * as Workspace from './workspace/workspace'
 
@@ -137,6 +137,13 @@ export class Application {
 		if (this.workspace) {
 			this.workspace.boot()
 		}
+	}
+
+	/**
+	 * setting the workspace stage shows / hides the relevant panels
+	 */
+	setStage(stage) {
+
 	}
 
 	createWorkspace(name = 'main', options = {}) {

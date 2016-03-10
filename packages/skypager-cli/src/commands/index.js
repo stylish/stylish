@@ -7,7 +7,7 @@ import get from 'lodash/get'
 
 const isDevMode = argv.devMode || process.env.SKYPAGER_ENV === 'development'
 
-import author from './author'
+import electron from './electron'
 import available from './available'
 import build from './build'
 import create from './create'
@@ -25,7 +25,7 @@ import { loadProjectFromDirectory, skypagerBabel } from '../util'
 import pkg from '../../package.json'
 
 const commands = {
-   author,
+   electron,
    available,
    build,
    console: repl,
@@ -76,7 +76,7 @@ export function program (options = {}) {
 export default program
 
 export const MODES = {
-  full:['author', 'build', 'repl', 'develop', 'exporter', 'init', 'importer', 'serve'],
+  full:['electron', 'build', 'repl', 'develop', 'exporter', 'init', 'importer', 'serve'],
   setup:['available','repl','init']
 }
 

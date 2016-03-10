@@ -1,0 +1,6 @@
+theme: dashboard-dark
+contentHash: false
+platform: electron
+outputFolder: public/editor/portfolios
+entryPoints:
+  portfolios: ./src/editor/portfolios/index.js

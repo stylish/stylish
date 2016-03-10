@@ -1,6 +1,6 @@
 'use strict'
 
-import defaults from 'lodash/object/defaults'
+import defaults from 'lodash/defaults'
 
 export class Positioner {
   constructor (browserWindow, screen, setBounds) {

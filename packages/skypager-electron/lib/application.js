@@ -45,11 +45,11 @@ var _reduxThunk = require('redux-thunk');
 
 var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
-var _defaultsDeep = require('lodash/object/defaultsDeep');
+var _defaultsDeep = require('lodash/defaultsDeep');
 
 var _defaultsDeep2 = _interopRequireDefault(_defaultsDeep);
 
-var _pick = require('lodash/object/pick');
+var _pick = require('lodash/pick');
 
 var _pick2 = _interopRequireDefault(_pick);
 
@@ -181,6 +181,14 @@ var Application = exports.Application = (function () {
 				this.workspace.boot();
 			}
 		}
+
+		/**
+   * setting the workspace stage shows / hides the relevant panels
+   */
+
+	}, {
+		key: 'setStage',
+		value: function setStage(stage) {}
 	}, {
 		key: 'createWorkspace',
 		value: function createWorkspace() {

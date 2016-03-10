@@ -1,0 +1,12 @@
+baseUrl: '<%= "file://" + project.path("build", "app") %>'
+panels:
+  splash:
+    path: "/launch/index.html"
+    window:
+      centered: true
+      height: 480
+      width: 480
+      frame: false
+      resizable: false
+      resizeable: false
+      movable: false
