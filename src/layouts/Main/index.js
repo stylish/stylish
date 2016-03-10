@@ -3,7 +3,7 @@ import { Grid, Row, Col } from 'react-bootstrap'
 import { stateful } from 'ui/applications'
 
 import HTMLSafe from 'ui/components/HTMLSafe'
-import SiteHeader from 'components/SiteHeader'
+import SiteHeader from 'ui/components/SiteHeader'
 
 import styles from './styles.less'
 

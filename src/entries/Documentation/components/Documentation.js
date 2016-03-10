@@ -2,7 +2,7 @@ import React, { Component, PropTypes as type } from 'react'
 import { stateful } from 'ui/applications'
 import { Grid, Row, Col } from 'react-bootstrap'
 
-import SiteHeader from 'components/SiteHeader'
+import SiteHeader from 'ui/components/SiteHeader'
 
 export class Documentation extends Component {
   static displayName = 'Documentation';
