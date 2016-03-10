@@ -178,6 +178,8 @@ var ActionDefinition = exports.ActionDefinition = (function () {
             abort: function abort(message) {
               var _report$errors;
 
+              console.error(message);
+
               for (var _len3 = arguments.length, r = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
                 r[_key3 - 1] = arguments[_key3];
               }
