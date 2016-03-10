@@ -40,6 +40,19 @@ function clearDefinition() {
   _curr = null;delete tracker[_curr];
 }
 
+/**
+ * An ActionDefinition is created automatically when an action file is loaded
+ * by the actions registry.  A standard action file starts with:
+ *
+ * @example
+ *
+ *  action('MyAction')
+ *
+ *  execute(function(params = {}, context = {project}){
+ *
+ *  })
+ */
+
 var ActionDefinition = exports.ActionDefinition = (function () {
   function ActionDefinition(actionName) {
     (0, _classCallCheck3.default)(this, ActionDefinition);
@@ -149,8 +162,6 @@ var ActionDefinition = exports.ActionDefinition = (function () {
         validate: this.validator,
         parameters: this.parameters,
         runner: function runner() {
-          var _def$api;
-
           for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
             args[_key2] = arguments[_key2];
           }
@@ -161,62 +172,82 @@ var ActionDefinition = exports.ActionDefinition = (function () {
             warnings: []
           };
 
-          if ((_def$api = def.api).validate.apply(_def$api, args)) {
-            (0, _util.noConflict)(function () {
-              try {
-                var _def$api2;
+          var context = args[args.length - 1];
 
-                (_def$api2 = def.api).execute.apply(_def$api2, args);
-              } catch (err) {
-                report.errors.push('fatal error:' + err.message);
+          var localHelpers = {
+            abort: function abort(message) {
+              var _report$errors;
+
+              for (var _len3 = arguments.length, r = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+                r[_key3 - 1] = arguments[_key3];
               }
-            }, {
-              abort: function abort(message) {
-                var _report$errors;
 
-                for (var _len3 = arguments.length, r = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-                  r[_key3 - 1] = arguments[_key3];
-                }
+              (_report$errors = report.errors).push.apply(_report$errors, [message].concat((0, _toConsumableArray3.default)(r)));
+              process.exit(1);
+            },
+            error: function error(message) {
+              var _console;
 
-                (_report$errors = report.errors).push.apply(_report$errors, [message].concat((0, _toConsumableArray3.default)(r)));
-                process.exit(1);
-              },
-              error: function error(message) {
-                var _console;
+              for (var _len4 = arguments.length, r = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+                r[_key4 - 1] = arguments[_key4];
+              }
 
-                for (var _len4 = arguments.length, r = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-                  r[_key4 - 1] = arguments[_key4];
-                }
+              (_console = console).log.apply(_console, [message.red].concat((0, _toConsumableArray3.default)(r)));
+              report.errors.push(message);
+            },
+            warn: function warn(message) {
+              var _console2;
 
-                (_console = console).log.apply(_console, [message.red].concat((0, _toConsumableArray3.default)(r)));
-                report.errors.push(message);
-              },
-              warn: function warn(message) {
-                var _console2;
+              for (var _len5 = arguments.length, r = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
+                r[_key5 - 1] = arguments[_key5];
+              }
 
-                for (var _len5 = arguments.length, r = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
-                  r[_key5 - 1] = arguments[_key5];
-                }
+              (_console2 = console).log.apply(_console2, [message.yellow].concat((0, _toConsumableArray3.default)(r)));
+              report.warnings.push(message);
+            },
+            suggest: function suggest(message) {
+              var _console3;
 
-                (_console2 = console).log.apply(_console2, [message.yellow].concat((0, _toConsumableArray3.default)(r)));
-                report.warnings.push(message);
-              },
-              suggest: function suggest(message) {
-                var _console3;
+              for (var _len6 = arguments.length, r = Array(_len6 > 1 ? _len6 - 1 : 0), _key6 = 1; _key6 < _len6; _key6++) {
+                r[_key6 - 1] = arguments[_key6];
+              }
 
-                for (var _len6 = arguments.length, r = Array(_len6 > 1 ? _len6 - 1 : 0), _key6 = 1; _key6 < _len6; _key6++) {
-                  r[_key6 - 1] = arguments[_key6];
-                }
+              (_console3 = console).log.apply(_console3, [message.white].concat((0, _toConsumableArray3.default)(r)));
+              report.suggestions.push(message);
+            },
 
-                (_console3 = console).log.apply(_console3, [message.white].concat((0, _toConsumableArray3.default)(r)));
-                report.suggestions.push(message);
-              },
+            report: report,
+            context: context
+          };
 
-              report: report
-            }).apply(undefined, args);
+          context.report = report;
 
+          var passesValidation = (0, _util.noConflict)(function () {
+            var _def$api;
+
+            return (_def$api = def.api).validate.apply(_def$api, args);
+          }, localHelpers).apply(undefined, args);
+
+          if (passesValidation === false) {
+            report.success = false;
             return report;
           }
+
+          report.result = (0, _util.noConflict)(function () {
+            try {
+              var _def$api2;
+
+              var _r = (_def$api2 = def.api).execute.apply(_def$api2, args);
+              if (_r) {
+                report.success = true;
+              }
+              return _r;
+            } catch (err) {
+              report.errors.push('fatal error:' + err.message);
+            }
+          }, localHelpers).apply(undefined, args);
+
+          return report;
         }
       };
     }

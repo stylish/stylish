@@ -13,6 +13,18 @@ let _curr
 function current () { return tracker[_curr] }
 function clearDefinition () { _curr = null; delete tracker[_curr] }
 
+/**
+ * An ActionDefinition is created automatically when an action file is loaded
+ * by the actions registry.  A standard action file starts with:
+ *
+ * @example
+ *
+ *  action('MyAction')
+ *
+ *  execute(function(params = {}, context = {project}){
+ *
+ *  })
+ */
 export class ActionDefinition {
   constructor (actionName) {
     this.name = actionName
@@ -75,35 +87,51 @@ export class ActionDefinition {
           warnings:[]
         }
 
-        if (def.api.validate(...args)) {
-          noConflict(function(){
-            try {
-              def.api.execute(...args)
-            } catch(err) {
-              report.errors.push('fatal error:' + err.message)
-            }
-          }, {
-              abort(message, ...r) {
-                report.errors.push(message, ...r)
-                process.exit(1)
-              },
-              error(message, ...r) {
-                console.log(message.red, ...r)
-                report.errors.push(message)
-              },
-              warn(message, ...r) {
-                console.log(message.yellow, ...r)
-                report.warnings.push(message)
-              },
-              suggest(message, ...r) {
-                console.log(message.white, ...r)
-                report.suggestions.push(message)
-              },
-              report
-          })(...args)
+        let context = args[ args.length - 1 ]
 
+        let localHelpers = {
+           abort(message, ...r) {
+              report.errors.push(message, ...r)
+              process.exit(1)
+            },
+            error(message, ...r) {
+              console.log(message.red, ...r)
+              report.errors.push(message)
+            },
+            warn(message, ...r) {
+              console.log(message.yellow, ...r)
+              report.warnings.push(message)
+            },
+            suggest(message, ...r) {
+              console.log(message.white, ...r)
+              report.suggestions.push(message)
+            },
+            report,
+            context
+        }
+
+        context.report = report
+
+        let passesValidation = noConflict(function(){
+          return def.api.validate(...args)
+        }, localHelpers)(...args)
+
+        if (passesValidation === false) {
+          report.success = false
           return report
         }
+
+        report.result = noConflict(function(){
+          try {
+            let r = def.api.execute(...args)
+            if (r) { report.success = true }
+            return r
+          } catch(err) {
+            report.errors.push('fatal error:' + err.message)
+          }
+        }, localHelpers)(...args)
+
+        return report
       }
     }
   }
