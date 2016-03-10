@@ -1,4 +1,1 @@
-theme: marketing-bold
 contentHash: false
-entryPoints:
-  app: ./src/website/index

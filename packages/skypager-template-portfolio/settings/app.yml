@@ -1,3 +1,19 @@
-defaultLayout: icon
-entryPoints:
-  index: HomePage
+# see docs.skypager.io/application-runtimes
+current: web
+
+available:
+  - web
+
+platforms:
+  - web
+
+environments:
+  - development
+  - production
+  - test
+
+ # see docs.skypager.io/content-management/internationalization-and-copy-management
+locale: en
+
+availableLocales:
+  - en
