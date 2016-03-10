@@ -29,6 +29,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var IncludeData = ['data_sources', 'settings_files', 'copy_files'];
 var IncludeExporters = ['entities', 'settings', 'copy', 'project', 'models'];
 var AssetFields = ['id', 'assetGroup', 'categoryFolder', 'fingerprint', 'paths'];
+var IncludeCollections = ['documents', 'data_sources', 'copy_files', 'settings_files', 'scripts', 'stylesheets', 'packages', 'projects', 'vectors'];
 
 function BrowserBundle() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -72,6 +73,12 @@ function AssetExporter() {
     });
   }
 
+  if (asset.assetGroup === 'vectors') {
+    output = (0, _assign2.default)(output, {
+      raw: asset.raw.replace(/^\uFEFF/, '')
+    });
+  }
+
   if (asset.assetGroup === 'documents') {
     output = (0, _assign2.default)(output, {
       markdown: asset.raw,
@@ -101,8 +108,6 @@ function ProjectExporter() {
   }
 
   var lines = [contextPolyfill(), 'console.log("Generating Bundle")', 'var bundle = module.exports = {bundleApi:2};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.models = require(\'./models-export.json\');', 'bundle.settings = require(\'./settings-export.json\');', 'bundle.copy = require(\'./copy-export.json\');', 'bundle.requireContexts = {\n      scripts: require.context(\'' + project.scripts.paths.absolute + '\', true, /.js$/i),\n      stylesheets: require.context(\'' + project.stylesheets.paths.absolute + '\', true, /..*ss$/i)\n    };', 'bundle.content = {}'];
-
-  var IncludeCollections = ['documents', 'data_sources', 'copy_files', 'settings_files', 'scripts', 'stylesheets', 'packages', 'projects'];
 
   IncludeCollections.forEach(function (key) {
     lines.push('var _' + key + ' = bundle.content.' + key + ' = {};');

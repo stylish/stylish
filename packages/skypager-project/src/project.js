@@ -492,16 +492,16 @@ class Project {
   exists(...args) {
     try {
       return require('path-exists').sync(
-        this.paths.join(...args)
+        this.path(...args)
       )
     } catch(error) {
        return false
     }
   }
 
-  ensureFolder(name) {
+  ensureFolder(...pathArgs) {
     let fs = require('fs')
-    let path = this.paths[name]
+    let path = this.path(...pathArgs)
 
     return new Promise((resolve,reject) => {
       if (this.exists(path)) { resolve(path); return path }
@@ -513,10 +513,9 @@ class Project {
     })
   }
 
-  ensurePath(name) {
-    if(this.paths[name]) {
-       return this.ensureFolder(name)
-    }
+  ensurePath(...args) {
+    let name = args[0]
+    if(this.paths[name]) { return this.ensureFolder(...args) }
   }
 }
 

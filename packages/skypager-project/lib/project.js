@@ -435,20 +435,18 @@ var Project = (function () {
     key: 'exists',
     value: function exists() {
       try {
-        var _paths2;
-
-        return require('path-exists').sync((_paths2 = this.paths).join.apply(_paths2, arguments));
+        return require('path-exists').sync(this.path.apply(this, arguments));
       } catch (error) {
         return false;
       }
     }
   }, {
     key: 'ensureFolder',
-    value: function ensureFolder(name) {
+    value: function ensureFolder() {
       var _this3 = this;
 
       var fs = require('fs');
-      var path = this.paths[name];
+      var path = this.path.apply(this, arguments);
 
       return new _promise2.default(function (resolve, reject) {
         if (_this3.exists(path)) {
@@ -465,9 +463,10 @@ var Project = (function () {
     }
   }, {
     key: 'ensurePath',
-    value: function ensurePath(name) {
+    value: function ensurePath() {
+      var name = arguments.length <= 0 ? undefined : arguments[0];
       if (this.paths[name]) {
-        return this.ensureFolder(name);
+        return this.ensureFolder.apply(this, arguments);
       }
     }
   }, {

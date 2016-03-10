@@ -3,6 +3,18 @@ import pick from 'lodash/pick'
 const IncludeData = ['data_sources','settings_files','copy_files']
 const IncludeExporters = ['entities','settings', 'copy','project','models']
 const AssetFields = ['id','assetGroup', 'categoryFolder', 'fingerprint', 'paths']
+const IncludeCollections = [
+ 'documents',
+ 'data_sources',
+ 'copy_files',
+ 'settings_files',
+ 'scripts',
+ 'stylesheets',
+ 'packages',
+ 'projects',
+ 'vectors'
+]
+
 
 export function BrowserBundle (options = {}) {
   let project = options.project = this
@@ -40,6 +52,12 @@ export function AssetExporter (options = {}, callback) {
   if (IncludeData.indexOf(asset.assetGroup) >= 0) {
     output = Object.assign(output, {
       data: asset.data
+    })
+  }
+
+  if (asset.assetGroup === 'vectors') {
+    output = Object.assign(output, {
+      raw: asset.raw.replace(/^\uFEFF/,'')
     })
   }
 
@@ -86,17 +104,6 @@ export function ProjectExporter (options = {}, callback) {
 
     `bundle.content = {}`
   ]
-
-   const IncludeCollections = [
-     'documents',
-     'data_sources',
-     'copy_files',
-     'settings_files',
-     'scripts',
-     'stylesheets',
-     'packages',
-     'projects'
-   ]
 
    IncludeCollections.forEach(key => {
     lines.push(`var _${ key } = bundle.content.${ key } = {};`)
