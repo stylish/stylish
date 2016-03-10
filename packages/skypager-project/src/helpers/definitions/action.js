@@ -91,6 +91,7 @@ export class ActionDefinition {
 
         let localHelpers = {
            abort(message, ...r) {
+              console.error(message)
               report.errors.push(message, ...r)
               process.exit(1)
             },
