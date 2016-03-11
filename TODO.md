@@ -1,0 +1,3 @@
+- implement tcomb-react everywhere
+- use tcomb-react parser for component models
+- generate tcomb-forms for manipulating component proptypes

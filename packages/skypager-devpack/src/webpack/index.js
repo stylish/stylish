@@ -21,7 +21,11 @@ const DefaultVendorStack = [
   'redux-thunk',
   'redux-actions',
   'redux-simple-router',
-  'radium'
+  'radium',
+  'tcomb-react',
+  'tcomb-form',
+  'skypager-ui',
+  'skypager-themes'
 ]
 
 const ExternalVendorMappings = {
@@ -35,7 +39,11 @@ const ExternalVendorMappings = {
   'redux-thunk': 'ReduxThunk',
   'redux-simple-router': 'ReduxSimpleRouter',
   'history': 'History',
-  'radium': 'Radium'
+  'radium': 'Radium',
+  'tcomb-form': 'TcombForm',
+  'tcomb-react': 'TcombReact',
+  'skypager-ui': 'SkypagerUI',
+  'skypager-themes': 'SkypagerThemes'
 }
 
 module.exports = function (externalOptions = {}) {
@@ -66,17 +74,26 @@ module.exports = function (externalOptions = {}) {
 	const isDev = (env === 'development')
   const fontsPrefix = options.fontsPrefix || 'fonts'
 
-  const themesModuleRoot = path.dirname(require.resolve('skypager-themes'))
+  const themesModuleRoot = path.dirname(
+    require.resolve('skypager-themes')
+  )
+
+  const uiModuleRoot = path.dirname(
+    require.resolve('skypager-ui')
+  )
+
   const devpackModuleRoot = path.join(__dirname, '../..')
 
   const modulesDirectories = [
     directory,
     join(directory,'src'),
     devpackModuleRoot,
-    join(devpackModuleRoot, 'src'),
+    join(uiModuleRoot, 'src'),
     themesModuleRoot,
     join(directory, 'node_modules'),
-    join(devpackModuleRoot, 'node_modules')
+    join(uiModuleRoot, 'node_modules'),
+    join(themesModuleRoot, 'node_modules'),
+    join(devpackModuleRoot, 'node_modules'),
   ]
 
   const platform = options.platform || 'web'
@@ -337,7 +354,9 @@ module.exports = function (externalOptions = {}) {
     resolve:{
       alias: {
         'dist': (options.distPath && resolve(options.distPath)) || path.join(directory, 'dist'),
-        'project-theme': projectThemePath
+        'project-theme': projectThemePath,
+        'ui': join(uiModuleRoot, 'src'),
+        'themes': join(themesModuleRoot, 'packages')
       }
     }
   })

@@ -43,7 +43,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  */
 
-var DefaultVendorStack = ['history', 'jquery', 'react', 'react-dom', 'react-redux', 'react-router', 'react-bootstrap', 'redux', 'redux-thunk', 'redux-actions', 'redux-simple-router', 'radium'];
+var DefaultVendorStack = ['history', 'jquery', 'react', 'react-dom', 'react-redux', 'react-router', 'react-bootstrap', 'redux', 'redux-thunk', 'redux-actions', 'redux-simple-router', 'radium', 'tcomb-react', 'tcomb-form', 'skypager-ui', 'skypager-themes'];
 
 var ExternalVendorMappings = {
   'jquery': 'jQuery',
@@ -56,7 +56,11 @@ var ExternalVendorMappings = {
   'redux-thunk': 'ReduxThunk',
   'redux-simple-router': 'ReduxSimpleRouter',
   'history': 'History',
-  'radium': 'Radium'
+  'radium': 'Radium',
+  'tcomb-form': 'TcombForm',
+  'tcomb-react': 'TcombReact',
+  'skypager-ui': 'SkypagerUI',
+  'skypager-themes': 'SkypagerThemes'
 };
 
 module.exports = function () {
@@ -86,9 +90,12 @@ module.exports = function () {
   var fontsPrefix = options.fontsPrefix || 'fonts';
 
   var themesModuleRoot = path.dirname(require.resolve('skypager-themes'));
+
+  var uiModuleRoot = path.dirname(require.resolve('skypager-ui'));
+
   var devpackModuleRoot = path.join(__dirname, '../..');
 
-  var modulesDirectories = [directory, join(directory, 'src'), devpackModuleRoot, join(devpackModuleRoot, 'src'), themesModuleRoot, join(directory, 'node_modules'), join(devpackModuleRoot, 'node_modules')];
+  var modulesDirectories = [directory, join(directory, 'src'), devpackModuleRoot, join(uiModuleRoot, 'src'), themesModuleRoot, join(directory, 'node_modules'), join(uiModuleRoot, 'node_modules'), join(themesModuleRoot, 'node_modules'), join(devpackModuleRoot, 'node_modules')];
 
   var platform = options.platform || 'web';
   var precompiled = options.precompiled || options.usePrecompiledTemplate;
@@ -292,7 +299,9 @@ module.exports = function () {
     resolve: {
       alias: {
         'dist': options.distPath && resolve(options.distPath) || path.join(directory, 'dist'),
-        'project-theme': projectThemePath
+        'project-theme': projectThemePath,
+        'ui': join(uiModuleRoot, 'src'),
+        'themes': join(themesModuleRoot, 'packages')
       }
     }
   });

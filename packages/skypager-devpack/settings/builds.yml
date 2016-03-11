@@ -1,6 +1,0 @@
-build:
-  development:
-    fromTheConfig: true
-  production:
-    integrations:
-      segment: true

@@ -1,17 +1,14 @@
-var React = require('react')
-
-module.exports = function anonymous(params
+function anonymous(params
 /**/) {
-var evalColor = function (prop, defaultValue) {
+var evalColor = function () {
     if (typeof params.color === 'function') {
         return params.color;
     } else {
-        return function (k, v) {
-          return params.color || v
+        return function () {
+            return params.color;
         };
     }
 }();
-
 var _extends = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
         var source = arguments[i];
