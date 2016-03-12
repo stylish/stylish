@@ -87,7 +87,18 @@ export function configure (commander, options = {}) {
     return (...args) => {
       args.push(context)
       try {
-        handlerFn(...args)
+        let report = handlerFn(...args)
+
+        if (report && report.errors.length > 0) {
+           console.log('Command threw an error'.red)
+
+           console.log(JSON.stringify({
+              errors: report.errors,
+              warnings: report.warnings,
+              suggestions: report.suggestions,
+              success: report.success
+           }, null, 2))
+        }
       } catch(error) {
         console.log('Command Error:'.red)
         console.log(error.message)
