@@ -1,0 +1,21 @@
+links:
+  - label: Home
+    icon: home
+    link: '/'
+
+  - label: App Shells
+    icon: tablet-mobile-combo
+    link: '/shells'
+
+  - label: Components
+    icon: layers
+    link: '/components'
+
+  - label: Layouts
+    icon: browser
+    link: '/layouts'
+
+  - label: Themes
+    icon: palette
+    link: '/themes'
+

@@ -8,8 +8,6 @@ import invariant from 'invariant'
 export default stores
 
 export function stores (options = {}) {
-  console.log('Building a Store')
-
   let { initialState, reducers, history, middlewares, project } = options
 
   invariant(isArray(reducers), 'Pass an array of reducers')

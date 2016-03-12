@@ -1,8 +1,6 @@
-import BundleWrapper from './bundle_wrapper'
+import BundleWrapper from './wrapper'
 
 export function ProjectLoader(bundle, options = {}) {
-  bundle = bundle || require('dist/bundle')
-
   return BundleWrapper.create(bundle)
 }
 

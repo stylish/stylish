@@ -2,10 +2,11 @@ import React, { Component, PropTypes as types } from 'react'
 import { render } from 'react-dom'
 import { Router, browserHistory as history } from 'react-router'
 
-import { stores as buildStore } from 'ui/shells/util/stores'
-import { routes as buildRoutes } from 'ui/shells/util/routes'
-import { validate as validateProps } from 'ui/shells/util/validate'
-import stateful from 'ui/shells/util/stateful'
+import { stores as buildStore } from 'ui/util/stores'
+import { routes as buildRoutes } from 'ui/util/routes'
+import { validate as validateProps } from 'ui/util/validate'
+
+import stateful from 'ui/util/stateful'
 
 import DefaultLayout from 'ui/layouts/DefaultLayout'
 
@@ -63,22 +64,28 @@ export class WebApp extends Component {
 
 
   static propTypes = {
-    // an array of objects which will get merged into the rootReducer
+    /** an array of objects which will get merged into the rootReducer */
     reducers: types.arrayOf(types.object),
-    // an array of objects which will get merged into an initialState
-    state: types.arrayOf(types.object),
-    // the layout layout component to wrap the app in
-    layout: types.string,
 
-    // entry point configuration
+    /** an array of objects which will get merged into an initialState */
+    state: types.arrayOf(types.object),
+
+    /** the layout layout component to wrap the app in */
+    layout: types.func,
+
+    /** entry point configuration */
     screens: types.shape({
-      index: types.string.isRequired
+      index: types.func
     }),
 
-    // an array of redux middlewares to inject into the store
+    /** an array of redux middlewares to inject into the store */
     middlewares: types.array,
 
-    project: types.object,
+    project: types.shape({
+      settings: types.object,
+      copy: types.object,
+      entities: types.object
+    }),
 
     client: types.object
   };
@@ -120,10 +127,6 @@ export class WebApp extends Component {
       reducers,
       initialState
     } = props
-
-    if (version >= 1 && project && app && options.hot) {
-      app.reloadBundle(project)
-    }
 
     app = render(
       <WebApp screens={screens}

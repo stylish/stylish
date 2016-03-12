@@ -6,12 +6,23 @@
 import isString from 'lodash/isString'
 import isObject from 'lodash/isObject'
 import omit from 'lodash/omit'
+import pick from 'lodash/pick'
 import defaults from 'lodash/defaultsDeep'
+import mapValues from 'lodash/mapValues'
+import pickBy from 'lodash/pickBy'
 import get from 'lodash/get'
 
-import DefaultSettings from './default_settings'
+import DefaultSettings from './defaults'
 
 const default_settings = DefaultSettings({version:'v1'})
+
+const cache = {
+  components: {},
+  layouts: {},
+  screens: {},
+  contexts: {},
+  redux: {}
+}
 
 module.exports =
 
@@ -21,28 +32,28 @@ class BundleWrapper {
   }
 
   constructor (bundle, options = {}) {
+    // don't overwrite these values once set as it breaks webpacks module ids
+    defaults(cache.contexts, {
+      ...(bundle.requireContexts)
+    })
+
     hide(this, {
       bundle
     })
 
-    if (options.computed) {
-      assign(this, options.computed)
+    if (options.api) {
+      assign(this, options.api)
     }
 
     let content = bundle.content || {}
     let contentCollections = keys(content)
 
-    this.assets   = bundle.assets
     this.project  = bundle.project
     this.entities = bundle.entities
     this.content  = bundle.content
-    this.model    = bundle.models
+    this.models   = bundle.models
 
-    let settings = defaults(
-      bundle.settings,
-      default_settings
-    )
-
+    let settings = bundle.settings
     let currentApp = settings.app.current || settings.app.available[0] || default_settings.app.current || 'web'
     let app = settings.apps[currentApp] || default_settings.apps[currentApp] || default_settings.apps.web
 
@@ -53,56 +64,36 @@ class BundleWrapper {
       : bundle.copy
 
     //this.assetsContent = this.content.assets
-    this.settingsContent = this.content.settings
-    this.docs = this.content.documents
-    this.data = this.content.data_sources
-
-    this.scripts = this.content.scripts
-    this.stylesheets = this.content.stylesheets
-    this.packages = this.content.packages
-    this.projects = this.content.projects
-
-    this.entityNames = keys(this.entities || {})
-
-    this.requireContexts = bundle.requireContexts
-
-    // naming irregularities
-    assign(this, {
-      get settingsFiles() {
-        return bundle.content.settings_files
-      },
-      get copyFiles() {
-        return bundle.content.copy_files
-      },
-      get data() {
-        return bundle.content.data_sources
-      }
-    })
+    this.docs = addQuerySugar(this.content.documents)
+    this.data = addQuerySugar(this.content.data_sources)
+    this.scripts = addQuerySugar(this.content.scripts)
 
     if (options.subscribe) {
       this.setupSubscription(options.subscribe)
     }
-
-
   }
 
-  createApp(appClass, options = {}) {
-    appClass = appClass || require('ui/applications').Application
-
-    return appClass.create(
-      this.buildApp(
-        options
-      )
-    )
+  get entityNames() {
+     return keys(this.entities)
   }
 
-  buildApp (options = {}) {
-    let props =
+  get requireContexts() {
+     return cache.contexts
+  }
 
-    this.buildStateMachine(
-      this.buildLayout(
-        this.buildScreens(
-          options
+  buildApp (props = {}) {
+    props = defaults(props, {
+      reducers: [],
+      initialState: [],
+      middlewares: []
+    })
+
+    this.buildRedux(
+      this.loadProjectReduxFiles(
+        this.loadComponents(
+          this.buildScreens(
+            this.buildLayout(props)
+          )
         )
       )
     )
@@ -124,16 +115,24 @@ class BundleWrapper {
 
   }
 
-  requireEntryPoint (id) {
-    return this.requireScreen(id)
+  findComponentHandler(assetId) {
+    let scripts = this.scripts || {}
+
+    return (
+      scripts[`components/${ assetId }`] ||
+      scripts[`components/${ assetId }/index`]
+    )
   }
 
-  requireComponent (id) {
-    return this.require('script', `components/${ id }`)
-  }
+  findLayoutHandler(assetId) {
+    let scripts = this.scripts || {}
 
-  requireStyleSheet (id) {
-    return this.require('stylesheet', id)
+    return (
+      scripts[`layouts/${ assetId }`] ||
+      scripts[`layouts/${ assetId }/index`] ||
+      scripts[`components/${ assetId }`] ||
+      scripts[`components/${ assetId }/index`]
+    )
   }
 
   findLayoutHandler(assetId) {
@@ -164,46 +163,29 @@ class BundleWrapper {
      return !!(this.findScreenHandler(assetId))
   }
 
-  requireLayout(componentId) {
-    let handler = this.findLayoutHandler(componentId)
-    let relativePath = handler && handler.paths.relative
 
-    if (!relativePath) {
-      throw('Failed to find screen via: ' + componentId)
-    }
-
-    let asset = this.requireContexts.scripts( './' + relativePath )
-
-    if (!asset) {
-      throw('Failed to require screen via context: ' + componentId)
-    }
-
-    return asset.default ? asset.default : asset
+  requireComponent(assetId) {
+    return cache.components[assetId] || requireComponent.call(this, assetId)
   }
 
+  requireLayout(assetId) {
+    return cache.layouts[assetId] || requireLayout.call(this, assetId)
+  }
 
+  requireScreen(assetId) {
+    return cache.screens[assetId] || requireScreen.call(this, assetId)
+  }
 
-  requireScreen(screenId) {
-    let handler = this.findScreenHandler(screenId)
-    let relativePath = handler && handler.paths.relative
-
-    if (!relativePath) {
-      throw('Failed to find screen via: ' + screenId)
-    }
-
-    let asset = this.requireContexts.scripts( './' + relativePath )
-
-    if (!asset) {
-      throw('Failed to require screen via context: ' + screenId)
-    }
-
-    return asset.default ? asset.default : asset
+  requireStateConfig(assetId) {
+    return cache.redux[assetId] || requireStateConfig.call(this, assetId)
   }
 
   require(assetType, assetId) {
-    let file = this[`${assetType}s`][assetId] ||
-               this[`${assetType}s`][`${assetId}/index`] ||
-               this[`${assetType}s`][`${assetId}/${ assetId }`];
+    let base = this[assetType + 's']
+
+    let file = base[assetId] ||
+               base[assetId + '/index'] ||
+               base[assetId + '/' + assetId]
 
     if(!file) {
       console.error('Error requiring asset from require contexts', assetId, assetType)
@@ -211,7 +193,7 @@ class BundleWrapper {
     }
 
     let key = file.paths.relative
-    let asset = this.requireContexts[`${assetType}s`]( './' + key )
+    let asset = this.requireContexts[assetType + 's']( './' + key )
 
     if (!asset) {
        throw('Could not find ' + assetType + ' ' + assetId)
@@ -220,54 +202,70 @@ class BundleWrapper {
     return asset.default ? asset.default : asset
   }
 
+  buildRedux (props) {
+    let project = this
 
-  buildStateMachine (props = {}) {
-    let project = props.project = this
+    props.reducers.push(
+      pick(ProjectReducers, 'copy', 'settings', 'entities')
+    )
 
-    props.reducers = props.reducers || []
-    props.initialState = props.initialState || []
-
-    props.reducers.push(ProjectReducers)
-
+    // TODO
+    // This should be controllable via project settings
+    // not every app needs all of this stuff loaded in redux
     props.initialState.push({
-      assets: project.assets,
-      content: project.content,
-      entities: project.entities,
-      models: project.models,
-      settings: this.settings,
-      copy: this.copy
+      copy: project.copy,
+      settings: project.settings,
+      entities: project.entities
     })
 
     return props
   }
 
-  buildScreens (props = {}) {
-    let { project } = props.project
+  /**
+   * this is an attempt to lock a webpack module id down
+   * and don't hot reload it when we hot reload the bundle
+   */
+  loadComponents(props = {}) {
+    props.layout = this.requireLayout(props.layout)
+
+    props.screens = mapValues(this.settings.screens, (id) => {
+      return this.requireScreen(id)
+    })
+
+    return props
   }
 
-  buildLayout (props = {}) {
-    let settings = this.settings
+  loadProjectReduxFiles (props) {
+    mapValues(this.settings.screens, (screenId) => {
+      let base = this.findScreenHandler(screenId).id
 
-    props.layout = props.layout || settings.layout
+      if(this.scripts[`${ base }/state`]) {
+        let stateConfig = this.requireStateConfig.call(this, `${base}`)
 
-    if (isString(props.layout)) {
-      try {
-        props.layout = this.requireLayout(props.layout)
-      } catch(error) {
-         console.log(`Error looking up string based layout`, props.layout)
+        if (stateConfig && stateConfig.reducers) {
+          props.reducers.push(
+             stateConfig.reducers
+          )
+        }
+
+        if (stateConfig && stateConfig.initialState) {
+          props.initialState.push(
+             stateConfig.initialState
+          )
+        }
       }
-    }
+    })
 
-    if (!props.layout) {
-       props.layout = require('ui/layouts/DefaultLayout').default
-    }
+    return props
+  }
 
-    if (!props.layout) {
-      console.warn(
-        'Could not auto generate a layout component'
-      )
-    }
+  buildScreens (props) {
+    props.screens = this.settings.screens
+    return props
+  }
 
+  buildLayout (props) {
+    props.layout = this.settings.layout
     return props
   }
 
@@ -295,6 +293,17 @@ function hide(obj, props = {}) {
       enumerable: false,
       value
     })
+  })
+
+  return obj
+}
+
+function addQuerySugar(object) {
+  return hide(object, {
+    query: (...args) => filterQuery(object, ...args),
+    where: (...args) => addQuerySugar(pickBy(object, ...args)),
+    pickBy: (...args) => addQuerySugar(pickBy(object, ...args)),
+    sortBy: (...args) => sortBy(values(object), ...args),
   })
 }
 
@@ -424,6 +433,62 @@ function delegate(recipient, ...propertyNames) {
   i.to = i
 
   return i
+}
+
+function requireStateConfig(screenId) {
+  return cache.redux[screenId] = cache.redux[screenId] || this.require('script', `${ screenId }/state`)
+}
+
+function requireScreen(screenId) {
+  let handler = this.findScreenHandler(screenId)
+  let relativePath = handler && handler.paths.relative
+
+  if (!relativePath) {
+    throw('Failed to find screen via: ' + screenId)
+  }
+
+  let asset = this.requireContexts.scripts( './' + relativePath )
+
+  if (!asset) {
+    throw('Failed to require screen via context: ' + screenId)
+  }
+
+  return asset.default ? asset.default : asset
+}
+
+function requireComponent(componentId) {
+    let handler = this.findComponentHandler(componentId)
+    let relativePath = handler && handler.paths.relative
+
+    if (!relativePath) {
+      throw('Failed to find component handler via: ' + componentId)
+    }
+
+    let asset = this.requireContexts.scripts( './' + relativePath )
+
+    if (!asset) {
+      throw('Failed to require component via context: ' + componentId)
+    }
+
+    return asset.default ? asset.default : asset
+}
+
+
+function requireLayout(componentId) {
+    let handler = this.findLayoutHandler(componentId)
+    let relativePath = handler && handler.paths.relative
+
+    if (!relativePath) {
+      throw('Failed to find layout handler via: ' + componentId)
+    }
+
+    let asset = this.requireContexts.scripts( './' + relativePath )
+
+    if (!asset) {
+      throw('Failed to require layout via context: ' + componentId)
+    }
+
+    return asset.default ? asset.default : asset
 }
 
 

@@ -8,7 +8,6 @@
  */
 import LockedWebApp from 'ui/shells/LockedWebApp'
 import BundleLoader from 'ui/bundle/loader'
-import Auth0 from 'auth0'
 
 const bundle = BundleLoader(
   require('ui/bundle/example')
@@ -16,12 +15,7 @@ const bundle = BundleLoader(
 
 const { clientId, domain } = bundle.settings.integrations.auth0
 
-const lock = new Auth0.Lock({
-  clientId,
-  domain
-})
-
 LockedWebApp.create({
   bundle,
-  lock
+  lock: { clientId, domain }
 })
