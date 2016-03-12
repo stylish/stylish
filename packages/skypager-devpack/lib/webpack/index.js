@@ -59,10 +59,10 @@ var ExternalVendorMappings = {
   'radium': 'Radium',
   'tcomb-form': 'TcombForm',
   'tcomb-react': 'TcombReact',
-  'skypager-ui': 'SkypagerUI',
-  'skypager-themes': 'SkypagerThemes'
+  'skypager-ui': 'SkypagerUI'
 };
 
+//'skypager-themes': 'SkypagerThemes'
 module.exports = function () {
   var externalOptions = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -114,7 +114,7 @@ module.exports = function () {
   });
 
   if (!entry.theme && options.theme) {
-    entry.theme = [options.theme.match(/\//) ? options.theme : 'themes/' + options.theme];
+    entry.theme = [options.theme.match(/\//) ? options.theme : 'ui/themes/' + options.theme];
   }
 
   if (exists(join(directory, 'src/theme'))) {
@@ -209,7 +209,7 @@ module.exports = function () {
 
   }).loader('less', {
     test: /\.less$/,
-    include: [join(directory, 'src'), join(devpackModuleRoot, 'src', 'ui')],
+    include: [join(directory, 'src'), join(uiModuleRoot, 'src')],
     exclude: [excludeNodeModulesExceptSkypagers, themesModuleRoot, projectThemePath],
     loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less' : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')
 
