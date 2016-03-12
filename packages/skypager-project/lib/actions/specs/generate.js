@@ -42,21 +42,18 @@ execute(function () {
     files = files.map(function (source) {
       return {
         source: source,
-        destination: project.path('documents', source.replace(/\.\w+$/, '.md'))
+        destination: project.path('documents', source.replace('/index.js', '.md').replace(/\.\w+$/, '.md'))
       };
     });
 
-    console.log('files', files);
-
     if (!options.overwrite) {
-      files = files.filter(function (_ref) {
-        var destination = _ref.destination;
-        return exists(destination);
+      files = files.filter(function (doc) {
+        return !exists(doc.destination);
       });
     }
 
     files.forEach(function (doc) {
-      console.log('' + doc.destination);
+      console.log('doc ' + doc.destination);
     });
   });
 });

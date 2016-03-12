@@ -43,17 +43,15 @@ execute(function(...args){
 
     files = files.map((source) => ({
       source,
-      destination: project.path('documents', source.replace(/\.\w+$/,'.md'))
+      destination: project.path('documents', source.replace('/index.js','.md').replace(/\.\w+$/,'.md'))
     }))
 
-    console.log('files', files)
-
     if (!options.overwrite) {
-      files = files.filter(({destination})=> { return exists(destination) })
+      files = files.filter((doc) => !exists(doc.destination))
     }
 
     files.forEach(doc => {
-      console.log(`${ doc.destination }`)
+      console.log('doc ' + doc.destination)
     })
 
   })
