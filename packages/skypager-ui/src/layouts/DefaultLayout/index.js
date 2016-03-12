@@ -3,7 +3,7 @@ import FluidLayout from 'ui/layouts/FluidLayout'
 import BasicFluidLayout from 'ui/layouts/BasicFluidLayout'
 import IconNavLayout from 'ui/layouts/IconNavLayout'
 
-import stateful from '../applications/util/stateful'
+import stateful from 'ui/util/stateful'
 
 import pick from 'lodash/pick'
 
@@ -20,6 +20,8 @@ export class DefaultLayout extends Component {
 
   render () {
     const { settings } = this.props
+
+    console.log('default layout', settings)
 
     const layoutComponent = settings.layout && layouts[settings.layout]
       ? layouts[settings.layout]

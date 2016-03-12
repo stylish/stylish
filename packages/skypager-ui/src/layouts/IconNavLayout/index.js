@@ -1,9 +1,11 @@
 import React, { PropTypes as types } from 'react'
 import classnames from 'classnames'
-
-import IconNav from '../components/IconNav'
 import defaults from 'lodash/defaultsDeep'
-import styles from './IconNavLayout.less'
+
+import IconNav from 'ui/components/IconNav'
+import styles from './style.less'
+
+import stateful from 'ui/util/stateful'
 
 export class IconNavLayout extends React.Component {
   static displayName = 'IconNavLayout';
@@ -25,15 +27,27 @@ export class IconNavLayout extends React.Component {
     wide: types.bool
   };
 
+  static defaultProps = {
+    wide: true,
+    thin: false,
+    containerClassName: 'container'
+  };
+
   render () {
+    let { settings, children, containerClassName } = this.props
+    let { branding, navigation } = settings
+
     const classes = classnames({
+      'iconav-layout': true,
       'with-iconav': true,
-      'iconav-wide': (this.props.wide || !this.props.thin),
+      'iconav-wide': (this.props.wide !== false && !this.props.thin),
       [ styles.wrapper ]: true
     })
 
-    let { settings, children, containerClassName } = this.props
-    let { branding, navigation } = settings
+    const containerClasses = classnames({
+      [containerClassName]: true,
+      'iconav-container': true
+    })
 
     return (
       <div className={classes}>
@@ -41,7 +55,7 @@ export class IconNavLayout extends React.Component {
                  brandIcon={branding.icon}
                  links={navigation.links} />
 
-        <div className={containerClassName || 'container'}>
+        <div className={containerClasses}>
           {children}
         </div>
       </div>
@@ -49,4 +63,4 @@ export class IconNavLayout extends React.Component {
   }
 }
 
-export default IconNavLayout
+export default stateful(IconNavLayout, 'settings')

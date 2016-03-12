@@ -1,6 +1,6 @@
 import React, { Component, PropTypes as types } from 'react'
 
-import FluidTopNavbar from '../components/FluidTopNavbar'
+import FluidTopNavbar from 'ui/components/FluidTopNavbar'
 
 export class FluidLayout extends Component {
   static displayName = 'FluidLayout';

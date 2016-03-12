@@ -1,6 +1,6 @@
 import React, { Component, PropTypes as types } from 'react'
 import FluidLayout from 'ui/layouts/IconNavLayout'
-import stateful from '../applications/util/stateful'
+import stateful from 'ui/util/stateful'
 
 import pick from 'lodash/pick'
 
