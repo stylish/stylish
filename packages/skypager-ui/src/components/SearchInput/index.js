@@ -1,6 +1,6 @@
 import React from 'react'
 
-import InputWithIcon from './InputWithIcon'
+import InputWithIcon from 'ui/components/InputWithIcon'
 
 export class SearchInput extends React.Component {
   constructor (props) {

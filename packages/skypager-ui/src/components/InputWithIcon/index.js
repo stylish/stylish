@@ -1,6 +1,6 @@
 import React, { PropTypes as types } from 'react'
 
-import Icon from './Icon'
+import Icon from 'ui/components/Icon'
 
 const INPUT_TYPES = [
   'datepicker',

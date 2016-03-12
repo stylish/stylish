@@ -3,7 +3,7 @@ import BodyClassName from 'react-body-classname'
 import classnames from 'classnames'
 
 import { Link } from 'react-router'
-import Icon from './Icon'
+import Icon from 'ui/components/Icon'
 
 export class FluidTopNavbar extends Component {
   static displayName = 'FluidTopNavbar';

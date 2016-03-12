@@ -1,8 +1,15 @@
 import React, { Children } from 'react'
-import { Grid, Col, Row, Panel } from 'react-bootstrap'
 
-import { range } from 'lodash'
+import Col from 'react-bootstrap/lib/Col'
+import Grid from 'react-bootstrap/lib/Grid'
+import Panel from 'react-bootstrap/lib/Panel'
+import Row from 'react-bootstrap/lib/Row'
 
+import range from 'lodash/range'
+
+/**
+ * The CardsContainer aligns a list of items in a grid pattern.
+*/
 export function CardsContainer (props = {}) {
   let num = props.perRow || 4
   let items = each_cons(Children.toArray(props.children), num)
@@ -22,6 +29,7 @@ export function CardsContainer (props = {}) {
 
 export default CardsContainer
 
+// investigate whether it is better to use lodash.chunk which i discovered after this solution
 function each_cons (list, size) {
   let groupsCount = list.length <= size ? 1 : list.length / size
 

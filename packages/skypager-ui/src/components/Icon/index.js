@@ -14,7 +14,7 @@ export function Icon (props = {}) {
 
   const sizeClass = size ? `icon-${ size }` : `icon-default`
 
-  props.className = cx({
+  let classes = cx({
     icon: true,
     [`icon-${ icon }`]: true,
     [sizeClass]: sizeClass,
@@ -22,7 +22,7 @@ export function Icon (props = {}) {
   })
 
   return (
-    <span { ...props } />
+    <span { ...props } className={classes} />
   )
 }
 
