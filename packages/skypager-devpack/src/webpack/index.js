@@ -43,7 +43,7 @@ const ExternalVendorMappings = {
   'tcomb-form': 'TcombForm',
   'tcomb-react': 'TcombReact',
   'skypager-ui': 'SkypagerUI',
-  'skypager-themes': 'SkypagerThemes'
+  //'skypager-themes': 'SkypagerThemes'
 }
 
 module.exports = function (externalOptions = {}) {
@@ -114,7 +114,7 @@ module.exports = function (externalOptions = {}) {
 
   if (!entry.theme && options.theme) {
     entry.theme = [
-      options.theme.match(/\//) ? options.theme : `themes/${ options.theme }`
+      options.theme.match(/\//) ? options.theme : `ui/themes/${ options.theme }`
     ]
   }
 
@@ -238,7 +238,7 @@ module.exports = function (externalOptions = {}) {
       test: /\.less$/,
       include:[
         join(directory, 'src'),
-        join(devpackModuleRoot, 'src', 'ui')
+        join(uiModuleRoot, 'src')
       ],
       exclude:[
         excludeNodeModulesExceptSkypagers,
