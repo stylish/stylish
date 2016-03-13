@@ -8,10 +8,10 @@ import assign from 'object-assign'
 */
 
 function reflector (host, startProp, getIdPaths) {
-  host.should.be.an.Object()
-  host.should.have.property('type')
-  idPaths.should.be.a.Function()
-  startProp.should.be.a.String()
+  invariant(host, 'provide a host')
+  invariant(host.type, 'host needs a type')
+  invariant(idPaths, 'idPaths should be a function')
+  invariant(startProp, 'provide startProp')
 
   let Interface = class {
 

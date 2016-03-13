@@ -1,5 +1,5 @@
 describe("Model Definition DSL", function(){
-  let project = require('./fixture')
+  let project = require('../fixture')
   let model = project.models.lookup('testcase')
   let testcase = project.documents.at('testcases/structure-spec')
 
@@ -14,7 +14,7 @@ describe("Model Definition DSL", function(){
     })
 
     it( "should recognize the decorated methods as actions", function(){
-      testcase.modelClass.actions.should.containEql('testcases/run')
+      testcase.modelClass.actions.should.contain('testcases/run')
     })
   })
 
@@ -53,7 +53,7 @@ describe("Model Definition DSL", function(){
       let content = testcase.content
 
       content.should.have.property('specifications')
-      content.specifications.should.be.an.Object()
+      content.specifications.should.be.an('object')
     })
 
     it( "creates lists of articles for nested h3 headings", function(){
@@ -61,7 +61,7 @@ describe("Model Definition DSL", function(){
       let specifications = content.specifications
 
       specifications.should.have.property('examples')
-      specifications.examples.should.be.an.Array()
+      specifications.examples.should.be.an('array')
     })
   })
 })

@@ -1,5 +1,5 @@
 describe('The Project Vault', function() {
-  let project = require('./fixture')
+  let project = require('../fixture')
 
   it('can be accessed on the project', function(){
     project.should.have.property('vault')

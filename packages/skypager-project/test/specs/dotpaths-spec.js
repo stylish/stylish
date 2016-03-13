@@ -1,7 +1,7 @@
 import { doesNotThrow as noErrorsBabyNoErrors } from 'assert'
 
 describe("Access Via Dot Paths", function(){
-  let project = require('./fixture')
+  let project = require('../fixture')
   let doc = project.docs.at('assets/data-source-spec')
   let isUndefined = require('lodash').isUndefined
 

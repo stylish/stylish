@@ -1,5 +1,5 @@
 describe('The Settings System', function(){
-  const project = require('./fixture')
+  const project = require('../fixture')
 
   it('merges all of the settings yml files into a single structure', function(){
     project.settings.should.have.property('app')

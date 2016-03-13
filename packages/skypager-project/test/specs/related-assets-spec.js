@@ -1,5 +1,5 @@
 describe("Related Assets", function(){
-  let project = require('./fixture')
+  let project = require('../fixture')
   let subject = project.documents.at('assets/data-source-spec')
 
   it("relates assets across different content collections", function(){

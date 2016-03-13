@@ -1,6 +1,7 @@
 var PROJECT_ACTIONS = [
   'testcases/run',
-  'testcases/random'
+  'testcases/random',
+  'testcases/emit'
 ]
 
 function resolve(action){ return require.resolve('./' + action) }

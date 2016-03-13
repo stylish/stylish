@@ -1,4 +1,4 @@
-import * as util from '../src/util'
+import * as util from '../../src/util'
 
 describe("Utils", function(){
   describe("No Conflict", function(){
@@ -21,9 +21,8 @@ describe("Utils", function(){
 
       util.noConflict(fn, {clean_this_up: true, no_conflict_var: 99})()
 
-      test.should.equal(69)
-      global.should.have.property('no_conflict_var')
-      global.should.not.have.property('clean_this_up')
+      expect(global).to.have.property('no_conflict_var')
+      expect(global).to.not.have.property('clean_this_up')
     })
   })
 })

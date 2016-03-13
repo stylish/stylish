@@ -13,7 +13,7 @@ import { dirname, resolve, join, basename, extname } from 'path'
 import defaults from 'lodash/defaultsDeep'
 
 require('./polyfill')
-require('should')
+GLOBAL.invariant = require('invariant')
 
 // temp
 delete (Assets.default)

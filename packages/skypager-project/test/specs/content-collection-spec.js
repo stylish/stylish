@@ -1,13 +1,13 @@
 import set from 'lodash/set'
 
 describe("Content Collections", function(){
-  const project = require('./fixture')
+  const project = require('../fixture')
   const content = project.content
   const documents = project.content.documents
   const collections = Object.keys(content).map(key => content[key])
 
   it("provides simple access via asset id", function() {
-    documents.at('index').should.be.an.Object
+    documents.at('index').should.be.an('object')
   })
 
   it("returns all of the assets as an array", function(){
@@ -15,19 +15,19 @@ describe("Content Collections", function(){
   })
 
   it("has all of the collections for different asset classes", function(){
-    Object.keys(content).should.containEql('assets')
-    Object.keys(content).should.containEql('data_sources')
-    Object.keys(content).should.containEql('documents')
-    Object.keys(content).should.containEql('images')
-    Object.keys(content).should.containEql('scripts')
-    Object.keys(content).should.containEql('stylesheets')
-    Object.keys(content).should.containEql('vectors')
+    Object.keys(content).should.contain('assets')
+    Object.keys(content).should.contain('data_sources')
+    Object.keys(content).should.contain('documents')
+    Object.keys(content).should.contain('images')
+    Object.keys(content).should.contain('scripts')
+    Object.keys(content).should.contain('stylesheets')
+    Object.keys(content).should.contain('vectors')
   })
 
   it("knows the extension and glob pattern for different asset classes", function(){
     Object.values(content).forEach(collection => {
-      collection.AssetClass.should.be.a.Function()
-      collection.AssetClass.EXTENSIONS.should.be.a.Array()
+      collection.AssetClass.should.be.a('function')
+      collection.AssetClass.EXTENSIONS.should.be.an('array')
     })
   })
 
