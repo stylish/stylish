@@ -32,7 +32,7 @@ function CollectionBundle() {
         path: asset.paths.projectRequire
       };
 
-      if (asset.assetClass.name == 'DataSource') {
+      if (asset.assetClass.name === 'DataSource' || asset.assetClass.name === 'Document') {
         entry.data = asset.data;
       }
     } catch (e) {
