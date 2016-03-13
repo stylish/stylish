@@ -1,7 +1,7 @@
 import pick from 'lodash/pick'
 
-const IncludeData = ['data_sources','settings_files','copy_files']
-const IncludeExporters = ['entities','settings', 'copy','project','models']
+const IncludeData = ['data_sources','settings_files','copy_files','documents']
+const IncludeExporters = ['entities','settings', 'copy']
 const AssetFields = ['id','assetGroup', 'categoryFolder', 'fingerprint', 'paths']
 const IncludeCollections = [
  'documents',
@@ -66,7 +66,8 @@ export function AssetExporter (options = {}, callback) {
       markdown: asset.raw,
       ast: asset.indexed,
       indexes: asset.indexes,
-      html: asset.html.content
+      html: asset.html.content,
+      data: asset.data || asset.metadata
     })
   }
 
