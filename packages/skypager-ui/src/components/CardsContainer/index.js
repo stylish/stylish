@@ -2,7 +2,6 @@ import React, { Children } from 'react'
 
 import Col from 'react-bootstrap/lib/Col'
 import Grid from 'react-bootstrap/lib/Grid'
-import Panel from 'react-bootstrap/lib/Panel'
 import Row from 'react-bootstrap/lib/Row'
 
 import range from 'lodash/range'
@@ -13,15 +12,24 @@ import range from 'lodash/range'
 export function CardsContainer (props = {}) {
   let num = props.perRow || 4
   let items = each_cons(Children.toArray(props.children), num)
+  let wrapper = props.wrapper ? props.wrapper : undefined
 
   let colSize = 12 / num;
 
   let rows = items.map((row,i) => {
-    let columns = row.map((item,j) => {
-      return <Col key={j} xs={colSize}>{item}</Col>
+    let columns = row.map((_item,j) => {
+      const item = wrapper
+        ? (<wrapper>{_item}</wrapper>)
+        : _item
+
+        return (
+          <Col key={j} xs={colSize}>{item}</Col>
+        )
     })
 
-    return <Row key={i}>{columns}</Row>
+    return (
+      <Row key={i}>{columns}</Row>
+    )
   })
 
   return <Grid>{rows}</Grid>

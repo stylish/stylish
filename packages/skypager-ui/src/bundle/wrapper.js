@@ -5,6 +5,7 @@
 
 import isString from 'lodash/isString'
 import isObject from 'lodash/isObject'
+import isRegExp from 'lodash/isRegExp'
 import omit from 'lodash/omit'
 import pick from 'lodash/pick'
 import defaults from 'lodash/defaultsDeep'
@@ -299,12 +300,14 @@ function hide(obj, props = {}) {
 }
 
 function addQuerySugar(object) {
-  return hide(object, {
-    query: (...args) => filterQuery(object, ...args),
+  hide(object, {
+    query: (...args) => filterQuery(values(object), ...args),
     where: (...args) => addQuerySugar(pickBy(object, ...args)),
     pickBy: (...args) => addQuerySugar(pickBy(object, ...args)),
     sortBy: (...args) => sortBy(values(object), ...args),
   })
+
+  return object
 }
 
 function filterQuery (list = [], params) {
@@ -317,7 +320,7 @@ function filterQuery (list = [], params) {
       let param = params[key]
       let value = item[key]
 
-      if (isRegexp(param) && param.test(value)) {
+      if (isRegExp(param) && param.test(value)) {
         return true
       }
 
@@ -331,7 +334,7 @@ function filterQuery (list = [], params) {
 
       // treat normal arrays to search for any exact matches
       if (isArray(param)) {
-        return param.any(val => val === value)
+        return param.filter(val => val === value).length > 0
       }
     })
   })

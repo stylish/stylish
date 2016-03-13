@@ -1,6 +1,8 @@
 var skypager = require('skypager-project')
 var reactDocs = require('react-docgen')
 
+// Most of the scripts in this library are react components.
+// We can parse them without evaluating them and learn important things about their interface
 Object.assign(skypager.Assets.Script.prototype, {
   parser(raw) {
     try {
@@ -15,6 +17,13 @@ Object.assign(skypager.Assets.Script.prototype, {
 })
 
 var project = module.exports = skypager.load(__filename)
+
+skypager.exporters.load(
+  require('./exporters/component_interfaces'), {
+    id: 'component_docs',
+    uri: require.resolve('./exporters/component_interfaces')
+  }
+)
 
 Object.assign(project.scripts, {
   get components() {
@@ -33,3 +42,4 @@ Object.assign(project.scripts, {
     return project.scripts.query(script => script.isIndex && script.categoryFolder === 'themes')
   },
 })
+

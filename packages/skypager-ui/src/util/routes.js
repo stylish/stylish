@@ -44,9 +44,15 @@ function toPlainRoute(component, path, project) {
     throw('Can not build a plain route object if the component does not define a path or if you do not provide one')
   }
 
-  // already a plain route object apparently
-  if (component && component.path && (hasOwnProperty(component, 'component') || hasOwnProperty(component, 'getComponent'))) {
-    return component
+  try {
+    // already a plain route object apparently
+    if (typeof component === 'object' && component && component.path && (hasOwnProperty(component, 'component') || hasOwnProperty(component, 'getComponent'))) {
+      return component
+    }
+
+  } catch (error) {
+    console.log(error.message, component)
+    throw(error)
   }
 
   let plainRoute = {
@@ -55,7 +61,16 @@ function toPlainRoute(component, path, project) {
   }
 
   if (component.childRoutes) {
-     plainRoute.childRoutes = component.childRoutes
+    plainRoute.childRoutes = Object.values(
+      mapValues(component.childRoutes, (comp, path) => {
+        console.log('sheeeit', comp, path)
+        return toPlainRoute(
+          isString(comp) ? project.requireScreen(comp) : comp,
+          path,
+          project
+        )
+      })
+    )
   }
 
   if (component.components) {

@@ -1,30 +1,25 @@
 module.exports = function (params = {}, context = {}) {
   let project = context.project || this
-  let outputPath = project.path('build', 'component_interfaces.json')
+  let outputPath = project.path('data_sources', 'component-docs.json')
   let mapValues = require('lodash/mapValues')
+  let include = params.include
+    ? params.include.split(',').map(s => s.trim().toLowerCase())
+    : ['components','layouts','entries','shells']
 
-  let types = ['components','layouts','shells','entries']
+  let writeFile = require('fs').writeFileSync
 
-  let payload = types.reduce((memo,type) => {
-    let scripts = project.scripts[type].reduce((i,s) => {
-      i[s.id] = s.parsed
-      return i
-    }, {})
+  include.forEach(type => {
+    project.scripts[type].forEach(convertToData)
+  })
 
-    memo[type] = scripts
+  function convertToData(script) {
+     script.runImporter('disk', {sync: true})
+     require('child_process').execSync("mkdir -p " + project.path('data_sources', script.id))
 
-    return memo
-  }, {})
-
-  require('fs').writeFileSync(
-    outputPath,
-    JSON.stringify(
-      payload,
-      null,
-      2
-    ),
-    'utf8'
-  )
-
-  return payload
+     writeFile(
+       project.path('data_sources', `${ script.id }/interface.json`),
+       JSON.stringify(script.parsed, null, 2),
+       'utf8'
+    )
+  }
 }
