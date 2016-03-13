@@ -15,15 +15,15 @@ describe("The Plugin System", function(){
   })
 
   it("makes framework plugins available to a project", function(){
-    project.plugins.available.should.containEql('example')
+    project.plugins.available.should.contain('example')
   })
 
   it("shows available project plugins", function(){
-    project.plugins.available.should.containEql('test_runner')
+    project.plugins.available.should.contain('test_runner')
   })
 
   it("automatically loads plugins defined in the manifest", function(){
-    project.enabledPlugins.should.containEql('test_runner')
+    project.enabledPlugins.should.contain('test_runner')
   })
 
   it("loads the projects models", function(){

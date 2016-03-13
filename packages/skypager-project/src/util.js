@@ -194,8 +194,8 @@ export function copyProp (property) {
 }
 
 export function noConflict (fn, provider = {}, scope) {
-  fn.should.be.a.Function
-  provider.should.be.an.Object
+  invariant(fn, 'provide a function')
+  invariant(provider, 'provide a provider')
 
   let safe = { }
 

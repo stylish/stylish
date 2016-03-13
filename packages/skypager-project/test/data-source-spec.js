@@ -25,7 +25,7 @@ describe("DataSources", function(){
 
     it("gets run with certain values in the global scope", function(){
       let datasource = project.content.data_sources.at('scripts/global-scope-helpers')
-      datasource.data.should.containEql('util', 'project', 'datasource')
+      datasource.data.should.contain('util', 'project', 'datasource')
     })
   })
 })

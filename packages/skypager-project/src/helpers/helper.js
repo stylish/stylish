@@ -8,11 +8,10 @@
 */
 import skypager from '../index'
 import * as util from '../util'
-import path from 'path'
-
 import { dirname, extname, resolve, join } from 'path'
+import { EventEmitter } from 'fbemitter'
 
-export default class Helper {
+export default class Helper extends EventEmitter {
   static decorateRegistry (registry) {
     if (this.registryInterface) {
       defineProperties(registry, this.registryInterface(registry))
@@ -51,6 +50,7 @@ export default class Helper {
   }
 
   constructor (uri, options = {}) {
+    super()
     let helper = this
     let raw
 
@@ -94,6 +94,20 @@ export default class Helper {
 
     this.hidden('api', () => this.buildAPI(options.api, this.required))
   }
+
+  /**
+   * creates a subscription to an event
+   * 
+   * @param String event name of the event to monitor
+   * @Param function callback callback to execute when event occurs
+   */
+  on(event, callback) {
+    return this.addListener(event, callback)
+  }
+
+  //TODO: implement
+  //see https://github.com/facebook/emitter#__emittosubscriptionsubscription-eventtype-args
+  //__emitToSubscription(subscription, eventType, ...args) {}
 
   result(...args) {
     return util.result(this, ...args)
