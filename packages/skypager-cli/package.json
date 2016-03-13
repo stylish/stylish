@@ -1,6 +1,6 @@
 {
   "name": "skypager-cli",
-  "version": "2.19.1",
+  "version": "2.19.3",
   "preferGlobal": "true",
   "bin": {
     "skypager": "./bin/cli.js"
