@@ -1,0 +1,52 @@
+{
+  "description": "",
+  "displayName": "FeatureList",
+  "props": {
+    "features": {
+      "type": {
+        "name": "arrayOf",
+        "value": {
+          "name": "shape",
+          "value": {
+            "icon": {
+              "name": "string",
+              "required": true
+            },
+            "iconSize": {
+              "name": "enum",
+              "value": [
+                {
+                  "value": "'small'",
+                  "computed": false
+                },
+                {
+                  "value": "'medium'",
+                  "computed": false
+                },
+                {
+                  "value": "'large'",
+                  "computed": false
+                },
+                {
+                  "value": "'huge'",
+                  "computed": false
+                }
+              ],
+              "required": false
+            },
+            "title": {
+              "name": "string",
+              "required": true
+            },
+            "text": {
+              "name": "string",
+              "required": true
+            }
+          }
+        }
+      },
+      "required": true,
+      "description": ""
+    }
+  }
+}

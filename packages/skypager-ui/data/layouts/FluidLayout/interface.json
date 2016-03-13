@@ -1,0 +1,90 @@
+{
+  "description": "",
+  "displayName": "FluidLayout",
+  "props": {
+    "branding": {
+      "type": {
+        "name": "shape",
+        "value": {
+          "icon": {
+            "name": "string",
+            "required": false
+          },
+          "style": {
+            "name": "string",
+            "required": false
+          },
+          "brand": {
+            "name": "string",
+            "required": false
+          }
+        }
+      },
+      "required": false,
+      "description": "",
+      "defaultValue": {
+        "value": "{\n  icon: 'rocket',\n  style: 'default',\n  brand: 'Skypager'\n}",
+        "computed": false
+      }
+    },
+    "children": {
+      "type": {
+        "name": "node"
+      },
+      "required": true,
+      "description": ""
+    },
+    "containerClassName": {
+      "type": {
+        "name": "string"
+      },
+      "required": false,
+      "description": ""
+    },
+    "searchForm": {
+      "type": {
+        "name": "node"
+      },
+      "required": false,
+      "description": "",
+      "defaultValue": {
+        "value": "<div />",
+        "computed": false
+      }
+    },
+    "navigation": {
+      "type": {
+        "name": "shape",
+        "value": {
+          "links": {
+            "name": "arrayOf",
+            "value": {
+              "name": "shape",
+              "value": {
+                "icon": {
+                  "name": "string",
+                  "required": false
+                },
+                "label": {
+                  "name": "string",
+                  "required": false
+                },
+                "link": {
+                  "name": "string",
+                  "required": false
+                }
+              }
+            },
+            "required": false
+          }
+        }
+      },
+      "required": false,
+      "description": "",
+      "defaultValue": {
+        "value": "{\n  links:[{\n    label: 'Home',\n    link: '/',\n    icon: 'home'\n  }]\n}",
+        "computed": false
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "description": "",
+  "displayName": "SiteHeader",
+  "props": {
+    "branding": {
+      "type": {
+        "name": "shape",
+        "value": {
+          "brand": {
+            "name": "string",
+            "required": true
+          },
+          "icon": {
+            "name": "string",
+            "required": false
+          }
+        }
+      },
+      "required": false,
+      "description": ""
+    },
+    "copy": {
+      "type": {
+        "name": "object"
+      },
+      "required": true,
+      "description": ""
+    }
+  }
+}

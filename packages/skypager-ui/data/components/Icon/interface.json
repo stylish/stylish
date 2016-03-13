@@ -1,0 +1,28 @@
+{
+  "description": "",
+  "props": {
+    "icon": {
+      "type": {
+        "name": "string"
+      },
+      "required": true,
+      "description": ""
+    },
+    "size": {
+      "type": {
+        "name": "enum",
+        "computed": true,
+        "value": "Sizes"
+      },
+      "required": false,
+      "description": ""
+    },
+    "inverse": {
+      "type": {
+        "name": "bool"
+      },
+      "required": false,
+      "description": ""
+    }
+  }
+}

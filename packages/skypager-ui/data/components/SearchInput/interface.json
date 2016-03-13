@@ -1,0 +1,19 @@
+{
+  "description": "",
+  "props": {
+    "value": {
+      "type": {
+        "name": "string"
+      },
+      "required": false,
+      "description": ""
+    },
+    "onChange": {
+      "type": {
+        "name": "func"
+      },
+      "required": false,
+      "description": ""
+    }
+  }
+}

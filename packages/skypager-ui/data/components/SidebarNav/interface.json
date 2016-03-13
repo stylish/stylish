@@ -1,0 +1,27 @@
+{
+  "description": "",
+  "displayName": "SidebarNav",
+  "props": {
+    "children": {
+      "type": {
+        "name": "node"
+      },
+      "required": false,
+      "description": ""
+    },
+    "header": {
+      "type": {
+        "name": "element"
+      },
+      "required": false,
+      "description": ""
+    },
+    "searchForm": {
+      "type": {
+        "name": "element"
+      },
+      "required": false,
+      "description": ""
+    }
+  }
+}

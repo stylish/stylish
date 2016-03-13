@@ -1,0 +1,12 @@
+{
+  "description": "",
+  "props": {
+    "brand": {
+      "type": {
+        "name": "string"
+      },
+      "required": false,
+      "description": ""
+    }
+  }
+}

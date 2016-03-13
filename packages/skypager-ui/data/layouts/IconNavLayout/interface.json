@@ -1,0 +1,83 @@
+{
+  "description": "",
+  "displayName": "IconNavLayout",
+  "props": {
+    "children": {
+      "type": {
+        "name": "node"
+      },
+      "required": true,
+      "description": ""
+    },
+    "containerClassName": {
+      "type": {
+        "name": "string"
+      },
+      "required": false,
+      "description": "",
+      "defaultValue": {
+        "value": "'container'",
+        "computed": false
+      }
+    },
+    "settings": {
+      "type": {
+        "name": "shape",
+        "value": {
+          "navigation": {
+            "name": "shape",
+            "value": {
+              "links": {
+                "name": "array",
+                "required": false
+              }
+            },
+            "required": false
+          },
+          "branding": {
+            "name": "shape",
+            "value": {
+              "icon": {
+                "name": "string",
+                "required": false
+              },
+              "brand": {
+                "name": "string",
+                "required": false
+              },
+              "style": {
+                "name": "string",
+                "required": false
+              }
+            },
+            "required": false
+          }
+        }
+      },
+      "required": true,
+      "description": ""
+    },
+    "thin": {
+      "type": {
+        "name": "bool"
+      },
+      "required": false,
+      "description": "",
+      "defaultValue": {
+        "value": "false",
+        "computed": false
+      }
+    },
+    "wide": {
+      "type": {
+        "name": "bool"
+      },
+      "required": false,
+      "description": "",
+      "defaultValue": {
+        "value": "true",
+        "computed": false
+      }
+    }
+  }
+}

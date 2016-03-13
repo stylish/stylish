@@ -1,0 +1,50 @@
+{
+  "description": "",
+  "displayName": "FluidTopNavbar",
+  "props": {
+    "searchForm": {
+      "type": {
+        "name": "node"
+      },
+      "required": false,
+      "description": ""
+    },
+    "links": {
+      "type": {
+        "name": "arrayOf",
+        "value": {
+          "name": "shape",
+          "value": {
+            "label": {
+              "name": "string",
+              "required": false
+            },
+            "link": {
+              "name": "string",
+              "required": false
+            }
+          }
+        }
+      },
+      "required": false,
+      "description": ""
+    },
+    "branding": {
+      "type": {
+        "name": "shape",
+        "value": {
+          "icon": {
+            "name": "string",
+            "required": false
+          },
+          "brand": {
+            "name": "string",
+            "required": false
+          }
+        }
+      },
+      "required": false,
+      "description": ""
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "description": "",
+  "props": {
+    "position": {
+      "type": {
+        "name": "string"
+      },
+      "required": false,
+      "description": ""
+    }
+  }
+}

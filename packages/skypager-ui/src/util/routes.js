@@ -79,5 +79,6 @@ function toPlainRoute(component, path, project) {
     })
   }
 
+  console.log('returning', plainRoute)
   return plainRoute
 }

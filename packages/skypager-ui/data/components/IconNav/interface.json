@@ -1,0 +1,44 @@
+{
+  "description": "",
+  "displayName": "IconNav",
+  "props": {
+    "brandIcon": {
+      "type": {
+        "name": "string"
+      },
+      "required": false,
+      "description": ""
+    },
+    "brandStyle": {
+      "type": {
+        "name": "string"
+      },
+      "required": false,
+      "description": ""
+    },
+    "links": {
+      "type": {
+        "name": "arrayOf",
+        "value": {
+          "name": "shape",
+          "value": {
+            "link": {
+              "name": "string",
+              "required": true
+            },
+            "icon": {
+              "name": "string",
+              "required": false
+            },
+            "label": {
+              "name": "string",
+              "required": false
+            }
+          }
+        }
+      },
+      "required": true,
+      "description": ""
+    }
+  }
+}

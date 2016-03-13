@@ -1,0 +1,26 @@
+{
+  "description": "",
+  "props": {
+    "subtitle": {
+      "type": {
+        "name": "string"
+      },
+      "required": false,
+      "description": ""
+    },
+    "title": {
+      "type": {
+        "name": "string"
+      },
+      "required": false,
+      "description": ""
+    },
+    "children": {
+      "type": {
+        "name": "node"
+      },
+      "required": false,
+      "description": ""
+    }
+  }
+}

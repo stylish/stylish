@@ -1,0 +1,100 @@
+{
+  "description": "The Block Component is part of the Bootstrap Professional Marketing theme.",
+  "displayName": "Block",
+  "props": {
+    "inverse": {
+      "type": {
+        "name": "bool"
+      },
+      "required": false,
+      "description": "use the inverse color style for this block",
+      "defaultValue": {
+        "value": "false",
+        "computed": false
+      }
+    },
+    "text": {
+      "type": {
+        "name": "string"
+      },
+      "required": false,
+      "description": "body text underneath the block title"
+    },
+    "title": {
+      "type": {
+        "name": "string"
+      },
+      "required": false,
+      "description": "main title text in the block"
+    },
+    "muteText": {
+      "type": {
+        "name": "bool"
+      },
+      "required": false,
+      "description": "use a muted text style for the body text in the block",
+      "defaultValue": {
+        "value": "true",
+        "computed": false
+      }
+    },
+    "centerText": {
+      "type": {
+        "name": "bool"
+      },
+      "required": false,
+      "description": "center text within the block",
+      "defaultValue": {
+        "value": "true",
+        "computed": false
+      }
+    },
+    "background": {
+      "type": {
+        "name": "element"
+      },
+      "required": false,
+      "description": "a react component to use as an interactive background for this block"
+    },
+    "children": {
+      "type": {
+        "name": "node"
+      },
+      "required": false,
+      "description": "additional content will be displayed under the block title in the block foreground"
+    },
+    "angled": {
+      "type": {
+        "name": "bool"
+      },
+      "required": false,
+      "description": "use the angled style variation of this block",
+      "defaultValue": {
+        "value": "false",
+        "computed": false
+      }
+    },
+    "bordered": {
+      "type": {
+        "name": "bool"
+      },
+      "required": false,
+      "description": "use the bordered style variation of this block",
+      "defaultValue": {
+        "value": "false",
+        "computed": false
+      }
+    },
+    "fillHeight": {
+      "type": {
+        "name": "bool"
+      },
+      "required": false,
+      "description": "when enabled this block will occupy the full height of the parent container",
+      "defaultValue": {
+        "value": "false",
+        "computed": false
+      }
+    }
+  }
+}
