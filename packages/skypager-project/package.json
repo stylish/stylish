@@ -1,6 +1,6 @@
 {
   "name": "skypager-project",
-  "version": "2.19.0",
+  "version": "2.19.1",
   "description": "skypager.io core framework project and helpers",
   "main": "index.js",
   "bin": {
