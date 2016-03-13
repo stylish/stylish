@@ -26,8 +26,8 @@ var _pick2 = _interopRequireDefault(_pick);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var IncludeData = ['data_sources', 'settings_files', 'copy_files'];
-var IncludeExporters = ['entities', 'settings', 'copy', 'project', 'models'];
+var IncludeData = ['data_sources', 'settings_files', 'copy_files', 'documents'];
+var IncludeExporters = ['entities', 'settings', 'copy'];
 var AssetFields = ['id', 'assetGroup', 'categoryFolder', 'fingerprint', 'paths'];
 var IncludeCollections = ['documents', 'data_sources', 'copy_files', 'settings_files', 'scripts', 'stylesheets', 'packages', 'projects', 'vectors'];
 
@@ -84,7 +84,8 @@ function AssetExporter() {
       markdown: asset.raw,
       ast: asset.indexed,
       indexes: asset.indexes,
-      html: asset.html.content
+      html: asset.html.content,
+      data: asset.data || asset.metadata
     });
   }
 
