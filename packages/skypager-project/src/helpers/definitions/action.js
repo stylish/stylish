@@ -69,11 +69,6 @@ export class ActionDefinition {
     return matching && matching(sample)
   }
 
-  on(eventName, cb) {
-    const knownEvents = [ 'abort', 'error', 'warn', 'suggest', 'info', 'done' ]
-    
-  }
-
   get api () {
     let action = this
 
@@ -95,30 +90,35 @@ export class ActionDefinition {
         let context = args[ args.length - 1 ]
 
         let localHelpers = {
-          //TODO: change ...r to ...args
            abort(message, ...args) {
               console.error(message)
               report.errors.push(message, ...args)
               process.exit(1)
             },
             error(message, ...args) {
+              action._helper.emit('error', message, ...args)
               console.log(message, ...args)
               report.errors.push(message)
             },
             warn(message, ...args) {
+              action._helper.emit('warn', message, ...args)
               console.log(message, ...args)
               report.warnings.push(message)
             },
             //deprecated
             suggest(message, ...args) {
+              action._helper.emit('suggest', message, ...args)
               console.log(message, ...args)
               report.suggestions.push(message)
             },
             info(message, ...args) {
+              action._helper.emit('info', message, ...args)
               console.log(message, ...args)
               report.suggestions.push(message)
             },
-            done(result, ...r) {},
+            done(result, ...args) {
+              action._helper.emit('done', result, ...args)
+            },
             report,
             context
         }
@@ -137,7 +137,10 @@ export class ActionDefinition {
         report.result = noConflict(function(){
           try {
             let r = action.api.execute(...args)
-            if (r) { report.success = true }
+            if (r) { 
+              report.success = true 
+              report.result = r
+            }
             return r
           } catch(err) {
             report.errors.push('fatal error:' + err.message)
