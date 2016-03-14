@@ -37,6 +37,8 @@
   "scripts": {
     "start": "skypager serve web",
     "test": "skypager each package --command 'npm run test'",
-    "publish:all": "skypager each package --command 'npm run test' && skypager each package --command 'npm run compile' && git add -A && git commit -m 'prepublish building assets' && npm version patch && lerna publish"
+    "prerelease": "skypager each package --command 'npm run test' && skypager each package --command 'npm run compile' && git add -A && git commit -m 'prepublish building assets' && npm version patch && lerna publish",
+    "release": "git push origin master && lerna publish || true",
+    "postrelease": "npm publish"
   }
 }
