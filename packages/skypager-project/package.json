@@ -16,6 +16,7 @@
     "test:watch": "SKYPAGER_ENV=development NODE_ENV=test mocha --growl --watch --require 'babel-register' --require ./test/setup.js --require ./test/index.js --recursive test/specs",
     "lint": "eslint src/**/*",
     "lint:fix": "npm run lint -- --fix",
+    "precompile": "SKYPAGER_ENV=release rimraf lib",
     "compile": "SKYPAGER_ENV=release babel -q -d lib src",
     "compile:watch": "SKYPAGER_ENV=release babel -w -d lib src"
   },
