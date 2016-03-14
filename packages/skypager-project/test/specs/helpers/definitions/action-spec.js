@@ -1,6 +1,6 @@
 import { spy } from 'sinon'
 
-describe.only('Running an action', () => {
+describe('Running an action', () => {
   
   let project = require('../../../fixture')
   let action = project.actions.lookup('testcases/emit')
