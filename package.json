@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "2.19.0",
+  "version": "2.19.4",
   "description": "skypager is a framework for managing a portfolio of applications, modules, and components. Skypager makes working with react, babel, webpack and other ecosystems a breeze.",
   "skypager": {
     "main": "skypager.js",
@@ -9,7 +9,7 @@
     ]
   },
   "bin": {
-    "skypager":"./node_modules/skypager-cli/bin/cli.js"
+    "skypager":"./packages/skypager-cli/bin/cli.js"
   },
   "main": "index.js",
   "dependencies": {
@@ -20,6 +20,8 @@
     "skypager-server": "latest",
     "skypager-themes": "latest",
     "skypager-plugin-portfolio": "latest",
+  },
+  "optionalDependencies":{
     "skypager-electron": "latest"
   },
   "devDependencies": {
@@ -34,7 +36,6 @@
   "license": "SEE LICENSE IN License.md",
   "scripts": {
     "start": "skypager serve web",
-    "test": "skypager each package --command 'npm run test'",
-    "preversion": "lerna publish && git add -A && git commit -m 'bumping version' && npm version"
+    "test": "skypager each package --command 'npm run test'"
   }
 }
