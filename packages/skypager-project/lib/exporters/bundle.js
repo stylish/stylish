@@ -85,7 +85,13 @@ function AssetExporter() {
       ast: asset.indexed,
       indexes: asset.indexes,
       html: asset.html.content,
-      data: asset.data || asset.metadata
+      data: asset.data || asset.metadata,
+      title: attempt(function () {
+        return asset.documentTitle;
+      }),
+      mainCopy: attempt(function () {
+        return asset.mainCopy;
+      })
     });
   }
 
@@ -165,4 +171,10 @@ var keys = _Object.keys;
 function contextPolyfill() {
   return;
   'if (typeof require.context === \'undefined\') {\n  require.context = function(){\n    return {\n      keys:function(){ return [] },\n      req:function(){}\n    }\n  }\n}';
+}
+
+function attempt(fn) {
+  try {
+    return fn();
+  } catch (error) {}
 }

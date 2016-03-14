@@ -67,7 +67,9 @@ export function AssetExporter (options = {}, callback) {
       ast: asset.indexed,
       indexes: asset.indexes,
       html: asset.html.content,
-      data: asset.data || asset.metadata
+      data: asset.data || asset.metadata,
+      title: attempt(() => asset.documentTitle),
+      mainCopy: attempt(() => asset.mainCopy)
     })
   }
 
@@ -167,4 +169,8 @@ return
     }
   }
 }`
+}
+
+function attempt(fn) {
+  try { return fn() } catch(error) {}
 }
