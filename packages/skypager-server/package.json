@@ -18,10 +18,10 @@
       "devtools"
     ]
   },
-  "license": "UNLICENSED",
+  "license": "SEE LICENSE IN License.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/architects/skypager-central"
+    "url": "https://github.com/skypager/skypager"
   },
   "optionalDependencies": {
     "redis": "2.4.2",
@@ -53,5 +53,10 @@
     "babel-preset-skypager": "^1.34.0",
     "mocha": "^2.3.4",
     "should": "^8.2.2"
-  }
+  },
+  "author": "Jon Soeder <jon@chicago.com>",
+  "bugs": {
+    "url": "https://github.com/skypager/skypager"
+  },
+  "homepage": "https://skypager.io"
 }

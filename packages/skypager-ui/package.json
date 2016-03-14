@@ -43,12 +43,14 @@
     "type": "git",
     "url": "https://github.com/skypager/skypager"
   },
-  "author": [
-    "Jonathan Soeder <jon@chicago.com>"
-  ],
-  "license": "MIT",
+  "author": "Jon Soeder <jon@chicago.com>",
+  "license": "SEE LICENSE IN License.md",
   "devDependencies": {
     "babel-core": "^6.7.2",
     "babel-preset-skypager": "latest"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/skypager/skypager"
+  },
+  "homepage": "https://skypager.io"
 }

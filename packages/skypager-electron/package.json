@@ -2,8 +2,8 @@
   "name": "skypager-electron",
   "version": "2.19.0",
   "description": "skypager electron stack",
-  "author": "Jonathan Soeder <jon@chicago.com>",
-  "license": "UNLICENSED",
+  "author": "Jon Soeder <jon@chicago.com>",
+  "license": "SEE LICENSE IN License.md",
   "main": "app.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/node/**/*-spec.js || true",
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/skypager/skypager-electron"
+    "url": "https://github.com/skypager/skypager"
   },
   "skypager": {
     "main": "skypager.js",
@@ -47,5 +47,9 @@
     "babel-preset-skypager": "^2.18.0",
     "mocha": "^2.4.5",
     "should": "^8.0.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/skypager/skypager"
+  },
+  "homepage": "https://skypager.io"
 }

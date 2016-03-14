@@ -71,15 +71,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/skypager/superdevpack.git"
+    "url": "https://github.com/skypager/skypager"
   },
-  "author": [
-    "Mike Kruk <mike@ripeworks.com> (http://ripeworks.com)",
-    "Jonathan Soeder <jon@chicago.com>"
-  ],
-  "license": "MIT",
+  "author": "Jon Soeder <jon@chicago.com>",
+  "license": "SEE LICENSE IN License.md",
   "bugs": {
-    "url": "https://github.com/skypager/superdevpack/issues"
+    "url": "https://github.com/skypager/skypager"
   },
-  "homepage": "https://github.com/skypager/superdevpack#readme"
+  "homepage": "https://skypager.io"
 }

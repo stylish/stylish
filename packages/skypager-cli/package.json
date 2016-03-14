@@ -20,17 +20,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/skypager/skypager.git"
+    "url": "https://github.com/skypager/skypager"
   },
   "keywords": [
     "skypager"
   ],
-  "author": "jonathan soeder <jon@chicago.com>",
-  "license": "UNLICENSED",
+  "author": "Jon Soeder <jon@chicago.com>",
+  "license": "SEE LICENSE IN License.md",
   "bugs": {
-    "url": "https://github.com/skypager/skypager/issues"
+    "url": "https://github.com/skypager/skypager"
   },
-  "homepage": "https://github.com/skypager/skypager#readme",
+  "homepage": "https://skypager.io",
   "devDependencies": {
     "mocha": "^2.4.5",
     "should": "^8.2.2"

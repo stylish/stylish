@@ -28,5 +28,13 @@
     "babel-preset-skypager": "latest",
     "mocha": "latest",
     "should": "latest"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skypager/skypager"
+  },
+  "bugs": {
+    "url": "https://github.com/skypager/skypager"
+  },
+  "homepage": "https://skypager.io"
 }

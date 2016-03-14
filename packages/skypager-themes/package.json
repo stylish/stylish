@@ -22,8 +22,8 @@
     "compile": "babel -q -d lib src",
     "prepublish": "npm run compile && git add . -A"
   },
-  "author": "Jonathan Soeder <jon@chicago.com>",
-  "license": "UNLICENSED",
+  "author": "Jon Soeder <jon@chicago.com>",
+  "license": "SEE LICENSE IN License.md",
   "dependencies": {
     "bootstrap": "^3.3.6",
     "expose-loader": "^0.7.1",
@@ -38,5 +38,9 @@
   },
   "devDependencies": {
     "babel-preset-skypager": "^2.18.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/skypager/skypager"
+  },
+  "homepage": "https://skypager.io"
 }

@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/architects/babel-preset-skypager.git"
+    "url": "https://github.com/skypager/skypager"
   },
   "keywords": [
     "babel",
@@ -17,8 +17,8 @@
   "skypager": {
     "main": "skypager.js"
   },
-  "author": "Jonathan Soeder <jon@chicago.com>",
-  "license": "MIT",
+  "author": "Jon Soeder <jon@chicago.com>",
+  "license": "SEE LICENSE IN License.md",
   "dependencies": {
     "babel-runtime": "^6.3.19",
     "babel-plugin-check-es2015-constants": "^6.3.13",
@@ -59,5 +59,9 @@
   },
   "devDependencies": {
     "react": "^0.14.6"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/skypager/skypager"
+  },
+  "homepage": "https://skypager.io"
 }

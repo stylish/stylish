@@ -21,17 +21,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/architects/skypager"
+    "url": "https://github.com/skypager/skypager"
   },
   "keywords": [
     "skypager"
   ],
-  "author": "Jonathan Soeder",
-  "license": "MIT",
+  "author": "Jon Soeder <jon@chicago.com>",
+  "license": "SEE LICENSE IN License.md",
   "bugs": {
-    "url": "https://github.com/architects/skypager/issues"
+    "url": "https://github.com/skypager/skypager"
   },
-  "homepage": "https://github.com/architects/skypager#readme",
+  "homepage": "https://skypager.io",
   "skypager": {
     "main": "test/fixture/index.js",
     "provides": [
