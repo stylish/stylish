@@ -70,7 +70,7 @@ export class ActionDefinition {
   }
 
   get api () {
-    let def = this
+    let action = this
 
     return {
       name: this.name,
@@ -90,22 +90,34 @@ export class ActionDefinition {
         let context = args[ args.length - 1 ]
 
         let localHelpers = {
-           abort(message, ...r) {
+           abort(message, ...args) {
               console.error(message)
-              report.errors.push(message, ...r)
+              report.errors.push(message, ...args)
               process.exit(1)
             },
-            error(message, ...r) {
-              console.log(message.red, ...r)
+            error(message, ...args) {
+              action._helper.emit('error', message, ...args)
+              console.log(message, ...args)
               report.errors.push(message)
             },
-            warn(message, ...r) {
-              console.log(message.yellow, ...r)
+            warn(message, ...args) {
+              action._helper.emit('warn', message, ...args)
+              console.log(message, ...args)
               report.warnings.push(message)
             },
-            suggest(message, ...r) {
-              console.log(message.white, ...r)
+            //deprecated
+            suggest(message, ...args) {
+              action._helper.emit('suggest', message, ...args)
+              console.log(message, ...args)
               report.suggestions.push(message)
+            },
+            info(message, ...args) {
+              action._helper.emit('info', message, ...args)
+              console.log(message, ...args)
+              report.suggestions.push(message)
+            },
+            done(result, ...args) {
+              action._helper.emit('done', result, ...args)
             },
             report,
             context
@@ -114,7 +126,7 @@ export class ActionDefinition {
         context.report = report
 
         let passesValidation = noConflict(function(){
-          return def.api.validate(...args)
+          return action.api.validate(...args)
         }, localHelpers)(...args)
 
         if (passesValidation === false) {
@@ -124,8 +136,11 @@ export class ActionDefinition {
 
         report.result = noConflict(function(){
           try {
-            let r = def.api.execute(...args)
-            if (r) { report.success = true }
+            let r = action.api.execute(...args)
+            if (r) { 
+              report.success = true 
+              report.result = r
+            }
             return r
           } catch(err) {
             report.errors.push('fatal error:' + err.message)

@@ -3,11 +3,6 @@ import { DSL, PluginDefinition } from './definitions/plugin'
 
 class Plugin extends Helper {
   static validate (instance) {
-    try {
-			      instance.name.should.be.a.String
-    } catch (error) {
-      return error.message
-    }
 
     return true
   }

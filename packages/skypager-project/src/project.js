@@ -10,6 +10,7 @@ import * as Assets from './assets'
 import * as util from './util'
 import logger from './logger'
 import vault from './vault'
+import invariant from 'invariant'
 
 import { resolve, dirname, join, basename, extname } from 'path'
 
@@ -46,8 +47,7 @@ const DefaultOptions = {
 
 class Project {
   constructor (uri, options = {}) {
-    uri.should.be.a.String()
-    uri.should.not.be.empty()
+    invariant(uri, 'uri must be provided')
 
     normalizeOptions(options)
 

@@ -1,5 +1,5 @@
 describe("Resolving Entities",function(){
-  let project = require('./fixture')
+  let project = require('../fixture')
 
   describe('Any Asset -> Model Resolution', function(){
     it('can resolve script assets to models', function(){
@@ -28,7 +28,7 @@ describe("Resolving Entities",function(){
     })
 
     it("accepts arguments in the project export for resolver patterns", function(){
-      project.resolve.patterns.models.should.not.be.empty()
+      project.resolve.patterns.models.should.not.be.empty
     })
 
     it("uses the resolver patterns to match a document uri", function(){

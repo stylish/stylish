@@ -1,5 +1,5 @@
 describe("Skypager.Registry", function(){
-  let project = require('./fixture')
+  let project = require('../fixture')
 
   it("provides access to framework and project models", function(){
     project.models.lookup("outline").should.be.a.Function
@@ -12,7 +12,7 @@ describe("Skypager.Registry", function(){
 })
 
 describe("Project Registry", function(){
-  let project = require('./fixture')
+  let project = require('../fixture')
   let testcase = project.models.lookup("testcase")
 
   before(function(){
@@ -20,8 +20,8 @@ describe("Project Registry", function(){
   })
 
   it("required loading helpers manually if they dont have an index", function(){
-    project.exporters.load(require.resolve('./fixture/exporters/sample'),'sample')
-    project.exporters.available.should.containEql('sample')
+    project.exporters.load(require.resolve('../fixture/exporters/sample'),'sample')
+    project.exporters.available.should.contain('sample')
     project.exporters.remove("sample")
   })
 
@@ -34,7 +34,7 @@ describe("Project Registry", function(){
   })
 
   it("lets you run exporters in the context of the project", function(){
-    project.exporters.load(require.resolve('./fixture/exporters/sample'),'sample')
-    project.exporters.lookup("sample").api.should.be.a.Function()
+    project.exporters.load(require.resolve('../fixture/exporters/sample'),'sample')
+    project.exporters.lookup("sample").api.should.be.a('function')
   })
 })

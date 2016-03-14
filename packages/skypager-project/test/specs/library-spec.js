@@ -1,4 +1,4 @@
-import Skypager from './index'
+import Skypager from '../index'
 
 describe("Skypager", function(){
 	it("exposes a public class interface", function(){

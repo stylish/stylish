@@ -1,7 +1,7 @@
-import Skypager from './index'
+import Skypager from '../index'
 
 describe("DataSources", function(){
-  const project = require('./fixture')
+  const project = require('../fixture')
 
   it("can be accessed through the project content collections", function(){
     typeof(project.content.data_sources.at('inspiration')).should.not.equal('undefined')
@@ -25,7 +25,7 @@ describe("DataSources", function(){
 
     it("gets run with certain values in the global scope", function(){
       let datasource = project.content.data_sources.at('scripts/global-scope-helpers')
-      datasource.data.should.containEql('util', 'project', 'datasource')
+      datasource.data.should.contain('util', 'project', 'datasource')
     })
   })
 })
