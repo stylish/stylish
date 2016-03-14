@@ -292,8 +292,8 @@ function noConflict(fn) {
   var provider = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
   var scope = arguments[2];
 
-  fn.should.be.a.Function;
-  provider.should.be.an.Object;
+  invariant(fn, 'provide a function');
+  invariant(provider, 'provide a provider');
 
   var safe = {};
 

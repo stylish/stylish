@@ -151,7 +151,7 @@ var ActionDefinition = exports.ActionDefinition = (function () {
   }, {
     key: 'api',
     get: function get() {
-      var def = this;
+      var action = this;
 
       return {
         name: this.name,
@@ -180,42 +180,67 @@ var ActionDefinition = exports.ActionDefinition = (function () {
 
               console.error(message);
 
-              for (var _len3 = arguments.length, r = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-                r[_key3 - 1] = arguments[_key3];
+              for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+                args[_key3 - 1] = arguments[_key3];
               }
 
-              (_report$errors = report.errors).push.apply(_report$errors, [message].concat((0, _toConsumableArray3.default)(r)));
+              (_report$errors = report.errors).push.apply(_report$errors, [message].concat((0, _toConsumableArray3.default)(args)));
               process.exit(1);
             },
             error: function error(message) {
-              var _console;
+              var _action$_helper, _console;
 
-              for (var _len4 = arguments.length, r = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-                r[_key4 - 1] = arguments[_key4];
+              for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+                args[_key4 - 1] = arguments[_key4];
               }
 
-              (_console = console).log.apply(_console, [message.red].concat((0, _toConsumableArray3.default)(r)));
+              (_action$_helper = action._helper).emit.apply(_action$_helper, ['error', message].concat((0, _toConsumableArray3.default)(args)));
+              (_console = console).log.apply(_console, [message].concat((0, _toConsumableArray3.default)(args)));
               report.errors.push(message);
             },
             warn: function warn(message) {
-              var _console2;
+              var _action$_helper2, _console2;
 
-              for (var _len5 = arguments.length, r = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
-                r[_key5 - 1] = arguments[_key5];
+              for (var _len5 = arguments.length, args = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
+                args[_key5 - 1] = arguments[_key5];
               }
 
-              (_console2 = console).log.apply(_console2, [message.yellow].concat((0, _toConsumableArray3.default)(r)));
+              (_action$_helper2 = action._helper).emit.apply(_action$_helper2, ['warn', message].concat((0, _toConsumableArray3.default)(args)));
+              (_console2 = console).log.apply(_console2, [message].concat((0, _toConsumableArray3.default)(args)));
               report.warnings.push(message);
             },
-            suggest: function suggest(message) {
-              var _console3;
 
-              for (var _len6 = arguments.length, r = Array(_len6 > 1 ? _len6 - 1 : 0), _key6 = 1; _key6 < _len6; _key6++) {
-                r[_key6 - 1] = arguments[_key6];
+            //deprecated
+            suggest: function suggest(message) {
+              var _action$_helper3, _console3;
+
+              for (var _len6 = arguments.length, args = Array(_len6 > 1 ? _len6 - 1 : 0), _key6 = 1; _key6 < _len6; _key6++) {
+                args[_key6 - 1] = arguments[_key6];
               }
 
-              (_console3 = console).log.apply(_console3, [message.white].concat((0, _toConsumableArray3.default)(r)));
+              (_action$_helper3 = action._helper).emit.apply(_action$_helper3, ['suggest', message].concat((0, _toConsumableArray3.default)(args)));
+              (_console3 = console).log.apply(_console3, [message].concat((0, _toConsumableArray3.default)(args)));
               report.suggestions.push(message);
+            },
+            info: function info(message) {
+              var _action$_helper4, _console4;
+
+              for (var _len7 = arguments.length, args = Array(_len7 > 1 ? _len7 - 1 : 0), _key7 = 1; _key7 < _len7; _key7++) {
+                args[_key7 - 1] = arguments[_key7];
+              }
+
+              (_action$_helper4 = action._helper).emit.apply(_action$_helper4, ['info', message].concat((0, _toConsumableArray3.default)(args)));
+              (_console4 = console).log.apply(_console4, [message].concat((0, _toConsumableArray3.default)(args)));
+              report.suggestions.push(message);
+            },
+            done: function done(result) {
+              var _action$_helper5;
+
+              for (var _len8 = arguments.length, args = Array(_len8 > 1 ? _len8 - 1 : 0), _key8 = 1; _key8 < _len8; _key8++) {
+                args[_key8 - 1] = arguments[_key8];
+              }
+
+              (_action$_helper5 = action._helper).emit.apply(_action$_helper5, ['done', result].concat((0, _toConsumableArray3.default)(args)));
             },
 
             report: report,
@@ -225,10 +250,10 @@ var ActionDefinition = exports.ActionDefinition = (function () {
           context.report = report;
 
           var passesValidation = (0, _util.noConflict)(function () {
-            var _def$api;
+            var _action$api;
 
-            return (_def$api = def.api).validate.apply(_def$api, args);
-          }, localHelpers).apply(undefined, args);
+            return (_action$api = action.api).validate.apply(_action$api, (0, _toConsumableArray3.default)(args));
+          }, localHelpers).apply(undefined, (0, _toConsumableArray3.default)(args));
 
           if (passesValidation === false) {
             report.success = false;
@@ -237,17 +262,18 @@ var ActionDefinition = exports.ActionDefinition = (function () {
 
           report.result = (0, _util.noConflict)(function () {
             try {
-              var _def$api2;
+              var _action$api2;
 
-              var _r = (_def$api2 = def.api).execute.apply(_def$api2, args);
-              if (_r) {
+              var r = (_action$api2 = action.api).execute.apply(_action$api2, (0, _toConsumableArray3.default)(args));
+              if (r) {
                 report.success = true;
+                report.result = r;
               }
-              return _r;
+              return r;
             } catch (err) {
               report.errors.push('fatal error:' + err.message);
             }
-          }, localHelpers).apply(undefined, args);
+          }, localHelpers).apply(undefined, (0, _toConsumableArray3.default)(args));
 
           return report;
         }
@@ -330,8 +356,8 @@ function lookup(actionName) {
   cli: function cli() {
     var _tracker$_curr12;
 
-    for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-      args[_key7] = arguments[_key7];
+    for (var _len9 = arguments.length, args = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
+      args[_key9] = arguments[_key9];
     }
 
     (_tracker$_curr12 = tracker[_curr]).expose.apply(_tracker$_curr12, ['cli'].concat(args));
@@ -339,8 +365,8 @@ function lookup(actionName) {
   ipc: function ipc() {
     var _tracker$_curr13;
 
-    for (var _len8 = arguments.length, args = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
-      args[_key8] = arguments[_key8];
+    for (var _len10 = arguments.length, args = Array(_len10), _key10 = 0; _key10 < _len10; _key10++) {
+      args[_key10] = arguments[_key10];
     }
 
     (_tracker$_curr13 = tracker[_curr]).expose.apply(_tracker$_curr13, ['ipc'].concat(args));
@@ -348,8 +374,8 @@ function lookup(actionName) {
   web: function web() {
     var _tracker$_curr14;
 
-    for (var _len9 = arguments.length, args = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
-      args[_key9] = arguments[_key9];
+    for (var _len11 = arguments.length, args = Array(_len11), _key11 = 0; _key11 < _len11; _key11++) {
+      args[_key11] = arguments[_key11];
     }
 
     (_tracker$_curr14 = tracker[_curr]).expose.apply(_tracker$_curr14, ['web'].concat(args));

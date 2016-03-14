@@ -39,11 +39,6 @@ var Plugin = (function (_Helper) {
   (0, _createClass3.default)(Plugin, null, [{
     key: 'validate',
     value: function validate(instance) {
-      try {
-        instance.name.should.be.a.String;
-      } catch (error) {
-        return error.message;
-      }
 
       return true;
     }

@@ -53,7 +53,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //if (!process.env.SKYPAGER_DIST) { require('./environment')() }
 
 require('./polyfill');
-require('should');
+GLOBAL.invariant = require('invariant');
 
 // temp
 delete Assets.default;

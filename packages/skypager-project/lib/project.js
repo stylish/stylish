@@ -68,6 +68,10 @@ var _vault = require('./vault');
 
 var _vault2 = _interopRequireDefault(_vault);
 
+var _invariant = require('invariant');
+
+var _invariant2 = _interopRequireDefault(_invariant);
+
 var _path = require('path');
 
 var _mapValues = require('lodash/mapValues');
@@ -112,8 +116,7 @@ var Project = (function () {
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
     (0, _classCallCheck3.default)(this, Project);
 
-    uri.should.be.a.String();
-    uri.should.not.be.empty();
+    (0, _invariant2.default)(uri, 'uri must be provided');
 
     normalizeOptions(options);
 

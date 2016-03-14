@@ -12,6 +12,10 @@ var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
 
+var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
+
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
 var _defineProperties = require('babel-runtime/core-js/object/define-properties');
 
 var _defineProperties2 = _interopRequireDefault(_defineProperties);
@@ -24,9 +28,17 @@ var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
+var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
 var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _inherits2 = require('babel-runtime/helpers/inherits');
+
+var _inherits3 = _interopRequireDefault(_inherits2);
 
 var _index = require('../index');
 
@@ -38,7 +50,7 @@ var util = _interopRequireWildcard(_util);
 
 var _path = require('path');
 
-var _path2 = _interopRequireDefault(_path);
+var _fbemitter = require('fbemitter');
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -53,7 +65,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * the helper system.
 */
 
-var Helper = (function () {
+var Helper = (function (_EventEmitter) {
+  (0, _inherits3.default)(Helper, _EventEmitter);
   (0, _createClass3.default)(Helper, null, [{
     key: 'decorateRegistry',
     value: function decorateRegistry(registry) {
@@ -102,15 +115,15 @@ var Helper = (function () {
   }]);
 
   function Helper(uri) {
-    var _this = this;
-
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
     (0, _classCallCheck3.default)(this, Helper);
 
-    var helper = this;
+    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Helper).call(this));
+
+    var helper = _this;
     var raw = undefined;
 
-    util.assign(this, {
+    util.assign(_this, {
       get raw() {
         return raw;
       },
@@ -121,22 +134,22 @@ var Helper = (function () {
       }
     });
 
-    this.hidden('uri', uri);
-    this.hidden('options', options);
-    this.hidden('project', function () {
+    _this.hidden('uri', uri);
+    _this.hidden('options', options);
+    _this.hidden('project', function () {
       return options.project;
     });
-    this.getter('owner', function () {
+    _this.getter('owner', function () {
       return options.owner;
     });
-    this.getter('required', function () {
+    _this.getter('required', function () {
       return options.required || _this.require(uri);
     }, true);
 
     var definition = options.definition;
 
     // before returning the definition make sure to call any configure methods we have
-    this.getter('definition', function () {
+    _this.getter('definition', function () {
       var _this2 = this;
 
       var d = options.definition || this.required.definition;
@@ -158,14 +171,32 @@ var Helper = (function () {
       return d;
     });
 
-    this.id = this.paths.relative.replace(this.extension, '');
+    _this.id = _this.paths.relative.replace(_this.extension, '');
 
-    this.hidden('api', function () {
+    _this.hidden('api', function () {
       return _this.buildAPI(options.api, _this.required);
     });
+    return _this;
   }
 
+  /**
+   * creates a subscription to an event
+   * 
+   * @param String event name of the event to monitor
+   * @Param function callback callback to execute when event occurs
+   */
+
   (0, _createClass3.default)(Helper, [{
+    key: 'on',
+    value: function on(event, callback) {
+      return this.addListener(event, callback);
+    }
+
+    //TODO: implement
+    //see https://github.com/facebook/emitter#__emittosubscriptionsubscription-eventtype-args
+    //__emitToSubscription(subscription, eventType, ...args) {}
+
+  }, {
     key: 'result',
     value: function result() {
       for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -305,7 +336,7 @@ var Helper = (function () {
     }
   }]);
   return Helper;
-})();
+})(_fbemitter.EventEmitter);
 
 exports.default = Helper;
 
