@@ -1,15 +1,15 @@
 {
   "name": "skypager",
-  "version": "2.19.4",
+  "version": "2.19.5",
   "description": "skypager is a framework for managing a portfolio of applications, modules, and components. Skypager makes working with react, babel, webpack and other ecosystems a breeze.",
   "skypager": {
     "main": "skypager.js",
-    "plugins":[
+    "plugins": [
       "portfolio"
     ]
   },
   "bin": {
-    "skypager":"./packages/skypager-cli/bin/cli.js"
+    "skypager": "./packages/skypager-cli/bin/cli.js"
   },
   "main": "index.js",
   "dependencies": {
@@ -21,7 +21,7 @@
     "skypager-themes": "latest",
     "skypager-plugin-portfolio": "latest"
   },
-  "optionalDependencies":{
+  "optionalDependencies": {
     "skypager-electron": "latest"
   },
   "devDependencies": {
