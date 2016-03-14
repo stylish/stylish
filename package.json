@@ -19,7 +19,8 @@
     "skypager-devpack": "latest",
     "skypager-server": "latest",
     "skypager-themes": "latest",
-    "skypager-plugin-portfolio": "latest"
+    "skypager-plugin-portfolio": "latest",
+    "skypager-ui": "latest"
   },
   "optionalDependencies": {
     "skypager-electron": "latest"
