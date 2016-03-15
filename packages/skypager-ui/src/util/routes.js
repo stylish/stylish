@@ -10,6 +10,7 @@ import { createRoutes as create } from 'react-router'
 export default routes
 
 export function routes({layout, screens, project}) {
+
   let base = ({
     path: '/',
 
@@ -20,13 +21,13 @@ export function routes({layout, screens, project}) {
     }
   })
 
-  let childRouteConfig = omit(screens, 'default', 'index', '/')
+  let otherRoutes = omit(screens, 'default', 'index', '/')
 
   // TODO: ability for a component to act as an entry point. we can assume entry points
   // are already exported as plainRoute objects, which they should be to take advantage of
   // webpack code splitting via require.ensure.  Components would just need to be wrapped in
   // a plainRoute object interface
-  let plainRoutes = mapValues(childRouteConfig, (entryPoint, name) => {
+  let plainRoutes = mapValues(otherRoutes, (entryPoint, name) => {
     return toPlainRoute(
       entryPoint, name, project
     )
@@ -37,40 +38,48 @@ export function routes({layout, screens, project}) {
   return base
 }
 
-function toPlainRoute(component, path, project) {
-  path = path || component.path
+function toPlainRoute(component, name, project) {
+  let path = component.route
+    ? (component.route.path || name)
+    : (component.path || name)
 
-  if (!path) {
-    throw('Can not build a plain route object if the component does not define a path or if you do not provide one')
+  if (isPlainRoute(component)) {
+    return component
   }
 
-  try {
-    // already a plain route object apparently
-    if (typeof component === 'object' && component && component.path && (hasOwnProperty(component, 'component') || hasOwnProperty(component, 'getComponent'))) {
-      return component
-    }
-
-  } catch (error) {
-    console.log(error.message, component)
-    throw(error)
-  }
+  let screens = component.route && component.route.screens
 
   let plainRoute = {
-     path,
-     component
+    ...(component.route),
+    path,
+    component,
+    _generated: true,
   }
 
-  if (component.childRoutes) {
-    plainRoute.childRoutes = Object.values(
-      mapValues(component.childRoutes, (comp, path) => {
-        console.log('sheeeit', comp, path)
+  if (screens) {
+    let indexComponent = screens.index || screens.default
+
+    if (indexComponent) {
+      plainRoute.indexRoute = {
+        component: isString(indexComponent) ? project.requireScreen(indexComponent) : indexComponent,
+      }
+    }
+
+    component.childRoutes = omit(screens, 'index', 'default')
+  }
+
+  if (!isEmpty(component.childRoutes)) {
+    component.childRoutes = mapValues(
+      component.childRoutes,
+      (childCompnent, path) => {
         return toPlainRoute(
-          isString(comp) ? project.requireScreen(comp) : comp,
+          isString(childCompnent) ? project.requireScreen(childCompnent) : childCompnent,
           path,
           project
         )
       })
-    )
+
+    plainRoute.childRoutes = Object.values(component.childRoutes)
   }
 
   if (component.components) {
@@ -79,6 +88,15 @@ function toPlainRoute(component, path, project) {
     })
   }
 
-  console.log('returning', plainRoute)
   return plainRoute
+}
+
+function isPlainRoute(component) {
+  if (!isObject(component)) {
+    return false
+  }
+
+  if (component.path && (component.components || component.childRoutes || component.indexRoute)) {
+     return true
+  }
 }

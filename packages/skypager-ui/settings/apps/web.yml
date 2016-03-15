@@ -8,11 +8,11 @@ theme: dashboard-dark
 platform: web
 
 # see docs.skypager.io/base-web-applications/screen-definitions
-layout: IconNavLayout
+layout: FluidLayout
 
 screens:
   index: Home
-  components: BrowseComponents
-  layouts: BrowseLayouts
-  shells: BrowseShells
-  themes: BrowseThemes
+  components: Components
+  layouts: Layouts
+  application-shells: ApplicationShells
+  themes: Themes

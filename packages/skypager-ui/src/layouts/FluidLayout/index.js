@@ -2,24 +2,30 @@ import React, { Component, PropTypes as types } from 'react'
 
 import FluidTopNavbar from 'ui/components/FluidTopNavbar'
 
+import stateful from 'ui/util/stateful'
+
 export class FluidLayout extends Component {
   static displayName = 'FluidLayout';
 
    static propTypes = {
-    branding: types.shape({
-      icon: types.string,
-      style: types.string,
-      brand: types.string
-    }),
     children: types.node.isRequired,
     containerClassName: types.string,
     searchForm: types.node,
-    navigation: types.shape({
-      links: types.arrayOf(types.shape({
+    settings: types.shape({
+      branding: types.shape({
         icon: types.string,
-        label: types.string,
-        link: types.string
-      }))
+        style: types.string,
+        brand: types.string
+      }),
+
+       navigation: types.shape({
+        links: types.arrayOf(types.shape({
+          icon: types.string,
+          label: types.string,
+          link: types.string
+        }))
+      })
+
     })
   };
 
@@ -40,9 +46,11 @@ export class FluidLayout extends Component {
   };
 
   render () {
-    const { navigation, branding, searchForm } = this.props
+    const { searchForm } = this.props
 
+    const { branding, navigation } = this.props.settings
     const { links } = navigation
+
 
     return (
       <div className='fluid-layout'>
@@ -57,4 +65,4 @@ export class FluidLayout extends Component {
 }
 
 
-export default FluidLayout
+export default stateful(FluidLayout, 'settings')

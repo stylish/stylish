@@ -34,7 +34,10 @@ export class FeatureList extends Component {
       title: type.string.isRequired,
       /** a brief summary of the feature and why it matters */
       text: type.string.isRequired
-    })).isRequired
+    })).isRequired,
+
+    /** a stateless component function for displaying additional content underneath the feature text */
+    tileBody: type.func
   };
 
   static defaultProps = {
@@ -45,7 +48,7 @@ export class FeatureList extends Component {
 
   /** Returns <ul> lists containing feature tiles */
   get lists() {
-    const { bordered, columns, features, spacer } = this.props
+    const { bordered, columns, features, spacer, tileBody } = this.props
 
     const classes = cx({
       'featured-list': true,
@@ -55,11 +58,13 @@ export class FeatureList extends Component {
     let groups = chunk(features, columns)
 
     return times(columns)
-      .map(i =>
-        <ul key={i} className={classes}>
-          {groups.map((items,pos) => <FeatureTile item={items[i]} key={pos} pos={pos} spacer={spacer} />)}
-        </ul>
-      )
+      .map(i => {
+        return (
+          <ul key={i} className={classes}>
+            {groups.filter(items => items && items[i]).map((items,pos) => <FeatureTile tileBody={tileBody} item={items[i]} key={pos} spacer={spacer} />)}
+          </ul>
+        )
+      })
   }
 
   render() {
@@ -85,14 +90,15 @@ export class FeatureList extends Component {
 
 export default FeatureList
 
-function FeatureTile({pos, spacer, item}) {
+function FeatureTile({key, spacer, item, tileBody}) {
   return (
-    <li key={pos} className={spacer}>
+    <li key={key} className={spacer}>
       <div className='featured-list-icon'>
         <span className={`icon icon-${ item.icon }`} />
       </div>
       <h3>{item.title}</h3>
       <p>{item.text}</p>
+      { tileBody ? tileBody(item) : undefined }
     </li>
   )
 }

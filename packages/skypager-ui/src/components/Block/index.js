@@ -62,7 +62,7 @@ export class Block extends Component {
     })
 
     // TODO: Look into sensible defaults
-    const textMargin = 'm-b-md'
+    const textMargin = 'm-t-md m-x-md'
 
     const textClasses = classnames({
       'muted-text': muteText,

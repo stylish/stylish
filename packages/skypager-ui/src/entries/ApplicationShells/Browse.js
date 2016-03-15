@@ -2,6 +2,8 @@ import React, { Component, PropTypes as type } from 'react'
 import stateful from 'ui/util/stateful'
 
 import FeatureList from 'ui/components/FeatureList'
+import DashboardHeader from 'ui/components/DashboardHeader'
+import { Link } from 'react-router'
 
 const categoryFolder = 'shells'
 
@@ -18,39 +20,39 @@ export class BrowseShells extends Component {
     filters: { }
   };
 
-  static path = 'shells';
-
-  static childRoutes = {
-    ':shellId': 'BrowseShells/Details'
-  };
-
   get shells() {
     let { project } = this.context
-    let { filters } = this.props
+    let { filters, copy } = this.props
 
     return project
       .scripts.query({ ...filters, categoryFolder })
       .map(script => {
         let doc = project.docs[`${ script.id }`]
-        let paragraph = doc.ast.children.find(node => node.type === 'paragraph')
 
         return {
-          icon: doc.data && doc.data.icon,
-          title: doc.title || script.id.split('/').pop(),
-          text: paragraph && paragraph.value
+          icon: doc.data.icon,
+          title: doc.title,
+          text: doc.mainCopy,
+          link: `/application-shells/details/${ doc.id }`
         }
       })
   }
 
   render() {
-    const features = this.shells.map(script => ({
-      ...script
-    }))
+    const copy = this.props.copy
 
     return (
-      <FeatureList features={features} />
+      <FeatureList tileBody={additionalInfo} features={this.shells} />
     )
   }
 }
 
-export default stateful(BrowseShells, 'settings', 'shells.filters')
+export default stateful(BrowseShells, 'settings', 'shells.filters', 'copy')
+
+function additionalInfo(props = {}, context = {}) {
+  return (
+    <Link to={props.link} className='btn btn-primary'>
+      Details
+    </Link>
+  )
+}

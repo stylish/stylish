@@ -31,9 +31,8 @@ export class Home extends Component {
     return (
       <BodyClassName className='iconav-hidden'>
         <div>
-          <Block inverse title={hero.title} text={hero.text} >
-            <Link className='btn btn-primary btn-lg btn-pill' to='application-shells'>View Docs</Link>
-          </Block>
+          <CodeHighlighter theme='hybrid' code={install} language='bash' />
+          <CodeHighlighter theme='hybrid' code={code} language='es6' />
           <FeatureList ref='features' spacer='m-b-md' features={features} />
         </div>
       </BodyClassName>

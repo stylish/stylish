@@ -1,19 +1,18 @@
 /**
- * WebApp Example
- *
  * The WebApp shell will generate a `React.Router` application consisting
- * of multiple screens or `Entry Point` React.Component classes. Redux is used
- * to manage all of the application state.
- *
- * All of this stuff is handled for you if you follow conventions for storing
- * React Components, Redux Reducer definitions, etc.
- *
+ * of multiple screens  Redux is automatically configured to manage your application state.
  */
+
 import WebApp from 'ui/shells/WebApp'
-import BundleLoader from 'ui/bundle/loader'
 
-const bundle = BundleLoader(
-  require('ui/bundle/example')
-)
+WebApp.create({
+  // your project's content and settings
+  bundle: require('dist/bundle'),
 
-WebApp.create({ bundle })
+  // lazy load screens by name
+  screens: [
+    'Home',
+    'About',
+    'Jobs'
+  ]
+})

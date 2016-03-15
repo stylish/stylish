@@ -5,7 +5,7 @@ links:
 
   - label: App Shells
     icon: tablet-mobile-combo
-    link: '/shells'
+    link: '/application-shells'
 
   - label: Components
     icon: layers

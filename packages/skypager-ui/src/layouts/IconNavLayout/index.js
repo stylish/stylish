@@ -1,6 +1,7 @@
 import React, { PropTypes as types } from 'react'
 import classnames from 'classnames'
 import defaults from 'lodash/defaultsDeep'
+import get from 'lodash/get'
 
 import IconNav from 'ui/components/IconNav'
 import styles from './style.less'
@@ -49,12 +50,13 @@ export class IconNavLayout extends React.Component {
       'iconav-container': true
     })
 
+    const navComponent = !this.props.hideNav
+      ? <IconNav brandStyle={branding.style} brandIcon={branding.icon} links={navigation.links} />
+      : undefined
+
     return (
       <div className={classes}>
-        <IconNav brandStyle={branding.style}
-                 brandIcon={branding.icon}
-                 links={navigation.links} />
-
+        {navComponent}
         <div className={containerClasses}>
           {children}
         </div>

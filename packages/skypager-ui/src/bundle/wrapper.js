@@ -74,6 +74,10 @@ class BundleWrapper {
     }
   }
 
+  get(...args) {
+    return get(this, ...args)
+  }
+
   get entityNames() {
      return keys(this.entities)
   }
