@@ -234,6 +234,16 @@ module.exports = function (externalOptions = {}) {
 
     })
 
+    .loader('css', {
+      test: /\.css$/,
+      loader: 'style!css!postcss'
+    })
+
+    .loader('css-2', {
+      test: /\.mod\.css$/,
+      loader: 'style!css?modules!postcss'
+    })
+
     .loader('less', {
       test: /\.less$/,
       include:[

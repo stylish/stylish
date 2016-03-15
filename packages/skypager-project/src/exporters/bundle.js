@@ -92,11 +92,11 @@ export function ProjectExporter (options = {}, callback) {
 
   let lines = [
     contextPolyfill(),
-    `console.log("Generating Bundle")`,
-    `var bundle = module.exports = {bundleApi:2};`,
-    `bundle.project = require('./project-export.json');`,
+    `var bundle = module.exports = {bundleApi:2, content: {}};`,
+  ]
+
+  lines.push(
     `bundle.entities = require('./entities-export.json');`,
-    `bundle.models = require('./models-export.json');`,
     `bundle.settings = require('./settings-export.json');`,
     `bundle.copy = require('./copy-export.json');`,
 
@@ -104,9 +104,7 @@ export function ProjectExporter (options = {}, callback) {
       scripts: require.context('${ project.scripts.paths.absolute }', true, /\.js$/i),
       stylesheets: require.context('${ project.stylesheets.paths.absolute }', true, /\..*ss$/i)
     };`,
-
-    `bundle.content = {}`
-  ]
+  )
 
    IncludeCollections.forEach(key => {
     lines.push(`var _${ key } = bundle.content.${ key } = {};`)

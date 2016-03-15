@@ -114,7 +114,9 @@ function ProjectExporter() {
     });
   }
 
-  var lines = [contextPolyfill(), 'console.log("Generating Bundle")', 'var bundle = module.exports = {bundleApi:2};', 'bundle.project = require(\'./project-export.json\');', 'bundle.entities = require(\'./entities-export.json\');', 'bundle.models = require(\'./models-export.json\');', 'bundle.settings = require(\'./settings-export.json\');', 'bundle.copy = require(\'./copy-export.json\');', 'bundle.requireContexts = {\n      scripts: require.context(\'' + project.scripts.paths.absolute + '\', true, /.js$/i),\n      stylesheets: require.context(\'' + project.stylesheets.paths.absolute + '\', true, /..*ss$/i)\n    };', 'bundle.content = {}'];
+  var lines = [contextPolyfill(), 'var bundle = module.exports = {bundleApi:2, content: {}};'];
+
+  lines.push('bundle.entities = require(\'./entities-export.json\');', 'bundle.settings = require(\'./settings-export.json\');', 'bundle.copy = require(\'./copy-export.json\');', 'bundle.requireContexts = {\n      scripts: require.context(\'' + project.scripts.paths.absolute + '\', true, /.js$/i),\n      stylesheets: require.context(\'' + project.stylesheets.paths.absolute + '\', true, /..*ss$/i)\n    };');
 
   IncludeCollections.forEach(function (key) {
     lines.push('var _' + key + ' = bundle.content.' + key + ' = {};');
