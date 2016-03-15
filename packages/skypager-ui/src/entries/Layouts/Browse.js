@@ -25,6 +25,7 @@ export class BrowseLayouts extends Component {
 
     return project
       .scripts.query({ ...filters, categoryFolder })
+
       .map(script => {
         let doc = project.docs[`${ script.id }`] || {data:{
           icon: 'browser',

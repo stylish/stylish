@@ -3,20 +3,20 @@ import stateful from 'ui/util/stateful'
 
 import DashboardHeader from 'ui/components/DashboardHeader'
 
-export class Layouts extends Component {
-  static displayName = 'Layouts';
+export class Themes extends Component {
+  static displayName = 'Themes';
 
   static route = {
     screens: {
-      index: 'Layouts/Browse',
-      'details/*': 'Layouts/Details'
+      index: 'Themes/Browse',
+      'details/*': 'Themes/Details'
     }
   };
 
   static propTypes = {
     /** copy pulled from the projects i18n system */
     copy: type.shape({
-      layouts: type.shape({
+      themes: type.shape({
         browseHeading: type.string,
         browseSubtitle: type.string
       })
@@ -28,7 +28,7 @@ export class Layouts extends Component {
 
     return (
       <div className="p-t-md">
-        <DashboardHeader title={copy.layouts.browseHeading} subtitle={copy.layouts.browseSubtitle} />
+        <DashboardHeader title={copy.themes.browseHeading} subtitle={copy.themes.browseSubtitle} />
         <hr className="m-t-md" />
         {this.props.children}
       </div>
@@ -36,4 +36,4 @@ export class Layouts extends Component {
   }
 }
 
-export default stateful(Layouts, 'settings', 'layouts.filters', 'copy')
+export default stateful(Themes, 'settings', 'themes.filters', 'copy')

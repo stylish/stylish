@@ -3,8 +3,6 @@ import stateful from 'ui/util/stateful'
 
 import { Link } from 'react-router'
 
-import DashboardHeader from 'ui/components/DashboardHeader'
-
 const categoryFolder = 'themes'
 
 export class BrowseThemes extends Component {
@@ -31,8 +29,7 @@ export class BrowseThemes extends Component {
     const copy = this.props.copy
 
     return (
-      <div className='browse-themes page'>
-      </div>
+
     )
   }
 }
