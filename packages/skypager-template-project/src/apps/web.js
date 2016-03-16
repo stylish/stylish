@@ -1,10 +1,10 @@
 import WebApp from 'ui/shells/WebApp'
 import BundleLoader from 'ui/bundle/loader'
 
-const project = BundleLoader(
+const bundle = BundleLoader(
   require('dist/bundle')
 )
 
 WebApp.create({
-  project
+  bundle
 })
