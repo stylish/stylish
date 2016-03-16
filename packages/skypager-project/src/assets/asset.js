@@ -1,33 +1,78 @@
-import Skypager from '../index'
-import Collection from '../collection'
-
+/**
+ * The Skypager.Asset is an abstract container representing a single file
+ * of a specific type (e.g. javascript, markdown, css).
+ *
+ * Assets have a `uri` property which is either a file system path or URL on a remote server.
+ *
+ * Assets provide metadata about files, and a mechanism for determining relationships between
+ * other files in the project.
+ *
+ * Asset classes define a `parse`, `index`, and `transform` interface that can delegate
+ * to different libraries that provide us with access to an AST for the given type of file.
+ *
+ * For example `mdast` or `remark` for markdown, babel for javascript, cheerio for html and svg.
+ *
+ * The main goal behind having access to the ASTs of different files is extracting entities
+ * and references from the Asset for the purposes of building applications which allow for
+ * programatic manipulation of groups of related assets.
+ *
+ */
 import { extname, dirname, join, basename } from 'path'
+import { singularize, pluralize, tableize, template, flatten, assign, hidden, lazy } from '../util'
+
+import invariant from 'invariant'
 import md5 from 'md5'
-import * as util from '../util'
+import pick from 'lodash/pick'
+import result from 'lodash/result'
+
+import Collection from '../collection'
 
 const EXTENSIONS = ['js', 'css', 'html']
 const GLOB = '**/*.{' + EXTENSIONS.join(',') + '}'
 
-const { defineProperties } = Object
-
-const { singularize, pluralize } = util
-
-import pick from 'lodash/pick'
-
-class Asset {
+module.exports = class Asset {
   static EXTENSIONS = EXTENSIONS;
 
   static GLOB = GLOB;
 
-  static decorateCollection (collection) {
-    if (this.collectionInterface) {
-      defineProperties(collection, this.collectionInterface(collection))
-    }
+  /**
+   * Create a collection of Assets for this particular class.
+   *
+   * @see Skypager.Collection
+   *
+   * @param {Project} project which project does this collection belong to
+   * @param {Object} options options for the collection
+   */
+  static createCollection (project, options = {}) {
+    let assetClass = this
+    let root = options.root || project.paths[tableize(assetClass.name)]
+
+    return new Collection({
+      root,
+      project,
+      assetClass,
+      ...options
+    })
   }
 
+  /**
+   * @private
+   *
+   * Create an asset for a given uri. This will usually be handled automatically
+   * by the collection or project.
+   *
+   * @param {String} uri A URI or file system path which can access the file
+   * @param {Object} options
+   */
   constructor (uri, options = {}) {
     let asset = this
-    let raw
+    let { collection, project } = options
+    let raw = options.raw || options.contents
+
+    invariant(uri, 'Must specify a URI for an asset')
+    invariant(collection, 'Must specify the collection this asset belongs to')
+
+    if (!project) { project = collection.project }
 
     defineProperties(this, {
       raw: {
@@ -50,6 +95,9 @@ class Asset {
     this.lazy('indexed', () => this.index(this.parsed, this))
     this.lazy('transformed', () => this.transform(this.indexed, this))
     this.lazy('data', this.getData, true)
+
+
+
   }
 
   getData() {
@@ -74,7 +122,7 @@ class Asset {
 
     let accessibleEnvVars = project.vault.templates.accessibleEnvVars
 
-    return util.template(string, {
+    return template(string, {
       imports: {
         get project() {
           return asset.project
@@ -101,19 +149,19 @@ class Asset {
   }
 
   pick(...args) {
-    return util.pick(this, ...args)
+    return pick(this, ...args)
   }
 
   get(...args) {
-    return util.result(this, ...args)
+    return result(this, ...args)
   }
 
   result(...args) {
-    return util.result(this, ...args)
+    return result(this, ...args)
   }
 
   runImporter(importer = 'disk', options = {}, callback){
-    util.assign(options, {asset: this, project: this.project, collection: this.collection})
+    assign(options, {asset: this, project: this.project, collection: this.collection})
     this.project.run.importer(importer, options, callback || this.assetWasImported.bind(this))
   }
 
@@ -158,38 +206,62 @@ class Asset {
     return [this.id, this.fingerprint.substr(0, 6)].join('-')
   }
 
+  /**
+   * Return the name of a file that can be used to store information for this file
+   * in the project cache directory.
+   */
   get cacheFilename () {
     return [this.cacheKey, this.extension].join('')
   }
 
-  hidden (...args) { return util.hidden.getter(this, ...args) }
+  hidden (...args) { return hidden.getter(this, ...args) }
 
-  lazy (...args) { return util.lazy(this, ...args) }
+  lazy (...args) { return lazy(this, ...args) }
 
-  render (ast = 'transformed', options = {}) {
-  }
+  render (ast = 'transformed', options = {}) { }
 
-  assetWasImported () {
-  }
+  assetWasImported () { }
 
-  assetWasProcessed () {
-  }
+  assetWasProcessed () { }
 
-  contentWillChange (oldContent, newContent) {
-  }
+  contentWillChange (oldContent, newContent) { }
 
-  contentDidChange (asset) {
+  contentDidChange (asset) { }
 
-  }
-
-  get type() {
-    return singularize(this.paths.relative.split('/')[0])
-  }
-
+  /**
+   * The groupName of an asset is the name of the folder it belongs to
+   * inside of the collection.
+   *
+   * @example the scripts collection found at <projectRoot>/src
+   *
+   *    Given the following folder structure:
+   *
+   *    - src/
+   *      - components/
+   *        - TableView/
+   *          - index.js
+   *      - screens/
+   *        - HomePage/
+   *          - index.js
+   *
+   *    The asset components/TableView has a groupName of "components"
+   *
+   *    The asset screens/HomePage has a groupName of "screens"
+   */
   get groupName() {
     return this.id == 'index'
       ? this.collection.name
-      : pluralize(this.paths.relative.split('/')[0])
+      : pluralize(
+          this.paths.relative.split('/')[0]
+        )
+  }
+
+  /**
+   * A singularized version of Asset#groupName
+   *
+   */
+  get type() {
+    return singularize(this.paths.relative.split('/')[0])
   }
 
   get assetClass () {
@@ -197,26 +269,23 @@ class Asset {
   }
 
   get assetGroup () {
-    return util.tableize(this.assetClass.name)
+    return tableize(this.assetClass.name)
   }
 
-  get assetFamily() {
-    return this.categoryFolder
-  }
   /**
    * If an asset belongs to a folder like components, layouts, etc.
    * then the categoryFolder would be components
    *
    * @return {String}
    */
-  get categoryFolder () {
+  get category () {
     if (this.id === 'index' || this.dirname === 'src') {
       return this.assetGroup
     }
 
     let result = this.isIndex
-      ? util.tableize(basename(dirname(this.dirname)))
-      : util.tableize(basename(this.dirname))
+      ? tableize(basename(dirname(this.dirname)))
+      : tableize(basename(this.dirname))
 
     switch(result) {
       case 'srcs':
@@ -226,26 +295,73 @@ class Asset {
     }
   }
 
+  /**
+   * @alias Asset#category
+   */
+  get assetFamily() {
+    return this.categoryFolder
+  }
+
+  /**
+   * @alias Asset#category
+   */
+  get categoryFolder() {
+    return this.category
+  }
+
+
+  /**
+   * Returns the parent folder of this asset
+   *
+   * @return {String}
+   */
   get parentdir () {
     return dirname(this.dirname)
   }
 
+  /**
+   * Returns the folder this asset belongs to
+   *
+   * @return {String}
+   */
   get dirname () {
     return dirname(this.paths.absolute)
   }
 
+  /**
+   * Returns this assets extension
+   *
+   * @return {String}
+   */
   get extension () {
     return extname(this.uri)
   }
 
+  /**
+   * Returns true if this asset is an index
+   */
   get isIndex () {
      return !!this.uri.match(/index\.\w+$/)
   }
 
+  /**
+   * How many folders deep is this asset inside of the collection
+   *
+   * @return {Number}
+   */
   get depth () {
     return this.id.split('/').length
   }
 
+  /**
+   * Return different path values for this asset.
+   *
+   * - absolute,
+   * - relative to collection,
+   * - relative to the project
+   *
+   * @return {Object}
+   */
   get paths () {
     let asset = this
 
@@ -268,45 +384,39 @@ class Asset {
   }
 
   /**
-  * Return any datasources which exist in a path
-  * that is identically named to certain derivatives of ours
+   * Return an object which provides access to all assets related to this one.
   */
-
   get related () {
     return relationshipProxy(this)
   }
 
-  __require () {
-    if (this.requireable) { return require(this.uri) }
+  /**
+  * Require this asset by its absolute path.
+  */
+  require () {
+    if (this.requireable) { return require(this.paths.absolute) }
   }
 
+  /**
+   * can this asset be natively required? checks require.extensions
+   *
+   * @return {Boolean}
+   */
   get requireable () {
     return typeof (require.extensions[this.extension]) === 'function'
   }
 
-  get extension () {
-    return extname(this.uri)
-  }
-
-  loadWithWebpack () {
-    let string = [this.loaderString, this.uri].join('!')
-    return require(string)
-  }
-
-  saveSync (options = {}) {
-    if (!this.raw || this.raw.length === 0) {
-      if (!options.allowEmpty) {
-        return false
-      }
-    }
-
-    return require('fs').writeFileSync(
-       this.paths.absolute,
-       this.raw,
-       'utf8'
-    )
-  }
-
+  /**
+  *
+  * @param {Boolean} options.allowEmpty
+  *
+  * Save this asset by flushing the raw contents
+  * of the asset to disk.  If there is no raw content, or if it is
+  * zero length, you must pass a truthy value for allowEmpty
+  *
+  * @return {Promise}
+  *
+  */
   save (options = {}) {
     if (!this.raw || this.raw.length === 0) {
       if (!options.allowEmpty) {
@@ -321,17 +431,27 @@ class Asset {
     )
   }
 
-  static createCollection (project, options = {}) {
-    let assetClass = this
-    let root = project.paths[util.tabelize(assetClass.name)]
+  /**
+   * Synchronously save this asset by flushing the raw contents
+   * of the asset to disk.  If there is no raw content, or if it is
+   * zero length, you must pass a truthy value for allowEmpty
+   *
+   * @param {Boolean} options.allowEmpty
+   */
+  saveSync (options = {}) {
+    if (!this.raw || this.raw.length === 0) {
+      if (!options.allowEmpty) {
+        return false
+      }
+    }
 
-    return new Collection({
-      root,
-      project,
-      assetClass,
-      ...options
-    })
+    return require('fs').writeFileSync(
+       this.paths.absolute,
+       this.raw,
+       'utf8'
+    )
   }
+
 }
 
 function relationshipProxy (asset) {
@@ -354,14 +474,14 @@ function relationshipProxy (asset) {
       return i.all.length
     },
     get all(){
-      return util.flatten(groups.map(group => i[group]))
+      return flatten(groups.map(group => i[group]))
     }
   }
 
   let content = asset.project.content
 
   groups.forEach(group => {
-    util.assign(i, {
+    assign(i, {
       get [group] () {
         let related = content[group].relatedGlob(asset)
         return related.filter(a => a.paths.absolute != asset.paths.absolute)
@@ -372,4 +492,4 @@ function relationshipProxy (asset) {
   return i
 }
 
-exports = module.exports = Asset
+const { defineProperties } = Object

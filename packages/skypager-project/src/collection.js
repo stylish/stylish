@@ -26,8 +26,15 @@ import set from 'lodash/set'
 const carve = set
 
 export default class Collection {
+
   /**
   * Create a Collection for a subfolder of a Skypager Project.
+  *
+  * @param {Object} options
+  * @param {Class} assetClass which type of assets are in this collection
+  * @param {Project} project which project does this collection belong to
+  * @param {String} root which folder is the root of the collection
+  *
   */
   constructor (options = {}) {
     const { assetClass, project, root } = options
@@ -78,6 +85,25 @@ export default class Collection {
   }
 
   /**
+   * Find assets which match the passed conditions.
+   *
+   * @param {Object,Function} params key/value pairs of attributes to match,
+   *  or a function which returns true for a match
+   *
+   */
+  where(params) {
+    return wrapCollection(this, query(this.all, params))
+  }
+
+  /**
+  *
+  * @alias Collection#query
+  */
+  query(params) {
+    return this.where(params)
+  }
+
+  /**
    * Load assets into the collection. By default will load all files which match the include / exclude rules.
    *
    * This will get called automatically if the collection was created with autoLoad set to true.
@@ -94,6 +120,34 @@ export default class Collection {
 
     this._didLoadAssets(paths, false)
   }
+
+  /**
+  * Returns a unique list of group names for the assets in this collection
+  *
+  * Group names are usually the names of the direct subfolders of the collection root
+  *
+  * @return {Array}
+  */
+  get groupNames() {
+     return this.pluck('groupName').unique()
+  }
+
+  /**
+   * Returns an object whose keys are the asset group name, and value
+   * is an array of the asset ids which belong to that group.
+   *
+   * @return {Object}
+   */
+  get idsByGroupName() {
+    let grouped = this.groupBy('groupName')
+
+    return Object.keys(grouped)
+    .reduce((memo, group) => {
+      memo[group] = grouped[group].pluck('id')
+      return memo
+    }, {})
+  }
+
 
   /**
    * Returns a unique list of the asset categories in this collection.
@@ -267,6 +321,14 @@ export default class Collection {
     return this.all.map(a => a.uri)
   }
 
+  /**
+   * Returns a pattern than can be used to match any assets related to
+   * the target asset.
+   *
+   * @param {Asset} target an asset which might have related assets in this collection
+   *
+   * @return {Array}
+   */
   relatedGlob (target) {
     let patterns = [
       target.id + '.{' + this.AssetClass.EXTENSIONS.join(',') + '}',
@@ -278,6 +340,9 @@ export default class Collection {
     }, [])
   }
 
+  /**
+   * Pick attributes from each of the assets
+   */
   mapPick(...args) {
     return this.map(asset => asset.pick(...args))
   }
@@ -310,10 +375,6 @@ export default class Collection {
     return values(this.assets)
   }
 
-  get indexes () {
-    return keys(this.index)
-  }
-
   get available () {
     return keys(this.assets)
   }
@@ -322,9 +383,6 @@ export default class Collection {
     return this.all.map(asset => get(asset, prop))
   }
 
-  query(params = {}, options = {}) {
-    return wrapCollection(this, query(this.all, params))
-  }
 
   reduce(...args){
     return this.all.reduce(...args)

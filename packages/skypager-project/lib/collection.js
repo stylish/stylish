@@ -79,8 +79,15 @@ var carve = _set2.default; /**
                             */
 
 var Collection = (function () {
+
   /**
   * Create a Collection for a subfolder of a Skypager Project.
+  *
+  * @param {Object} options
+  * @param {Class} assetClass which type of assets are in this collection
+  * @param {Project} project which project does this collection belong to
+  * @param {String} root which folder is the root of the collection
+  *
   */
 
   function Collection() {
@@ -145,14 +152,39 @@ var Collection = (function () {
   }
 
   /**
-   * Load assets into the collection. By default will load all files which match the include / exclude rules.
+   * Find assets which match the passed conditions.
    *
-   * This will get called automatically if the collection was created with autoLoad set to true.
+   * @param {Object,Function} params key/value pairs of attributes to match,
+   *  or a function which returns true for a match
    *
-   * @param {Array} paths an array of paths relative to the collection root
    */
 
   (0, _createClass3.default)(Collection, [{
+    key: 'where',
+    value: function where(params) {
+      return wrapCollection(this, (0, _util.filterQuery)(this.all, params));
+    }
+
+    /**
+    *
+    * @alias Collection#query
+    */
+
+  }, {
+    key: 'query',
+    value: function query(params) {
+      return this.where(params);
+    }
+
+    /**
+     * Load assets into the collection. By default will load all files which match the include / exclude rules.
+     *
+     * This will get called automatically if the collection was created with autoLoad set to true.
+     *
+     * @param {Array} paths an array of paths relative to the collection root
+     */
+
+  }, {
     key: 'loadAssetsFromDisk',
     value: function loadAssetsFromDisk() {
       var _this = this;
@@ -170,10 +202,12 @@ var Collection = (function () {
     }
 
     /**
-     * Returns a unique list of the asset categories in this collection.
-     *
-     * @return {Array}
-     */
+    * Returns a unique list of group names for the assets in this collection
+    *
+    * Group names are usually the names of the direct subfolders of the collection root
+    *
+    * @return {Array}
+    */
 
   }, {
     key: 'globFiles',
@@ -250,6 +284,15 @@ var Collection = (function () {
     }
   }, {
     key: 'relatedGlob',
+
+    /**
+     * Returns a pattern than can be used to match any assets related to
+     * the target asset.
+     *
+     * @param {Asset} target an asset which might have related assets in this collection
+     *
+     * @return {Array}
+     */
     value: function relatedGlob(target) {
       var _this2 = this;
 
@@ -259,6 +302,11 @@ var Collection = (function () {
         return m.concat(_this2.glob(a));
       }, []);
     }
+
+    /**
+     * Pick attributes from each of the assets
+     */
+
   }, {
     key: 'mapPick',
     value: function mapPick() {
@@ -332,14 +380,6 @@ var Collection = (function () {
       return this.all.map(function (asset) {
         return (0, _result2.default)(asset, prop);
       });
-    }
-  }, {
-    key: 'query',
-    value: function query() {
-      var params = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-      return wrapCollection(this, (0, _util.filterQuery)(this.all, params));
     }
   }, {
     key: 'reduce',
@@ -436,6 +476,36 @@ var Collection = (function () {
       return this.assets[pointer];
     }
   }, {
+    key: 'groupNames',
+    get: function get() {
+      return this.pluck('groupName').unique();
+    }
+
+    /**
+     * Returns an object whose keys are the asset group name, and value
+     * is an array of the asset ids which belong to that group.
+     *
+     * @return {Object}
+     */
+
+  }, {
+    key: 'idsByGroupName',
+    get: function get() {
+      var grouped = this.groupBy('groupName');
+
+      return (0, _keys2.default)(grouped).reduce(function (memo, group) {
+        memo[group] = grouped[group].pluck('id');
+        return memo;
+      }, {});
+    }
+
+    /**
+     * Returns a unique list of the asset categories in this collection.
+     *
+     * @return {Array}
+     */
+
+  }, {
     key: 'categories',
     get: function get() {
       return this.pluck('categoryFolder').unique();
@@ -475,10 +545,10 @@ var Collection = (function () {
   }, {
     key: 'indexes',
     get: function get() {
-      return keys(this.index);
+      return this.filter(function (asset) {
+        return asset.isIndex();
+      });
     }
-  }, {
-    key: 'assetType',
 
     /**
      * The asset type alias for this collection's Asset Class name.
@@ -489,6 +559,9 @@ var Collection = (function () {
      *
      * @return {String}
      */
+
+  }, {
+    key: 'assetType',
     get: function get() {
       return this.AssetClass.typeAlias;
     }

@@ -4,13 +4,13 @@ var _defineEnumerableProperties2 = require('babel-runtime/helpers/defineEnumerab
 
 var _defineEnumerableProperties3 = _interopRequireDefault(_defineEnumerableProperties2);
 
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
 
 var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -20,48 +20,90 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-var _index = require('../index');
-
-var _index2 = _interopRequireDefault(_index);
-
-var _collection = require('../collection');
-
-var _collection2 = _interopRequireDefault(_collection);
+var _class, _temp; /**
+                    * The Skypager.Asset is an abstract container representing a single file
+                    * of a specific type (e.g. javascript, markdown, css).
+                    *
+                    * Assets have a `uri` property which is either a file system path or URL on a remote server.
+                    *
+                    * Assets provide metadata about files, and a mechanism for determining relationships between
+                    * other files in the project.
+                    *
+                    * Asset classes define a `parse`, `index`, and `transform` interface that can delegate
+                    * to different libraries that provide us with access to an AST for the given type of file.
+                    *
+                    * For example `mdast` or `remark` for markdown, babel for javascript, cheerio for html and svg.
+                    *
+                    * The main goal behind having access to the ASTs of different files is extracting entities
+                    * and references from the Asset for the purposes of building applications which allow for
+                    * programatic manipulation of groups of related assets.
+                    *
+                    */
 
 var _path = require('path');
+
+var _util = require('../util');
+
+var _invariant = require('invariant');
+
+var _invariant2 = _interopRequireDefault(_invariant);
 
 var _md = require('md5');
 
 var _md2 = _interopRequireDefault(_md);
 
-var _util = require('../util');
+var _pick2 = require('lodash/pick');
 
-var util = _interopRequireWildcard(_util);
+var _pick3 = _interopRequireDefault(_pick2);
 
-var _pick = require('lodash/pick');
+var _result2 = require('lodash/result');
 
-var _pick2 = _interopRequireDefault(_pick);
+var _result3 = _interopRequireDefault(_result2);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+var _collection = require('../collection');
+
+var _collection2 = _interopRequireDefault(_collection);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var EXTENSIONS = ['js', 'css', 'html'];
 var GLOB = '**/*.{' + EXTENSIONS.join(',') + '}';
 
-var _Object = Object;
-var defineProperties = _Object.defineProperties;
-var singularize = util.singularize;
-var pluralize = util.pluralize;
-
-var Asset = (function () {
+module.exports = (_temp = _class = (function () {
   (0, _createClass3.default)(Asset, null, [{
-    key: 'decorateCollection',
-    value: function decorateCollection(collection) {
-      if (this.collectionInterface) {
-        defineProperties(collection, this.collectionInterface(collection));
-      }
+    key: 'createCollection',
+
+    /**
+     * Create a collection of Assets for this particular class.
+     *
+     * @see Skypager.Collection
+     *
+     * @param {Project} project which project does this collection belong to
+     * @param {Object} options options for the collection
+     */
+    value: function createCollection(project) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+      var assetClass = this;
+      var root = options.root || project.paths[(0, _util.tableize)(assetClass.name)];
+
+      return new _collection2.default((0, _extends3.default)({
+        root: root,
+        project: project,
+        assetClass: assetClass
+      }, options));
     }
+
+    /**
+     * @private
+     *
+     * Create an asset for a given uri. This will usually be handled automatically
+     * by the collection or project.
+     *
+     * @param {String} uri A URI or file system path which can access the file
+     * @param {Object} options
+     */
+
   }]);
 
   function Asset(uri) {
@@ -71,7 +113,17 @@ var Asset = (function () {
     (0, _classCallCheck3.default)(this, Asset);
 
     var asset = this;
-    var raw = undefined;
+    var collection = options.collection;
+    var project = options.project;
+
+    var raw = options.raw || options.contents;
+
+    (0, _invariant2.default)(uri, 'Must specify a URI for an asset');
+    (0, _invariant2.default)(collection, 'Must specify the collection this asset belongs to');
+
+    if (!project) {
+      project = collection.project;
+    }
 
     defineProperties(this, {
       raw: {
@@ -130,7 +182,7 @@ var Asset = (function () {
 
       var accessibleEnvVars = project.vault.templates.accessibleEnvVars;
 
-      return util.template(string, {
+      return (0, _util.template)(string, {
         imports: {
           get project() {
             return asset.project;
@@ -146,11 +198,11 @@ var Asset = (function () {
           },
           get process() {
             return {
-              env: _pick2.default.apply(undefined, [process.env].concat((0, _toConsumableArray3.default)(accessibleEnvVars)))
+              env: _pick3.default.apply(undefined, [process.env].concat((0, _toConsumableArray3.default)(accessibleEnvVars)))
             };
           },
           get env() {
-            return _pick2.default.apply(undefined, [process.env].concat((0, _toConsumableArray3.default)(accessibleEnvVars)));
+            return _pick3.default.apply(undefined, [process.env].concat((0, _toConsumableArray3.default)(accessibleEnvVars)));
           }
         }
       });
@@ -162,7 +214,7 @@ var Asset = (function () {
         args[_key] = arguments[_key];
       }
 
-      return util.pick.apply(util, [this].concat(args));
+      return _pick3.default.apply(undefined, [this].concat(args));
     }
   }, {
     key: 'get',
@@ -171,7 +223,7 @@ var Asset = (function () {
         args[_key2] = arguments[_key2];
       }
 
-      return util.result.apply(util, [this].concat(args));
+      return _result3.default.apply(undefined, [this].concat(args));
     }
   }, {
     key: 'result',
@@ -180,7 +232,7 @@ var Asset = (function () {
         args[_key3] = arguments[_key3];
       }
 
-      return util.result.apply(util, [this].concat(args));
+      return _result3.default.apply(undefined, [this].concat(args));
     }
   }, {
     key: 'runImporter',
@@ -189,7 +241,7 @@ var Asset = (function () {
       var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
       var callback = arguments[2];
 
-      util.assign(options, { asset: this, project: this.project, collection: this.collection });
+      (0, _util.assign)(options, { asset: this, project: this.project, collection: this.collection });
       this.project.run.importer(importer, options, callback || this.assetWasImported.bind(this));
     }
   }, {
@@ -224,13 +276,11 @@ var Asset = (function () {
   }, {
     key: 'hidden',
     value: function hidden() {
-      var _util$hidden;
-
       for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
         args[_key4] = arguments[_key4];
       }
 
-      return (_util$hidden = util.hidden).getter.apply(_util$hidden, [this].concat(args));
+      return _util.hidden.getter.apply(_util.hidden, [this].concat(args));
     }
   }, {
     key: 'lazy',
@@ -239,7 +289,7 @@ var Asset = (function () {
         args[_key5] = arguments[_key5];
       }
 
-      return util.lazy.apply(util, [this].concat(args));
+      return _util.lazy.apply(undefined, [this].concat(args));
     }
   }, {
     key: 'render',
@@ -259,19 +309,90 @@ var Asset = (function () {
   }, {
     key: 'contentDidChange',
     value: function contentDidChange(asset) {}
+
+    /**
+     * The groupName of an asset is the name of the folder it belongs to
+     * inside of the collection.
+     *
+     * @example the scripts collection found at <projectRoot>/src
+     *
+     *    Given the following folder structure:
+     *
+     *    - src/
+     *      - components/
+     *        - TableView/
+     *          - index.js
+     *      - screens/
+     *        - HomePage/
+     *          - index.js
+     *
+     *    The asset components/TableView has a groupName of "components"
+     *
+     *    The asset screens/HomePage has a groupName of "screens"
+     */
+
   }, {
-    key: '__require',
-    value: function __require() {
-      if (this.requireable) {
-        return require(this.uri);
+    key: 'require',
+
+    /**
+    * Require this asset by its absolute path.
+    */
+    value: (function (_require) {
+      function require() {
+        return _require.apply(this, arguments);
       }
-    }
+
+      require.toString = function () {
+        return _require.toString();
+      };
+
+      return require;
+    })(function () {
+      if (this.requireable) {
+        return require(this.paths.absolute);
+      }
+    })
+
+    /**
+     * can this asset be natively required? checks require.extensions
+     *
+     * @return {Boolean}
+     */
+
   }, {
-    key: 'loadWithWebpack',
-    value: function loadWithWebpack() {
-      var string = [this.loaderString, this.uri].join('!');
-      return require(string);
+    key: 'save',
+
+    /**
+    *
+    * @param {Boolean} options.allowEmpty
+    *
+    * Save this asset by flushing the raw contents
+    * of the asset to disk.  If there is no raw content, or if it is
+    * zero length, you must pass a truthy value for allowEmpty
+    *
+    * @return {Promise}
+    *
+    */
+    value: function save() {
+      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      if (!this.raw || this.raw.length === 0) {
+        if (!options.allowEmpty) {
+          return false;
+        }
+      }
+
+      return require('fs-promise').writeFile(this.paths.absolute, this.raw, 'utf8');
     }
+
+    /**
+     * Synchronously save this asset by flushing the raw contents
+     * of the asset to disk.  If there is no raw content, or if it is
+     * zero length, you must pass a truthy value for allowEmpty
+     *
+     * @param {Boolean} options.allowEmpty
+     */
+
   }, {
     key: 'saveSync',
     value: function saveSync() {
@@ -284,19 +405,6 @@ var Asset = (function () {
       }
 
       return require('fs').writeFileSync(this.paths.absolute, this.raw, 'utf8');
-    }
-  }, {
-    key: 'save',
-    value: function save() {
-      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-      if (!this.raw || this.raw.length === 0) {
-        if (!options.allowEmpty) {
-          return false;
-        }
-      }
-
-      return require('fs-promise').writeFile(this.paths.absolute, this.raw, 'utf8');
     }
   }, {
     key: 'metadata',
@@ -333,20 +441,32 @@ var Asset = (function () {
     get: function get() {
       return [this.id, this.fingerprint.substr(0, 6)].join('-');
     }
+
+    /**
+     * Return the name of a file that can be used to store information for this file
+     * in the project cache directory.
+     */
+
   }, {
     key: 'cacheFilename',
     get: function get() {
       return [this.cacheKey, this.extension].join('');
     }
   }, {
-    key: 'type',
-    get: function get() {
-      return singularize(this.paths.relative.split('/')[0]);
-    }
-  }, {
     key: 'groupName',
     get: function get() {
-      return this.id == 'index' ? this.collection.name : pluralize(this.paths.relative.split('/')[0]);
+      return this.id == 'index' ? this.collection.name : (0, _util.pluralize)(this.paths.relative.split('/')[0]);
+    }
+
+    /**
+     * A singularized version of Asset#groupName
+     *
+     */
+
+  }, {
+    key: 'type',
+    get: function get() {
+      return (0, _util.singularize)(this.paths.relative.split('/')[0]);
     }
   }, {
     key: 'assetClass',
@@ -356,13 +476,9 @@ var Asset = (function () {
   }, {
     key: 'assetGroup',
     get: function get() {
-      return util.tableize(this.assetClass.name);
+      return (0, _util.tableize)(this.assetClass.name);
     }
-  }, {
-    key: 'assetFamily',
-    get: function get() {
-      return this.categoryFolder;
-    }
+
     /**
      * If an asset belongs to a folder like components, layouts, etc.
      * then the categoryFolder would be components
@@ -371,13 +487,13 @@ var Asset = (function () {
      */
 
   }, {
-    key: 'categoryFolder',
+    key: 'category',
     get: function get() {
       if (this.id === 'index' || this.dirname === 'src') {
         return this.assetGroup;
       }
 
-      var result = this.isIndex ? util.tableize((0, _path.basename)((0, _path.dirname)(this.dirname))) : util.tableize((0, _path.basename)(this.dirname));
+      var result = this.isIndex ? (0, _util.tableize)((0, _path.basename)((0, _path.dirname)(this.dirname))) : (0, _util.tableize)((0, _path.basename)(this.dirname));
 
       switch (result) {
         case 'srcs':
@@ -386,31 +502,95 @@ var Asset = (function () {
           return result;
       }
     }
+
+    /**
+     * @alias Asset#category
+     */
+
+  }, {
+    key: 'assetFamily',
+    get: function get() {
+      return this.categoryFolder;
+    }
+
+    /**
+     * @alias Asset#category
+     */
+
+  }, {
+    key: 'categoryFolder',
+    get: function get() {
+      return this.category;
+    }
+
+    /**
+     * Returns the parent folder of this asset
+     *
+     * @return {String}
+     */
+
   }, {
     key: 'parentdir',
     get: function get() {
       return (0, _path.dirname)(this.dirname);
     }
+
+    /**
+     * Returns the folder this asset belongs to
+     *
+     * @return {String}
+     */
+
   }, {
     key: 'dirname',
     get: function get() {
       return (0, _path.dirname)(this.paths.absolute);
     }
+
+    /**
+     * Returns this assets extension
+     *
+     * @return {String}
+     */
+
   }, {
     key: 'extension',
     get: function get() {
       return (0, _path.extname)(this.uri);
     }
+
+    /**
+     * Returns true if this asset is an index
+     */
+
   }, {
     key: 'isIndex',
     get: function get() {
       return !!this.uri.match(/index\.\w+$/);
     }
+
+    /**
+     * How many folders deep is this asset inside of the collection
+     *
+     * @return {Number}
+     */
+
   }, {
     key: 'depth',
     get: function get() {
       return this.id.split('/').length;
     }
+
+    /**
+     * Return different path values for this asset.
+     *
+     * - absolute,
+     * - relative to collection,
+     * - relative to the project
+     *
+     * @return {Object}
+     */
+
   }, {
     key: 'paths',
     get: function get() {
@@ -435,8 +615,7 @@ var Asset = (function () {
     }
 
     /**
-    * Return any datasources which exist in a path
-    * that is identically named to certain derivatives of ours
+     * Return an object which provides access to all assets related to this one.
     */
 
   }, {
@@ -449,26 +628,9 @@ var Asset = (function () {
     get: function get() {
       return typeof require.extensions[this.extension] === 'function';
     }
-  }], [{
-    key: 'createCollection',
-    value: function createCollection(project) {
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-      var assetClass = this;
-      var root = project.paths[util.tabelize(assetClass.name)];
-
-      return new _collection2.default((0, _extends3.default)({
-        root: root,
-        project: project,
-        assetClass: assetClass
-      }, options));
-    }
   }]);
   return Asset;
-})();
-
-Asset.EXTENSIONS = EXTENSIONS;
-Asset.GLOB = GLOB;
+})(), _class.EXTENSIONS = EXTENSIONS, _class.GLOB = GLOB, _temp);
 
 function relationshipProxy(asset) {
   var groups = ['assets', 'data_sources', 'documents', 'images', 'scripts', 'packages', 'projects', 'settings_files', 'copy_files', 'stylesheets', 'vectors'];
@@ -478,7 +640,7 @@ function relationshipProxy(asset) {
       return i.all.length;
     },
     get all() {
-      return util.flatten(groups.map(function (group) {
+      return (0, _util.flatten)(groups.map(function (group) {
         return i[group];
       }));
     }
@@ -487,17 +649,18 @@ function relationshipProxy(asset) {
   var content = asset.project.content;
 
   groups.forEach(function (group) {
-    var _util$assign, _mutatorMap;
+    var _assign, _mutatorMap;
 
-    util.assign(i, (_util$assign = {}, _mutatorMap = {}, _mutatorMap[group] = _mutatorMap[group] || {}, _mutatorMap[group].get = function () {
+    (0, _util.assign)(i, (_assign = {}, _mutatorMap = {}, _mutatorMap[group] = _mutatorMap[group] || {}, _mutatorMap[group].get = function () {
       var related = content[group].relatedGlob(asset);
       return related.filter(function (a) {
         return a.paths.absolute != asset.paths.absolute;
       });
-    }, (0, _defineEnumerableProperties3.default)(_util$assign, _mutatorMap), _util$assign));
+    }, (0, _defineEnumerableProperties3.default)(_assign, _mutatorMap), _assign));
   });
 
   return i;
 }
 
-exports = module.exports = Asset;
+var _Object = Object;
+var defineProperties = _Object.defineProperties;
