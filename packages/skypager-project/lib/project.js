@@ -9,10 +9,6 @@ var _defineEnumerableProperties2 = require('babel-runtime/helpers/defineEnumerab
 
 var _defineEnumerableProperties3 = _interopRequireDefault(_defineEnumerableProperties2);
 
-var _assign = require('babel-runtime/core-js/object/assign');
-
-var _assign2 = _interopRequireDefault(_assign);
-
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -87,6 +83,10 @@ var _pick = require('lodash/pick');
 
 var _pick2 = _interopRequireDefault(_pick);
 
+var _result = require('lodash/result');
+
+var _result2 = _interopRequireDefault(_result);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -104,7 +104,7 @@ var Project = exports.Project = (function () {
     * @param {Array}    options.plugins     an array of plugin names, or functions to enable
     * @param {Object}   options.manifest    the package.json manifest data
     * @param {Object}   options.autoLoad    an object specifying which content collections should be autoImported
-    * @param {Object}   options.hooks       an object with functions that will respond to life cycle hooks whenever emitted
+    * @param {Object}   options.hooks       an object with functions for lifecycle hooks
     * @param {Boolean}  options.autoImport  false to disable autoloading altogether
     *
     * @return {Project}
@@ -202,6 +202,10 @@ var Project = exports.Project = (function () {
       return project.entities;
     });
 
+    if (options.collections || this.setting('collections')) {
+      assign(project.content, buildCustomCollections(this, this.setting('collections')));
+    }
+
     hide('modelDefinitions', modelDefinitions.bind(this));
   }
 
@@ -215,6 +219,24 @@ var Project = exports.Project = (function () {
   */
 
   (0, _createClass3.default)(Project, [{
+    key: 'setting',
+
+    /**
+    *
+    */
+    value: function setting(key) {
+      return (0, _result2.default)(this.settings, key);
+    }
+
+    /**
+    * Combine all of the project copy files into a single structure.
+    *
+    * Copy values will be specific to the current locale setting for a project.
+    *
+    * @return {Object}
+    */
+
+  }, {
     key: 'emit',
 
     /**
@@ -543,15 +565,6 @@ var Project = exports.Project = (function () {
         prop: 'data'
       });
     }
-
-    /**
-    * Combine all of the project copy files into a single structure.
-    *
-    * Copy values will be specific to the current locale setting for a project.
-    *
-    * @return {Object}
-    */
-
   }, {
     key: 'copy',
     get: function get() {
@@ -808,7 +821,7 @@ function paths() {
 
   var custom = project.options.paths || project.manifest.paths || {};
 
-  return util.assign(conventional, custom);
+  return assign(conventional, custom);
 }
 
 function content() {
@@ -912,13 +925,13 @@ function modelDefinitions() {
   var _this4 = this;
 
   return this.models.available.reduce(function (memo, id) {
-    var _util$tabelize, _Object$assign2, _mutatorMap;
+    var _util$tabelize, _assign, _mutatorMap;
 
     var model = _this4.models.lookup(id);
 
-    (0, _assign2.default)(memo, (_Object$assign2 = {}, _util$tabelize = util.tabelize(util.underscore(model.name)), _mutatorMap = {}, _mutatorMap[_util$tabelize] = _mutatorMap[_util$tabelize] || {}, _mutatorMap[_util$tabelize].get = function () {
+    assign(memo, (_assign = {}, _util$tabelize = util.tabelize(util.underscore(model.name)), _mutatorMap = {}, _mutatorMap[_util$tabelize] = _mutatorMap[_util$tabelize] || {}, _mutatorMap[_util$tabelize].get = function () {
       return model.definition;
-    }, (0, _defineEnumerableProperties3.default)(_Object$assign2, _mutatorMap), _Object$assign2));
+    }, (0, _defineEnumerableProperties3.default)(_assign, _mutatorMap), _assign));
 
     return memo;
   }, {});
@@ -928,14 +941,14 @@ function entities() {
   var _this5 = this;
 
   return this.models.available.reduce(function (memo, id) {
-    var _util$tabelize2, _Object$assign3, _mutatorMap2;
+    var _util$tabelize2, _assign2, _mutatorMap2;
 
     var model = _this5.models.lookup(id);
     var entities = model.entities = model.entities || {};
 
-    (0, _assign2.default)(memo, (_Object$assign3 = {}, _util$tabelize2 = util.tabelize(util.underscore(model.name)), _mutatorMap2 = {}, _mutatorMap2[_util$tabelize2] = _mutatorMap2[_util$tabelize2] || {}, _mutatorMap2[_util$tabelize2].get = function () {
+    assign(memo, (_assign2 = {}, _util$tabelize2 = util.tabelize(util.underscore(model.name)), _mutatorMap2 = {}, _mutatorMap2[_util$tabelize2] = _mutatorMap2[_util$tabelize2] || {}, _mutatorMap2[_util$tabelize2].get = function () {
       return entities;
-    }, (0, _defineEnumerableProperties3.default)(_Object$assign3, _mutatorMap2), _Object$assign3));
+    }, (0, _defineEnumerableProperties3.default)(_assign2, _mutatorMap2), _assign2));
 
     return memo;
   }, {});
@@ -961,12 +974,31 @@ function normalizeOptions() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
   if (options.manifest && options.manifest.skypager) {
-    options = (0, _assign2.default)(options, options.manifest.skypager);
+    options = assign(options, options.manifest.skypager);
   }
 
   return (0, _defaultsDeep2.default)(options, DefaultOptions);
 }
 
+function buildCustomCollections(project, config) {
+  return (0, _mapValues2.default)(project.settings.collections, function (cfg, name) {
+    var assetClass = Assets[cfg.assetClass];
+
+    (0, _invariant2.default)(assetClass, ('Invalid assetClass in custom collections: ' + cfg.assetClass + '\n        Pick one of: ' + (0, _keys2.default)(Assets).join(', ')).trim());
+
+    (0, _invariant2.default)(cfg.root, 'Must specify a valid root path for this collection');
+
+    return new _collection2.default({
+      root: cfg.root,
+      project: project,
+      assetClass: assetClass,
+      name: name,
+      exclude: cfg.exclude,
+      include: cfg.include,
+      autoLoad: cfg.autoLoad
+    });
+  });
+}
 function buildRunInterface() {
   var project = this;
 
@@ -1038,3 +1070,6 @@ var DefaultOptions = {
     }
   }
 };
+
+var _Object = Object;
+var assign = _Object.assign;

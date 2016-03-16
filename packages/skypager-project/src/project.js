@@ -18,6 +18,7 @@ import { resolve, dirname, join, basename, extname } from 'path'
 import mapValues from 'lodash/mapValues'
 import defaults from 'lodash/defaultsDeep'
 import pick from 'lodash/pick'
+import get from 'lodash/result'
 
 export class Project {
   /**
@@ -29,7 +30,7 @@ export class Project {
   * @param {Array}    options.plugins     an array of plugin names, or functions to enable
   * @param {Object}   options.manifest    the package.json manifest data
   * @param {Object}   options.autoLoad    an object specifying which content collections should be autoImported
-  * @param {Object}   options.hooks       an object with functions that will respond to life cycle hooks whenever emitted
+  * @param {Object}   options.hooks       an object with functions for lifecycle hooks
   * @param {Boolean}  options.autoImport  false to disable autoloading altogether
   *
   * @return {Project}
@@ -116,6 +117,13 @@ export class Project {
       return project.entities
     })
 
+    if (options.collections || this.setting('collections')) {
+      assign(
+        project.content,
+        buildCustomCollections(this, this.setting('collections'))
+      )
+    }
+
     hide('modelDefinitions', modelDefinitions.bind(this))
   }
 
@@ -132,6 +140,13 @@ export class Project {
       key: 'idpath',
       prop: 'data'
     })
+  }
+
+  /**
+  *
+  */
+  setting(key) {
+    return get(this.settings, key)
   }
 
   /**
@@ -576,7 +591,7 @@ function paths () {
 
   let custom = project.options.paths || project.manifest.paths || {}
 
-  return util.assign(conventional, custom)
+  return assign(conventional, custom)
 }
 
 function content () {
@@ -672,7 +687,7 @@ function modelDefinitions() {
   return this.models.available.reduce((memo,id) => {
     let model = this.models.lookup(id)
 
-    Object.assign(memo, {
+    assign(memo, {
       get [util.tabelize(util.underscore(model.name))](){
         return model.definition
       }
@@ -687,7 +702,7 @@ function entities() {
     let model = this.models.lookup(id)
     let entities = model.entities = model.entities || {}
 
-    Object.assign(memo, {
+    assign(memo, {
       get [util.tabelize(util.underscore(model.name))](){
         return entities
       }
@@ -713,12 +728,38 @@ function setupHooks(hooks = {}) {
 
 function normalizeOptions (options = {}) {
   if (options.manifest && options.manifest.skypager) {
-    options = Object.assign(options, options.manifest.skypager)
+    options = assign(options, options.manifest.skypager)
   }
 
   return defaults(options, DefaultOptions)
 }
 
+function buildCustomCollections(project, config) {
+  return mapValues(project.settings.collections, (cfg, name) => {
+    let assetClass = Assets[cfg.assetClass]
+
+    invariant(
+      assetClass,
+       `Invalid assetClass in custom collections: ${ cfg.assetClass }
+        Pick one of: ${  Object.keys(Assets).join(', ') }`.trim()
+    )
+
+    invariant(
+      cfg.root,
+      'Must specify a valid root path for this collection'
+    )
+
+    return new Collection({
+      root: cfg.root,
+      project,
+      assetClass,
+      name,
+      exclude: cfg.exclude,
+      include: cfg.include,
+      autoLoad: cfg.autoLoad
+    })
+  })
+}
 function buildRunInterface() {
      let project = this
 
@@ -785,4 +826,5 @@ const DefaultOptions = {
   }
 }
 
+const { assign } = Object
 
