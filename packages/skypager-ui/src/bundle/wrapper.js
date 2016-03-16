@@ -37,7 +37,7 @@ class BundleWrapper {
     invariant(rawBundle.copy, 'The bundle must include the copy export from the project')
     invariant(rawBundle.settings, 'The bundle must include the settings export from the project')
 
-    return new BundleWrapper(...args)
+    return new BundleWrapper(rawBundle, options)
   }
 
   constructor (bundle, options = {}) {
@@ -144,17 +144,6 @@ class BundleWrapper {
     )
   }
 
-  findLayoutHandler(assetId) {
-    let scripts = this.scripts || {}
-
-    return (
-      scripts[`layouts/${ assetId }`] ||
-      scripts[`layouts/${ assetId }/index`] ||
-      scripts[`components/${ assetId }`] ||
-      scripts[`components/${ assetId }/index`]
-    )
-  }
-
   findScreenHandler(assetId) {
     let scripts = this.scripts || {}
 
@@ -171,7 +160,6 @@ class BundleWrapper {
   validateScreenReference(assetId) {
      return !!(this.findScreenHandler(assetId))
   }
-
 
   requireComponent(assetId) {
     return cache.components[assetId] || requireComponent.call(this, assetId)
@@ -275,6 +263,7 @@ class BundleWrapper {
 
   buildLayout (props) {
     props.layout = this.settings.layout
+
     return props
   }
 
@@ -450,32 +439,40 @@ function requireStateConfig(screenId) {
   return cache.redux[screenId] = cache.redux[screenId] || this.require('script', `${ screenId }/state`)
 }
 
-function requireScreen(screenId) {
-  let handler = this.findScreenHandler(screenId)
-  let relativePath = handler && handler.paths.relative
+function requireLayout(componentId) {
+    let asset
+    let handler = this.findLayoutHandler(componentId)
+    let relativePath = handler && handler.paths.relative
 
-  if (!relativePath) {
-    throw('Failed to find screen via: ' + screenId)
-  }
+    if (!relativePath && !handler) {
+      throw('Failed to find layout via: ' + componentId)
+    }
 
-  let asset = this.requireContexts.scripts( './' + relativePath )
+    asset = asset || this.requireContexts.scripts( './' + relativePath )
 
-  if (!asset) {
-    throw('Failed to require screen via context: ' + screenId)
-  }
+    if (!asset) {
+      throw('Failed to require layout via context: ' + componentId)
+    }
 
-  return asset.default ? asset.default : asset
+    return asset.default ? asset.default : asset
 }
 
 function requireComponent(componentId) {
+    let asset
     let handler = this.findComponentHandler(componentId)
     let relativePath = handler && handler.paths.relative
 
-    if (!relativePath) {
-      throw('Failed to find component handler via: ' + componentId)
+    if (!handler) {
+      asset = attempt(function() {
+        require('../components/' + componentId + '/index.js')
+      })
     }
 
-    let asset = this.requireContexts.scripts( './' + relativePath )
+    if (!relativePath && !handler && !asset) {
+      throw('Failed to find component via: ' + componentId)
+    }
+
+    asset = this.requireContexts.scripts( './' + relativePath )
 
     if (!asset) {
       throw('Failed to require component via context: ' + componentId)
@@ -484,19 +481,23 @@ function requireComponent(componentId) {
     return asset.default ? asset.default : asset
 }
 
-
-function requireLayout(componentId) {
-    let handler = this.findLayoutHandler(componentId)
+function requireScreen(componentId) {
+    let asset
+    let handler = this.findScreenHandler(componentId)
     let relativePath = handler && handler.paths.relative
 
-    if (!relativePath) {
-      throw('Failed to find layout handler via: ' + componentId)
+    if (!handler) {
+      require('../entries/' + componentId + '/index.js')
     }
 
-    let asset = this.requireContexts.scripts( './' + relativePath )
+    if (!relativePath && !handler && !asset) {
+      throw('Failed to find screen via: ' + componentId)
+    }
+
+    asset = this.requireContexts.scripts( './' + relativePath )
 
     if (!asset) {
-      throw('Failed to require layout via context: ' + componentId)
+      throw('Failed to require screen via context: ' + componentId)
     }
 
     return asset.default ? asset.default : asset

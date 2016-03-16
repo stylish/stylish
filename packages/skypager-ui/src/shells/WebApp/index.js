@@ -13,6 +13,9 @@ import stateful from 'ui/util/stateful'
 
 import DefaultLayout from 'ui/layouts/DefaultLayout'
 
+// singleton tracker
+let app
+
 /**
  * WebApp provides any Skypager Project with a React Router and Redux based application.
 */
@@ -37,8 +40,6 @@ export class WebApp extends Component {
   static create (options = {}) {
     options = sanitize(options)
 
-    const { layout, settings, copy, entities, screens, project } = options
-
     let renderer = (()=>{
       this.render(options)
     })
@@ -54,7 +55,7 @@ export class WebApp extends Component {
     reducers: types.arrayOf(types.object).isRequired,
 
     /** an array of objects which will get merged into an initialState */
-    state: types.arrayOf(types.object).isRequired,
+    initialState: types.arrayOf(types.object).isRequired,
 
     /** the layout layout component to wrap the app in */
     layout: types.func,
@@ -71,7 +72,9 @@ export class WebApp extends Component {
 
     copy: types.object,
 
-    entities: types.object
+    entities: types.object,
+
+    history: types.object
   };
 
   static defaultProps = {
@@ -103,12 +106,12 @@ export class WebApp extends Component {
 
     const root = document.getElementById(options.root || 'app')
 
+    console.log('creating', props)
     return app = render(<WebApp {...props} />, root)
   }
 
   constructor (props = {}, context = {}) {
     let project = props.project
-    delete(props.project)
 
     super(props, context)
 
@@ -122,15 +125,16 @@ export class WebApp extends Component {
 
     this.store = buildStore({
       project,
-      ...(pick(props, 'history', 'initialState', 'middlewares', 'reducers'))
+      history,
+      ...(pick(props, 'initialState', 'middlewares', 'reducers'))
     })
   }
 
   getChildContext () {
     return {
+      store: this.store,
       project: this.project,
-      query: this.project.query,
-      settings: this.project.settings
+      query: this.project.query
     }
   }
 
