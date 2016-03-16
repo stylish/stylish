@@ -12,6 +12,8 @@ import defaults from 'lodash/defaultsDeep'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
 import get from 'lodash/get'
+import result from 'lodash/result'
+import invariant from 'invariant'
 
 import DefaultSettings from './defaults'
 
@@ -28,7 +30,13 @@ const cache = {
 module.exports =
 
 class BundleWrapper {
-  static create(...args) {
+  static create(rawBundle, options = {}) {
+    invariant(rawBundle, 'Must pass a bundle object. By default this will be available by requiring dist/bundle')
+    invariant(rawBundle.entities, 'The bundle must include data about the projects entities')
+    invariant(rawBundle.content, 'The bundle must include the content collections export from the project')
+    invariant(rawBundle.copy, 'The bundle must include the copy export from the project')
+    invariant(rawBundle.settings, 'The bundle must include the settings export from the project')
+
     return new BundleWrapper(...args)
   }
 
@@ -39,47 +47,39 @@ class BundleWrapper {
     })
 
     hide(this, {
-      bundle
+      entities: mapValues(bundle.entities, (v) => addQuerySugar(v)),
+      content: mapValues(bundle.content, (v) => addQuerySugar(v))
     })
+
+    let _settings = bundle.settings
+    let currentApp = _settings.app.current || _settings.app.available[0] || default_settings.app.current || 'web'
+
+    this.settings = _settings.apps[currentApp] || default_settings.apps[currentApp] || default_settings.apps.web
+    this.copy = (bundle.copy && bundle.copy[currentApp]) ? bundle.copy[currentApp] : bundle.copy
 
     if (options.api) {
       assign(this, options.api)
     }
-
-    let content = bundle.content || {}
-    let contentCollections = keys(content)
-
-    this.project  = bundle.project
-    this.entities = bundle.entities
-    this.content  = bundle.content
-    this.models   = bundle.models
-
-    let settings = bundle.settings
-    let currentApp = settings.app.current || settings.app.available[0] || default_settings.app.current || 'web'
-    let app = settings.apps[currentApp] || default_settings.apps[currentApp] || default_settings.apps.web
-
-    this.settings = app
-
-    this.copy = (bundle.copy && bundle.copy[currentApp])
-      ? bundle.copy[currentApp]
-      : bundle.copy
-
-    //this.assetsContent = this.content.assets
-    this.docs = addQuerySugar(this.content.documents)
-    this.data = addQuerySugar(this.content.data_sources)
-    this.scripts = addQuerySugar(this.content.scripts)
-
-    if (options.subscribe) {
-      this.setupSubscription(options.subscribe)
-    }
   }
 
   get(...args) {
-    return get(this, ...args)
+    return result(this, ...args)
+  }
+
+  get docs() {
+     return this.content.documents
+  }
+
+  get data() {
+    return this.content.data_sources
+  }
+
+  get scripts() {
+    return this.content.scripts
   }
 
   get entityNames() {
-     return keys(this.entities)
+     return keys(this.entities || {})
   }
 
   get requireContexts() {
@@ -109,15 +109,19 @@ class BundleWrapper {
   query (source, params) {
     source = `${ source }`.toLowerCase()
 
-    if (this.entityNames.indexOf(source) > 0) {
-      return filterQuery(values(this.entities[source]), params)
+    if (this.entities[source]) {
+      return query(
+        values(this.entities[source]),
+        params
+      )
+    } else if (this.content[source]) {
+      return query(
+        values(this.content[source]),
+        params
+      )
     }
-  }
 
-  // subscribe to a notifications channel which will push updates
-  // whenever the bundle changes
-  setupSubscription(options = {}) {
-
+    return []
   }
 
   findComponentHandler(assetId) {
@@ -305,7 +309,7 @@ function hide(obj, props = {}) {
 
 function addQuerySugar(object) {
   hide(object, {
-    query: (...args) => filterQuery(values(object), ...args),
+    query: (...args) => query(values(object), ...args),
     where: (...args) => addQuerySugar(pickBy(object, ...args)),
     pickBy: (...args) => addQuerySugar(pickBy(object, ...args)),
     sortBy: (...args) => sortBy(values(object), ...args),
@@ -314,7 +318,7 @@ function addQuerySugar(object) {
   return object
 }
 
-function filterQuery (list = [], params) {
+function query (list = [], params) {
   if ( typeof params === 'function' ) {
     return list.filter(params)
   }
@@ -500,3 +504,7 @@ function requireLayout(componentId) {
 
 
 const { defineProperty, keys, assign } = Object
+
+function attempt(fn) {
+  try { return fn() } catch(error) {  }
+}
