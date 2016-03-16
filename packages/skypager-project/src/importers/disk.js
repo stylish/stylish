@@ -42,7 +42,6 @@ export function AssetImporter (options = {}, context = {}) {
 
 export function ProjectImporter (options = {}, context = {}) {
   let path = require('path')
-  let glob = require('glob')
   let project = this
   let collections = options.collections || project.content
   let autoLoad = options.autoLoad || {}

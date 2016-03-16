@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
@@ -28,38 +32,73 @@ var _minimatch = require('minimatch');
 
 var _minimatch2 = _interopRequireDefault(_minimatch);
 
-var _lodash = require('lodash');
+var _result = require('lodash/result');
+
+var _result2 = _interopRequireDefault(_result);
+
+var _groupBy2 = require('lodash/groupBy');
+
+var _groupBy3 = _interopRequireDefault(_groupBy2);
+
+var _invokeMap2 = require('lodash/invokeMap');
+
+var _invokeMap3 = _interopRequireDefault(_invokeMap2);
+
+var _mapValues2 = require('lodash/mapValues');
+
+var _mapValues3 = _interopRequireDefault(_mapValues2);
+
+var _pick = require('lodash/pick');
+
+var _pick2 = _interopRequireDefault(_pick);
+
+var _pickBy2 = require('lodash/pickBy');
+
+var _pickBy3 = _interopRequireDefault(_pickBy2);
+
+var _transform2 = require('lodash/transform');
+
+var _transform3 = _interopRequireDefault(_transform2);
+
+var _set = require('lodash/set');
+
+var _set2 = _interopRequireDefault(_set);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * The Skypager.Collection is a wrapper around local file folders
- * which is responsible for assigning different types of Asset Classes
- * to handle different types of source files in the project, which are used to parse,
- * index, and transform these files so that they can be manipulated programmatically
- * loaded into a collection, they can easily be searched, queried, aggregated, related,
- * or whatever.
- *
- * Collections work through simple file extensions and folder naming conventions,
- * however they can be configured to use different patterns and paths to suit your liking.
- */
+var carve = _set2.default; /**
+                            * The Skypager.Collection is a wrapper around local file folders
+                            * which is responsible for assigning different types of Asset Classes
+                            * to handle different types of source files in the project, which are used to parse,
+                            * index, and transform these files so that they can be manipulated programmatically
+                            * loaded into a collection, they can easily be searched, queried, aggregated, related,
+                            * or whatever.
+                            *
+                            * Collections work through simple file extensions and folder naming conventions,
+                            * however they can be configured to use different patterns and paths to suit your liking.
+                            */
 
 var Collection = (function () {
+  /**
+  * Create a Collection for a subfolder of a Skypager Project.
+  */
+
   function Collection() {
     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
     (0, _classCallCheck3.default)(this, Collection);
-    var root = options.root;
-    var project = options.project;
     var assetClass = options.assetClass;
+    var project = options.project;
+    var root = options.root;
 
     var collection = this;
+
     collection.root = root;
 
-    if (typeof options.exclude === 'string') {
+    if (options.exclude && typeof options.exclude === 'string') {
       options.exclude = [options.exclude];
     }
 
-    if (typeof options.include === 'string') {
+    if (options.include && typeof options.include === 'string') {
       options.include = [options.include];
     }
 
@@ -77,7 +116,7 @@ var Collection = (function () {
       return assetClass;
     });
 
-    (0, _assign2.default)(this, {}, (0, _lodash.pick)(options, 'include', 'exclude', 'name', 'autoLoad'));
+    (0, _assign2.default)(this, (0, _pick2.default)(options, 'include', 'exclude', 'name', 'autoLoad'));
 
     var assets = {};
     var index = {};
@@ -91,11 +130,7 @@ var Collection = (function () {
       return index;
     });
 
-    _util.hide.property(collection, 'expandDotPaths', function () {
-      return buildAtInterface(collection, true);
-    });
-
-    // provides access to document
+    // create a way of accessing a collections assets that matches the name of the collection
     if (assetClass.groupName && !collection[assetClass.groupName]) {
       collection.hidden((0, _util.tabelize)(assetClass.groupName), function () {
         return collection.assets;
@@ -108,6 +143,14 @@ var Collection = (function () {
       this.loadAssetsFromDisk();
     }
   }
+
+  /**
+   * Load assets into the collection. By default will load all files which match the include / exclude rules.
+   *
+   * This will get called automatically if the collection was created with autoLoad set to true.
+   *
+   * @param {Array} paths an array of paths relative to the collection root
+   */
 
   (0, _createClass3.default)(Collection, [{
     key: 'loadAssetsFromDisk',
@@ -125,8 +168,23 @@ var Collection = (function () {
 
       this._didLoadAssets(paths, false);
     }
+
+    /**
+     * Returns a unique list of the asset categories in this collection.
+     *
+     * @return {Array}
+     */
+
   }, {
     key: 'globFiles',
+
+    /**
+     * Returns a list of file paths within this collection's root folder.
+     *
+     * Will respect the collection's `include` and `exclude` options.
+     *
+     * @return {Array}
+     */
     value: function globFiles() {
       var patterns = this.include;
 
@@ -142,7 +200,7 @@ var Collection = (function () {
         this.exclude.map(p => '!' + p)
       )*/
 
-      patterns.push('node_modules/');
+      patterns.push('!node_modules/');
 
       var results = require('glob-all').sync(patterns, {
         cwd: this.root
@@ -150,6 +208,38 @@ var Collection = (function () {
 
       return results;
     }
+
+    /**
+     * Returns different paths for this collection.
+     *
+     * @example
+     *
+     *   project.root // => /Users/jonathan/Skypager/example
+     *   project.docs.root // => /Users/jonathan/Skypager/example/docs
+     *   project.docs.paths.absolute // => /User/jonathan/Skypager/example/docs
+     *   project.docs.paths.relative // => docs
+     */
+
+  }, {
+    key: 'makeGlobRegex',
+
+    /**
+    * Utility function to create a RegExp for a given glob pattern
+    *
+    * @param {String} pattern a glob pattern to pass to minimatch
+    *
+    * @return {RegExp}
+    */
+    value: function makeGlobRegex(pattern) {
+      return _minimatch2.default.makeRe(pattern);
+    }
+
+    /**
+    * RegExp patterns for each of this collections include patterns
+    *
+    * @return {Array, RegExp}
+    */
+
   }, {
     key: 'glob',
     value: function glob(pattern) {
@@ -198,7 +288,7 @@ var Collection = (function () {
         args[_key3] = arguments[_key3];
       }
 
-      return _lodash.transform.apply(undefined, [this.assets].concat(args));
+      return _transform3.default.apply(undefined, [this.assets].concat(args));
     }
   }, {
     key: 'mapValues',
@@ -207,40 +297,40 @@ var Collection = (function () {
         args[_key4] = arguments[_key4];
       }
 
-      return _lodash.mapValues.apply(undefined, [this.assets].concat(args));
+      return _mapValues3.default.apply(undefined, [this.assets].concat(args));
     }
   }, {
-    key: 'groupBy',
-    value: function groupBy() {
+    key: 'pickBy',
+    value: function pickBy() {
       for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
         args[_key5] = arguments[_key5];
       }
 
-      return _lodash.groupBy.apply(undefined, [this.all].concat(args));
+      return _pickBy3.default.apply(undefined, [this.assets].concat(args));
     }
   }, {
-    key: 'invokeMap',
-    value: function invokeMap() {
+    key: 'groupBy',
+    value: function groupBy() {
       for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
         args[_key6] = arguments[_key6];
       }
 
-      return _lodash.invokeMap.apply(undefined, [this.all].concat(args));
+      return _groupBy3.default.apply(undefined, [this.all].concat(args));
     }
   }, {
-    key: 'invoke',
-    value: function invoke() {
+    key: 'invokeMap',
+    value: function invokeMap() {
       for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
         args[_key7] = arguments[_key7];
       }
 
-      return _lodash.invoke.apply(undefined, [this.all].concat(args));
+      return _invokeMap3.default.apply(undefined, [this.all].concat(args));
     }
   }, {
     key: 'pluck',
     value: function pluck(prop) {
       return this.all.map(function (asset) {
-        return (0, _lodash.get)(asset, prop);
+        return (0, _result2.default)(asset, prop);
       });
     }
   }, {
@@ -333,17 +423,31 @@ var Collection = (function () {
     key: '_didLoadAssets',
     value: function _didLoadAssets(paths, expand) {
       if (expand) {
-        //this.expandDotPaths()
+        buildAtInterface(this, true);
       }
     }
   }, {
     key: '_willLoadAssets',
     value: function _willLoadAssets(paths) {}
   }, {
+    key: 'at',
+    value: function at(assetId) {
+      var pointer = this.index[assetId];
+      return this.assets[pointer];
+    }
+  }, {
     key: 'categories',
     get: function get() {
-      this.pluck('categoryFolder').unique();
+      return this.pluck('categoryFolder').unique();
     }
+
+    /**
+     * Returns an object whose keys are the asset category, and value
+     * is an array of the asset ids which belong to that category.
+     *
+     * @return {Object}
+     */
+
   }, {
     key: 'idsByCategory',
     get: function get() {
@@ -354,6 +458,20 @@ var Collection = (function () {
         return memo;
       }, {});
     }
+
+    /**
+     * Returns all of the assets which are indexes in their folder.
+     *
+     * This is useful for example when you want to get all of javascript files which are
+     * the main entry points for a particular component.
+     *
+     * @example
+     *
+     *    project.scripts.query(asset => asset.isIndex && asset.categoryFolder === 'components')
+     *
+     * @return {Array}
+     */
+
   }, {
     key: 'indexes',
     get: function get() {
@@ -361,14 +479,41 @@ var Collection = (function () {
     }
   }, {
     key: 'assetType',
+
+    /**
+     * The asset type alias for this collection's Asset Class name.
+     *
+     * @example
+     *
+     *    project.docs.assetType // => 'document'
+     *
+     * @return {String}
+     */
     get: function get() {
       return this.AssetClass.typeAlias;
     }
+
+    /**
+     * A pluralized version of this collection's Asset Class name
+     *
+     * @return {String}
+     */
+
   }, {
     key: 'assetGroupName',
     get: function get() {
       return this.AssetClass.groupName;
     }
+
+    /**
+     * A getter that returns all of the files within this collection's root folder.
+     *
+     * @see globFiles
+     *
+     * @return {Array}
+     *
+     */
+
   }, {
     key: 'filesInRoot',
     get: function get() {
@@ -392,23 +537,31 @@ var Collection = (function () {
       };
     }
   }, {
+    key: 'includeRegexes',
+    get: function get() {
+      return this.include.map(function (pattern) {
+        return _minimatch2.default.makeRe(pattern);
+      });
+    }
+
+    /**
+    * RegExp patterns for each of this collections exclude patterns
+    *
+    * @return {Array, RegExp}
+    */
+
+  }, {
+    key: 'excludeRegexes',
+    get: function get() {
+      return this.exclude.map(function (pattern) {
+        return _minimatch2.default.makeRe(pattern);
+      });
+    }
+  }, {
     key: 'assetPaths',
     get: function get() {
       return this.all.map(function (a) {
         return a.uri;
-      });
-    }
-  }, {
-    key: 'subfolderPaths',
-    get: function get() {
-      var _this3 = this;
-
-      return this.assetPaths.map(function (p) {
-        return (0, _path.relative)(_this3.root, (0, _path.dirname)(p));
-      }).unique().filter(function (i) {
-        return i.length > 0;
-      }).sort(function (a, b) {
-        return a.length > b.length;
       });
     }
   }, {
@@ -431,35 +584,25 @@ var Collection = (function () {
 * instead, since the tree can change
 */
 
+exports.default = Collection;
 function buildAtInterface(collection) {
   var expand = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
 
-  var chain = (function (needle) {
-    var pointer = this.index[needle];
-    return this.assets[pointer];
-  }).bind(collection);
-
-  defineProperty(collection, 'at', {
-    configurable: true,
-    enumerable: false,
-    value: chain
-  });
-
   if (expand) {
-    var expanded = collection.available.map(function (idPath) {
-      return idPath.split('/');
+    var expanded = collection.available.map(function (assetId) {
+      return assetId.split('/');
     }).sort(function (a, b) {
       return a.length > b.length;
+    }).map(function (id) {
+      return id.join('/');
     });
 
     expanded.forEach(function (id) {
       var dp = id.replace(/-/g, '_').replace(/\//g, '.');
-      (0, _lodash.set)(chain, dp, chain(id));
+      carve(collection.at, dp, collection.at(id));
     });
   }
 }
-
-module.exports = Collection;
 
 function wrapCollection(collection, array) {
   defineProperty(array, 'condense', {
@@ -477,7 +620,7 @@ function wrapCollection(collection, array) {
         var asset = prop ? a[prop] : a;
 
         if (key === 'idpath') {
-          (0, _lodash.set)(memo, a.id.replace(/\//g, '.'), asset);
+          carve(memo, a.id.replace(/\//g, '.'), asset);
           return memo;
         }
 
@@ -517,7 +660,7 @@ function wrapCollection(collection, array) {
         args[_key11] = arguments[_key11];
       }
 
-      return _lodash.groupBy.apply(undefined, [array].concat(args));
+      return _groupBy3.default.apply(undefined, [array].concat(args));
     }
   });
 

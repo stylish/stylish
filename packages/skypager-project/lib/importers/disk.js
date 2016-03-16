@@ -70,7 +70,6 @@ function ProjectImporter() {
   var context = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   var path = require('path');
-  var glob = require('glob');
   var project = this;
   var collections = options.collections || project.content;
   var autoLoad = options.autoLoad || {};

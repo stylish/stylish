@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Project = undefined;
+
 var _defineEnumerableProperties2 = require('babel-runtime/helpers/defineEnumerableProperties');
 
 var _defineEnumerableProperties3 = _interopRequireDefault(_defineEnumerableProperties2);
@@ -8,17 +13,13 @@ var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
 
-var _promise = require('babel-runtime/core-js/promise');
-
-var _promise2 = _interopRequireDefault(_promise);
-
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
+
+var _promise = require('babel-runtime/core-js/promise');
+
+var _promise2 = _interopRequireDefault(_promise);
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -31,10 +32,6 @@ var _createClass3 = _interopRequireDefault(_createClass2);
 var _index = require('./index');
 
 var _index2 = _interopRequireDefault(_index);
-
-var _md = require('md5');
-
-var _md2 = _interopRequireDefault(_md);
 
 var _registry = require('./registry');
 
@@ -72,6 +69,10 @@ var _invariant = require('invariant');
 
 var _invariant2 = _interopRequireDefault(_invariant);
 
+var _pathExists = require('path-exists');
+
+var _pathExists2 = _interopRequireDefault(_pathExists);
+
 var _path = require('path');
 
 var _mapValues = require('lodash/mapValues');
@@ -90,26 +91,54 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var hide = util.hide.getter;
-var lazy = util.lazy;
+var Project = exports.Project = (function () {
+  (0, _createClass3.default)(Project, null, [{
+    key: 'load',
 
-var HOOKS = ['contentWillInitialize', 'contentDidInitialize', 'projectWillAutoImport', 'projectDidAutoImport', 'willBuildEntities', 'didBuildEntities', 'registriesDidLoad'];
+    /**
+    * Load a Skypager Project from a folder. defaults to process.env.PWD
+    *
+    * @param {String}   uri                 absolute path to a folder or skypager.js file
+    * @param {Object}   options             options for loading the project
+    * @param {String}   options.type        an optional type identifier for the project
+    * @param {Array}    options.plugins     an array of plugin names, or functions to enable
+    * @param {Object}   options.manifest    the package.json manifest data
+    * @param {Object}   options.autoLoad    an object specifying which content collections should be autoImported
+    * @param {Object}   options.hooks       an object with functions that will respond to life cycle hooks whenever emitted
+    * @param {Boolean}  options.autoImport  false to disable autoloading altogether
+    *
+    * @return {Project}
+    */
+    value: function load() {
+      var uri = arguments.length <= 0 || arguments[0] === undefined ? process.env.PWD : arguments[0];
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-var DefaultOptions = {
-  type: 'project',
-  env: process.env.NODE_ENV || 'development',
-  importer: {
-    type: 'disk',
-    autoLoad: {
-      documents: true,
-      data_sources: true,
-      settings_files: true,
-      copy_files: true
+      return _index2.default.load(uri, options);
     }
-  }
-};
 
-var Project = (function () {
+    /**
+    *
+    * @private
+    *
+    * Wrap a project folder.
+    *
+    * A Project folder SHOULD contain a package.json with a `skypager` property
+    * that contains an object.
+    *
+    * The `skypager` object on the manifest should contain:
+    *
+    * - main {String} a file that will get required and export the project.
+    *
+    * - plugins {Array} an array of the names of plugin packages.
+    *   will try to use skypager-plugin-*
+    *
+    * - provides {Array} an optional list tags for what the project contains
+    *     (e.g. ui:components, devtools, themes, website)
+    *
+    */
+
+  }]);
+
   function Project(uri) {
     var _this = this;
 
@@ -121,37 +150,33 @@ var Project = (function () {
     normalizeOptions(options);
 
     var project = this;
+    var hide = project.hidden.bind(project);
+    var lazy = project.lazy.bind(project);
+    var emit = project.emit.bind(project);
 
-    project.uri = uri;
-    project.root = (0, _path.dirname)(uri);
-    project.type = options.type;
+    hide('uri', uri);
+    hide('type', options.type);
 
-    project.hidden('options', function () {
-      return options;
-    });
-
-    Object.defineProperty(project, 'manifest', {
-      enumerable: false,
-      value: options.manifest || {}
-    });
+    project.root = uri.match(/\.(js|json)$/) ? (0, _path.dirname)(uri) : uri;
 
     project.name = options.name || (0, _path.basename)(project.root);
+    project.env = options.env;
+
+    hide('options', function () {
+      return options;
+    });
+    hide('manifest', options.manifest || {});
 
     // autobind hooks functions passed in as options
-    project.hidden('hooks', setupHooks.call(project, options.hooks));
-
-    project.hidden('paths', paths.bind(project));
-
-    project.env = options.env;
+    hide('hooks', setupHooks.call(project, options.hooks));
+    hide('paths', paths.bind(project));
 
     (0, _logger2.default)(project, options);
 
-    project.hidden('registries', registries.call(project), false);
+    hide('registries', registries.call(project), false);
+    hide('_run', buildRunInterface.call(project), false);
 
-    var plugins = [];
-    util.hide.getter(project, 'enabledPlugins', function () {
-      return plugins;
-    });
+    hide('enabledPlugins', []);
 
     if (options.plugins) {
       options.plugins.forEach(function (plugin) {
@@ -163,69 +188,44 @@ var Project = (function () {
       });
     }
 
-    project.emit('contentWillInitialize');
-    // wrap the content interface in a getter but make sure
-    // the documents collection is loaded and available right away
-
-    project.hidden('content', content.call(project));
-
-    project.emit('contentDidInitialize');
+    hide('content', content.call(project));
 
     if (options.autoImport !== false && options.autoLoad !== false) {
-      project.debug('running autoimport', options.autoLoad);
-
-      project.emit('projectWillAutoImport');
-
       runImporter.call(project, options.importer);
-
-      project.emit('projectDidAutoImport');
     }
 
-    if (project.settings.collections) {
-      (0, _defaultsDeep2.default)(project.content, (0, _mapValues2.default)(project.settings.collections, function (cfg, name) {
-        var assetClass = Assets[cfg.assetClass];
+    lazy('entities', function () {
+      emit('willBuildEntities');
+      project.entities = entities.call(project);
+      emit('didBuildEntities', project, project.entities);
 
-        if (!assetClass) {
-          throw 'Invalid Collection Definition in settings. Invalid assetClass key.\n                   Pick one of: ' + (0, _keys2.default)(Assets).join(' ,');
-        }
-
-        return new _collection2.default((0, _extends3.default)({
-          root: cfg.root,
-          project: project,
-          assetClass: assetClass,
-          name: name
-        }, (0, _pick2.default)(cfg, 'exclude', 'include', 'autoLoad')));
-      }));
-    }
-
-    util.hide.getter(project, 'supportedAssetExtensions', function () {
-      return Assets.Asset.SupportedExtensions;
+      return project.entities;
     });
 
-    // lazy load / memoize the entity builder
-    Object.defineProperty(project, 'entities', {
-      configurable: true,
-      get: function get() {
-        delete project.entities;
-        project.emit('willBuildEntities');
-        project.entities = entities.call(project);
-        project.emit('didBuildEntities', project, project.entities);
-
-        project.debug('built entities', (0, _keys2.default)(project.entities));
-
-        return project.entities;
-      }
-    });
-
-    util.hide.getter(project, 'modelDefinitions', modelDefinitions.bind(this));
+    hide('modelDefinitions', modelDefinitions.bind(this));
   }
+
+  /**
+  * Combine all of the project settings files into a single structure.
+  *
+  * The values for a projects settings will be specific to process.env.NODE_ENV
+  * if the settings file contains keys that match development, production, test etc.
+  *
+  * @return {Object}
+  */
 
   (0, _createClass3.default)(Project, [{
     key: 'emit',
+
+    /**
+    * Trigger a project lifecycle hook.
+    *
+    * @param {String} name the name of the life cycle hook
+    */
     value: function emit(name) {
       var project = this;
       var fn = project.hooks[name] || project[name];
-      if (fn) {
+      if (typeof fn === 'function') {
         for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
           args[_key - 1] = arguments[_key];
         }
@@ -233,6 +233,15 @@ var Project = (function () {
         fn.call.apply(fn, [project].concat(args));
       }
     }
+
+    /**
+    * Get an arbitrary value from the project using the lodash result utility.
+    *
+    * @example
+    *
+    *   project.get('docs.all[0].paths.absolute')
+    */
+
   }, {
     key: 'get',
     value: function get() {
@@ -242,8 +251,25 @@ var Project = (function () {
 
       return util.result.apply(util, [this].concat(args));
     }
+
+    /**
+    * Returns an instance of the project's vaule. This is a data store which
+    * can be used to store keys and credentials that should not be exposed to the
+    * outside, via an exporter, when publishing the project, etc.
+    */
+
   }, {
     key: 'findBy',
+
+    /**
+    * Find a single object in the project using the query mechanism.
+    * Accepts any argument that project.query accepts.
+    *
+    * @param {String} source where to start the search.
+    *   Any content collection or model name is valid.
+    *
+    * @param {Object, Function} params either attributes to match, or a predicate function
+    */
     value: function findBy(source, params) {
       params.limit = 1;
       return this.query(source, params)[0];
@@ -252,6 +278,8 @@ var Project = (function () {
     key: 'query',
     value: function query(source, params) {
       source = ('' + source).toLowerCase();
+
+      (0, _invariant2.default)(this.querySources.indexOf(source) >= 0, 'Must supply a valid source to query from: ' + this.querySources.join(', '));
 
       if (source === 'docs' || source === 'documents') {
         return this.docs.query(params);
@@ -269,18 +297,43 @@ var Project = (function () {
         return util.filterQuery(util.values(this.entities[source]), params);
       }
     }
+
+    /**
+    * Run a query against the project helper registries.
+    *
+    * @param {String} source which registry to run your query against
+    * @param {Object, Function} params the search criteria
+    *
+    * @return {Helper}
+    */
+
   }, {
     key: 'queryHelpers',
     value: function queryHelpers(source, params) {
       return this.registries[source].query(params);
     }
+
+    /**
+    * Returns a manifest of all of the project's assets.
+    */
+
   }, {
     key: 'eachAsset',
+
+    /**
+    * Iterate over every asset in the project.
+    */
     value: function eachAsset() {
       var _allAssets;
 
       return (_allAssets = this.allAssets).forEach.apply(_allAssets, arguments);
     }
+
+    /**
+    * Run a reducer function against every asset in the project.
+    *
+    */
+
   }, {
     key: 'reduceAssets',
     value: function reduceAssets() {
@@ -288,6 +341,11 @@ var Project = (function () {
 
       return (_allAssets2 = this.allAssets).reduce.apply(_allAssets2, arguments);
     }
+
+    /**
+    * Convenience method for running Array.map for every asset.
+    */
+
   }, {
     key: 'mapAssets',
     value: function mapAssets() {
@@ -295,6 +353,11 @@ var Project = (function () {
 
       return (_allAssets3 = this.allAssets).map.apply(_allAssets3, arguments);
     }
+
+    /**
+    * Convenience method for running Array.filter for every asset in the project.
+    */
+
   }, {
     key: 'filterAssets',
     value: function filterAssets() {
@@ -305,8 +368,6 @@ var Project = (function () {
 
     /**
     * Access a document by the document id short hand
-    *
-    * Documents are the most important part of a Skypager project, so make it easy to access them
     *
     */
 
@@ -438,7 +499,7 @@ var Project = (function () {
     key: 'exists',
     value: function exists() {
       try {
-        return require('path-exists').sync(this.path.apply(this, arguments));
+        return _pathExists2.default.sync(this.path.apply(this, arguments));
       } catch (error) {
         return false;
       }
@@ -473,82 +534,76 @@ var Project = (function () {
       }
     }
   }, {
+    key: 'settings',
+    get: function get() {
+      return this.content.settings_files.query(function (s) {
+        return true;
+      }).condense({
+        key: 'idpath',
+        prop: 'data'
+      });
+    }
+
+    /**
+    * Combine all of the project copy files into a single structure.
+    *
+    * Copy values will be specific to the current locale setting for a project.
+    *
+    * @return {Object}
+    */
+
+  }, {
+    key: 'copy',
+    get: function get() {
+      return this.content.copy_files.query(function (s) {
+        return true;
+      }).condense({
+        key: 'idpath',
+        prop: 'data'
+      });
+    }
+
+    /**
+    * Returns the current locale for the project. This value gets used
+    * when building the copy system
+    */
+
+  }, {
+    key: 'locale',
+    get: function get() {
+      return this.get('settings.app.locale') || 'en';
+    }
+  }, {
     key: 'vault',
     get: function get() {
       return (0, _vault2.default)(this);
     }
 
     /**
-     * A proxy object that lets you run one of the project helpers.
-     *
-     * @example
-     *
-     * project.run.importer('disk')
-     * project.run.action('snapshots/save', '/path/to/snapshot.json')
-     *
-     */
+    * Provides a nicer language like interface around looking up and running
+    * one of the project's helpers (e.g. actions, exporters, importers, etc.)
+    *
+    * @example
+    *
+    *   project.run.importer('disk')
+    *   project.run.action('snapshots/save', '/path/to/snapshot.json')
+    *
+    */
 
   }, {
     key: 'run',
     get: function get() {
-      var project = this;
-
-      return {
-        action: function action(helperId) {
-          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-          var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-          context.project = context.project || options.project || project;
-          return project.actions.run(helperId, options, context);
-        },
-        importer: function importer(helperId) {
-          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-          var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-          context.project = context.project || options.project || project;
-          return project.importers.run(helperId, options, context);
-        },
-        exporter: function exporter(helperId) {
-          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-          var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-          context.project = context.project || options.project || project;
-          return project.exporters.run(helperId, options, context);
-        },
-        plugin: function plugin(helperId) {
-          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-          var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-          context.project = context.project || options.project || project;
-          return project.plugins.run(helperId, options, context);
-        },
-        model: function model(helperId) {
-          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-          var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-          context.project = context.project || options.project || project;
-          return project.models.run(helperId, options, context);
-        },
-        renderer: function renderer(helperId) {
-          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-          var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-          context.project = context.project || options.project || project;
-          return project.renderers.run(helperId, options, context);
-        },
-        view: function view(helperId) {
-          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-          var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-          context.project = context.project || options.project || project;
-          return project.views.run(helperId, options, context);
-        }
-      };
+      return this._run;
+    }
+  }, {
+    key: 'querySources',
+    get: function get() {
+      return (0, _keys2.default)(this.content).concat((0, _keys2.default)(this.entities || {})).concat(['docs', 'data', 'datasources']);
     }
   }, {
     key: 'assetManifest',
     get: function get() {
-      return this.exporters.run('asset_manifest', {
+      return this.exporters.run('assets', {
         project: this
       });
     }
@@ -562,6 +617,13 @@ var Project = (function () {
     get: function get() {
       return util.values(this.content);
     }
+
+    /**
+    * Returns an array of every asset in the project
+    *
+    * @return {Array}
+    */
+
   }, {
     key: 'allAssets',
     get: function get() {
@@ -569,6 +631,13 @@ var Project = (function () {
         return c.all;
       }));
     }
+
+    /**
+    * Returns an array of relative paths for every asset in the project.
+    *
+    * @return {Array}
+    */
+
   }, {
     key: 'assetPaths',
     get: function get() {
@@ -693,31 +762,11 @@ var Project = (function () {
         return util.tabelize(util.underscore(model.name));
       });
     }
-  }, {
-    key: 'settings',
-    get: function get() {
-      return this.content.settings_files.query(function (s) {
-        return true;
-      }).condense({
-        key: 'idpath',
-        prop: 'data'
-      });
-    }
-  }, {
-    key: 'copy',
-    get: function get() {
-      return this.content.copy_files.query(function (s) {
-        return true;
-      }).condense({
-        key: 'idpath',
-        prop: 'data'
-      });
-    }
   }]);
   return Project;
 })();
 
-module.exports = Project;
+exports.default = Project;
 
 function paths() {
   var project = this;
@@ -917,3 +966,75 @@ function normalizeOptions() {
 
   return (0, _defaultsDeep2.default)(options, DefaultOptions);
 }
+
+function buildRunInterface() {
+  var project = this;
+
+  return {
+    action: function action(helperId) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+      context.project = context.project || options.project || project;
+      return project.actions.run(helperId, options, context);
+    },
+    importer: function importer(helperId) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+      context.project = context.project || options.project || project;
+      return project.importers.run(helperId, options, context);
+    },
+    exporter: function exporter(helperId) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+      context.project = context.project || options.project || project;
+      return project.exporters.run(helperId, options, context);
+    },
+    plugin: function plugin(helperId) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+      context.project = context.project || options.project || project;
+      return project.plugins.run(helperId, options, context);
+    },
+    model: function model(helperId) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+      context.project = context.project || options.project || project;
+      return project.models.run(helperId, options, context);
+    },
+    renderer: function renderer(helperId) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+      context.project = context.project || options.project || project;
+      return project.renderers.run(helperId, options, context);
+    },
+    view: function view(helperId) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+      context.project = context.project || options.project || project;
+      return project.views.run(helperId, options, context);
+    }
+  };
+}
+
+var HOOKS = ['contentWillInitialize', 'contentDidInitialize', 'projectWillAutoImport', 'projectDidAutoImport', 'willBuildEntities', 'didBuildEntities', 'registriesDidLoad'];
+
+var DefaultOptions = {
+  type: 'project',
+  env: process.env.NODE_ENV || 'development',
+  importer: {
+    type: 'disk',
+    autoLoad: {
+      documents: true,
+      data_sources: true,
+      settings_files: true,
+      copy_files: true
+    }
+  }
+};

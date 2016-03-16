@@ -1,8 +1,3 @@
-import {defaults, filterQuery as query, hide, hidden, lazy, tabelize, values} from './util'
-import {relative, basename, dirname, extname, resolve, join} from 'path'
-import minimatch from 'minimatch'
-import { get, invokeMap, mapValues, transform, groupBy, invoke, pick, set as carve } from 'lodash'
-
 /**
  * The Skypager.Collection is a wrapper around local file folders
  * which is responsible for assigning different types of Asset Classes
@@ -14,17 +9,37 @@ import { get, invokeMap, mapValues, transform, groupBy, invoke, pick, set as car
  * Collections work through simple file extensions and folder naming conventions,
  * however they can be configured to use different patterns and paths to suit your liking.
  */
-class Collection {
+
+import {defaults, filterQuery as query, hide, hidden, lazy, tabelize, values} from './util'
+import {relative, basename, dirname, extname, resolve, join} from 'path'
+import minimatch from 'minimatch'
+
+import get from 'lodash/result'
+import groupBy from 'lodash/groupBy'
+import invokeMap from 'lodash/invokeMap'
+import mapValues from 'lodash/mapValues'
+import pick from 'lodash/pick'
+import pickBy from 'lodash/pickBy'
+import transform from 'lodash/transform'
+import set from 'lodash/set'
+
+const carve = set
+
+export default class Collection {
+  /**
+  * Create a Collection for a subfolder of a Skypager Project.
+  */
   constructor (options = {}) {
-    let { root, project, assetClass } = options
-    let collection = this
+    const { assetClass, project, root } = options
+    const collection = this
+
     collection.root = root
 
-    if (typeof options.exclude === 'string') {
+    if (options.exclude && typeof options.exclude === 'string') {
       options.exclude = [options.exclude]
     }
 
-    if (typeof options.include === 'string') {
+    if (options.include && typeof options.include === 'string') {
       options.include = [options.include]
     }
 
@@ -40,7 +55,7 @@ class Collection {
     collection.hidden('project', project)
     collection.hidden('AssetClass', () => assetClass)
 
-    Object.assign(this, {}, pick(options, 'include', 'exclude', 'name', 'autoLoad'))
+    Object.assign(this, pick(options, 'include', 'exclude', 'name', 'autoLoad'))
 
     const assets = { }
     const index = { }
@@ -50,9 +65,7 @@ class Collection {
     collection.hidden('assets', () => assets )
     collection.hidden('index', () => index )
 
-    hide.property(collection, 'expandDotPaths', () => buildAtInterface(collection, true))
-
-    // provides access to document
+    // create a way of accessing a collections assets that matches the name of the collection
     if (assetClass.groupName && !collection[assetClass.groupName]) {
       collection.hidden(tabelize(assetClass.groupName), () => collection.assets )
     }
@@ -64,6 +77,13 @@ class Collection {
     }
   }
 
+  /**
+   * Load assets into the collection. By default will load all files which match the include / exclude rules.
+   *
+   * This will get called automatically if the collection was created with autoLoad set to true.
+   *
+   * @param {Array} paths an array of paths relative to the collection root
+   */
   loadAssetsFromDisk (paths = this.filesInRoot){
     this._willLoadAssets(paths)
 
@@ -75,10 +95,21 @@ class Collection {
     this._didLoadAssets(paths, false)
   }
 
+  /**
+   * Returns a unique list of the asset categories in this collection.
+   *
+   * @return {Array}
+   */
   get categories() {
-    this.pluck('categoryFolder').unique()
+    return this.pluck('categoryFolder').unique()
   }
 
+  /**
+   * Returns an object whose keys are the asset category, and value
+   * is an array of the asset ids which belong to that category.
+   *
+   * @return {Object}
+   */
   get idsByCategory() {
     let grouped = this.groupBy('categoryFolder')
 
@@ -89,22 +120,63 @@ class Collection {
     }, {})
   }
 
+  /**
+   * Returns all of the assets which are indexes in their folder.
+   *
+   * This is useful for example when you want to get all of javascript files which are
+   * the main entry points for a particular component.
+   *
+   * @example
+   *
+   *    project.scripts.query(asset => asset.isIndex && asset.categoryFolder === 'components')
+   *
+   * @return {Array}
+   */
   get indexes() {
     return this.filter(asset => asset.isIndex())
   }
 
+  /**
+   * The asset type alias for this collection's Asset Class name.
+   *
+   * @example
+   *
+   *    project.docs.assetType // => 'document'
+   *
+   * @return {String}
+   */
   get assetType () {
     return this.AssetClass.typeAlias
   }
 
+  /**
+   * A pluralized version of this collection's Asset Class name
+   *
+   * @return {String}
+   */
   get assetGroupName () {
     return this.AssetClass.groupName
   }
 
+  /**
+   * A getter that returns all of the files within this collection's root folder.
+   *
+   * @see globFiles
+   *
+   * @return {Array}
+   *
+   */
   get filesInRoot() {
     return this.globFiles()
   }
 
+  /**
+   * Returns a list of file paths within this collection's root folder.
+   *
+   * Will respect the collection's `include` and `exclude` options.
+   *
+   * @return {Array}
+   */
   globFiles() {
     let patterns = this.include
 
@@ -122,7 +194,7 @@ class Collection {
       this.exclude.map(p => '!' + p)
     )*/
 
-    patterns.push('node_modules/')
+    patterns.push('!node_modules/')
 
     let results = require('glob-all').sync(patterns,{
       cwd: this.root
@@ -131,6 +203,16 @@ class Collection {
     return results
   }
 
+  /**
+   * Returns different paths for this collection.
+   *
+   * @example
+   *
+   *   project.root // => /Users/jonathan/Skypager/example
+   *   project.docs.root // => /Users/jonathan/Skypager/example/docs
+   *   project.docs.paths.absolute // => /User/jonathan/Skypager/example/docs
+   *   project.docs.paths.relative // => docs
+   */
   get paths() {
     let c = this
 
@@ -147,6 +229,35 @@ class Collection {
     }
   }
 
+  /**
+  * Utility function to create a RegExp for a given glob pattern
+  *
+  * @param {String} pattern a glob pattern to pass to minimatch
+  *
+  * @return {RegExp}
+  */
+  makeGlobRegex(pattern) {
+    return minimatch.makeRe(pattern)
+  }
+
+  /**
+  * RegExp patterns for each of this collections include patterns
+  *
+  * @return {Array, RegExp}
+  */
+  get includeRegexes() {
+    return this.include.map(pattern => minimatch.makeRe(pattern))
+  }
+
+  /**
+  * RegExp patterns for each of this collections exclude patterns
+  *
+  * @return {Array, RegExp}
+  */
+  get excludeRegexes() {
+    return this.exclude.map(pattern => minimatch.makeRe(pattern))
+  }
+
   glob (pattern) {
     var regex = minimatch.makeRe(pattern)
     return this.all.filter(asset => asset.paths.relative && regex.test(asset.paths.relative))
@@ -154,13 +265,6 @@ class Collection {
 
   get assetPaths () {
     return this.all.map(a => a.uri)
-  }
-
-  get subfolderPaths () {
-    return this.assetPaths.map(p => relative(this.root, dirname(p)))
-    .unique()
-    .filter(i => i.length > 0)
-    .sort((a, b) => a.length > b.length)
   }
 
   relatedGlob (target) {
@@ -190,16 +294,16 @@ class Collection {
     return mapValues(this.assets, ...args)
   }
 
+  pickBy(...args) {
+    return pickBy(this.assets, ...args)
+  }
+
   groupBy(...args) {
     return groupBy(this.all, ...args)
   }
 
   invokeMap(...args) {
     return invokeMap(this.all, ...args)
-  }
-
-  invoke(...args) {
-    return invoke(this.all, ...args)
   }
 
   get all () {
@@ -269,11 +373,17 @@ class Collection {
 
   _didLoadAssets (paths, expand) {
     if (expand) {
-      //this.expandDotPaths()
+      buildAtInterface(this, true)
     }
   }
 
   _willLoadAssets (paths) {
+
+  }
+
+  at(assetId) {
+    let pointer = this.index[assetId]
+    return this.assets[pointer]
   }
 }
 
@@ -283,28 +393,18 @@ class Collection {
 * instead, since the tree can change
 */
 function buildAtInterface (collection, expand = true) {
-  let chain = function (needle) {
-    let pointer = this.index[needle]
-    return this.assets[pointer]
-  }.bind(collection)
-
-  defineProperty(collection, 'at', {
-    configurable: true,
-    enumerable: false,
-    value: chain
-  })
-
   if (expand) {
-    let expanded = collection.available.map(idPath => idPath.split('/')).sort((a, b) => a.length > b.length)
+    let expanded = collection.available
+      .map(assetId => assetId.split('/'))
+      .sort((a, b) => a.length > b.length)
+      .map(id => id.join('/'))
 
     expanded.forEach(id => {
       let dp = id.replace(/-/g, '_').replace(/\//g, '.')
-      carve(chain, dp, chain(id))
+      carve(collection.at, dp, collection.at(id))
     })
   }
 }
-
-module.exports = Collection
 
 function wrapCollection(collection, array) {
   defineProperty(array, 'condense', {

@@ -1,5 +1,4 @@
 import Skypager from './index'
-import md5 from 'md5'
 
 import Registry from './registry'
 import Collection from './collection'
@@ -12,73 +11,86 @@ import logger from './logger'
 import vault from './vault'
 import invariant from 'invariant'
 
+import pathExists from 'path-exists'
+
 import { resolve, dirname, join, basename, extname } from 'path'
 
 import mapValues from 'lodash/mapValues'
 import defaults from 'lodash/defaultsDeep'
 import pick from 'lodash/pick'
 
-const hide = util.hide.getter
-const lazy = util.lazy
-
-const HOOKS = [
-  'contentWillInitialize',
-  'contentDidInitialize',
-  'projectWillAutoImport',
-  'projectDidAutoImport',
-  'willBuildEntities',
-  'didBuildEntities',
-  'registriesDidLoad'
-]
-
-const DefaultOptions = {
-  type: 'project',
-  env: process.env.NODE_ENV || 'development',
-  importer: {
-    type: 'disk',
-    autoLoad: {
-      documents: true,
-      data_sources: true,
-      settings_files: true,
-      copy_files: true
-    }
+export class Project {
+  /**
+  * Load a Skypager Project from a folder. defaults to process.env.PWD
+  *
+  * @param {String}   uri                 absolute path to a folder or skypager.js file
+  * @param {Object}   options             options for loading the project
+  * @param {String}   options.type        an optional type identifier for the project
+  * @param {Array}    options.plugins     an array of plugin names, or functions to enable
+  * @param {Object}   options.manifest    the package.json manifest data
+  * @param {Object}   options.autoLoad    an object specifying which content collections should be autoImported
+  * @param {Object}   options.hooks       an object with functions that will respond to life cycle hooks whenever emitted
+  * @param {Boolean}  options.autoImport  false to disable autoloading altogether
+  *
+  * @return {Project}
+  */
+  static load(uri = process.env.PWD, options = {}) {
+    return Skypager.load(uri, options)
   }
-}
 
-class Project {
+  /**
+  *
+  * @private
+  *
+  * Wrap a project folder.
+  *
+  * A Project folder SHOULD contain a package.json with a `skypager` property
+  * that contains an object.
+  *
+  * The `skypager` object on the manifest should contain:
+  *
+  * - main {String} a file that will get required and export the project.
+  *
+  * - plugins {Array} an array of the names of plugin packages.
+  *   will try to use skypager-plugin-*
+  *
+  * - provides {Array} an optional list tags for what the project contains
+  *     (e.g. ui:components, devtools, themes, website)
+  *
+  */
   constructor (uri, options = {}) {
     invariant(uri, 'uri must be provided')
 
     normalizeOptions(options)
 
     let project = this
+    let hide = project.hidden.bind(project)
+    let lazy = project.lazy.bind(project)
+    let emit = project.emit.bind(project)
 
-    project.uri = uri
-    project.root = dirname(uri)
-    project.type = options.type
+    hide('uri', uri)
+    hide('type', options.type)
 
-    project.hidden('options', () => options)
-
-    Object.defineProperty(project, 'manifest', {
-      enumerable: false,
-      value: options.manifest || {}
-    })
+    project.root = uri.match(/\.(js|json)$/)
+      ? dirname(uri)
+      : uri
 
     project.name = options.name || basename(project.root)
+    project.env = options.env
+
+    hide('options', () => options)
+    hide('manifest', options.manifest || {})
 
     // autobind hooks functions passed in as options
-    project.hidden('hooks', setupHooks.call(project, options.hooks))
-
-    project.hidden('paths', paths.bind(project))
-
-    project.env = options.env
+    hide('hooks', setupHooks.call(project, options.hooks))
+    hide('paths', paths.bind(project))
 
     logger(project, options)
 
-    project.hidden('registries', registries.call(project), false)
+    hide('registries', registries.call(project), false)
+    hide('_run', buildRunInterface.call(project), false)
 
-    const plugins = [ ]
-    util.hide.getter(project, 'enabledPlugins', () => plugins)
+    hide('enabledPlugins', [])
 
     if (options.plugins) {
       options.plugins.forEach(plugin => {
@@ -90,140 +102,135 @@ class Project {
       })
     }
 
-    project.emit('contentWillInitialize')
-    // wrap the content interface in a getter but make sure
-    // the documents collection is loaded and available right away
-
-    project.hidden('content', content.call(project))
-
-    project.emit('contentDidInitialize')
-
+    hide('content', content.call(project))
 
     if (options.autoImport !== false && options.autoLoad !== false) {
-      project.debug('running autoimport', options.autoLoad)
-
-      project.emit('projectWillAutoImport')
-
       runImporter.call(project, options.importer)
-
-      project.emit('projectDidAutoImport')
     }
 
-    if (project.settings.collections) {
-      defaults(
-        project.content,
-        mapValues(project.settings.collections, (cfg, name) => {
-          let assetClass = Assets[cfg.assetClass]
+    lazy('entities', () => {
+      emit('willBuildEntities')
+      project.entities = entities.call(project)
+      emit('didBuildEntities', project, project.entities)
 
-          if (!assetClass) {
-             throw(`Invalid Collection Definition in settings. Invalid assetClass key.
-                   Pick one of: ${  Object.keys(Assets).join(' ,') }`)
-          }
-
-          return new Collection({
-            root: cfg.root,
-            project,
-            assetClass,
-            name,
-            ...(pick(cfg,'exclude','include', 'autoLoad'))
-          })
-        })
-      )
-    }
-
-    util.hide.getter(project, 'supportedAssetExtensions', () => Assets.Asset.SupportedExtensions )
-
-    // lazy load / memoize the entity builder
-    Object.defineProperty(project, 'entities', {
-      configurable: true,
-      get: function () {
-        delete project.entities
-        project.emit('willBuildEntities')
-        project.entities = entities.call(project)
-        project.emit('didBuildEntities', project, project.entities)
-
-        project.debug('built entities', Object.keys(project.entities))
-
-        return project.entities
-      }
+      return project.entities
     })
 
-    util.hide.getter(project, 'modelDefinitions', modelDefinitions.bind(this))
-
+    hide('modelDefinitions', modelDefinitions.bind(this))
   }
 
+  /**
+  * Combine all of the project settings files into a single structure.
+  *
+  * The values for a projects settings will be specific to process.env.NODE_ENV
+  * if the settings file contains keys that match development, production, test etc.
+  *
+  * @return {Object}
+  */
+  get settings () {
+    return this.content.settings_files.query((s) => true).condense({
+      key: 'idpath',
+      prop: 'data'
+    })
+  }
+
+  /**
+  * Combine all of the project copy files into a single structure.
+  *
+  * Copy values will be specific to the current locale setting for a project.
+  *
+  * @return {Object}
+  */
+  get copy () {
+    return this.content.copy_files.query((s) => true).condense({
+      key: 'idpath',
+      prop: 'data'
+    })
+  }
+
+  /**
+  * Returns the current locale for the project. This value gets used
+  * when building the copy system
+  */
+  get locale() {
+    return this.get('settings.app.locale') || 'en'
+  }
+
+  /**
+  * Trigger a project lifecycle hook.
+  *
+  * @param {String} name the name of the life cycle hook
+  */
   emit(name, ...args) {
     let project = this
     let fn = project.hooks[name] || project[name]
-    if (fn) { fn.call(project, ...args) }
+    if (typeof fn === 'function') { fn.call(project, ...args) }
   }
 
+  /**
+  * Get an arbitrary value from the project using the lodash result utility.
+  *
+  * @example
+  *
+  *   project.get('docs.all[0].paths.absolute')
+  */
   get (...args) {
     return util.result(this, ...args)
   }
 
+  /**
+  * Returns an instance of the project's vaule. This is a data store which
+  * can be used to store keys and credentials that should not be exposed to the
+  * outside, via an exporter, when publishing the project, etc.
+  */
   get vault() {
     return vault(this)
   }
 
   /**
-   * A proxy object that lets you run one of the project helpers.
-   *
-   * @example
-   *
-   * project.run.importer('disk')
-   * project.run.action('snapshots/save', '/path/to/snapshot.json')
-   *
-   */
+  * Provides a nicer language like interface around looking up and running
+  * one of the project's helpers (e.g. actions, exporters, importers, etc.)
+  *
+  * @example
+  *
+  *   project.run.importer('disk')
+  *   project.run.action('snapshots/save', '/path/to/snapshot.json')
+  *
+  */
   get run() {
-    let project = this
-
-    return {
-      action (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.actions.run(helperId, options, context)
-      },
-
-      importer (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.importers.run(helperId, options, context)
-      },
-
-      exporter (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.exporters.run(helperId, options, context)
-      },
-
-      plugin (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.plugins.run(helperId, options, context)
-      },
-
-      model (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.models.run(helperId, options, context)
-      },
-
-      renderer (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.renderers.run(helperId, options, context)
-      },
-
-      view (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.views.run(helperId, options, context)
-      }
-
-    }
+    return this._run
   }
 
+  /**
+  * Find a single object in the project using the query mechanism.
+  * Accepts any argument that project.query accepts.
+  *
+  * @param {String} source where to start the search.
+  *   Any content collection or model name is valid.
+  *
+  * @param {Object, Function} params either attributes to match, or a predicate function
+  */
   findBy(source, params) {
     params.limit = 1
     return this.query(source, params)[0]
   }
 
+  get querySources() {
+    return Object.keys(this.content)
+      .concat(
+        Object.keys(this.entities || {})
+      ).concat([
+        'docs', 'data', 'datasources'
+      ])
+  }
+
   query (source, params) {
     source = `${ source }`.toLowerCase()
+
+    invariant(
+       this.querySources.indexOf(source) >= 0,
+       'Must supply a valid source to query from: ' + this.querySources.join(', ')
+    )
 
     if (source === 'docs' || source === 'documents') {
       return this.docs.query(params)
@@ -245,16 +252,26 @@ class Project {
     }
   }
 
+  /**
+  * Run a query against the project helper registries.
+  *
+  * @param {String} source which registry to run your query against
+  * @param {Object, Function} params the search criteria
+  *
+  * @return {Helper}
+  */
   queryHelpers(source, params) {
      return this.registries[source].query(params)
   }
 
+  /**
+  * Returns a manifest of all of the project's assets.
+  */
   get assetManifest () {
-    return this.exporters.run('asset_manifest', {
+    return this.exporters.run('assets', {
       project: this
     })
   }
-
 
   /**
    * Returns an array of all of this project's content collections.
@@ -263,34 +280,55 @@ class Project {
     return util.values(this.content)
   }
 
+  /**
+  * Returns an array of every asset in the project
+  *
+  * @return {Array}
+  */
   get allAssets () {
     return util.flatten(this.collections.map(c => c.all))
   }
 
+  /**
+  * Returns an array of relative paths for every asset in the project.
+  *
+  * @return {Array}
+  */
   get assetPaths (){
     return this.allAssets.map(a => a.paths.project)
   }
 
+  /**
+  * Iterate over every asset in the project.
+  */
   eachAsset (...args) {
      return this.allAssets.forEach(...args)
   }
 
+  /**
+  * Run a reducer function against every asset in the project.
+  *
+  */
   reduceAssets(...args) {
      return this.allAssets.reduce(...args)
   }
 
+  /**
+  * Convenience method for running Array.map for every asset.
+  */
   mapAssets(...args) {
      return this.allAssets.map(...args)
   }
 
+  /**
+  * Convenience method for running Array.filter for every asset in the project.
+  */
   filterAssets(...args) {
      return this.allAssets.filter(...args)
   }
 
   /**
   * Access a document by the document id short hand
-  *
-  * Documents are the most important part of a Skypager project, so make it easy to access them
   *
   */
    at (documentId) {
@@ -405,10 +443,6 @@ class Project {
     return this.content.vectors
   }
 
-  get collections () {
-    return util.values(this.content)
-  }
-
   get actions () {
     return this.registries.actions
   }
@@ -451,21 +485,6 @@ class Project {
     )
   }
 
-  get settings () {
-    return this.content.settings_files.query((s) => true).condense({
-      key: 'idpath',
-      prop: 'data'
-    })
-  }
-
-  get copy () {
-    return this.content.copy_files.query((s) => true).condense({
-      key: 'idpath',
-      prop: 'data'
-    })
-  }
-
-
   streamFile(path, type = 'readable', mode) {
     let fd = require('fs').openSync(path, 'a+')
     let stream
@@ -491,7 +510,7 @@ class Project {
 
   exists(...args) {
     try {
-      return require('path-exists').sync(
+      return pathExists.sync(
         this.path(...args)
       )
     } catch(error) {
@@ -519,7 +538,7 @@ class Project {
   }
 }
 
-module.exports = Project
+export default Project
 
 function paths () {
   let project = this
@@ -699,3 +718,71 @@ function normalizeOptions (options = {}) {
 
   return defaults(options, DefaultOptions)
 }
+
+function buildRunInterface() {
+     let project = this
+
+    return {
+      action (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.actions.run(helperId, options, context)
+      },
+
+      importer (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.importers.run(helperId, options, context)
+      },
+
+      exporter (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.exporters.run(helperId, options, context)
+      },
+
+      plugin (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.plugins.run(helperId, options, context)
+      },
+
+      model (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.models.run(helperId, options, context)
+      },
+
+      renderer (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.renderers.run(helperId, options, context)
+      },
+
+      view (helperId, options = {}, context = {}) {
+        context.project = context.project || options.project || project
+        return project.views.run(helperId, options, context)
+      }
+    }
+
+}
+
+const HOOKS = [
+  'contentWillInitialize',
+  'contentDidInitialize',
+  'projectWillAutoImport',
+  'projectDidAutoImport',
+  'willBuildEntities',
+  'didBuildEntities',
+  'registriesDidLoad'
+]
+
+const DefaultOptions = {
+  type: 'project',
+  env: process.env.NODE_ENV || 'development',
+  importer: {
+    type: 'disk',
+    autoLoad: {
+      documents: true,
+      data_sources: true,
+      settings_files: true,
+      copy_files: true
+    }
+  }
+}
+
+

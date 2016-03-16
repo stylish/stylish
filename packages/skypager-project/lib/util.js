@@ -483,15 +483,22 @@ function pathExists(fp) {
   }
 }
 
-function loadProjectFromDirectory(directory, skypagerProject) {
+function loadProjectFromDirectory(directory, framework) {
   var exists = pathExists;
   var path = require('path');
 
   global.$skypager = global.$skypager || {};
 
   try {
-    skypagerProject = skypagerProject || $skypager && $skypager['skypager-project'] && require($skypager['skypager-project']);
-    skypagerProject = skypagerProject || require('skypager-project');
+    if ($skypager['skypager-project']) {
+      framework = require($skypager['skypager-project']);
+    } else if ($skypager.project) {
+      framework = require($skypager.project);
+    } else if (process.env.SKYPAGER_PROJECT_ROOT) {
+      framework = require(process.env.SKYPAGER_PROJECT_ROOT);
+    } else {
+      framework = require('./index');
+    }
   } catch (error) {
     console.log('There was an error attempting to load the ' + 'skypager-project'.magenta + ' package.');
     console.log('Usually this means it is not installed or can not be found relative to the current directory');

@@ -372,10 +372,6 @@ class Builder {
     let root = options.root || host.root
     let c = this.cache[host.root] = this.cache[host.root] || { }
 
-    invariant(root, 'root should exist')
-    invariant(c, 'cache should exist')
-    invariant(helpers, 'helpers should exist')
-
     Object.keys(helpers).filter(type => type !== 'default').forEach(type => {
       let name = util.tabelize(type)
 

@@ -124,6 +124,7 @@ var Document = exports.Document = (function (_Asset) {
         entity = this.modelClass.run({ document: this, asset: this }, { project: this.project });
       } catch (error) {
         console.log('Error building entity from document: ' + this.id + ': ' + error.message);
+        console.log(error.stack);
       }
 
       return this.modelClass.entities[this.id] = (0, _assign2.default)({}, entity, {

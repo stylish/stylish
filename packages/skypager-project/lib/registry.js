@@ -497,10 +497,6 @@ var Builder = (function () {
       var root = options.root || host.root;
       var c = this.cache[host.root] = this.cache[host.root] || {};
 
-      invariant(root, 'root should exist');
-      invariant(c, 'cache should exist');
-      invariant(helpers, 'helpers should exist');
-
       (0, _keys2.default)(helpers).filter(function (type) {
         return type !== 'default';
       }).forEach(function (type) {
