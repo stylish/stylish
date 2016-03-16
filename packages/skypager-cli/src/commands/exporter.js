@@ -39,10 +39,11 @@ export function handle (exporterId, options = {}, context = {}) {
     options.watch = false
 
     let onChange = () => {
+      console.log('change detected. re-exporting')
       actuallyHandle(exporterId, options, context)
     }
 
-    watcher.on('change', debounce(onChange, 300))
+    watcher.on('change', onChange)
   }
 }
 

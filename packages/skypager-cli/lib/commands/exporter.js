@@ -58,10 +58,11 @@ function handle(exporterId) {
     options.watch = false;
 
     var onChange = function onChange() {
+      console.log('change detected. re-exporting');
       actuallyHandle(exporterId, options, context);
     };
 
-    watcher.on('change', (0, _debounce2.default)(onChange, 300));
+    watcher.on('change', onChange);
   }
 }
 
