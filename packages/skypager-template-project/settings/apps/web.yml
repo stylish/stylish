@@ -8,7 +8,7 @@ theme: dashboard-dark
 platform: web
 
 # see docs.skypager.io/base-web-applications/screen-definitions
-layout: FluidLayout
+layout: Web
 
 screens:
   index: Home
