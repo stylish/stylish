@@ -86,7 +86,7 @@ export function ProjectExporter (options = {}, callback) {
 
   if (options.runIncluded !== false) {
     IncludeExporters.forEach(exporter =>
-      runAndSave(project, exporter, options)
+      runAndSave(project, exporter)
     )
   }
 
@@ -129,10 +129,10 @@ export function ProjectExporter (options = {}, callback) {
 
 export default BrowserBundle
 
-function runAndSave(project, exporter, options) {
+function runAndSave(project, exporter) {
   write (
     project.path('build', 'bundle', `${ exporter }-export.json`),
-    JSON.stringify(project.run.exporter(exporter, options))
+    JSON.stringify(project.run.exporter(exporter))
   )
 }
 

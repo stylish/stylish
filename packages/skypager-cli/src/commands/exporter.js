@@ -67,6 +67,11 @@ function actuallyHandle (exporterId, options = {}, context = {}) {
 
   let payload = project.run.exporter(exporterId, params)
 
+  if (!payload) {
+    console.log('Exporter generated null payload'.red)
+    process.exit(1)
+  }
+
   let output
 
   if (options.format === 'json' && options.pretty) {
