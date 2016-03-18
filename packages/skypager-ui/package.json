@@ -1,6 +1,6 @@
 {
   "name": "skypager-ui",
-  "version": "2.21.0",
+  "version": "2.22.0",
   "description": "ui components for skypager react applications, written es6 built with react, redux, react-router, and react-bootstrap",
   "main": "index.js",
   "dependencies": {
