@@ -7,9 +7,10 @@ cli(function (program, dispatch){
 
   program
     .command('each <group>')
-    .description('')
-    .option('--group <group>', 'which group of module do you want to loop over? project or package', 'package')
-    .option('--command <command>', 'which command to run in this package directory')
+    .description('run commands in each project')
+    .option('--group <group>', 'which type of folders do you want to loop over? projects or packages', 'package')
+    .option('--command <command>', 'run a shell command for each of the matching packages')
+    .option('--run <script>', 'run an npm script for each of the matching packages')
     .option('--exclude <list>','exclude a comma separated list of package names')
     .option('--include <list>','include a comma separated list of package names')
     .action(dispatch(action.api.runner))
@@ -17,15 +18,33 @@ cli(function (program, dispatch){
   return program
 })
 
-execute(function(group, params, context) {
+execute(function(group, params = {}, context = {}) {
+
+  if (!params || !context) {
+    console.log(group, params, context)
+    throw('missing params and context')
+  }
+
+  var project = context.project || params.project || this
+
   group = group || params.group
   params.group = group
 
-  var project = context.project
   var shell = require('shelljs')
 
+  if (params.run) {
+    params.command = "npm run " + params.run
+  }
+
+  var requested = params.command || ""
   var args = params.command.split(' ')
   var cmd = args.shift()
+
+  if (!cmd) {
+    console.log('Must supply a command via the --command or --run flags.'.red)
+    process.exit(1)
+  }
+
   var dirname = require('path').dirname
   var pull = require('lodash/pull')
 

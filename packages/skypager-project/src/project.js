@@ -761,43 +761,32 @@ function buildCustomCollections(project, config) {
   })
 }
 function buildRunInterface() {
-     let project = this
+    let project = this
 
     return {
-      action (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.actions.run(helperId, options, context)
+      action (helperId, ...args) {
+        return project.actions.run(helperId, ...args)
       },
 
-      importer (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.importers.run(helperId, options, context)
+      importer (helperId, ...args) {
+        return project.importers.run(helperId, ...args)
       },
 
-      exporter (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.exporters.run(helperId, options, context)
+      exporter (helperId, ...args) {
+        return project.exporters.run(helperId, ...args)
       },
 
-      plugin (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.plugins.run(helperId, options, context)
+      model (helperId, ...args) {
+        return project.models.run(helperId, ...args)
       },
 
-      model (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.models.run(helperId, options, context)
+      plugin (helperId, ...args) {
+        return project.plugins.run(helperId, ...args)
       },
 
-      renderer (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.renderers.run(helperId, options, context)
+      renderer (helperId, ...args) {
+        return project.renderers.run(helperId, ...args)
       },
-
-      view (helperId, options = {}, context = {}) {
-        context.project = context.project || options.project || project
-        return project.views.run(helperId, options, context)
-      }
     }
 
 }

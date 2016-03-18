@@ -12,9 +12,13 @@ var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
 
-var _assign = require('babel-runtime/core-js/object/assign');
+var _defineEnumerableProperties2 = require('babel-runtime/helpers/defineEnumerableProperties');
 
-var _assign2 = _interopRequireDefault(_assign);
+var _defineEnumerableProperties3 = _interopRequireDefault(_defineEnumerableProperties2);
+
+var _assign2 = require('babel-runtime/core-js/object/assign');
+
+var _assign3 = _interopRequireDefault(_assign2);
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -64,19 +68,33 @@ var _set = require('lodash/set');
 
 var _set2 = _interopRequireDefault(_set);
 
+var _isFunction = require('lodash/isFunction');
+
+var _isFunction2 = _interopRequireDefault(_isFunction);
+
+var _isObject = require('lodash/isObject');
+
+var _isObject2 = _interopRequireDefault(_isObject);
+
+var _isEmpty = require('lodash/isEmpty');
+
+var _isEmpty2 = _interopRequireDefault(_isEmpty);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var carve = _set2.default; /**
-                            * The Skypager.Collection is a wrapper around local file folders
-                            * which is responsible for assigning different types of Asset Classes
-                            * to handle different types of source files in the project, which are used to parse,
-                            * index, and transform these files so that they can be manipulated programmatically
-                            * loaded into a collection, they can easily be searched, queried, aggregated, related,
-                            * or whatever.
-                            *
-                            * Collections work through simple file extensions and folder naming conventions,
-                            * however they can be configured to use different patterns and paths to suit your liking.
-                            */
+/**
+ * The Skypager.Collection is a wrapper around local file folders
+ * which is responsible for assigning different types of Asset Classes
+ * to handle different types of source files in the project, which are used to parse,
+ * index, and transform these files so that they can be manipulated programmatically
+ * loaded into a collection, they can easily be searched, queried, aggregated, related,
+ * or whatever.
+ *
+ * Collections work through simple file extensions and folder naming conventions,
+ * however they can be configured to use different patterns and paths to suit your liking.
+ */
+
+var carve = _set2.default;
 
 var Collection = (function () {
 
@@ -123,7 +141,7 @@ var Collection = (function () {
       return assetClass;
     });
 
-    (0, _assign2.default)(this, (0, _pick2.default)(options, 'include', 'exclude', 'name', 'autoLoad'));
+    (0, _assign3.default)(this, (0, _pick2.default)(options, 'include', 'exclude', 'name', 'autoLoad'));
 
     var assets = {};
     var index = {};
@@ -152,17 +170,56 @@ var Collection = (function () {
   }
 
   /**
-   * Find assets which match the passed conditions.
+   * Define a named query pattern for this collection.
    *
-   * @param {Object,Function} params key/value pairs of attributes to match,
-   *  or a function which returns true for a match
+   * @param {String}
    *
+   * @example
+   *
+   *    project.docs.scope('drafts', {status: 'draft'})
+   *    project.docs.drafts
    */
 
   (0, _createClass3.default)(Collection, [{
+    key: 'scope',
+    value: function scope(scopeName, queryParams) {
+      var _assign, _mutatorMap;
+
+      var collection = this;
+
+      if (collection.hasOwnProperty(scopeName)) {
+        return collection;
+      }
+
+      if (typeof queryParams === 'function') {
+        queryParams = attempt(queryParams);
+      }
+
+      assign(collection, (_assign = {}, _mutatorMap = {}, _mutatorMap[scopeName] = _mutatorMap[scopeName] || {}, _mutatorMap[scopeName].get = function () {
+        try {
+          return collection.where(queryParams || {});
+        } catch (error) {
+          return [error.message];
+        }
+      }, (0, _defineEnumerableProperties3.default)(_assign, _mutatorMap), _assign));
+
+      return collection;
+    }
+
+    /**
+     * Find assets which match the passed conditions.
+     *
+     * @param {Object,Function} params key/value pairs of attributes to match,
+     *  or a function which returns true for a match
+     *
+     */
+
+  }, {
     key: 'where',
-    value: function where(params) {
-      return wrapCollection(this, (0, _util.filterQuery)(this.all, params));
+    value: function where() {
+      var params = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      return wrapCollection(this, (0, _util.filterQuery)(this.all, params || {}));
     }
 
     /**
@@ -172,8 +229,10 @@ var Collection = (function () {
 
   }, {
     key: 'query',
-    value: function query(params) {
-      return this.where(params);
+    value: function query() {
+      var params = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      return this.where(params || {});
     }
 
     /**
@@ -546,7 +605,7 @@ var Collection = (function () {
     key: 'indexes',
     get: function get() {
       return this.filter(function (asset) {
-        return asset.isIndex();
+        return asset.isIndex;
       });
     }
 
@@ -713,6 +772,20 @@ function wrapCollection(collection, array) {
     }
   });
 
+  defineProperty(array, 'first', {
+    enumerable: false,
+    get: function get() {
+      return array[0];
+    }
+  });
+
+  defineProperty(array, 'last', {
+    enumerable: false,
+    get: function get() {
+      return array[array.length - 1];
+    }
+  });
+
   defineProperty(array, 'mapPick', {
     enumerable: false,
     value: function value() {
@@ -744,3 +817,11 @@ var _Object = Object;
 var assign = _Object.assign;
 var keys = _Object.keys;
 var defineProperty = _Object.defineProperty;
+
+function attempt(fn, onError) {
+  try {
+    return fn();
+  } catch (error) {
+    return typeof onError === 'function' ? onError(error) : false;
+  }
+}

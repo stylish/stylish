@@ -1,6 +1,6 @@
 {
   "name": "skypager",
-  "version": "2.21.0",
+  "version": "2.22.0",
   "description": "skypager is a framework for managing a portfolio of applications, modules, and components. Skypager makes working with react, babel, webpack and other ecosystems a breeze.",
   "skypager": {
     "main": "skypager.js",
@@ -42,6 +42,7 @@
   "scripts": {
     "start": "skypager serve web",
     "test": "skypager each package --command 'npm run test'",
+    "compile": "skypager each package --command 'npm run compile",
     "prerelease": "skypager each package --command 'npm run test' && skypager each package --command 'npm run compile' && git add -A && npm version patch",
     "release": "git push origin master && lerna publish || true",
     "postrelease": "npm publish"

@@ -25,7 +25,7 @@ var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
 
-var _jsxFileName = 'src/entries/Home/index.js';
+var _jsxFileName = 'src/entries/EmptyPage/index.js';
 
 var _react = require('react');
 
@@ -98,26 +98,19 @@ var Home = exports.Home = (function (_Component) {
               lineNumber: 33
             }
           },
-          _react2.default.createElement(
-            _Block2.default,
-            { inverse: true, title: hero.title, text: hero.text, __source: {
-                fileName: _jsxFileName,
-                lineNumber: 34
-              }
-            },
-            _react2.default.createElement(
-              _reactRouter.Link,
-              { className: 'btn btn-primary btn-lg btn-pill', to: 'application-shells', __source: {
-                  fileName: _jsxFileName,
-                  lineNumber: 35
-                }
-              },
-              'View Docs'
-            )
-          ),
+          _react2.default.createElement(_CodeHighlighter2.default, { theme: 'hybrid', code: install, language: 'bash', __source: {
+              fileName: _jsxFileName,
+              lineNumber: 34
+            }
+          }),
+          _react2.default.createElement(_CodeHighlighter2.default, { theme: 'hybrid', code: code, language: 'es6', __source: {
+              fileName: _jsxFileName,
+              lineNumber: 35
+            }
+          }),
           _react2.default.createElement(_FeatureList2.default, { ref: 'features', spacer: 'm-b-md', features: features, __source: {
               fileName: _jsxFileName,
-              lineNumber: 37
+              lineNumber: 36
             }
           })
         )

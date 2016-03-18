@@ -97,9 +97,11 @@ function actuallyHandle(exporterId) {
     output = (0, _stringify2.default)(payload);
   } else if (options.format === 'yaml') {
     output = yaml.dump(payload);
+  } else {
+    output = (0, _stringify2.default)(payload, null, 2);
   }
 
-  if (options.output) {
+  if (output && options.output) {
     var outputPath = (0, _path.resolve)((0, _path.normalize)(options.output));
     (0, _fs.writeFileSync)(outputPath, output.toString(), 'utf8');
   } else if (options.stdout) {

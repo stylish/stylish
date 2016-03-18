@@ -105,6 +105,14 @@ function launchServer(preset) {
   options.devpack_api = 'v2';
   options = (0, _assign2.default)(options, opts);
 
+  if (!options.noBundle || options.bundle === false) {
+    try {
+      project.run.exporter('bundle', {});
+    } catch (error) {
+      console.log('Error running bundle exporter');
+    }
+  }
+
   devpack.webpack('develop', options, { beforeCompile: beforeCompile, onCompile: onCompile });
 }
 

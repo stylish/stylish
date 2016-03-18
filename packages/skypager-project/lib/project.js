@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Project = undefined;
 
+var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
 var _defineEnumerableProperties2 = require('babel-runtime/helpers/defineEnumerableProperties');
 
 var _defineEnumerableProperties3 = _interopRequireDefault(_defineEnumerableProperties2);
@@ -1004,53 +1008,58 @@ function buildRunInterface() {
 
   return {
     action: function action(helperId) {
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var _project$actions;
 
-      context.project = context.project || options.project || project;
-      return project.actions.run(helperId, options, context);
+      for (var _len7 = arguments.length, args = Array(_len7 > 1 ? _len7 - 1 : 0), _key7 = 1; _key7 < _len7; _key7++) {
+        args[_key7 - 1] = arguments[_key7];
+      }
+
+      return (_project$actions = project.actions).run.apply(_project$actions, [helperId].concat((0, _toConsumableArray3.default)(args)));
     },
     importer: function importer(helperId) {
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var _project$importers;
 
-      context.project = context.project || options.project || project;
-      return project.importers.run(helperId, options, context);
+      for (var _len8 = arguments.length, args = Array(_len8 > 1 ? _len8 - 1 : 0), _key8 = 1; _key8 < _len8; _key8++) {
+        args[_key8 - 1] = arguments[_key8];
+      }
+
+      return (_project$importers = project.importers).run.apply(_project$importers, [helperId].concat((0, _toConsumableArray3.default)(args)));
     },
     exporter: function exporter(helperId) {
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var _project$exporters;
 
-      context.project = context.project || options.project || project;
-      return project.exporters.run(helperId, options, context);
-    },
-    plugin: function plugin(helperId) {
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      for (var _len9 = arguments.length, args = Array(_len9 > 1 ? _len9 - 1 : 0), _key9 = 1; _key9 < _len9; _key9++) {
+        args[_key9 - 1] = arguments[_key9];
+      }
 
-      context.project = context.project || options.project || project;
-      return project.plugins.run(helperId, options, context);
+      return (_project$exporters = project.exporters).run.apply(_project$exporters, [helperId].concat((0, _toConsumableArray3.default)(args)));
     },
     model: function model(helperId) {
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var _project$models;
 
-      context.project = context.project || options.project || project;
-      return project.models.run(helperId, options, context);
+      for (var _len10 = arguments.length, args = Array(_len10 > 1 ? _len10 - 1 : 0), _key10 = 1; _key10 < _len10; _key10++) {
+        args[_key10 - 1] = arguments[_key10];
+      }
+
+      return (_project$models = project.models).run.apply(_project$models, [helperId].concat((0, _toConsumableArray3.default)(args)));
+    },
+    plugin: function plugin(helperId) {
+      var _project$plugins;
+
+      for (var _len11 = arguments.length, args = Array(_len11 > 1 ? _len11 - 1 : 0), _key11 = 1; _key11 < _len11; _key11++) {
+        args[_key11 - 1] = arguments[_key11];
+      }
+
+      return (_project$plugins = project.plugins).run.apply(_project$plugins, [helperId].concat((0, _toConsumableArray3.default)(args)));
     },
     renderer: function renderer(helperId) {
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var _project$renderers;
 
-      context.project = context.project || options.project || project;
-      return project.renderers.run(helperId, options, context);
-    },
-    view: function view(helperId) {
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      for (var _len12 = arguments.length, args = Array(_len12 > 1 ? _len12 - 1 : 0), _key12 = 1; _key12 < _len12; _key12++) {
+        args[_key12 - 1] = arguments[_key12];
+      }
 
-      context.project = context.project || options.project || project;
-      return project.views.run(helperId, options, context);
+      return (_project$renderers = project.renderers).run.apply(_project$renderers, [helperId].concat((0, _toConsumableArray3.default)(args)));
     }
   };
 }

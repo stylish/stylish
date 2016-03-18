@@ -86,16 +86,20 @@ class Registry {
    * @param {Helper.id} helperId
    * @param {Whatever} ...args
   */
-  run (helperId, options = {}, context = {}) {
-    if ( helperId === 'loader' ) {
-      return this.runLoader(options, context)
-    }
+  run (helperId, ...args) {
+    let context = { }
 
     if (this.host.type === 'project') {
-      context.project = context.project || this.host
+      context.project = {project: this.host}
     }
 
-    return this.lookup(helperId).run(options, context)
+    args.push(context)
+
+    if ( helperId === 'loader' ) {
+      return this.runLoader(...args)
+    }
+
+    return this.lookup(helperId).run(...args)
   }
 
   /**

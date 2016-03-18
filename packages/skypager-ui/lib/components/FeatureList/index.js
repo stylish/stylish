@@ -84,7 +84,7 @@ var FeatureList = exports.FeatureList = (function (_Component) {
         {
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 71
+            lineNumber: 76
           }
         },
         _react2.default.createElement(
@@ -92,7 +92,7 @@ var FeatureList = exports.FeatureList = (function (_Component) {
           {
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 72
+              lineNumber: 77
             }
           },
           this.lists.map(function (list, key) {
@@ -100,7 +100,7 @@ var FeatureList = exports.FeatureList = (function (_Component) {
               _Col2.default,
               { key: key, xs: xs, md: md, __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 75
+                  lineNumber: 80
                 }
               },
               list
@@ -119,6 +119,7 @@ var FeatureList = exports.FeatureList = (function (_Component) {
       var columns = _props.columns;
       var features = _props.features;
       var spacer = _props.spacer;
+      var tileBody = _props.tileBody;
 
       var classes = (0, _classnames2.default)({
         'featured-list': true,
@@ -132,13 +133,15 @@ var FeatureList = exports.FeatureList = (function (_Component) {
           'ul',
           { key: i, className: classes, __source: {
               fileName: _jsxFileName,
-              lineNumber: 59
+              lineNumber: 63
             }
           },
-          groups.map(function (items, pos) {
-            return _react2.default.createElement(FeatureTile, { item: items[i], key: pos, pos: pos, spacer: spacer, __source: {
+          groups.filter(function (items) {
+            return items && items[i];
+          }).map(function (items, pos) {
+            return _react2.default.createElement(FeatureTile, { tileBody: tileBody, item: items[i], key: pos, spacer: spacer, __source: {
                 fileName: _jsxFileName,
-                lineNumber: 60
+                lineNumber: 64
               }
             });
           })
@@ -168,7 +171,10 @@ FeatureList.propTypes = {
     title: _react.PropTypes.string.isRequired,
     /** a brief summary of the feature and why it matters */
     text: _react.PropTypes.string.isRequired
-  })).isRequired
+  })).isRequired,
+
+  /** a stateless component function for displaying additional content underneath the feature text */
+  tileBody: _react.PropTypes.func
 };
 FeatureList.defaultProps = {
   columns: 2,
@@ -178,27 +184,28 @@ FeatureList.defaultProps = {
 exports.default = FeatureList;
 
 function FeatureTile(_ref) {
-  var pos = _ref.pos;
+  var key = _ref.key;
   var spacer = _ref.spacer;
   var item = _ref.item;
+  var tileBody = _ref.tileBody;
 
   return _react2.default.createElement(
     'li',
-    { key: pos, className: spacer, __source: {
+    { key: key, className: spacer, __source: {
         fileName: _jsxFileName,
-        lineNumber: 90
+        lineNumber: 95
       }
     },
     _react2.default.createElement(
       'div',
       { className: 'featured-list-icon', __source: {
           fileName: _jsxFileName,
-          lineNumber: 91
+          lineNumber: 96
         }
       },
       _react2.default.createElement('span', { className: 'icon icon-' + item.icon, __source: {
           fileName: _jsxFileName,
-          lineNumber: 92
+          lineNumber: 97
         }
       })
     ),
@@ -207,7 +214,7 @@ function FeatureTile(_ref) {
       {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 94
+          lineNumber: 99
         }
       },
       item.title
@@ -217,10 +224,11 @@ function FeatureTile(_ref) {
       {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 95
+          lineNumber: 100
         }
       },
       item.text
-    )
+    ),
+    tileBody ? tileBody(item) : undefined
   );
 }

@@ -207,6 +207,12 @@ module.exports = function () {
     exclude: [excludeNodeModulesExceptSkypagers],
     loader: isDev ? 'style-loader!css-loader!less-loader' : ExtractTextPlugin.extract('style-loader', 'css-loader?sourceMap!less')
 
+  }).loader('css', {
+    test: /\.css$/,
+    loader: 'style!css!postcss'
+  }).loader('css-2', {
+    test: /\.mod\.css$/,
+    loader: 'style!css?modules!postcss'
   }).loader('less', {
     test: /\.less$/,
     include: [join(directory, 'src'), join(uiModuleRoot, 'src')],

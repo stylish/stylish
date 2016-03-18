@@ -265,6 +265,7 @@ var ActionDefinition = exports.ActionDefinition = (function () {
               var _action$api2;
 
               var r = (_action$api2 = action.api).execute.apply(_action$api2, (0, _toConsumableArray3.default)(args));
+
               if (r) {
                 report.success = true;
                 report.result = r;
@@ -272,6 +273,7 @@ var ActionDefinition = exports.ActionDefinition = (function () {
               return r;
             } catch (err) {
               report.errors.push('fatal error:' + err.message);
+              report.errors.push(err.stack);
             }
           }, localHelpers).apply(undefined, (0, _toConsumableArray3.default)(args));
 

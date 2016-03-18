@@ -48,6 +48,14 @@ var _get = require('lodash/get');
 
 var _get2 = _interopRequireDefault(_get);
 
+var _result = require('lodash/result');
+
+var _result2 = _interopRequireDefault(_result);
+
+var _invariant = require('invariant');
+
+var _invariant2 = _interopRequireDefault(_invariant);
+
 var _defaults = require('./defaults');
 
 var _defaults2 = _interopRequireDefault(_defaults);
@@ -72,12 +80,16 @@ var cache = {
 module.exports = (function () {
   (0, _createClass3.default)(BundleWrapper, null, [{
     key: 'create',
-    value: function create() {
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
+    value: function create(rawBundle) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-      return new (Function.prototype.bind.apply(BundleWrapper, [null].concat(args)))();
+      (0, _invariant2.default)(rawBundle, 'Must pass a bundle object. By default this will be available by requiring dist/bundle');
+      (0, _invariant2.default)(rawBundle.entities, 'The bundle must include data about the projects entities');
+      (0, _invariant2.default)(rawBundle.content, 'The bundle must include the content collections export from the project');
+      (0, _invariant2.default)(rawBundle.copy, 'The bundle must include the copy export from the project');
+      (0, _invariant2.default)(rawBundle.settings, 'The bundle must include the settings export from the project');
+
+      return new BundleWrapper(rawBundle, options);
     }
   }]);
 
@@ -89,40 +101,35 @@ module.exports = (function () {
     (0, _defaultsDeep2.default)(cache.contexts, (0, _extends3.default)({}, bundle.requireContexts));
 
     hide(this, {
-      bundle: bundle
+      entities: (0, _mapValues2.default)(bundle.entities, function (v) {
+        return addQuerySugar(v);
+      }),
+      content: (0, _mapValues2.default)(bundle.content, function (v) {
+        return addQuerySugar(v);
+      })
     });
+
+    var _settings = bundle.settings;
+    var currentApp = _settings.app.current || _settings.app.available[0] || default_settings.app.current || 'web';
+
+    this.settings = _settings.apps[currentApp] || default_settings.apps[currentApp] || default_settings.apps.web;
+    this.copy = bundle.copy && bundle.copy[currentApp] ? bundle.copy[currentApp] : bundle.copy;
 
     if (options.api) {
       assign(this, options.api);
     }
-
-    var content = bundle.content || {};
-    var contentCollections = keys(content);
-
-    this.project = bundle.project;
-    this.entities = bundle.entities;
-    this.content = bundle.content;
-    this.models = bundle.models;
-
-    var settings = bundle.settings;
-    var currentApp = settings.app.current || settings.app.available[0] || default_settings.app.current || 'web';
-    var app = settings.apps[currentApp] || default_settings.apps[currentApp] || default_settings.apps.web;
-
-    this.settings = app;
-
-    this.copy = bundle.copy && bundle.copy[currentApp] ? bundle.copy[currentApp] : bundle.copy;
-
-    //this.assetsContent = this.content.assets
-    this.docs = addQuerySugar(this.content.documents);
-    this.data = addQuerySugar(this.content.data_sources);
-    this.scripts = addQuerySugar(this.content.scripts);
-
-    if (options.subscribe) {
-      this.setupSubscription(options.subscribe);
-    }
   }
 
   (0, _createClass3.default)(BundleWrapper, [{
+    key: 'get',
+    value: function get() {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return _result2.default.apply(undefined, [this].concat(args));
+    }
+  }, {
     key: 'buildApp',
     value: function buildApp() {
       var props = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -142,18 +149,13 @@ module.exports = (function () {
     value: function query(source, params) {
       source = ('' + source).toLowerCase();
 
-      if (this.entityNames.indexOf(source) > 0) {
-        return filterQuery(values(this.entities[source]), params);
+      if (this.entities[source]) {
+        return _query(values(this.entities[source]), params);
+      } else if (this.content[source]) {
+        return _query(values(this.content[source]), params);
       }
-    }
 
-    // subscribe to a notifications channel which will push updates
-    // whenever the bundle changes
-
-  }, {
-    key: 'setupSubscription',
-    value: function setupSubscription() {
-      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+      return [];
     }
   }, {
     key: 'findComponentHandler',
@@ -161,13 +163,6 @@ module.exports = (function () {
       var scripts = this.scripts || {};
 
       return scripts['components/' + assetId] || scripts['components/' + assetId + '/index'];
-    }
-  }, {
-    key: 'findLayoutHandler',
-    value: function findLayoutHandler(assetId) {
-      var scripts = this.scripts || {};
-
-      return scripts['layouts/' + assetId] || scripts['layouts/' + assetId + '/index'] || scripts['components/' + assetId] || scripts['components/' + assetId + '/index'];
     }
   }, {
     key: 'findLayoutHandler',
@@ -301,12 +296,28 @@ module.exports = (function () {
     key: 'buildLayout',
     value: function buildLayout(props) {
       props.layout = this.settings.layout;
+
       return props;
+    }
+  }, {
+    key: 'docs',
+    get: function get() {
+      return this.content.documents;
+    }
+  }, {
+    key: 'data',
+    get: function get() {
+      return this.content.data_sources;
+    }
+  }, {
+    key: 'scripts',
+    get: function get() {
+      return this.content.scripts;
     }
   }, {
     key: 'entityNames',
     get: function get() {
-      return keys(this.entities);
+      return keys(this.entities || {});
     }
   }, {
     key: 'requireContexts',
@@ -355,7 +366,7 @@ function addQuerySugar(object) {
         args[_key2] = arguments[_key2];
       }
 
-      return filterQuery.apply(undefined, [values(object)].concat(args));
+      return _query.apply(undefined, [values(object)].concat(args));
     },
     where: function where() {
       for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
@@ -393,7 +404,7 @@ function addQuerySugar(object) {
   return object;
 }
 
-function filterQuery() {
+function _query() {
   var list = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
   var params = arguments[1];
 
@@ -549,32 +560,40 @@ function _requireStateConfig(screenId) {
   return cache.redux[screenId] = cache.redux[screenId] || this.require('script', screenId + '/state');
 }
 
-function _requireScreen(screenId) {
-  var handler = this.findScreenHandler(screenId);
+function _requireLayout(componentId) {
+  var asset = undefined;
+  var handler = this.findLayoutHandler(componentId);
   var relativePath = handler && handler.paths.relative;
 
-  if (!relativePath) {
-    throw 'Failed to find screen via: ' + screenId;
+  if (!relativePath && !handler) {
+    throw 'Failed to find layout via: ' + componentId;
   }
 
-  var asset = this.requireContexts.scripts('./' + relativePath);
+  asset = asset || this.requireContexts.scripts('./' + relativePath);
 
   if (!asset) {
-    throw 'Failed to require screen via context: ' + screenId;
+    throw 'Failed to require layout via context: ' + componentId;
   }
 
   return asset.default ? asset.default : asset;
 }
 
 function _requireComponent(componentId) {
+  var asset = undefined;
   var handler = this.findComponentHandler(componentId);
   var relativePath = handler && handler.paths.relative;
 
-  if (!relativePath) {
-    throw 'Failed to find component handler via: ' + componentId;
+  if (!handler) {
+    asset = attempt(function () {
+      require('../components/' + componentId + '/index.js');
+    });
   }
 
-  var asset = this.requireContexts.scripts('./' + relativePath);
+  if (!relativePath && !handler && !asset) {
+    throw 'Failed to find component via: ' + componentId;
+  }
+
+  asset = this.requireContexts.scripts('./' + relativePath);
 
   if (!asset) {
     throw 'Failed to require component via context: ' + componentId;
@@ -583,18 +602,23 @@ function _requireComponent(componentId) {
   return asset.default ? asset.default : asset;
 }
 
-function _requireLayout(componentId) {
-  var handler = this.findLayoutHandler(componentId);
+function _requireScreen(componentId) {
+  var asset = undefined;
+  var handler = this.findScreenHandler(componentId);
   var relativePath = handler && handler.paths.relative;
 
-  if (!relativePath) {
-    throw 'Failed to find layout handler via: ' + componentId;
+  if (!handler) {
+    require('../entries/' + componentId + '/index.js');
   }
 
-  var asset = this.requireContexts.scripts('./' + relativePath);
+  if (!relativePath && !handler && !asset) {
+    throw 'Failed to find screen via: ' + componentId;
+  }
+
+  asset = this.requireContexts.scripts('./' + relativePath);
 
   if (!asset) {
-    throw 'Failed to require layout via context: ' + componentId;
+    throw 'Failed to require screen via context: ' + componentId;
   }
 
   return asset.default ? asset.default : asset;
@@ -604,3 +628,9 @@ var _Object = Object;
 var defineProperty = _Object.defineProperty;
 var keys = _Object.keys;
 var assign = _Object.assign;
+
+function attempt(fn) {
+  try {
+    return fn();
+  } catch (error) {}
+}

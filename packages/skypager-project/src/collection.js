@@ -22,6 +22,9 @@ import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
 import transform from 'lodash/transform'
 import set from 'lodash/set'
+import isFunction from 'lodash/isFunction'
+import isObject from 'lodash/isObject'
+import isEmpty from 'lodash/isEmpty'
 
 const carve = set
 
@@ -125,16 +128,16 @@ export default class Collection {
    *  or a function which returns true for a match
    *
    */
-  where(params) {
-    return wrapCollection(this, query(this.all, params))
+  where(params = {}) {
+    return wrapCollection(this, query(this.all, params || {}))
   }
 
   /**
   *
   * @alias Collection#query
   */
-  query(params) {
-    return this.where(params)
+  query(params = {}) {
+    return this.where(params || {})
   }
 
   /**

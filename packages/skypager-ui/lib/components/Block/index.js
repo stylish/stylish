@@ -78,7 +78,7 @@ var Block = exports.Block = (function (_Component) {
       });
 
       // TODO: Look into sensible defaults
-      var textMargin = 'm-b-md';
+      var textMargin = 'm-t-md m-x-md';
 
       var textClasses = (0, _classnames3.default)((0, _defineProperty3.default)({
         'muted-text': muteText

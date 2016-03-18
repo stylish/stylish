@@ -146,18 +146,25 @@ var Registry = (function () {
   }, {
     key: 'run',
     value: function run(helperId) {
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var _lookup;
 
-      if (helperId === 'loader') {
-        return this.runLoader(options, context);
-      }
+      var context = {};
 
       if (this.host.type === 'project') {
-        context.project = context.project || this.host;
+        context.project = { project: this.host };
       }
 
-      return this.lookup(helperId).run(options, context);
+      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
+      args.push(context);
+
+      if (helperId === 'loader') {
+        return this.runLoader.apply(this, args);
+      }
+
+      return (_lookup = this.lookup(helperId)).run.apply(_lookup, args);
     }
 
     /**

@@ -75,15 +75,16 @@ function actuallyHandle (exporterId, options = {}, context = {}) {
      output = JSON.stringify(payload)
   } else if (options.format === 'yaml') {
     output = yaml.dump(payload)
+  } else {
+    output = JSON.stringify(payload, null, 2)
   }
 
-  if (options.output) {
+  if (output && options.output) {
     let outputPath = resolve(normalize(options.output))
     write(outputPath, output.toString(), 'utf8')
   } else if (options.stdout) {
      console.log(output)
   }
-
 
   if (options.benchmark) { console.timeEnd('exporter') }
 }

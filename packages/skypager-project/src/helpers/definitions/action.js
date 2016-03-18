@@ -137,13 +137,15 @@ export class ActionDefinition {
         report.result = noConflict(function(){
           try {
             let r = action.api.execute(...args)
-            if (r) { 
-              report.success = true 
+
+            if (r) {
+              report.success = true
               report.result = r
             }
             return r
           } catch(err) {
             report.errors.push('fatal error:' + err.message)
+            report.errors.push(err.stack)
           }
         }, localHelpers)(...args)
 

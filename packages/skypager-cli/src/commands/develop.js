@@ -102,6 +102,14 @@ export function launchServer (preset, options = {}, context = {}) {
   options.devpack_api = 'v2'
   options = Object.assign(options, opts)
 
+  if(!options.noBundle || options.bundle === false) {
+    try {
+      project.run.exporter('bundle', { })
+    } catch(error) {
+      console.log('Error running bundle exporter')
+    }
+  }
+
   devpack.webpack('develop', options, {beforeCompile, onCompile})
 }
 
