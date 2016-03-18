@@ -1,4 +1,6 @@
-## Notes ##
+# Notes #
+
+## For DEV setup ##
 
 ### Running npm install ###
 
