@@ -29,7 +29,7 @@ export class BrowseThemes extends Component {
     const copy = this.props.copy
 
     return (
-
+      <div>Browse Themes</div>
     )
   }
 }
