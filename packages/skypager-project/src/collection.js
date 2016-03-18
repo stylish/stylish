@@ -85,6 +85,40 @@ export default class Collection {
   }
 
   /**
+   * Define a named query pattern for this collection.
+   *
+   * @param {String}
+   *
+   * @example
+   *
+   *    project.docs.scope('drafts', {status: 'draft'})
+   *    project.docs.drafts
+   */
+  scope(scopeName, queryParams) {
+    let collection = this
+
+    if (collection.hasOwnProperty(scopeName)) {
+      return collection
+    }
+
+    if( typeof(queryParams) === 'function' ) {
+      queryParams = attempt(queryParams)
+    }
+
+    assign(collection, {
+      get [scopeName]() {
+        try {
+          return collection.where(queryParams || {})
+        } catch (error) {
+          return [error.message]
+        }
+      }
+    })
+
+    return collection
+  }
+
+  /**
    * Find assets which match the passed conditions.
    *
    * @param {Object,Function} params key/value pairs of attributes to match,
@@ -187,7 +221,7 @@ export default class Collection {
    * @return {Array}
    */
   get indexes() {
-    return this.filter(asset => asset.isIndex())
+    return this.filter(asset => asset.isIndex)
   }
 
   /**
@@ -496,6 +530,20 @@ function wrapCollection(collection, array) {
     }
   })
 
+  defineProperty(array, 'first', {
+    enumerable: false,
+    get: function() {
+      return array[0]
+    }
+  })
+
+  defineProperty(array, 'last', {
+    enumerable: false,
+    get: function() {
+      return array[ array.length - 1 ]
+    }
+  })
+
   defineProperty(array, 'mapPick', {
     enumerable: false,
     value: function(...args) {
@@ -514,3 +562,13 @@ function wrapCollection(collection, array) {
 }
 
 const { assign, keys, defineProperty } = Object
+
+function attempt(fn, onError) {
+   try {
+     return fn()
+   } catch(error) {
+    return typeof onError === 'function'
+      ? onError(error)
+      : false
+   }
+}
