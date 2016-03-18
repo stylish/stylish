@@ -1,7 +1,7 @@
 {
   "name": "skypager-plugin-portfolio",
   "description": "skypager portfolio plugin",
-  "version": "2.18.0",
+  "version": "2.23.0",
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --require 'babel-register' --require should --require ./test/index.js test/**/*-spec.js || true",
