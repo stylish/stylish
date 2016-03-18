@@ -23,9 +23,7 @@ const DefaultVendorStack = [
   'redux-simple-router',
   'radium',
   'tcomb-react',
-  'tcomb-form',
-  'skypager-ui',
-  'skypager-themes'
+  'tcomb-form'
 ]
 
 const ExternalVendorMappings = {
@@ -41,9 +39,7 @@ const ExternalVendorMappings = {
   'history': 'History',
   'radium': 'Radium',
   'tcomb-form': 'TcombForm',
-  'tcomb-react': 'TcombReact',
-  'skypager-ui': 'SkypagerUI',
-  //'skypager-themes': 'SkypagerThemes'
+  'tcomb-react': 'TcombReact'
 }
 
 module.exports = function (externalOptions = {}) {

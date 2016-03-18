@@ -48,7 +48,10 @@
     "preversion": "npm run test && npm run compile",
     "prerelease:patch": "exit-on-dirty-git && npm version patch --no-git-tag && git add package.json && git commit -m 'Bump monorepo version to prep for release'",
     "release:patch": "exit-on-dirty-git && lerna publish",
-    "postrelease:patch": "npm publish",
+    "postrelease:patch": "npm publish && npm install",
+    "prerelease:minor": "exit-on-dirty-git && npm version minor --no-git-tag && git add package.json && git commit -m 'Bump monorepo version to prep for release'",
+    "release:minor": "exit-on-dirty-git && lerna publish",
+    "postrelease:minor": "npm publish && npm install",
     "release": "npm run release:patch"
   }
 }
