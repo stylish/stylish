@@ -1,0 +1,7 @@
+links:
+  - label: Home
+    icon: home
+    link: '/'
+  - label: Help
+    icon: help
+    link: /help
