@@ -29,6 +29,7 @@ You can run `skypager --help` to see the available options.
 
 Here are the important commands:
 
+- `skypager init` will create a new skypager project based on the package found in `packages/skypager-template-project`
 - `skypager dev` will start a webpack development server.
 - `skypager build` will run a production webpack build.
 - `skypager author` will open up skypager-electron
