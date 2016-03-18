@@ -21,3 +21,4 @@ dist/
 build/
 tmp/records
 packages/skypager*/lib/**
+**/.*.swp
