@@ -1,9 +1,11 @@
 import Asset from './asset'
 import * as util from '../util'
 
-import get from 'lodash/get'
+import get from 'lodash/result'
 import set from 'lodash/set'
 import isEmpty from 'lodash/isEmpty'
+import isString from 'lodash/isString'
+import isObject from 'lodash/isObject'
 import defaults from 'lodash/defaultsDeep'
 
 const { clone, pick, result, noConflict } = util
@@ -40,8 +42,31 @@ export class DataSource extends Asset {
      return get(this.data, ...args)
   }
 
-  set(...args) {
-     return set(this.data, ...args)
+  _get(...args){
+    return get(this, ...args)
+  }
+
+  update(...args) {
+    return this.set(...args).save()
+  }
+
+  saveSync(...args) {
+    return this.set(...args).save()
+  }
+
+  set(key, value) {
+    if (!value && isObject(key)) {
+      Object.keys(key).forEach(k => {
+        this.set(k, key[k])
+      })
+      return this
+    }
+
+    if(isString(key)) {
+      set(this.data, key, value)
+    }
+
+    return this
   }
 
   result(...args) {

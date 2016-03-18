@@ -17,6 +17,12 @@ describe("DataSources", function(){
     datasource.data.should.have.property('name','Example')
   })
 
+  it('can set data on a data source', function(){
+    let datasource = project.content.data_sources.at('example')
+    datasource.get('name').should.equal('Example')
+    datasource.set('name','haha').get('name').should.equal('haha')
+  })
+
   describe('Script Datasources', function(){
     it("gets run in the scope of the data source asset", function(){
       let datasource = project.content.data_sources.at('scripts/simple-exports')
