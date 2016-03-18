@@ -73,9 +73,7 @@ export default class Collection {
     collection.hidden('project', project)
     collection.hidden('AssetClass', () => assetClass)
 
-    Object.assign(this, {
-       ...options
-    })
+    Object.assign(this, pick(options, 'include', 'exclude', 'name', 'autoLoad'))
 
     this.AssetClass._decorateCollection(this, options)
 
