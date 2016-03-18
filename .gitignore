@@ -20,3 +20,4 @@ dist/**/*
 dist/
 build/
 tmp/records
+packages/skypager*/lib/**
