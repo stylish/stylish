@@ -19,6 +19,36 @@ export class Document extends Asset {
 
   static GLOB = GLOB;
 
+  /**
+   * @private
+   *
+   * Decorates the documents collections with helper functions.
+   *
+   */
+  static decorateCollection(collection, options = {}) {
+    defineProperty(collection, 'groups', {
+      enumerable: false,
+      configurable: true,
+      get: function() {
+        return collection.pluck('groupName').unique().sort()
+      }
+    }),
+    defineProperty(collection, 'categories', {
+      enumerable: false,
+      configurable: true,
+      get: function() {
+        return collection.pluck('category').unique().sort()
+      }
+    }),
+    defineProperty(collection, 'types', {
+      enumerable: false,
+      configurable: true,
+      get: function() {
+        return collection.pluck('type').unique().sort()
+      }
+    })
+  }
+
   constructor (uri, options = {}) {
     super(uri, options)
 
@@ -183,3 +213,5 @@ export class Document extends Asset {
 }
 
 export default Document
+
+const { defineProperty } = Object

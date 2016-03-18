@@ -26,8 +26,6 @@ import isFunction from 'lodash/isFunction'
 import isObject from 'lodash/isObject'
 import isEmpty from 'lodash/isEmpty'
 
-const carve = set
-
 export default class Collection {
 
   /**
@@ -40,8 +38,18 @@ export default class Collection {
   *
   */
   constructor (options = {}) {
-    const { assetClass, project, root } = options
     const collection = this
+    const { assetClass, project, root } = options
+
+    invariant(
+      root && root.length > 0,
+      'Must pass a root property representing this collections path'
+    )
+
+    invariant(
+      assetClass && assetClass.GLOB && assetClass.EXTENSIONS,
+      'Must create a collection by passing a valid Skypager.Asset subclass.'
+    )
 
     collection.root = root
 
@@ -56,7 +64,7 @@ export default class Collection {
     defaults(options, {
       autoLoad: false,
       include: [ assetClass.GLOB ],
-      exclude: [ '**/node_modules' ],
+      exclude: [ 'node_modules/**', '**/node_modules' ],
       name: basename(root)
     })
 
@@ -65,7 +73,11 @@ export default class Collection {
     collection.hidden('project', project)
     collection.hidden('AssetClass', () => assetClass)
 
-    Object.assign(this, pick(options, 'include', 'exclude', 'name', 'autoLoad'))
+    Object.assign(this, {
+       ...options
+    })
+
+    this.AssetClass._decorateCollection(this, options)
 
     const assets = { }
     const index = { }
@@ -155,6 +167,7 @@ export default class Collection {
       this.add(asset, true, true)
     })
 
+    this.AssetClass._collectionDidLoadAssets.call(this, this, {paths})
     this._didLoadAssets(paths, false)
   }
 
@@ -455,7 +468,7 @@ export default class Collection {
 
       // expand the dot path when a collection is already loaded and a new asset is added
       if (expandDotPath) {
-        //carve(this.at, asset.idPath, asset)
+        //set(this.at, asset.idPath, asset)
       }
     } catch(error) {
        console.log('Error adding asset', error.message)
@@ -496,7 +509,7 @@ function buildAtInterface (collection, expand = true) {
 
     expanded.forEach(id => {
       let dp = id.replace(/-/g, '_').replace(/\//g, '.')
-      carve(collection.at, dp, collection.at(id))
+      set(collection.at, dp, collection.at(id))
     })
   }
 }
@@ -515,7 +528,7 @@ function wrapCollection(collection, array) {
         let asset = prop ? a[prop] : a
 
         if (key === 'idpath') {
-          carve(memo, a.id.replace(/\//g,'.'), asset)
+          set(memo, a.id.replace(/\//g,'.'), asset)
           return memo
         }
 

@@ -65,4 +65,15 @@ describe("Content Collections", function(){
       project.settings.collections.testcases.should.have.property('root', testpath)
     })
   })
+
+  describe('Asset Class Collection Deocrator', function() {
+    it('decorates the collection with an interface specific to the asset class', function() {
+      documents.should.have.property('groups')
+      documents.should.have.property('categories')
+      documents.should.have.property('types')
+
+      documents.categories.should.contain('testcases')
+      documents.types.should.contain('testcase')
+    })
+  })
 })

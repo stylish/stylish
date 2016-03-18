@@ -55,6 +55,18 @@ module.exports = class Asset {
     })
   }
 
+  static _decorateCollection(collection, options = {}) {
+    if (typeof this.decorateCollection === 'function') {
+      this.decorateCollection(collection, options)
+    }
+  }
+
+  static _collectionDidLoadAssets(collection, options = {}) {
+    if (typeof this.collectionDidLoadAssets === 'function') {
+      this.collectionDidLoadAssets(collection, options)
+    }
+  }
+
   /**
    * @private
    *
