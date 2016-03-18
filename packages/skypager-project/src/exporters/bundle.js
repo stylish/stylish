@@ -96,9 +96,9 @@ export function ProjectExporter (options = {}, callback) {
   ]
 
   lines.push(
-    `bundle.entities = require('./entities-export.json');`,
-    `bundle.settings = require('./settings-export.json');`,
-    `bundle.copy = require('./copy-export.json');`,
+    `try { bundle.entities = require('./entities-export.json'); } catch(error) { bundle.entities = {error: error.message} }`,
+    `try { bundle.settings = require('./settings-export.json'); } catch(error) { bundle.settings = {error: error.message} }`,
+    `try { bundle.copy = require('./copy-export.json'); } catch(error) { bundle.copy = {error: error.message} }`,
 
     `bundle.requireContexts = {
       scripts: require.context('${ project.scripts.paths.absolute }', true, /\.js$/i),

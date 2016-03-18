@@ -29,7 +29,7 @@ export function handle (exporterId, options = {}, context = {}) {
   actuallyHandle(exporterId, options, context)
 
   if (options.watch) {
-    let files = './{data,docs,settings,src,assets,models,actions,exporters,importers}/**/*.*'
+    let files = './{copy,settings}/**/*.*'
     let watcher = require('chokidar').watch(files,{
       usePolling: true,
       interval: 200,
@@ -39,7 +39,7 @@ export function handle (exporterId, options = {}, context = {}) {
     options.watch = false
 
     let onChange = () => {
-      console.log('change detected. re-exporting')
+      console.log('change detected. re-exporting', arguments)
       actuallyHandle(exporterId, options, context)
     }
 
@@ -75,7 +75,7 @@ function actuallyHandle (exporterId, options = {}, context = {}) {
      output = JSON.stringify(payload)
   } else if (options.format === 'yaml') {
     output = yaml.dump(payload)
-  } else {
+  } else if (typeof payload === 'object'){
     output = JSON.stringify(payload, null, 2)
   }
 
