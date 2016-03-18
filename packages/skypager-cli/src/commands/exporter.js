@@ -65,7 +65,8 @@ function actuallyHandle (exporterId, options = {}, context = {}) {
 
   if (options.benchmark) { console.time('exporter') }
 
-  let payload = project.run.exporter(exporterId, params)
+  params.project = params.project || project
+  let payload = project.exporters.run(exporterId, params)
 
   if (!payload) {
     console.log('Exporter generated null payload'.red)
