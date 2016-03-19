@@ -20,5 +20,5 @@ dist/**/*
 dist/
 build/
 tmp/records
-packages/skypager*/lib/**
 **/.*.swp
+tmp/cache
