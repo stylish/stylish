@@ -1,39 +1,64 @@
 import React, { Component, PropTypes as type } from 'react'
-import { stateful } from 'ui/applications'
-
+import BodyClassName from 'react-body-classname'
 import { Link } from 'react-router'
+import get from 'lodash/get'
 
-import HTMLSafe from 'ui/components/HTMLSafe'
-import Icon from 'ui/components/Icon'
+import stateful from 'ui/util/stateful'
+
+import Block from 'components/Block'
+import CodeHighlighter from 'components/CodeHighlighter'
+import FeatureList from 'components/FeatureList'
+import SkypagerLogo from 'components/SkypagerLogo'
+
+import style from 'entries/Home/style.less'
 
 export class Home extends Component {
   static displayName = 'Home';
 
+  static route = {
+    hideNav: true
+  };
+
   static propTypes = {
-    pages: type.shape({
-      cover: type.object
-    }),
-    settings: type.shape({
-      branding: type.shape({
-        icon: type.string,
-        brand: type.string
-      })
+    copy: type.shape({
+      home: type.object.isRequired
     })
   };
 
   render() {
-    const { pages, settings } = this.props
-    const { branding } = settings
-    const { icon, brand } = branding
+    const { hero, features } = get(this.props, 'copy.home')
 
     return (
-      <div className='block text-center block-inverse'>
-        <h1 className='block-title'>{ brand }</h1>
-        <h4 className='text-muted'>What up?</h4>
-        <Link to='documentation' className='btn btn-primary m-t'>View the Docs</Link>
-      </div>
+      <BodyClassName className='iconav-hidden'>
+        <div>
+          <Block inverse title={hero.title} text={hero.text} >
+            <Link className='btn btn-primary btn-lg btn-pill' to='application-shells'>View Docs</Link>
+          </Block>
+          <FeatureList ref='features' spacer='m-b-md' features={features} />
+        </div>
+      </BodyClassName>
     )
   }
 }
 
-export default stateful(Home, 'settings', 'copy', 'entities.pages')
+export default stateful(Home, 'copy')
+
+const install = `
+npm install skypager-cli -g
+skypager init my-portfolio --portfolio
+cd my-portfolio && npm install
+skypager serve
+`.trim()
+
+const code = `
+import WebApp from 'skypager-ui/shells/WebApp'
+import bundle from 'skypager-ui/bundle/loader'
+
+/**
+* The WebApp shell generates a React.Router application consisting
+* of whatever screens are in your project. Redux is automatically configured
+* to manage your application state.
+*/
+WebApp.create({ bundle })
+`.trim()
+

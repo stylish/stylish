@@ -8,8 +8,8 @@ theme: dashboard-dark
 platform: web
 
 # see docs.skypager.io/base-web-applications/screen-definitions
-layout: Main
+layout: Web
+
 screens:
-  default: Home,
-  index: Home,
-  documentation: Documentation
+  index: Home
+  help: Help
