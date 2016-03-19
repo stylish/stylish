@@ -6,7 +6,6 @@ import Row from 'react-bootstrap/lib/Row'
 import Col from 'react-bootstrap/lib/Col'
 import Grid from 'react-bootstrap/lib/Grid'
 
-import CodeHighlighter from 'components/CodeHighlighter'
 import DataTable from 'components/DataTable'
 
 export class ComponentDetails extends Component {
@@ -68,7 +67,6 @@ export class ComponentDetails extends Component {
           </ul>
           </Col>
           <Col xs={6}>
-            <CodeHighlighter code={'hello world'} language='javascript' />
           </Col>
         </Row>
       </Grid>

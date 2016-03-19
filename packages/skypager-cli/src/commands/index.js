@@ -109,11 +109,15 @@ export function configure (commander, options = {}) {
 
   let project
 
+  console.log('Attempting to resolve project...'.cyan)
+
   let projectFile = (
     argv.project ||
     findNearestPackageManifest() ||
     process.env.PWD
   )
+
+  console.log('Using project file: ' + projectFile)
 
   if (mode === 'missing_dependencies') {
     mode = 'init'
@@ -121,11 +125,23 @@ export function configure (commander, options = {}) {
     try {
       project = loadProject(projectFile)
     } catch(error) {
-      console.log('Error loading project', error.message)
+      console.log('Error loading project:'.red, error.message)
+      console.log(error.stack)
     }
   }
 
+  if (!project) {
+     console.log('Could not build a project object from this path: ' + projectFile.yellow)
+  }
+
   let config = project && project.manifest && project.manifest.skypager
+
+  if (config) {
+    console.log('Skypager config found in manifest'.green)
+    console.log(
+       JSON.stringify(config)
+    )
+  }
 
   let context = {
     commander,
@@ -142,12 +158,16 @@ export function configure (commander, options = {}) {
 
   // the project can dynamically add its own cli commands from certain actions
   if (project && project.actions) {
-    project.actions
-    .filter(action => get(action, 'definition.interfaces.cli'))
-    .forEach(action => get(action, 'definition.interfaces.cli').call(action, commander, dispatch))
+    let cliActions = project.actions.filter(action => get(action, 'definition.interfaces.cli'))
+
+    if (cliActions.length > 0) {
+      console.log('Found ' + cliActions.length + ' actions which expose a CLI interface')
+      cliActions.forEach(action => get(action, 'definition.interfaces.cli').call(action, commander, dispatch))
+    }
   }
 
-  return () => commander.parse(argv)
+  return () =>
+    commander.parse(argv)
 }
 
 function loadProject(fromPath, silent = false) {
@@ -166,6 +186,7 @@ function loadProject(fromPath, silent = false) {
     if (!silent && requestedCommand !== 'init' && requestedCommand !== 'help') {
       console.error(`Error loading skypager project.`.red)
       console.log(`Attempted to load from ${ fromPath.yellow }. Run this from within a project directory and make sure the ${ 'skypager-project'.magenta } is installed.`)
+      console.log('The exact error thrown was '.yellow, "\n\n", error.message.red, "\n\n\n", error.stack)
     }
   }
 }
