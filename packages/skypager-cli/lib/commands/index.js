@@ -149,16 +149,16 @@ function configure(commander) {
 
       args.push(context);
       try {
-        var _report = handlerFn.apply(undefined, args);
+        var report = handlerFn.apply(undefined, args);
 
-        if (_report && _report.errors.length > 0) {
+        if (report && report.errors.length > 0) {
           console.log('Command threw an error'.red);
 
           console.log((0, _stringify2.default)({
-            errors: _report.errors,
-            warnings: _report.warnings,
-            suggestions: _report.suggestions,
-            success: _report.success
+            errors: report.errors,
+            warnings: report.warnings,
+            suggestions: report.suggestions,
+            success: report.success
           }, null, 2));
         }
       } catch (error) {
@@ -171,7 +171,11 @@ function configure(commander) {
 
   var project = undefined;
 
+  console.log('Attempting to resolve project...'.cyan);
+
   var projectFile = _yargs.argv.project || findNearestPackageManifest() || process.env.PWD;
+
+  console.log('Using project file: ' + projectFile);
 
   if (mode === 'missing_dependencies') {
     mode = 'init';
@@ -179,11 +183,21 @@ function configure(commander) {
     try {
       project = loadProject(projectFile);
     } catch (error) {
-      report("Error loading project at: " + projectFile, error);
+      console.log('Error loading project:'.red, error.message);
+      console.log(error.stack);
     }
   }
 
+  if (!project) {
+    console.log('Could not build a project object from this path: ' + projectFile.yellow);
+  }
+
   var config = project && project.manifest && project.manifest.skypager;
+
+  if (config) {
+    console.log('Skypager config found in manifest'.green);
+    console.log((0, _stringify2.default)(config));
+  }
 
   var context = {
     commander: commander,
@@ -200,11 +214,16 @@ function configure(commander) {
 
   // the project can dynamically add its own cli commands from certain actions
   if (project && project.actions) {
-    project.actions.filter(function (action) {
+    var cliActions = project.actions.filter(function (action) {
       return (0, _get2.default)(action, 'definition.interfaces.cli');
-    }).forEach(function (action) {
-      return (0, _get2.default)(action, 'definition.interfaces.cli').call(action, commander, dispatch);
     });
+
+    if (cliActions.length > 0) {
+      console.log('Found ' + cliActions.length + ' actions which expose a CLI interface');
+      cliActions.forEach(function (action) {
+        return (0, _get2.default)(action, 'definition.interfaces.cli').call(action, commander, dispatch);
+      });
+    }
   }
 
   return function () {
@@ -228,6 +247,7 @@ function loadProject(fromPath) {
     if (!silent && requestedCommand !== 'init' && requestedCommand !== 'help') {
       console.error('Error loading skypager project.'.red);
       console.log('Attempted to load from ' + fromPath.yellow + '. Run this from within a project directory and make sure the ' + 'skypager-project'.magenta + ' is installed.');
+      console.log('The exact error thrown was '.yellow, "\n\n", error.message.red, "\n\n\n", error.stack);
     }
   }
 }
@@ -240,14 +260,4 @@ function findNearestPackageManifest() {
   }
 
   return (0, _path.dirname)(loc);
-}
-
-function report(message, error) {
-  console.log('Error:'.red + ' ' + message);
-  console.log('Message:' + error.message);
-  console.log('Stacktrace:\n');
-  console.log('\n\n');
-  console.log(error.stack);
-  console.log('\n\n');
-  console.log('Path Info:' + (0, _stringify2.default)($skypager || {}, null, 2));
 }
