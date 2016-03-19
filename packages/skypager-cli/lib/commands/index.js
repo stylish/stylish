@@ -149,16 +149,16 @@ function configure(commander) {
 
       args.push(context);
       try {
-        var report = handlerFn.apply(undefined, args);
+        var _report = handlerFn.apply(undefined, args);
 
-        if (report && report.errors.length > 0) {
+        if (_report && _report.errors.length > 0) {
           console.log('Command threw an error'.red);
 
           console.log((0, _stringify2.default)({
-            errors: report.errors,
-            warnings: report.warnings,
-            suggestions: report.suggestions,
-            success: report.success
+            errors: _report.errors,
+            warnings: _report.warnings,
+            suggestions: _report.suggestions,
+            success: _report.success
           }, null, 2));
         }
       } catch (error) {
@@ -179,7 +179,7 @@ function configure(commander) {
     try {
       project = loadProject(projectFile);
     } catch (error) {
-      console.log('Error loading project', error.message);
+      report("Error loading project at: " + projectFile, error);
     }
   }
 
@@ -240,4 +240,14 @@ function findNearestPackageManifest() {
   }
 
   return (0, _path.dirname)(loc);
+}
+
+function report(message, error) {
+  console.log('Error:'.red + ' ' + message);
+  console.log('Message:' + error.message);
+  console.log('Stacktrace:\n');
+  console.log('\n\n');
+  console.log(error.stack);
+  console.log('\n\n');
+  console.log('Path Info:' + (0, _stringify2.default)($skypager || {}, null, 2));
 }
