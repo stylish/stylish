@@ -19,8 +19,10 @@
   "devDependencies": {
     "skypager-project": "latest",
     "babel-preset-skypager": "latest",
-    "mocha": "latest",
-    "should": "latest"
+    "mocha": "^2.3.4",
+    "chai": "^3.5.0",
+    "sinon": "^1.17.3",
+    "sinon-chai": "^2.8.0"
   },
   "repository": {
     "type": "git",
