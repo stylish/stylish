@@ -1,7 +1,0 @@
-entry: ./src/editor/basic
-noContentHash: true
-outputFolder: src/electron/templates/basic
-theme: dashboard-dark
-vendor:
-  react: React
-  react-dom: ReactDOM
