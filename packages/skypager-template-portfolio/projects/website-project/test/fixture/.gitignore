@@ -1,0 +1,8 @@
+node_modules/
+dist/bundle/**/*
+tmp/**/*
+*.log
+.DS_Store
+.env
+secrets.yml
+npm-debug*

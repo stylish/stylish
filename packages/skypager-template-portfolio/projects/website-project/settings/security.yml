@@ -1,0 +1,5 @@
+environment:
+  # these ENV variables are safe to export to a client
+  whitelist:
+    - GITHUB_APPLICATION_ID
+    - DROPBOX_APPLICATION_ID

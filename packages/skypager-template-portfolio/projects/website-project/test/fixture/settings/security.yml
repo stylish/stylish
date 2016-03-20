@@ -1,0 +1,6 @@
+environment:
+  accesibleVars:
+    - GITHUB_CLIENT_ID
+    - DROPBOX_APPLICATION_ID
+    - GOOGLE_APPLICATION_ID
+    - SEGMENT_PROJECT_KEY

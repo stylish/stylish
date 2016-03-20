@@ -1,0 +1,8 @@
+navigation:
+  links:
+    - label: Home
+      icon: home
+      link: '/'
+    - label: Docs
+      icon: open-book
+      link: '/docs'

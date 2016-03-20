@@ -1,0 +1,27 @@
+hero:
+  centerText: true
+  title: Effortless Web and Mobile Application Development
+  text: >
+    Skypager gives you a collection of pre-styled React App templates, and a state of the art development environment that you can be productive with in minutes.
+
+features:
+  - icon: tablet-mobile-combo
+    title: Starter Applications. Just add content
+    text: > 
+      Application Shells provide you with a head start for a variety of different scenarios.  You can be productive immediately just by adding screens and content.
+
+  - icon: layers
+    title: Components
+    text: >
+      Start from an existing library of UI Components or create your own and easily re-use them across all of future your projects.
+
+  - icon: browser
+    title: Layouts
+    text: >
+      Layouts help arrange components and content in the most user friendly and intuitive way.
+
+
+  - icon: palette
+    title: Themes
+    text: >
+      Choose from a library of professional Bootstrap themes that can be easily customized with or without writing code.
