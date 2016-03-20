@@ -7,6 +7,21 @@ const isFunction = lodash.isFunction
 const proxyMiddleware = require('http-proxy-middleware')
 
 module.exports = function(argv, compilerOptions = {}) {
+  if(argv.experimental) {
+    return experimental(argv, compilerOptions)
+  } else {
+    return original(argv, compilerOptions)
+  }
+}
+
+/**
+ * Branching the function instead of trying to modify it
+ */
+function experimental(argv, compilerOptions = {}) {
+
+}
+
+function original(argv, compilerOptions = {}) {
   const { onCompile, beforeCompile } = compilerOptions
 
   if (!argv) { argv = require('yargs').argv }
