@@ -24,9 +24,15 @@ function cli() {
 
   (0, _dependencies.checkAll)();
 
-  if (!(0, _util.findPackageSync)('skypager-project')) {
+  options.frameworkHost = options.frameworkHost || 'skypager-project';
+
+  if (!(0, _util.findPackageSync)(options.frameworkHost)) {
     (0, _commands.program)({ mode: 'missing_dependencies' })();
     return;
+  }
+
+  if (typeof options.frameworkHost !== 'string' && options.frameworkHost !== 'skypager-project') {
+    process.env.SKYPAGER_FRAMEWORK_HOST = options.frameworkHost;
   }
 
   (0, _commands.program)(options)();

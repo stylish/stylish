@@ -17,7 +17,7 @@ module.exports = function(argv, compilerOptions = {}) {
 /**
  * Branching the function instead of trying to modify it
  */
-function experimental(argv, compilerOptions = {}) {
+function experimental(argv, {project}) {
 
 }
 

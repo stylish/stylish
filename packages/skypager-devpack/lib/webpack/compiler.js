@@ -15,6 +15,23 @@ var fs = require('fs');
 
 module.exports = function (argv) {
   var compilerOptions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+  if (argv.experimental) {
+    return experimental(argv, compilerOptions);
+  } else {
+    return original(argv, compilerOptions);
+  }
+};
+
+/**
+ * Branching the function instead of trying to modify it
+ */
+function experimental(argv) {
+  var compilerOptions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+}
+
+function original(argv) {
+  var compilerOptions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
   var onCompile = compilerOptions.onCompile;
   var beforeCompile = compilerOptions.beforeCompile;
 
@@ -83,11 +100,17 @@ module.exports = function (argv) {
         console.log("\n----\n\n");
       }
 
-      if (argv.debug) {
-        console.log((0, _stringify2.default)(compilation.getStats().toJson(), null, 2));
+      if (!argv.stats === false) {
+        try {
+          var statsJson = (0, _stringify2.default)(compilation.getStats().toJson(), null, 2);
+
+          fs.write(argv.stats, statsJson, 'utf8');
+        } catch (error) {
+          console.log('Error saving webpack stats');
+        }
       }
 
       process.exit(0);
     }
   });
-};
+}

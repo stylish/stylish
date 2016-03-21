@@ -117,7 +117,7 @@ var Project = exports.Project = (function () {
       var uri = arguments.length <= 0 || arguments[0] === undefined ? process.env.PWD : arguments[0];
       var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-      return _index2.default.load(uri, options);
+      return this.framework.load(uri, options);
     }
 
     /**
@@ -783,6 +783,7 @@ var Project = exports.Project = (function () {
   return Project;
 })();
 
+Project.framework = _index2.default;
 exports.default = Project;
 
 function paths() {

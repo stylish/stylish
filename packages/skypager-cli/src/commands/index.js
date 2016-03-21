@@ -60,7 +60,7 @@ export function program (options = {}) {
     .option('--env <env>', 'the application environment', process.env.NODE_ENV || 'development')
     .option('--project <path>', 'the folder contains the project you wish to work with')
 
-  configure(commander, options.mode || 'full')
+  configure(commander, options.mode || 'full', options.frameworkHost || 'skypager-project')
 
   if (!requestedCommand || commander.commands.map(c => c._name).indexOf(requestedCommand) < 0) {
     // dont duplicate the output
@@ -69,7 +69,6 @@ export function program (options = {}) {
     }
   }
 
-
   return () => commander.parse(process.argv)
 }
 
@@ -77,7 +76,8 @@ export default program
 
 export const MODES = {
   full:['electron', 'build', 'repl', 'develop', 'exporter', 'init', 'importer', 'serve'],
-  setup:['available','repl','init']
+  setup:['available','repl','init'],
+  basic: ['build','repl','develop']
 }
 
 export function configure (commander, options = {}) {
@@ -89,7 +89,7 @@ export function configure (commander, options = {}) {
       try {
         let report = handlerFn(...args)
 
-        if (report && report.errors.length > 0) {
+        if (typeof report === 'object' && report && report.errors.length > 0) {
            console.log('Command threw an error'.red)
 
            console.log(JSON.stringify({
@@ -109,46 +109,29 @@ export function configure (commander, options = {}) {
 
   let project
 
-  console.log('Attempting to resolve project...'.cyan)
-
   let projectFile = (
     argv.project ||
     findNearestPackageManifest() ||
     process.env.PWD
   )
 
-  console.log('Using project file: ' + projectFile)
-
   if (mode === 'missing_dependencies') {
     mode = 'init'
   } else {
     try {
-      project = loadProject(projectFile)
+      project = loadProject(
+        projectFile,
+        options.frameworkHost || 'skypager-project'
+      )
     } catch(error) {
       console.log('Error loading project:'.red, error.message)
       console.log(error.stack)
     }
   }
 
-  if (!project) {
-     console.log('Could not build a project object from this path: ' + projectFile.yellow)
-  }
-
   let config = project && project.manifest && project.manifest.skypager
 
-  if (config) {
-    console.log('Skypager config found in manifest'.green)
-    console.log(
-       JSON.stringify(config)
-    )
-  }
-
-  let context = {
-    commander,
-    project,
-    config,
-    isCLI: true
-  }
+  let context = { commander, project, config, isCLI: true }
 
   let enabled = MODES[mode] || ['repl', 'init']
 
@@ -161,7 +144,6 @@ export function configure (commander, options = {}) {
     let cliActions = project.actions.filter(action => get(action, 'definition.interfaces.cli'))
 
     if (cliActions.length > 0) {
-      console.log('Found ' + cliActions.length + ' actions which expose a CLI interface')
       cliActions.forEach(action => get(action, 'definition.interfaces.cli').call(action, commander, dispatch))
     }
   }
@@ -170,7 +152,10 @@ export function configure (commander, options = {}) {
     commander.parse(argv)
 }
 
-function loadProject(fromPath, silent = false) {
+function loadProject(fromPath, options= {}) {
+  let silent = !!options.silent
+  let frameworkHost = options.frameworkHost || 'skypager-project'
+
   try {
     skypagerBabel()
   } catch(error) {
@@ -181,11 +166,14 @@ function loadProject(fromPath, silent = false) {
   }
 
   try {
-    return loadProjectFromDirectory(fromPath || process.env.PWD)
+    return loadProjectFromDirectory(
+      fromPath || process.env.PWD,
+      frameworkHost
+    )
   } catch (error) {
     if (!silent && requestedCommand !== 'init' && requestedCommand !== 'help') {
       console.error(`Error loading skypager project.`.red)
-      console.log(`Attempted to load from ${ fromPath.yellow }. Run this from within a project directory and make sure the ${ 'skypager-project'.magenta } is installed.`)
+      console.log(`Attempted to load from ${ fromPath.yellow }. Run this from within a project directory and make sure the ${ frameworkHost.magenta } is installed.`)
       console.log('The exact error thrown was '.yellow, "\n\n", error.message.red, "\n\n\n", error.stack)
     }
   }

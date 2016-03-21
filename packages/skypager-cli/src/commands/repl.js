@@ -1,3 +1,5 @@
+import { loadSkypagerFramework } from '../util'
+
 export function repl (program, dispatch) {
   program
     .command('console')
@@ -9,12 +11,16 @@ export function repl (program, dispatch) {
 export default repl
 
 export function handle (options = {}, context = {}) {
+  var prompt = `${ context.prompt || process.env.SKYPAGER_CLI_BRAND || 'skypager' }`.magenta
+
   var replServer = require('repl').start({
-    prompt: ('skypager'.magenta + ':'.cyan + ' ')
+    prompt: `${ prompt }: `
   })
+
+  replServer.context['skypager'] = loadSkypagerFramework()
 
   Object.keys(context).forEach(key => {
     replServer.context[key] = context[key]
-    replServer.context.keys = Object.keys(context)
+    replServer.context.contextKeys = Object.keys(context)
   })
 }

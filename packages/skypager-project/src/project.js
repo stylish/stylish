@@ -21,6 +21,7 @@ import pick from 'lodash/pick'
 import get from 'lodash/result'
 
 export class Project {
+  static framework = Skypager;
   /**
   * Load a Skypager Project from a folder. defaults to process.env.PWD
   *
@@ -36,7 +37,7 @@ export class Project {
   * @return {Project}
   */
   static load(uri = process.env.PWD, options = {}) {
-    return Skypager.load(uri, options)
+    return this.framework.load(uri, options)
   }
 
   /**

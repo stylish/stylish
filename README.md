@@ -1,11 +1,19 @@
 # Skypager
 
-This is the portfolio project for Skypager.  A Portfolio is
-a parent repository which contains multiple sub projects,
-some of which which support or depend on one another.  All
-of the projects will share dependencies and tooling by
-virtue of the project's folder structure, and through shared
-approaches.
+This is the portfolio project for Skypager.  A Portfolio is a parent repository which contains multiple sub projects, some of which which support or depend on one another.  All of the projects will share dependencies and tooling by virtue of the project's folder structure.
+
+## Skypager Projects
+
+Skypager Projects are npm modules which contain source code and other assets. They must have a `skypager` key in their package.json.  The contents of these projects are parsed and indexed based on configuration rules, and can be bundled up and exported.  Each project consists of Asset collections and Helper registries.  
+
+Asset Collections are different types of source files which get parsed into an AST format using popular AST libraries:
+
+- remark for markdown
+- postCSS for CSS, Less, Sass etc
+- babel for javascript
+- cheerio for XML and other DOMs
+
+You can add your own as well. Collections are wrappers around the Webpack module bundler system and internally use webpack loaders.
 
 ## Getting Started
 
@@ -15,15 +23,11 @@ cd skypager-central
 npm install
 ```
 
-Once this project is cloned and the dependencies are
-installed, you should be able to run `npm run test` and see
-that the entire test suite runs for each package in the
-portfolio.
+Once this project is cloned and the dependencies are installed, you should be able to run `npm run test` and see that the entire test suite runs for each package in the portfolio.
 
 ## Skypager CLI
 
-The `skypager` cli should be installed globally
-automatically when you run npm install inside this project.
+The `skypager` cli should be installed globally automatically when you run npm install inside this project.
 
 You can run `skypager --help` to see the available options.
 

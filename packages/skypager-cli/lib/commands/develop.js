@@ -44,7 +44,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Eventually I would rather have several presets which compose these different options together.
 */
 function develop(program, dispatch) {
-  program.command('dev [preset]').allowUnknownOption(true).description('run server for this project').option('--host <hostname>', 'which hostname should this server listen on?', 'localhost').option('--output-folder <path>', 'relative path to the output folder', 'public').option('--platform <name>', 'which platform are we building for? electron or web', 'web').option('--port <port>', 'which port should this server listen on?', 3000).option('--preset <name>', 'use a preset instead of all of this configuration').option('--theme <name>', 'the name of the theme to use', 'dashboard').action(dispatch(handle));
+  program.command('dev [preset]').alias('test:server').allowUnknownOption(true).description('run server for this project').option('--host <hostname>', 'which hostname should this server listen on?', 'localhost').option('--output-folder <path>', 'relative path to the output folder', 'public').option('--platform <name>', 'which platform are we building for? electron or web', 'web').option('--port <port>', 'which port should this server listen on?', 3000).option('--preset <name>', 'use a preset instead of all of this configuration').option('--theme <name>', 'the name of the theme to use', 'dashboard').action(dispatch(handle));
 }
 
 exports.default = develop;
@@ -113,7 +113,11 @@ function launchServer(preset) {
     }
   }
 
-  devpack.webpack('develop', options, { beforeCompile: beforeCompile, onCompile: onCompile });
+  devpack.webpack('develop', options, {
+    project: project,
+    beforeCompile: beforeCompile.bind(project),
+    onCompile: onCompile.bind(project)
+  });
 }
 
 function yaml(obj) {
