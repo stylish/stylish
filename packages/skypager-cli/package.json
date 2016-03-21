@@ -53,6 +53,7 @@
     "js-yaml": "^3.5.3",
     "lodash": "^4.5.0",
     "mkdirp": "^0.5.1",
+    "node-emoji": "^1.2.1",
     "path-exists": "^2.1.0",
     "shelljs": "^0.6.0",
     "yargs": "^4.2.0"

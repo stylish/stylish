@@ -16,6 +16,23 @@ var proxyMiddleware = require('http-proxy-middleware');
 
 module.exports = function (argv) {
   var compilerOptions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+  if (argv.experimental) {
+    return experimental(argv, compilerOptions);
+  } else {
+    return original(argv, compilerOptions);
+  }
+};
+
+/**
+ * Branching the function instead of trying to modify it
+ */
+function experimental(argv, _ref) {
+  var project = _ref.project;
+}
+
+function original(argv) {
+  var compilerOptions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
   var onCompile = compilerOptions.onCompile;
   var beforeCompile = compilerOptions.beforeCompile;
 
@@ -106,4 +123,4 @@ module.exports = function (argv) {
       console.log('Listening at http://localhost:' + (argv.port || 3000));
     }
   });
-};
+}

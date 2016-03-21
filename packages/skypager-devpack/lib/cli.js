@@ -83,5 +83,7 @@ function webpack(action) {
     return require('./webpack/compiler').apply(undefined, args);
   } else if (action === 'develop' || action === 'serve' || action === 'dev' || action === 'dev-server') {
     return require('./webpack/server').apply(undefined, args);
+  } else if (action === 'test:server' || action === 'test') {
+    return require('./webpack/test').apply(undefined, args);
   }
 }

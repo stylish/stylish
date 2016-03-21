@@ -25,16 +25,18 @@ const ProjectCache = {
 }
 
 class Framework {
-  constructor (root, initializer) {
+  constructor (root, key, initializer) {
     this.type = 'framework'
     this.root = __dirname
-
+    this.key = key
 
     util.hide.getter(this, 'manifest', require('../package.json'))
 
     const plugins = [ ]
 
     this.registries = Registry.buildAll(this, Helpers, {root})
+
+    this.transforms = []
 
     util.hide.getter(this, 'enabledPlugins', () => plugins)
 
@@ -114,6 +116,10 @@ class Framework {
     })
 
     let project = (new this.Project(projectFile, options))
+
+    this.transforms.forEach(transform => {
+      transform(project)
+    })
 
     return ProjectCache.projects[projectFile] = project
   }

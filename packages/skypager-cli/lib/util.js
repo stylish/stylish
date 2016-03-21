@@ -13,6 +13,7 @@ exports.findPackage = findPackage;
 exports.splitPath = splitPath;
 exports.skypagerBabel = skypagerBabel;
 exports.pathExists = pathExists;
+exports.loadSkypagerFramework = loadSkypagerFramework;
 exports.loadProjectFromDirectory = loadProjectFromDirectory;
 exports.loadManifestFromDirectory = loadManifestFromDirectory;
 
@@ -111,41 +112,52 @@ function pathExists(fp) {
   }
 }
 
-function loadProjectFromDirectory(directory, skypagerProject) {
+/**
+ * Frameworks which extend from Skypager can use this to make sure
+ * they have a chance to be the framework responsible for loading projects
+ */
+function loadSkypagerFramework(id) {
+  try {
+    return typeof $skypager !== 'undefined' && !id ? require($skypager.project || 'skypager-project') : require(id);
+  } catch (error) {
+    console.log('Error loading skypager framework module from the CLI. id ' + id);
+    throw error;
+  }
+}
+
+function loadProjectFromDirectory(directory) {
+  var frameworkHost = arguments.length <= 1 || arguments[1] === undefined ? 'skypager-project' : arguments[1];
+
   var exists = require('path-exists');
   var path = require('path');
 
-  try {
-    skypagerProject = skypagerProject || $skypager && $skypager['skypager-project'] && require($skypager['skypager-project']);
-    skypagerProject = skypagerProject || require('skypager-project');
-  } catch (error) {
-    console.log('There was an error attempting to load the ' + 'skypager-project'.magenta + ' package.');
-    console.log('Usually this means it is not installed or can not be found relative to the current directory');
-    console.log();
-    console.log('The exact error message we received is: '.yellow);
-    console.log(error.message);
-    console.log('stack trace: '.yellow);
-    console.log(error.stack);
-    process.exit(1);
-    return;
-  }
+  var skypagerFramework = typeof frameworkHost === 'string' ? loadSkypagerFramework(frameworkHost) : frameworkHost;
 
-  var manifest = loadManifestFromDirectory(directory);
-
-  if (!manifest) {
-    throw 'Could not load project from ' + directory;
-  }
+  var manifest = loadManifestFromDirectory(directory) || {};
+  var pathToMain = path.join(directory, 'skypager.js');
 
   if (manifest.skypager && manifest.skypager.main) {
-    return require(path.join(directory, manifest.skypager.main.replace(/^\.\//, '')));
+    pathToMain = path.join(directory, manifest.skypager.main.replace(/^\.\//, ''));
+
+    if (!exists(pathToMain)) {
+      console.log('The skypager.main value in the package manifest points to a non existing file'.red);
+      console.log('Value: ' + manifest.skypager.main + ' Path: ' + pathToMain);
+      throw 'Invalid skypager package main';
+    }
   }
 
-  if (manifest.skypager) {
-    return skypagerProject.load(join(directory, 'package.json'));
+  if (!exists(pathToMain) && manifest.skypager) {
+    pathToMain = join(directory, 'package.json');
   }
 
-  if (exists(path.join(directory, 'skypager.js'))) {
-    return require(path.join(directory, 'skypager.js'));
+  try {
+    var projectExport = skypagerFramework.load(pathToMain);
+
+    return typeof projectExport === 'function' ? projectExport.call(skypagerFramework) : projectExport;
+  } catch (error) {
+    console.log('There was an ' + 'error'.red + ' loading the skypager project from: ' + pathToMain.yellow);
+    console.log('Using the skypager framework:', skypagerFramework);
+    throw error;
   }
 }
 

@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.MODES = undefined;
 
+var _typeof2 = require('babel-runtime/helpers/typeof');
+
+var _typeof3 = _interopRequireDefault(_typeof2);
+
 var _stringify = require('babel-runtime/core-js/json/stringify');
 
 var _stringify2 = _interopRequireDefault(_stringify);
@@ -114,7 +118,7 @@ function program() {
 
   commander.version(_package2.default.version).option('--debug', 'enable debugging').option('--env <env>', 'the application environment', process.env.NODE_ENV || 'development').option('--project <path>', 'the folder contains the project you wish to work with');
 
-  configure(commander, options.mode || 'full');
+  configure(commander, options.mode || 'full', options.frameworkHost || 'skypager-project');
 
   if (!requestedCommand || commander.commands.map(function (c) {
     return c._name;
@@ -133,7 +137,8 @@ function program() {
 exports.default = program;
 var MODES = exports.MODES = {
   full: ['electron', 'build', 'repl', 'develop', 'exporter', 'init', 'importer', 'serve'],
-  setup: ['available', 'repl', 'init']
+  setup: ['available', 'repl', 'init'],
+  basic: ['build', 'repl', 'develop']
 };
 
 function configure(commander) {
@@ -141,6 +146,11 @@ function configure(commander) {
 
   var mode = options.mode || 'full';
 
+  /**
+   * The dispatcher wraps an action handler from the commander framework
+   * and ensures that the arguments passed to it are given the appropriate
+   * context based on the project directory we are in
+  */
   var dispatch = function dispatch(handlerFn) {
     return function () {
       for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -151,7 +161,7 @@ function configure(commander) {
       try {
         var report = handlerFn.apply(undefined, args);
 
-        if (report && report.errors.length > 0) {
+        if ((typeof report === 'undefined' ? 'undefined' : (0, _typeof3.default)(report)) === 'object' && report && report.errors.length > 0) {
           console.log('Command threw an error'.red);
 
           console.log((0, _stringify2.default)({
@@ -171,40 +181,22 @@ function configure(commander) {
 
   var project = undefined;
 
-  console.log('Attempting to resolve project...'.cyan);
-
   var projectFile = _yargs.argv.project || findNearestPackageManifest() || process.env.PWD;
-
-  console.log('Using project file: ' + projectFile);
 
   if (mode === 'missing_dependencies') {
     mode = 'init';
   } else {
     try {
-      project = loadProject(projectFile);
+      project = loadProject(projectFile, options.frameworkHost || 'skypager-project');
     } catch (error) {
       console.log('Error loading project:'.red, error.message);
       console.log(error.stack);
     }
   }
 
-  if (!project) {
-    console.log('Could not build a project object from this path: ' + projectFile.yellow);
-  }
-
   var config = project && project.manifest && project.manifest.skypager;
 
-  if (config) {
-    console.log('Skypager config found in manifest'.green);
-    console.log((0, _stringify2.default)(config));
-  }
-
-  var context = {
-    commander: commander,
-    project: project,
-    config: config,
-    isCLI: true
-  };
+  var context = { commander: commander, project: project, config: config, isCLI: true };
 
   var enabled = MODES[mode] || ['repl', 'init'];
 
@@ -219,7 +211,6 @@ function configure(commander) {
     });
 
     if (cliActions.length > 0) {
-      console.log('Found ' + cliActions.length + ' actions which expose a CLI interface');
       cliActions.forEach(function (action) {
         return (0, _get2.default)(action, 'definition.interfaces.cli').call(action, commander, dispatch);
       });
@@ -232,7 +223,10 @@ function configure(commander) {
 }
 
 function loadProject(fromPath) {
-  var silent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+  var silent = !!options.silent;
+  var frameworkHost = options.frameworkHost || 'skypager-project';
 
   try {
     (0, _util.skypagerBabel)();
@@ -242,11 +236,11 @@ function loadProject(fromPath) {
   }
 
   try {
-    return (0, _util.loadProjectFromDirectory)(fromPath || process.env.PWD);
+    return (0, _util.loadProjectFromDirectory)(fromPath || process.env.PWD, frameworkHost);
   } catch (error) {
     if (!silent && requestedCommand !== 'init' && requestedCommand !== 'help') {
       console.error('Error loading skypager project.'.red);
-      console.log('Attempted to load from ' + fromPath.yellow + '. Run this from within a project directory and make sure the ' + 'skypager-project'.magenta + ' is installed.');
+      console.log('Attempted to load from ' + fromPath.yellow + '. Run this from within a project directory and make sure the ' + frameworkHost.magenta + ' is installed.');
       console.log('The exact error thrown was '.yellow, "\n\n", error.message.red, "\n\n\n", error.stack);
     }
   }

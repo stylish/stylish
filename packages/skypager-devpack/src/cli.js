@@ -55,5 +55,7 @@ function webpack(action, ...args) {
     return require('./webpack/compiler')(...args)
   } else if (action === 'develop' || action === 'serve' || action === 'dev' || action === 'dev-server') {
     return require('./webpack/server')(...args)
+  } else if (action === 'test:server' || action === 'test') {
+    return require('./webpack/test')(...args)
   }
 }

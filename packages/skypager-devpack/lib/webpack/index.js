@@ -190,6 +190,7 @@ module.exports = function () {
     loader: 'babel',
     exclude: [path.join(process.env.PWD, 'dist', 'bundle'), excludeNodeModulesExceptSkypagers],
     query: {
+      cacheDirectory: true,
       presets: [require.resolve('babel-preset-skypager')],
       env: {
         development: {
@@ -201,21 +202,21 @@ module.exports = function () {
 
   config.loader('less-2', {
     test: /.*\.less$/,
-    include: [themesModuleRoot, projectThemePath],
+    include: [themesModuleRoot, join(uiModuleRoot, 'src'), projectThemePath],
     exclude: [excludeNodeModulesExceptSkypagers],
     loader: isDev ? 'style-loader!css-loader!less-loader' : ExtractTextPlugin.extract('style-loader', 'css-loader?sourceMap!less')
 
   }).loader('css', {
     test: /\.css$/,
-    loader: 'style!css!postcss'
+    loader: 'style!css'
   }).loader('css-2', {
     test: /\.mod\.css$/,
-    loader: 'style!css?modules!postcss'
+    loader: 'style!css?modules'
   }).loader('less', {
     test: /\.less$/,
-    include: [join(directory, 'src'), join(uiModuleRoot, 'src')],
+    include: [join(directory, 'src')],
     exclude: [excludeNodeModulesExceptSkypagers, themesModuleRoot, projectThemePath],
-    loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less' : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')
+    loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!less' : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!less')
 
   }).loader('url-1', { test: /\.woff(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[name].[ext]&limit=10000&mimetype=application/font-woff' }).loader('url-2', { test: /\.woff2(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[name].[ext]&limit=10000&mimetype=application/font-woff2' }).loader('url-3', { test: /\.ttf(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[name].[ext]&limit=10000&mimetype=application/octet-stream' }).loader('file', { test: /\.eot(\?.*)?$/, loader: 'file?prefix=' + fontsPrefix + '/&name=[name].[ext]' }).loader('url-4', { test: /\.svg(\?.*)?$/, loader: 'url?prefix=' + fontsPrefix + '/&name=[name].[ext]&limit=10000&mimetype=image/svg+xml' }).loader('url-5', { test: /\.(png|jpg)$/, loader: 'url?limit=8192' }).loader('ejs', { test: /\.ejs/, loader: 'ejs' });
 

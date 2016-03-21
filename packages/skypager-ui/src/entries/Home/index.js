@@ -6,7 +6,6 @@ import get from 'lodash/get'
 import stateful from 'ui/util/stateful'
 
 import Block from 'components/Block'
-import CodeHighlighter from 'components/CodeHighlighter'
 import FeatureList from 'components/FeatureList'
 import SkypagerLogo from 'components/SkypagerLogo'
 
@@ -52,13 +51,13 @@ skypager serve
 
 const code = `
 import WebApp from 'skypager-ui/shells/WebApp'
-import bundle from 'skypager-ui/bundle/loader'
+import BundleLoader from 'skypager-ui/bundle/loader'
 
 /**
 * The WebApp shell generates a React.Router application consisting
 * of whatever screens are in your project. Redux is automatically configured
 * to manage your application state.
 */
-WebApp.create({ bundle })
+WebApp.create({ project: BundleLoader })
 `.trim()
 

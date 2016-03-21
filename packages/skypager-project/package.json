@@ -68,7 +68,6 @@
     "mdast-yaml": "^1.0.0",
     "minimatch": "^3.0.0",
     "mkdirp": "^0.5.1",
-    "node-emoji": "^1.0.4",
     "path-exists": "^2.1.0",
     "path-match": "^1.2.3",
     "path-to-regexp": "^1.2.1",

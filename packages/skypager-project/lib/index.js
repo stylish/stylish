@@ -89,6 +89,6 @@ var Skypager = (function (_Framework) {
 
 // this tries to ensure that only one instance of skypager lj
 
-var framework = new Skypager(__dirname);
+var framework = new Skypager(__dirname, 'skypager');
 
 module.exports = framework;

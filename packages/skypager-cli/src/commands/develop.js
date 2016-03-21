@@ -12,6 +12,7 @@ import uniq from 'lodash/uniq'
 export function develop (program, dispatch) {
   program
     .command('dev [preset]')
+    .alias('test:server')
     .allowUnknownOption(true)
     .description('run server for this project')
     .option('--host <hostname>', 'which hostname should this server listen on?', 'localhost')
@@ -110,7 +111,11 @@ export function launchServer (preset, options = {}, context = {}) {
     }
   }
 
-  devpack.webpack('develop', options, {beforeCompile, onCompile})
+  devpack.webpack('develop', options, {
+    project,
+    beforeCompile: beforeCompile.bind(project),
+    onCompile: onCompile.bind(project)
+  })
 }
 
 function yaml(obj) {

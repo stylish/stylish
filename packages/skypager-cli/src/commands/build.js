@@ -7,6 +7,7 @@ import uniq from 'lodash/uniq'
 export function build (program, dispatch) {
   program
     .command('build [preset]')
+    .alias('test')
     .allowUnknownOption(true)
     .description('build a website for this project using our preconfigured webpack bundle')
     .option('--output-folder <path>', 'relative path to the output folder', 'public')
@@ -92,7 +93,11 @@ export function handle(preset, options = {}, context = {}) {
     'skypager-devpack'
   )
 
-  devpack.webpack('build', options, {beforeCompile, onCompile})
+  devpack.webpack('build', options, {
+    project,
+    beforeCompile: beforeCompile.bind(project),
+    onCompile: onCompile.bind(project)
+  })
 }
 
 function isDevpackInstalled () {

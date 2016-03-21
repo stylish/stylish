@@ -65,17 +65,20 @@ var ProjectCache = {
 };
 
 var Framework = (function () {
-  function Framework(root, initializer) {
+  function Framework(root, key, initializer) {
     (0, _classCallCheck3.default)(this, Framework);
 
     this.type = 'framework';
     this.root = __dirname;
+    this.key = key;
 
     util.hide.getter(this, 'manifest', require('../package.json'));
 
     var plugins = [];
 
     this.registries = _registry2.default.buildAll(this, Helpers, { root: root });
+
+    this.transforms = [];
 
     util.hide.getter(this, 'enabledPlugins', function () {
       return plugins;
@@ -169,6 +172,10 @@ var Framework = (function () {
       });
 
       var project = new this.Project(projectFile, options);
+
+      this.transforms.forEach(function (transform) {
+        transform(project);
+      });
 
       return ProjectCache.projects[projectFile] = project;
     }
