@@ -1,4 +1,10 @@
+import emoji from 'node-emoji'
+import defaults from 'lodash/defaults'
+import invoke from 'lodash/invoke'
+
 import { loadSkypagerFramework } from '../util'
+
+require('colors')
 
 export function repl (program, dispatch) {
   program
@@ -11,13 +17,31 @@ export function repl (program, dispatch) {
 export default repl
 
 export function handle (options = {}, context = {}) {
-  var prompt = `${ context.prompt || process.env.SKYPAGER_CLI_BRAND || 'skypager' }`.magenta
+  let { project } = context
 
-  var replServer = require('repl').start({
-    prompt: `${ prompt }: `
+  options = defaults(options, {
+    color: process.env.SKYPAGER_CLI_BRAND_COLOR,
+    icon: process.env.SKYPAGER_CLI_BRAND_ICON,
+    brand: process.env.SKYPAGER_CLI_BRAND || process.env.SKYPAGER_CLI_BRAND_NAME
+  }, {
+    color: (project && project.get('options.brand.color')) || 'cyan',
+    icon: (project && project.get('options.brand.icon')) || 'rocket',
+    brand: (project && project.get('options.brand.name')) || 'skypager',
   })
 
-  replServer.context['skypager'] = loadSkypagerFramework()
+  let { icon, brand, color } = options
+
+  if (options.icon) {
+    icon = emoji.get(icon) || 'rocket'
+  }
+
+  let prompt = (brand || 'skypager')[color] || (brand || 'skypager').cyan
+
+  var replServer = require('repl').start({
+    prompt: `${ icon } ${ prompt }: `
+  })
+
+  replServer.context['framework'] = replServer.context['skypager'] = loadSkypagerFramework()
 
   Object.keys(context).forEach(key => {
     replServer.context[key] = context[key]

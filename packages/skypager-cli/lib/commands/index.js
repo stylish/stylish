@@ -146,6 +146,11 @@ function configure(commander) {
 
   var mode = options.mode || 'full';
 
+  /**
+   * The dispatcher wraps an action handler from the commander framework
+   * and ensures that the arguments passed to it are given the appropriate
+   * context based on the project directory we are in
+  */
   var dispatch = function dispatch(handlerFn) {
     return function () {
       for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {

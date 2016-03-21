@@ -83,6 +83,11 @@ export const MODES = {
 export function configure (commander, options = {}) {
   let mode = options.mode || 'full'
 
+  /**
+   * The dispatcher wraps an action handler from the commander framework
+   * and ensures that the arguments passed to it are given the appropriate
+   * context based on the project directory we are in
+  */
   const dispatch = (handlerFn) => {
     return (...args) => {
       args.push(context)
