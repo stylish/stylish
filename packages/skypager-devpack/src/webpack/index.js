@@ -206,6 +206,7 @@ module.exports = function (externalOptions = {}) {
         excludeNodeModulesExceptSkypagers
       ],
       query: {
+        cacheDirectory: true,
         presets: [require.resolve('babel-preset-skypager')],
         env: {
           development: {
@@ -220,6 +221,7 @@ module.exports = function (externalOptions = {}) {
       test: /.*\.less$/,
       include:[
         themesModuleRoot,
+        join(uiModuleRoot, 'src'),
         projectThemePath
       ],
       exclude:[
@@ -232,27 +234,26 @@ module.exports = function (externalOptions = {}) {
 
     .loader('css', {
       test: /\.css$/,
-      loader: 'style!css!postcss'
+      loader: 'style!css'
     })
 
     .loader('css-2', {
       test: /\.mod\.css$/,
-      loader: 'style!css?modules!postcss'
+      loader: 'style!css?modules'
     })
 
     .loader('less', {
       test: /\.less$/,
       include:[
-        join(directory, 'src'),
-        join(uiModuleRoot, 'src')
+        join(directory, 'src')
       ],
       exclude:[
         excludeNodeModulesExceptSkypagers,
         themesModuleRoot,
         projectThemePath
       ],
-      loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!postcss!less'
-                     : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!postcss-loader!less')
+      loader: isDev ? 'style!css?modules&localIdentName=[path]-[local]-[hash:base64:5]!less'
+                     : ExtractTextPlugin.extract('style-loader', 'css-loader?modules&sourceMap!less')
 
     })
 
