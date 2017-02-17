@@ -6,7 +6,8 @@ node_js:
 before_install:
   - if [[ `npm -v` != 3*  ]]; then npm i -g npm@3; fi
 
-before_script:
+install:
+  - npm install
   - npm install -g skypager-cli
-
-script: npm run test
+script:
+  - npm run test
